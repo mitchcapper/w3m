@@ -482,8 +482,6 @@ select_menu(Menu *menu, int mselect)
     standout();
     draw_menu_item(menu, menu->select);
     standend();
-    /* 
-     * move(menu->cursorY, menu->cursorX); */
     move(menu->y + mselect - menu->offset, menu->x);
     toggle_stand();
     refresh();
@@ -1213,8 +1211,6 @@ mMouse(char c)
     if (y < 0)
 	y += 0x100;
 
-    /* 
-     * if (x < 0 || x >= COLS || y < 0 || y > LASTLINE) return; */
     return process_mMouse(btn, x, y);
 }
 
