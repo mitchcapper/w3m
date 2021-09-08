@@ -8369,7 +8369,6 @@ doFileSave(URLFile uf, char *defstr)
     char *p, *q;
     pid_t pid;
     char *lock;
-    char *tmpf = NULL; 
 #if !(defined(HAVE_SYMLINK) && defined(HAVE_LSTAT))
     FILE *f;
 #endif
@@ -8405,11 +8404,8 @@ doFileSave(URLFile uf, char *defstr)
 	pid = fork();
 	if (!pid) {
 	    int err;
-	    if ((uf.content_encoding != CMP_NOCOMPRESS) && AutoUncompress) {
-		uncompress_stream(&uf, &tmpf);
-		if (tmpf)
-		    unlink(tmpf);
-	    }
+	    if ((uf.content_encoding != CMP_NOCOMPRESS) && AutoUncompress)
+		uncompress_stream(&uf, NULL);
 	    setup_child(FALSE, 0, UFfileno(&uf));
 	    err = save2tmp(uf, p);
 	    if (err == 0 && PreserveTimestamp && uf.modtime != -1)
@@ -8445,11 +8441,8 @@ doFileSave(URLFile uf, char *defstr)
 	    printf("Can't save. Load file and %s are identical.", p);
 	    return -1;
 	}
-	if (uf.content_encoding != CMP_NOCOMPRESS && AutoUncompress) {
-	    uncompress_stream(&uf, &tmpf);
-	    if (tmpf)
-		unlink(tmpf);
-	}
+	if (uf.content_encoding != CMP_NOCOMPRESS && AutoUncompress)
+	    uncompress_stream(&uf, NULL);
 	if (save2tmp(uf, p) < 0) {
 	    /* FIXME: gettextize? */
 	    printf("Can't save to %s\n", p);
