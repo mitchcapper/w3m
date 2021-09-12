@@ -4,13 +4,18 @@ sources:
 packages:
   - boehm-gc
   - gettext-tools
+  - quilt
 triggers:
   - action: email
     condition: failure
     to: mail@rkta.de
 environment:
-  OPTS: '-Werror -flto -Wno-invalid-source-encoding'
+  OPTS: '-Werror -flto -Wno-invalid-source-encoding -Wno-error=unknown-warning-option'
 tasks:
+  - patches: |
+      cd w3m
+      printf "%s\n" '/BORKED/,$d' wq | ed -s patches/series
+      quilt push -a
   - default: |
       cd w3m
       make distclean || :

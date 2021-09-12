@@ -2,8 +2,10 @@ image: archlinux
 sources:
   - https://git.sr.ht/~rkta/w3m
 packages:
-  - imlib2
+  - ed
   - gdk-pixbuf-xlib
+  - imlib2
+  - quilt
   - tcc
 triggers:
   - action: email
@@ -12,6 +14,10 @@ triggers:
 environment:
   OPTS: '-Werror -flto'
 tasks:
+  - patches: |
+      cd w3m
+      printf "%s\n" '/BORKED/,$d' wq | ed -s patches/series
+      quilt push -a
   - default: |
       cd w3m
       make distclean || :
@@ -140,6 +146,12 @@ tasks:
         --with-ssl \
         --with-termlib \
         --with-x
+      printf "%s\n" "/FORTIFY_SOURCE/d" "w" "q" | ed -s w3mimg/x11/Makefile
+      printf "%s\n" "/FORTIFY_SOURCE/d" "w" "q" | ed -s w3mimg/win/Makefile
+      printf "%s\n" "/FORTIFY_SOURCE/d" "w" "q" | ed -s w3mimg/fb/Makefile
+      printf "%s\n" "/FORTIFY_SOURCE/d" "w" "q" | ed -s w3mimg/Makefile
+      printf "%s\n" "/FORTIFY_SOURCE/d" "w" "q" | ed -s libwc/Makefile
+      printf "%s\n" "/FORTIFY_SOURCE/d" "w" "q" | ed -s Makefile
       make -j4
       test -x w3m
       cd tests

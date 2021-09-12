@@ -2,6 +2,7 @@ image: alpine/edge
 sources:
   - https://git.sr.ht/~rkta/w3m
 packages:
+  - ed
   - gc-dev
   - gpm-dev
   - imlib2-dev
@@ -10,6 +11,7 @@ packages:
   - linux-headers
   - ncurses-dev
   - perl
+  - quilt
   - tcc
   - tcc-libs-static
 triggers:
@@ -19,6 +21,10 @@ triggers:
 environment:
   OPTS: '-Werror -flto'
 tasks:
+  - patches: |
+      cd w3m
+      printf "%s\n" '/BORKED/,$d' wq | ed -s patches/series
+      quilt push -a
   - default: |
       cd w3m
       make distclean || :
