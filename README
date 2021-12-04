@@ -1,17 +1,9 @@
-w3m: WWW wo Miru Tool
-=====================
+PATCHES BRANCH
 
-w3m is a pager with WWW capability.  It IS a pager, but it can be used
-as a text-mode WWW browser.
+This branch contains the most recent patches with bug fixes, code clean up and
+new features.
 
-This package <https://sr.ht/~rkta/w3m> is forked from the Debian version
-<https://github.com/tats/w3m>, which was forked from the original version
-<https://sourceforge.net/projects/w3m/>.
+Development on my side happens using quilt. This branch contains a copy
+of the patches directory and a modified build pipeline.
 
-If you can read English, see doc/*.
-If you can read Japanese, see doc-jp/*.
-If you can read both, read both and correct English. :-)
-
-Need Support?? Join: https://web.libera.chat/#w3m
-Send questions, bug reports and patches to: ~rkta/w3m@lists.sr.ht
-Follow us on Email: ~rkta/w3m-announce+subscribe@lists.sr.ht ;-)
+I try to avoid doing force pushes but they might happen.
