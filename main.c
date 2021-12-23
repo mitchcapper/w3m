@@ -3166,15 +3166,6 @@ DEFUN(followA, GOTO_LINK, "Follow current hyperlink in a new buffer")
     displayBuffer(Currentbuf, B_NORMAL);
 }
 
-/* follow HREF link in the buffer */
-void
-bufferA(void)
-{
-    on_target = FALSE;
-    followA();
-    on_target = TRUE;
-}
-
 /* view inline image */
 DEFUN(followI, VIEW_IMAGE, "Display image in viewer")
 {
@@ -3420,13 +3411,6 @@ query_from_followform(Str *query, FormItemList *fi, int multipart)
 DEFUN(submitForm, SUBMIT, "Submit form")
 {
     _followForm(TRUE);
-}
-
-/* process form */
-void
-followForm(void)
-{
-    _followForm(FALSE);
 }
 
 static void

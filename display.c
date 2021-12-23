@@ -1463,14 +1463,6 @@ cursorLeft(Buffer *buf, int n)
     buf->cursorX = buf->visualpos - l->bwidth;
 }
 
-void
-cursorHome(Buffer *buf)
-{
-    buf->visualpos = 0;
-    buf->cursorX = buf->cursorY = 0;
-}
-
-
 /* 
  * Arrange line,column and cursor position according to current line and
  * current position.
