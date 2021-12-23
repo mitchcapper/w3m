@@ -80,7 +80,8 @@ static void ins_char(Str str);
 #endif
 
 char *
-inputLineHistSearch(char *prompt, char *def_str, int flag, Hist *hist,
+inputLineHistSearch(const char *prompt, const char *def_str,
+		    int flag, Hist *hist,
 		    int (*incrfunc) (int ch, Str str, Lineprop *prop))
 {
     int opos, x, y, lpos, rpos, epos;
@@ -378,7 +379,7 @@ addStr(char *p, Lineprop *pr, int len, int offset, int limit)
 static void
 ins_char(Str str)
 {
-    char *p = str->ptr, *ep = p + str->length;
+    const char *p = str->ptr, *ep = p + str->length;
     Lineprop ctype;
     int len;
 
@@ -580,7 +581,7 @@ _enter(void)
 }
 
 static void
-insertself(char c)
+insertself(const char c)
 {
     if (CLen >= STR_LEN)
 	return;
@@ -1094,7 +1095,7 @@ setStrType(Str str, Lineprop *prop)
 }
 
 static int
-terminated(unsigned char c)
+terminated(const unsigned char c)
 {
     int termchar[] = { '/', '&', '?', ' ', -1 };
     int *tp;

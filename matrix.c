@@ -119,7 +119,7 @@ LUfactor(Matrix A, int *indexarray)
  */
 
 int
-LUsolve(Matrix A, int *indexarray, Vector b, Vector x)
+LUsolve(Matrix A, const int *indexarray, Vector b, Vector x)
 {
     int i, dim = A->dim;
 

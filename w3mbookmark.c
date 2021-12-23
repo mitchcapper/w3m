@@ -18,7 +18,7 @@
 #define DEFAULT_SECTION "Miscellaneous"
 #endif
 
-static char *bkmark_src1 =
+static const char *bkmark_src1 =
     "<html>\n\
 <head>\n\
 <title>" BKMARK_TITLE "</title>\n\
@@ -31,7 +31,7 @@ static char *bkmark_src1 =
 <input type=hidden name=cookie value=\"%s\">\n\
 <table cellpadding=0>\n";
 
-static char *bkmark_src2 =
+static const char *bkmark_src2 =
     "<tr><td>New&nbsp;Section:<td><input type=text name=newsection size=60>\n\
 <tr><td>URL:<td><input type=text name=url value=\"%s\" size=60>\n\
 <tr><td>Title:<td><input type=text name=title value=\"%s\" size=60>\n\
@@ -46,13 +46,14 @@ static char *bkmark_src2 =
 #undef TRUE
 #define TRUE 1
 
-static char end_section[] =
+static const char end_section[] =
     "<!--End of section (do not delete this comment)-->\n";
 
 static char *Local_cookie = NULL;
 
 static void
-print_bookmark_panel(char *bmark, char *url, char *title, char *charset)
+print_bookmark_panel(char *bmark, char *url, char *title,
+		     const char *charset)
 {
     Str tmp, tmp2;
     FILE *f;
@@ -86,8 +87,8 @@ print_bookmark_panel(char *bmark, char *url, char *title, char *charset)
 
 /* create new bookmark */
 static int
-create_new_bookmark(char *bmark, char *section, char *title, char *url,
-		    char *mode)
+create_new_bookmark(const char *bmark, const char *section, const char *title,
+		    const char *url, const char *mode)
 {
     FILE *f;
     f = fopen(bmark, mode);
@@ -110,7 +111,8 @@ create_new_bookmark(char *bmark, char *section, char *title, char *url,
 static int
 insert_bookmark(char *bmark, struct parsed_tagarg *data)
 {
-    char *url, *title, *section;
+    char *url;
+    char *section, *title;
     FILE *f;
     TextList *tl = newTextList();
     int section_found = 0;

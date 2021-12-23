@@ -15,7 +15,7 @@ extern int do_getch(void);
 #include <sys/kbdscan.h>
 #include <strings.h>
 #endif
-char *NullLine = "";
+const char *NullLine = "";
 Lineprop NullProp[] = { 0 };
 
 /* 
@@ -306,7 +306,7 @@ gotoRealLine(Buffer *buf, int n)
 
 
 static Buffer *
-listBuffer(Buffer *top, Buffer *current)
+listBuffer(Buffer *top, const Buffer *current)
 {
     int i, c = 0;
     Buffer *buf = top;
@@ -592,7 +592,7 @@ copyBuffer(Buffer *a, Buffer *b)
 }
 
 Buffer *
-prevBuffer(Buffer *first, Buffer *buf)
+prevBuffer(Buffer *first, const Buffer *buf)
 {
     Buffer *b;
 

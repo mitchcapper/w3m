@@ -1252,7 +1252,7 @@ parseURL2(char *url, ParsedURL *pu, ParsedURL *current)
 }
 
 static Str
-_parsedURL2Str(ParsedURL *pu, int pass, int user, int label)
+_parsedURL2Str(const ParsedURL *pu, int pass, int user, int label)
 {
     Str tmp;
     /* See SCM_* defines in html.h for correct order of entries. */
@@ -1347,7 +1347,7 @@ _parsedURL2Str(ParsedURL *pu, int pass, int user, int label)
 }
 
 Str
-parsedURL2Str(ParsedURL *pu)
+parsedURL2Str(const ParsedURL *pu)
 {
     return _parsedURL2Str(pu, FALSE, TRUE, TRUE);
 }
@@ -2050,10 +2050,10 @@ add_index_file(ParsedURL *pu, URLFile *uf)
 }
 
 static char *
-guessContentTypeFromTable(struct table2 *table, char *filename)
+guessContentTypeFromTable(struct table2 *table, const char *filename)
 {
     struct table2 *t;
-    char *p;
+    const char *p;
     if (table == NULL)
 	return NULL;
     p = &filename[strlen(filename) - 1];
@@ -2074,7 +2074,7 @@ guessContentTypeFromTable(struct table2 *table, char *filename)
 }
 
 char *
-guessContentType(char *filename)
+guessContentType(const char *filename)
 {
     char *ret;
     int i;

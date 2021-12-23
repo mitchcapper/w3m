@@ -117,9 +117,10 @@ currentdir(void)
 }
 
 char *
-cleanupName(char *name)
+cleanupName(const char *name)
 {
-    char *buf, *p, *q;
+    char *buf, *p;
+    const char *q;
 
     buf = allocStr(name, -1);
     p = buf;
@@ -315,7 +316,7 @@ remove_space(char *str)
 }
 
 int
-non_null(char *s)
+non_null(const char *s)
 {
     if (s == NULL)
 	return FALSE;
@@ -479,7 +480,7 @@ html_unquote(char *str)
     return str;
 }
 
-static char xdigit[0x10] = "0123456789ABCDEF";
+static const char xdigit[0x10] = "0123456789ABCDEF";
 
 #define url_unquote_char(pstr) \
   ((IS_XDIGIT((*(pstr))[1]) && IS_XDIGIT((*(pstr))[2])) ? \
@@ -490,7 +491,7 @@ char *
 url_quote(char *str)
 {
     Str tmp = NULL;
-    char *p;
+    const char *p;
 
     for (p = str; *p; p++) {
 	if (is_url_quote(*p)) {
@@ -628,11 +629,11 @@ Str_url_unquote(Str x, int is_form, int safe)
     return x;
 }
 
-char *
-shell_quote(char *str)
+const char *
+shell_quote(const char *str)
 {
     Str tmp = NULL;
-    char *p;
+    const char *p;
 
     for (p = str; *p; p++) {
 	if (is_shell_unsafe(*p)) {
@@ -756,8 +757,8 @@ growbuf_append(struct growbuf *gb, const unsigned char *src, int len)
     gb->length += len;
 }
 
-static char *
-w3m_dir(const char *name, char *dft)
+static const char *
+w3m_dir(const char *name, const char *dft)
 {
 #ifdef USE_PATH_ENVVAR
     char *value = getenv(name);
@@ -767,32 +768,32 @@ w3m_dir(const char *name, char *dft)
 #endif
 }
 
-char *
+const char *
 w3m_auxbin_dir(void)
 {
     return w3m_dir("W3M_AUXBIN_DIR", AUXBIN_DIR);
 }
 
-char *
+const char *
 w3m_lib_dir(void)
 {
     /* FIXME: use W3M_CGIBIN_DIR? */
     return w3m_dir("W3M_LIB_DIR", CGIBIN_DIR);
 }
 
-char *
+const char *
 w3m_etc_dir(void)
 {
     return w3m_dir("W3M_ETC_DIR", ETC_DIR);
 }
 
-char *
+const char *
 w3m_conf_dir(void)
 {
     return w3m_dir("W3M_CONF_DIR", CONF_DIR);
 }
 
-char *
+const char *
 w3m_help_dir(void)
 {
     return w3m_dir("W3M_HELP_DIR", HELP_DIR);

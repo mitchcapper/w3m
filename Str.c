@@ -470,12 +470,12 @@ Stralign_center(Str s, int width)
 #define SP_PREC2  2
 
 Str
-Sprintf(char *fmt, ...)
+Sprintf(const char *fmt, ...)
 {
     int len = 0;
     int status = SP_NORMAL;
     int p = 0;
-    char *f;
+    const char *f;
     Str s;
     va_list ap;
 

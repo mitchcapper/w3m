@@ -154,7 +154,7 @@ copyHist(Hist *hist)
 }
 
 HistItem *
-unshiftHist(Hist *hist, char *ptr)
+unshiftHist(Hist *hist, const char *ptr)
 {
     HistItem *item;
 
@@ -173,7 +173,7 @@ unshiftHist(Hist *hist, char *ptr)
 }
 
 HistItem *
-pushHist(Hist *hist, char *ptr)
+pushHist(Hist *hist, const char *ptr)
 {
     HistItem *item;
 
@@ -194,7 +194,7 @@ pushHist(Hist *hist, char *ptr)
 /* Don't mix pushHashHist() and pushHist()/unshiftHist(). */
 
 HistItem *
-pushHashHist(Hist *hist, char *ptr)
+pushHashHist(Hist *hist, const char *ptr)
 {
     HistItem *item;
 
@@ -219,7 +219,7 @@ pushHashHist(Hist *hist, char *ptr)
 }
 
 HistItem *
-getHashHist(Hist *hist, char *ptr)
+getHashHist(Hist *hist, const char *ptr)
 {
     HistItem *item;
 

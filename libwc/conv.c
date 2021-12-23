@@ -44,9 +44,9 @@ static Str
 wc_conv_to_ces(Str is, wc_ces ces)
 {
     Str os;
-    wc_uchar *sp = (wc_uchar *)is->ptr;
-    wc_uchar *ep = sp + is->length;
-    wc_uchar *p;
+    const wc_uchar *sp = (const wc_uchar *)is->ptr;
+    const wc_uchar *ep = sp + is->length;
+    const wc_uchar *p;
     wc_status st;
 
     switch (ces) {

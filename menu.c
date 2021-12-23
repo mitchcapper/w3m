@@ -941,15 +941,15 @@ mSusp(char c)
     return (MENU_NOTHING);
 }
 
-static char *SearchString = NULL;
+static const char *SearchString = NULL;
 
-int (*menuSearchRoutine) (Menu *, char *, int);
+int (*menuSearchRoutine) (Menu *, const char *, int);
 
 static int
-menuForwardSearch(Menu *menu, char *str, int from)
+menuForwardSearch(Menu *menu, const char *str, int from)
 {
     int i;
-    char *p;
+    const char *p;
     if ((p = regexCompile(str, IgnoreCase)) != NULL) {
 	message(p, 0, 0);
 	return -1;
@@ -966,7 +966,7 @@ menuForwardSearch(Menu *menu, char *str, int from)
 static int
 menu_search_forward(Menu *menu, int from)
 {
-    char *str;
+    const char *str;
     int found;
     str = inputStrHist("Forward: ", NULL, TextHist);
     if (str != NULL && *str == '\0')
@@ -996,10 +996,10 @@ mSrchF(char c)
 }
 
 static int
-menuBackwardSearch(Menu *menu, char *str, int from)
+menuBackwardSearch(Menu *menu, const char *str, int from)
 {
     int i;
-    char *p;
+    const char *p;
     if ((p = regexCompile(str, IgnoreCase)) != NULL) {
 	message(p, 0, 0);
 	return -1;
@@ -1016,7 +1016,7 @@ menuBackwardSearch(Menu *menu, char *str, int from)
 static int
 menu_search_backward(Menu *menu, int from)
 {
-    char *str;
+    const char *str;
     int found;
     str = inputStrHist("Backward: ", NULL, TextHist);
     if (str != NULL && *str == '\0')
@@ -1049,9 +1049,9 @@ static int
 menu_search_next_previous(Menu *menu, int from, int reverse)
 {
     int found;
-    static int (*routine[2]) (Menu *, char *, int) = {
+    static int (*routine[2]) (Menu *, const char *, int) = {
     menuForwardSearch, menuBackwardSearch};
-    char *str;
+    const char *str;
 
     if (menuSearchRoutine == NULL) {
 	disp_message("No previous regular expression", TRUE);
@@ -1618,7 +1618,7 @@ initSelTabMenu(void)
     Str str;
     char **label;
     char *p;
-    static char *comment = " SPC for select / D for delete tab ";
+    static char *comment = "char  SPC for select / D for delete tab ";
 
     SelTabV = -1;
     for (i = 0, tab = LastTab; tab != NULL; i++, tab = tab->prevTab) {

@@ -80,10 +80,10 @@ static void SigPipe(SIGNAL_ARG);
 #endif
 
 #ifdef USE_MARK
-static char *MarkString = NULL;
+static const char *MarkString = NULL;
 #endif
-static char *SearchString = NULL;
-int (*searchRoutine) (Buffer *, char *);
+static const char *SearchString = NULL;
+int (*searchRoutine) (Buffer *, const char *);
 
 #ifndef __MINGW32_VERSION
 JMP_BUF IntReturn;
@@ -112,7 +112,7 @@ void set_buffer_environ(Buffer *);
 static void save_buffer_position(Buffer *buf);
 
 static void _followForm(int);
-static void _goLine(char *);
+static void _goLine(const char *);
 static void _newT(void);
 static void followTab(TabBuffer * tab);
 static void moveTab(TabBuffer * t, TabBuffer * t2, int right);
@@ -1757,7 +1757,7 @@ clear_mark(Line *l)
 
 /* search by regular expression */
 static int
-srchcore(char *volatile str, int (*func) (Buffer *, char *))
+srchcore(const char *str, int (*func) (Buffer *, const char *))
 {
     void (*prevtrap) (SIGNAL_ARG);
     volatile int i, result = SR_NOTFOUND;
@@ -1783,7 +1783,7 @@ srchcore(char *volatile str, int (*func) (Buffer *, char *))
 }
 
 static void
-disp_srchresult(int result, char *prompt, char *str)
+disp_srchresult(int result, const char *prompt, const char *str)
 {
     if (str == NULL)
 	str = "";
@@ -1868,7 +1868,7 @@ dispincsrch(int ch, Str buf, Lineprop *prop)
 }
 
 static void
-isrch(int (*func) (Buffer *, char *), char *prompt)
+isrch(int (*func) (Buffer *, const char *), const char *prompt)
 {
     char *str;
     Buffer sbuf;
@@ -1884,9 +1884,9 @@ isrch(int (*func) (Buffer *, char *), char *prompt)
 }
 
 static void
-srch(int (*func) (Buffer *, char *), char *prompt)
+srch(int (*func) (Buffer *, const char *), const char *prompt)
 {
-    char *str;
+    const char *str;
     int result;
     int disp = FALSE;
     int pos;
@@ -1945,7 +1945,7 @@ srch_nxtprv(int reverse)
 {
     int result;
     /* *INDENT-OFF* */
-    static int (*routine[2]) (Buffer *, char *) = {
+    static int (*routine[2]) (Buffer *, const char *) = {
 	forwardSearch, backwardSearch
     };
     /* *INDENT-ON* */
@@ -2372,9 +2372,9 @@ DEFUN(movR1, MOVE_RIGHT1, "Cursor right. With edge touched, slide")
 #define prevChar(s, l)	do { (s)--; } while ((s) > 0 && (l)->propBuf[s] & PC_WCHAR2)
 
 static wc_uint32
-getChar(char *p)
+getChar(const char *p)
 {
-    return wc_any_to_ucs(wtf_parse1((wc_uchar **)&p));
+    return wc_any_to_ucs(wtf_parse1((const wc_uchar **)&p));
 }
 
 static int
@@ -2524,7 +2524,7 @@ DEFUN(movRW, NEXT_WORD, "Move to the next word")
 static void
 _quitfm(int confirm)
 {
-    char *ans = "y";
+    const char *ans = "y";
 
     if (checkDownloadList())
 	/* FIXME: gettextize? */
@@ -2653,7 +2653,7 @@ DEFUN(susp, INTERRUPT SUSPEND, "Suspend w3m to background")
 
 /* Go to specified line */
 static void
-_goLine(char *l)
+_goLine(const char *l)
 {
     if (l == NULL || *l == '\0' || Currentbuf->currentLine == NULL) {
 	displayBuffer(Currentbuf, B_FORCE_REDRAW);
@@ -2876,8 +2876,8 @@ DEFUN(prevMk, PREV_MARK, "Go to the previous mark")
 DEFUN(reMark, REG_MARK, "Mark all occurences of a pattern")
 {
     Line *l;
-    char *str;
-    char *p, *p1, *p2;
+    const char *str;
+    const char *p, *p1, *p2;
 
     if (!use_mark)
 	return;
@@ -4281,7 +4281,7 @@ cmd_loadURL(char *url, ParsedURL *current, char *referer, FormList *request)
 
 /* go to specified URL */
 static void
-goURL0(char *prompt, int relative)
+goURL0(const char *prompt, int relative)
 {
     char *url, *referer;
     ParsedURL p_url, *current;
@@ -5236,10 +5236,10 @@ DEFUN(rFrame, FRAME, "Toggle rendering HTML frames")
 
 /* spawn external browser */
 static void
-invoke_browser(char *url)
+invoke_browser(const char *url)
 {
     Str cmd;
-    char *browser = NULL;
+    const char *browser = NULL;
     int bg = 0, len;
 
     browser = searchKeyData();
@@ -6549,7 +6549,7 @@ DEFUN(tabA, TAB_LINK, "Follow current hyperlink in a new tab")
 }
 
 static void
-tabURL0(TabBuffer * tab, char *prompt, int relative)
+tabURL0(TabBuffer * tab, const char *prompt, int relative)
 {
     Buffer *buf;
 

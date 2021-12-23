@@ -992,7 +992,7 @@ global int image_map_list init(TRUE);
 global int displayImage init(FALSE);	/* XXX: emacs-w3m use display_image=off */
 #endif
 global int pseudoInlines init(TRUE);
-global char *Editor init(DEF_EDITOR);
+global const char *Editor init(DEF_EDITOR);
 #ifdef USE_W3MMAILER
 global char *Mailer init(NULL);
 #else
@@ -1036,11 +1036,11 @@ global int WrapSearch init(FALSE);
 global int squeezeBlankLine init(FALSE);
 global char *BookmarkFile init(NULL);
 global int UseExternalDirBuffer init(TRUE);
-global char *DirBufferCommand init("file:///$LIB/dirlist" CGI_EXTENSION);
+global const char *DirBufferCommand init("file:///$LIB/dirlist" CGI_EXTENSION);
 #ifdef USE_DICT
 global int UseDictCommand init(TRUE);
-global char *DictCommand init("file:///$LIB/w3mdict" CGI_EXTENSION);
-global char *DictPrompt init("(dictionary)!");
+global const char *DictCommand init("file:///$LIB/w3mdict" CGI_EXTENSION);
+global const char *DictPrompt init("(dictionary)!");
 #endif				/* USE_DICT */
 global int ignore_null_img_alt init(TRUE);
 #define DISPLAY_INS_DEL_SIMPLE	0
@@ -1227,10 +1227,10 @@ global int use_lessopen init(FALSE);
 global char *keymap_file init(KEYMAP_FILE);
 
 #ifdef USE_M17N
-#define get_mctype(c) ((Lineprop)wtf_type((wc_uchar *)(c)) << 8)
-#define get_mclen(c) wtf_len1((wc_uchar *)(c))
-#define get_mcwidth(c) wtf_width((wc_uchar *)(c))
-#define get_strwidth(c) wtf_strwidth((wc_uchar *)(c))
+#define get_mctype(c) ((Lineprop)wtf_type((const wc_uchar *)(c)) << 8)
+#define get_mclen(c) wtf_len1((const wc_uchar *)(c))
+#define get_mcwidth(c) wtf_width((const wc_uchar *)(c))
+#define get_strwidth(c) wtf_strwidth((const wc_uchar *)(c))
 #define get_Str_strwidth(c) wtf_strwidth((wc_uchar *)((c)->ptr))
 #else
 #define get_mctype(c) (IS_CNTRL(*(c)) ? PC_CTRL : PC_ASCII)

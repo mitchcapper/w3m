@@ -59,22 +59,22 @@ extern void       wtf_init(wc_ces ces1, wc_ces ces2);
 /* extern int     wtf_width(wc_uchar *p); */
 #define wtf_width(p) (WcOption.use_wide ? (int)WTF_WIDTH_MAP[(wc_uchar)*(p)] \
 		      : ((int)WTF_WIDTH_MAP[(wc_uchar)*(p)] ? 1 : 0))
-extern int        wtf_strwidth(wc_uchar *p);
-extern size_t     wtf_len1(wc_uchar *p);
-extern size_t     wtf_len(wc_uchar *p);
+extern int        wtf_strwidth(const wc_uchar *p);
+extern size_t     wtf_len1(const wc_uchar *p);
+extern size_t     wtf_len(const wc_uchar *p);
 /* extern int     wtf_type(wc_uchar *p); */
 #define wtf_type(p) WTF_TYPE_MAP[(wc_uchar)*(p)]
 
 extern void       wtf_push(Str os, wc_ccs ccs, wc_uint32 code);
 extern void       wtf_push_unknown(Str os, wc_uchar *p, size_t len);
-extern wc_wchar_t wtf_parse(wc_uchar **p);
-extern wc_wchar_t wtf_parse1(wc_uchar **p);
+extern wc_wchar_t wtf_parse(const wc_uchar **p);
+extern wc_wchar_t wtf_parse1(const wc_uchar **p);
 
-extern wc_ccs     wtf_get_ccs(wc_uchar *p);
-extern wc_uint32  wtf_get_code(wc_uchar *p);
+extern wc_ccs     wtf_get_ccs(const wc_uchar *p);
+extern wc_uint32  wtf_get_code(const wc_uchar *p);
 
 extern wc_bool    wtf_is_hangul(wc_uchar *p);
 
-extern char      *wtf_conv_fit(char *s, wc_ces ces);
+extern const char *wtf_conv_fit(const char *s, wc_ces ces);
 
 #endif

@@ -47,7 +47,7 @@ extern char *getescapecmd(char **s);
 extern char *allocStr(const char *s, int len);
 extern int strCmp(const void *s1, const void *s2);
 extern char *currentdir(void);
-extern char *cleanupName(char *name);
+extern char *cleanupName(const char *name);
 extern char *expandPath(char *name);
 #ifndef HAVE_STRCHR
 extern char *strchr(const char *s, int c);
@@ -61,7 +61,7 @@ extern char *strcasestr(const char *s1, const char *s2);
 #endif
 int strmatchlen(const char *s1, const char *s2, int maxlen);
 extern char *remove_space(char *str);
-extern int non_null(char *s);
+extern int non_null(const char *s);
 extern void cleanup_line(Str s, int mode);
 extern char *html_quote(char *str);
 extern char *html_unquote(char *str);
@@ -71,7 +71,7 @@ extern char *url_quote(char *str);
 extern Str Str_url_unquote(Str x, int is_form, int safe);
 extern Str Str_form_quote(Str x);
 #define Str_form_unquote(x) Str_url_unquote((x), TRUE, FALSE)
-extern char *shell_quote(char *str);
+extern const char *shell_quote(const char *str);
 #define xmalloc(s) xrealloc(NULL, s)
 extern void *xrealloc(void *ptr, size_t size);
 extern void xfree(void *ptr);
@@ -85,11 +85,11 @@ extern void growbuf_reserve(struct growbuf *gb, int leastarea);
 extern void growbuf_append(struct growbuf *gb, const unsigned char *src, int len);
 #define GROWBUF_ADD_CHAR(gb,ch) ((((gb)->length>=(gb)->area_size)?growbuf_reserve(gb,(gb)->length+1):(void)0),(void)((gb)->ptr[(gb)->length++] = (ch)))
 
-extern char *w3m_auxbin_dir(void);
-extern char *w3m_lib_dir(void);
-extern char *w3m_etc_dir(void);
-extern char *w3m_conf_dir(void);
-extern char *w3m_help_dir(void);
+extern const char *w3m_auxbin_dir(void);
+extern const char *w3m_lib_dir(void);
+extern const char *w3m_etc_dir(void);
+extern const char *w3m_conf_dir(void);
+extern const char *w3m_help_dir(void);
 
 #define NewWithoutGC(type)	((type*)xmalloc(sizeof(type)))
 #define NewWithoutGC_N(type,n)	((type*)xmalloc((n)*sizeof(type)))

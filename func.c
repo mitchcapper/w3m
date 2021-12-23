@@ -210,9 +210,9 @@ getKeyData(int key)
 }
 
 static int
-getKey2(char **str)
+getKey2(const char **str)
 {
-    char *s = *str;
+    const char *s = *str;
     int c, esc = 0, ctrl = 0;
 
     if (s == NULL || *s == '\0')
@@ -346,7 +346,7 @@ getKey2(char **str)
 }
 
 int
-getKey(char *s)
+getKey(const char *s)
 {
     int c, c2;
 

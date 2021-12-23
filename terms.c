@@ -535,9 +535,10 @@ put_image_kitty(char *url, int x, int y, int w, int h, int sx, int sy, int sw,
     int sh, int cols, int rows)
 {
     Str buf, base64;
-    char *type, *tmpf;
+    char *tmpf;
     char cbuf[IMG_BUF_SZ];
     char *argv[4];
+    const char *type;
     FILE *fp;
     int n, m, is_anim;
     struct stat st;
@@ -1268,7 +1269,7 @@ initscr(void)
 }
 
 static int
-write1(char c)
+write1(const char c)
 {
     putc(c, ttyf);
 #ifdef SCREEN_DEBUG
@@ -1294,13 +1295,13 @@ move(int line, int column)
 
 static int
 #ifdef USE_M17N
-need_redraw(char *c1, l_prop pr1, char *c2, l_prop pr2)
+need_redraw(const char *c1, l_prop pr1, const char *c2, l_prop pr2)
 {
     if (!c1 || !c2 || strcmp(c1, c2))
 	return 1;
     if (*c1 == ' ')
 #else
-need_redraw(char c1, l_prop pr1, char c2, l_prop pr2)
+need_redraw(const char c1, l_prop pr1, const char c2, l_prop pr2)
 {
     if (c1 != c2)
 	return 1;
@@ -1324,16 +1325,16 @@ need_redraw(char c1, l_prop pr1, char c2, l_prop pr2)
 
 #ifdef USE_M17N
 void
-addch(char c)
+addch(const char c)
 {
     addmch(&c, 1);
 }
 
 void
-addmch(char *pc, size_t len)
+addmch(const char *pc, size_t len)
 #else
 void
-addch(char pc)
+addch(const char pc)
 #endif
 {
     l_prop *pr;
@@ -1342,7 +1343,7 @@ addch(char pc)
     static Str tmp = NULL;
     char **p;
     char c = *pc;
-    int width = wtf_width((wc_uchar *) pc);
+    int width = wtf_width((const wc_uchar *) pc);
 
     if (tmp == NULL)
 	tmp = Strnew();
@@ -2036,13 +2037,13 @@ clrtobotx(void)
 }
 
 void
-addstr(char *s)
+addstr(const char *s)
 {
 #ifdef USE_M17N
     int len;
 
     while (*s != '\0') {
-	len = wtf_len((wc_uchar *) s);
+	len = wtf_len((const wc_uchar *) s);
 	addmch(s, len);
 	s += len;
     }
@@ -2053,17 +2054,17 @@ addstr(char *s)
 }
 
 void
-addnstr(char *s, int n)
+addnstr(const char *s, int n)
 {
     int i;
 #ifdef USE_M17N
     int len, width;
 
     for (i = 0; *s != '\0';) {
-	width = wtf_width((wc_uchar *) s);
+	width = wtf_width((const wc_uchar *) s);
 	if (i + width > n)
 	    break;
-	len = wtf_len((wc_uchar *) s);
+	len = wtf_len((const wc_uchar *) s);
 	addmch(s, len);
 	s += len;
 	i += width;
@@ -2075,17 +2076,17 @@ addnstr(char *s, int n)
 }
 
 void
-addnstr_sup(char *s, int n)
+addnstr_sup(const char *s, int n)
 {
     int i;
 #ifdef USE_M17N
     int len, width;
 
     for (i = 0; *s != '\0';) {
-	width = wtf_width((wc_uchar *) s);
+	width = wtf_width((const wc_uchar *) s);
 	if (i + width > n)
 	    break;
-	len = wtf_len((wc_uchar *) s);
+	len = wtf_len((const wc_uchar *) s);
 	addmch(s, len);
 	s += len;
 	i += width;
@@ -2176,7 +2177,7 @@ term_cbreak(void)
 }
 
 void
-term_title(char *s)
+term_title(const char *s)
 {
     if (!fmInitialized)
         return;

@@ -101,8 +101,8 @@ weight3(int x)
 #endif				/* not MATRIX */
 
 static int
-bsearch_2short(short e1, short *ent1, short e2, short *ent2, int base,
-	       short *indexarray, int nent)
+bsearch_2short(short e1, const short *ent1, short e2, const short *ent2,
+	       int base, const short *indexarray, int nent)
 {
     int n = nent;
     int k = 0;
@@ -128,7 +128,7 @@ bsearch_2short(short e1, short *ent1, short e2, short *ent2, int base,
 }
 
 static int
-bsearch_double(double e, double *ent, short *indexarray, int nent)
+bsearch_double(double e, const double *ent, const short *indexarray, int nent)
 {
     int n = nent;
     int k = 0;
@@ -418,7 +418,7 @@ suspend_or_pushdata(struct table *tbl, char *line)
 
 int visible_length_offset = 0;
 int
-visible_length(char *str)
+visible_length(const char *str)
 {
     int len = 0, n, max_len = 0;
     int status = R_ST_NORMAL;
@@ -848,9 +848,9 @@ table_rule_width(struct table *t)
 }
 
 static void
-check_cell_height(int *tabheight, int *cellheight,
-		 short *row, short *rowspan, short maxcell,
-		 short *indexarray, int space, int dir)
+check_cell_height(int *tabheight, const int *cellheight,
+		 const short *row, const short *rowspan, short maxcell,
+		 const short *indexarray, int space, int dir)
 {
     int i, j, k, brow, erow;
     int sheight, height;
@@ -881,9 +881,9 @@ check_cell_height(int *tabheight, int *cellheight,
 }
 
 static void
-check_cell_width(short *tabwidth, short *cellwidth,
-		 short *col, short *colspan, short maxcell,
-		 short *indexarray, int space, int dir)
+check_cell_width(short *tabwidth, const short *cellwidth,
+		 const short *col, const short *colspan, short maxcell,
+		 const short *indexarray, int space, int dir)
 {
     int i, j, k, bcol, ecol;
     int swidth, width;
@@ -3426,7 +3426,7 @@ correct_table_matrix2(struct table *t, int col, int cspan, double s, double b)
 }
 
 static void
-correct_table_matrix3(struct table *t, int col, char *flags, double s,
+correct_table_matrix3(struct table *t, int col, const char *flags, double s,
 		      double b)
 {
     int i, j;
@@ -3453,7 +3453,7 @@ correct_table_matrix3(struct table *t, int col, char *flags, double s,
 }
 
 static void
-correct_table_matrix4(struct table *t, int col, int cspan, char *flags,
+correct_table_matrix4(struct table *t, int col, int cspan, const char *flags,
 		      double s, double b)
 {
     int i, j;
