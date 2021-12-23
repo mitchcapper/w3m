@@ -577,7 +577,7 @@ openSocket(char *const hostname,
 #ifdef INET6
     /* rfc2732 compliance */
     hname = hostname;
-    if (hname != NULL && hname[0] == '[' && hname[strlen(hname) - 1] == ']') {
+    if (hname[0] == '[' && hname[strlen(hname) - 1] == ']') {
 	hname = allocStr(hostname + 1, -1);
 	hname[strlen(hname) - 1] = '\0';
 	if (strspn(hname, "0123456789abcdefABCDEF:.") != strlen(hname))

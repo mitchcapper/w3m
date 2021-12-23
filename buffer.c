@@ -154,7 +154,7 @@ replaceBuffer(Buffer *first, Buffer *delbuf, Buffer *newbuf)
 	discardBuffer(delbuf);
 	return newbuf;
     }
-    if (delbuf && (buf = prevBuffer(first, delbuf))) {
+    if ((buf = prevBuffer(first, delbuf))) {
 	buf->nextBuffer = newbuf;
 	newbuf->nextBuffer = delbuf->nextBuffer;
 	discardBuffer(delbuf);

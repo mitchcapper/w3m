@@ -3873,7 +3873,7 @@ _prevA(int visited)
 	    }
 	    x = an->start.pos;
 	    y = an->start.line;
-	    if (visited == TRUE && an) {
+	    if (visited == TRUE) {
 		parseURL2(an->url, &url, baseURL(Currentbuf));
 		if (getHashHist(URLHist, parsedURL2Str(&url)->ptr)) {
 		    goto _end;

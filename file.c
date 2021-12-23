@@ -1077,7 +1077,7 @@ extract_auth_val(char **q)
 		}
 	    }
 	}
-	else if (quoted && *qq == '\\')
+	else if (*qq == '\\')
 	    Strcat_char(val, *qq++);
 	Strcat_char(val, *qq++);
     }
@@ -7632,8 +7632,7 @@ loadImageBuffer(URLFile *uf, Buffer *newBuf)
     init_stream(&f, SCM_LOCAL, newStrStream(tmp));
     loadHTMLstream(&f, newBuf, src, TRUE);
     UFclose(&f);
-    if (src)
-	fclose(src);
+    fclose(src);
 
     newBuf->topLine = newBuf->firstLine;
     newBuf->lastLine = newBuf->currentLine;
