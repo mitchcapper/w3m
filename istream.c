@@ -297,7 +297,7 @@ ISread(InputStream stream, Str buf, int count)
 #endif
 
 int
-ISread_n(InputStream stream, char *dst, int count)
+ISread_n(InputStream stream, char *dst, int count) /* TODO(rkta):  */
 {
     int len, l;
     BaseStream base;
