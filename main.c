@@ -102,7 +102,7 @@ void show_params(FILE * fp);
 
 static char *getCurWord(Buffer *buf, int *spos, int *epos);
 
-static int display_ok = FALSE;
+static int display_ok = FALSE; /* TODO(rkta): values never changed */
 static void do_dump(Buffer *);
 int prec_num = 0;
 int prev_key = -1;
