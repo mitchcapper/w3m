@@ -59,10 +59,8 @@ extern void linend(void);
 extern void editBf(void);
 extern void editScr(void);
 extern void followA(void);
-extern void bufferA(void);
 extern void followI(void);
 extern void submitForm(void);
-extern void followForm(void);
 extern void topA(void);
 extern void lastA(void);
 extern void nthA(void);
@@ -606,9 +604,7 @@ extern Buffer *link_list_panel(Buffer *buf);
 extern Str decodeB(char **ww);
 extern void decodeB_to_growbuf(struct growbuf *gb, char **ww);
 extern Str decodeQ(char **ww);
-extern Str decodeQP(char **ww);
 extern void decodeQP_to_growbuf(struct growbuf *gb, char **ww);
-extern Str decodeU(char **ww);
 extern void decodeU_to_growbuf(struct growbuf *gb, char **ww);
 #ifdef USE_M17N
 extern Str decodeWord(char **ow, wc_ces * charset);
@@ -773,7 +769,6 @@ extern int addMenuList(MenuList **list, char *id);
 extern int getMenuN(MenuList *list, char *id);
 
 extern void popupMenu(int x, int y, Menu *menu);
-extern void mainMenu(int x, int y);
 extern void mainMn(void);
 extern void selMn(void);
 extern void tabMn(void);

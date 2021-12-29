@@ -137,7 +137,6 @@ extern Str ssl_get_certificate(SSL * ssl, char *hostname);
 #define IST_UNCLOSE	0x10
 
 #define IStype(stream) ((stream)->base.type)
-#define is_eos(stream) ISeos(stream)
 #define iseos(stream) ((stream)->base.iseos)
 #define str_of(stream) ((stream)->str.handle)
 #ifdef USE_SSL
