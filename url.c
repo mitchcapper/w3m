@@ -1738,8 +1738,13 @@ openURL(char *url, ParsedURL *pu, ParsedURL *current,
 	}
 	if (uf.stream == NULL && retryAsHttp && url[0] != '/') {
 	    if (scheme == SCM_MISSING || scheme == SCM_UNKNOWN) {
+#ifdef USE_SSL
+		/* retry it as "https://" */
+		u = Strnew_m_charp("https://", url, NULL)->ptr;
+#else
 		/* retry it as "http://" */
 		u = Strnew_m_charp("http://", url, NULL)->ptr;
+#endif
 		goto retry;
 	    }
 	}

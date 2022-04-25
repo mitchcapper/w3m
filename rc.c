@@ -191,7 +191,11 @@ static int OptionEncode = FALSE;
 #endif				/* USE_DICT */
 #define CMT_IGNORE_NULL_IMG_ALT	N_("Display link name for images lacking ALT")
 #define CMT_IFILE        N_("Index file for directories")
+#ifdef USE_SSL
+#define CMT_RETRY_HTTP   N_("Prepend https:// to URL automatically")
+#else
 #define CMT_RETRY_HTTP   N_("Prepend http:// to URL automatically")
+#endif				/* USE_SSL */
 #define CMT_DEFAULT_URL  N_("Default value for open-URL command")
 #define CMT_DECODE_CTE   N_("Decode Content-Transfer-Encoding when saving")
 #define CMT_PRESERVE_TIMESTAMP N_("Preserve timestamp when saving")
