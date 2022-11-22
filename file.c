@@ -2660,7 +2660,7 @@ passthrough(struct readbuffer *obuf, char *str, int back)
 	str_bak = str;
 	if (sloppy_parse_line(&str)) {
 	    char *q = str_bak;
-	    cmd = gethtmlcmd(&q);
+	    cmd = gethtmlcmd(q);
 	    if (back) {
 		struct link_stack *p;
 		for (p = link_stack; p; p = p->next) {
