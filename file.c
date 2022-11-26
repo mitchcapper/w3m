@@ -1719,7 +1719,7 @@ loadGeneralFile(char *path, ParsedURL *volatile current, char *referer,
 
   load_doc:
     {
-	const char *sc_redirect;
+	char *sc_redirect;
 	parseURL2(tpath, &pu, current);
 	sc_redirect = query_SCONF_SUBSTITUTE_URL(&pu);
 	if (sc_redirect && *sc_redirect && checkRedirection(&pu)) {
@@ -7594,7 +7594,7 @@ loadImageBuffer(URLFile *uf, Buffer *newBuf)
     URLFile f;
     void (*volatile prevtrap) (SIGNAL_ARG) = NULL;
     struct stat st;
-    const ParsedURL *pu = newBuf ? &newBuf->currentURL : NULL;
+    ParsedURL *pu = newBuf ? &newBuf->currentURL : NULL;
 
     loadImage(newBuf, IMG_FLAG_STOP);
     image.url = uf->url;
