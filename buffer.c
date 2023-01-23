@@ -40,6 +40,10 @@ extern int do_getch(void);
 const char *NullLine = "";
 Lineprop NullProp[] = { 0 };
 
+
+/* TODO(rkta): header file */
+Buffer * loadGeminiBuffer(URLFile *uf, Buffer *volatile buf);
+
 /* 
  * Buffer creation
  */
@@ -499,6 +503,8 @@ reshapeBuffer(Buffer *buf)
 {
     URLFile f;
     Buffer sbuf;
+    /* TODO(rkta): Shouldn't we do this for all schemes? */
+    Str t;
 #ifdef USE_M17N
     wc_uint8 old_auto_detect = WcOption.auto_detect;
 #endif
@@ -507,6 +513,7 @@ reshapeBuffer(Buffer *buf)
     buf->width = INIT_BUFFER_WIDTH;
     if (buf->sourcefile == NULL)
 	return;
+    t = Strnew_charp(buf->type);
     init_stream(&f, SCM_LOCAL, NULL);
     examineFile(buf->mailcap_source ? buf->mailcap_source : buf->sourcefile,
 		&f);
@@ -552,6 +559,8 @@ reshapeBuffer(Buffer *buf)
 #endif
     if (is_html_type(buf->type))
 	loadHTMLBuffer(&f, buf);
+    else if (!strcmp(t->ptr, "text/gemini"))
+	loadGeminiBuffer(&f, buf);
     else
 	loadBuffer(&f, buf);
     UFclose(&f);

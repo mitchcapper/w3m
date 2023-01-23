@@ -31,6 +31,8 @@
 
 #define MAX_INPUT_SIZE 80 /* TODO - max should be screen line length */
 
+Buffer * loadGeminiBuffer(URLFile *uf, Buffer *volatile newBuf);
+
 extern int fold_pre;
 static int frame_source = 0;
 static int need_number = 0;
@@ -248,7 +250,7 @@ loadSomething(URLFile *f,
        )
 	buf->type = "text/html";
     else
-	buf->type = "text/plain";
+	buf->type = buf->type ? buf->type : "text/plain";
     return buf;
 }
 
@@ -2006,6 +2008,166 @@ loadGeneralFile(char *path, ParsedURL *volatile current, char *referer,
     else if (pu.scheme == SCM_DATA) {
 	t = f.guess_type;
     }
+    else if (pu.scheme == SCM_GEMINI) {
+	Str err, hdr, meta;
+	char *m;
+	long status;
+
+	if (fmInitialized) {
+	    term_cbreak();
+	    message(Sprintf("%s contacted. Waiting for reply...", pu.host)->
+		    ptr, 0, 0);
+	    refresh();
+	}
+
+	hdr = StrmyUFgets(&f);
+	if (!hdr || !hdr->length) {
+	    err = Sprintf("Could not read from %s", pu.host);
+	    goto fail;
+	}
+
+	/* Gemini response header: <STATUS><SPACE><META><CR><LF> */
+	status = strtol(hdr->ptr, &m, 10);
+	if (!IS_SPACE(*m)
+		|| hdr->length > 1024 + 2
+		|| hdr->ptr[hdr->length - 2] != '\r'
+		|| hdr->ptr[hdr->length - 1] != '\n') {
+	    Strchop(hdr);
+	    err = Sprintf("Invalid Gemini response header: %s", hdr->ptr);
+	    goto fail;
+	}
+
+	Strchop(hdr);
+	SKIP_BLANKS(m);
+	meta = Strnew_charp(m);
+
+	t_buf = newBuffer(INIT_BUFFER_WIDTH);
+	t_buf->document_header = newTextList();
+
+	charset = WC_CES_UTF_8;
+	switch(status) {
+	case 10: /* INPUT */
+	case 11: /* SENSITIVE INPUT */
+	    /* TODO(rkta): Fix quoting */
+	    term_raw();
+	    p = inputLine(Strnew_m_charp(meta->ptr, ": ", NULL)->ptr, NULL,
+			  status == 11 ? IN_PASSWORD : IN_STRING);
+	    if (!p || !*p)
+		return NULL;
+	    tpath = url_encode(Strnew_m_charp(tpath, "?", p, NULL)->ptr, NULL, 0);
+	    request = NULL;
+	    UFclose(&f);
+	    current = New(ParsedURL);
+	    copyParsedURL(current, &pu);
+	    goto load_doc;
+	case 20: /* SUCCESS */
+	    /*
+	     * Gemini spec section 3.3:
+	     * If <META> is an empty string, the MIME type MUST default to
+	     * "text/gemini; charset=utf-8".
+	     */
+	    if (!*meta->ptr) {
+		t = "text/gemini";
+		pushText(t_buf->document_header, hdr->ptr);
+		break;
+	    }
+
+	    t = m = meta->ptr;
+	    while (*m && !IS_SPACE(*m) && *m != ';') m++;
+	    if (*m)
+		*m++ = '\0';
+	    SKIP_BLANKS(m);
+
+	    while (*m) { /* Not done parsing */
+		if (!strncmp(m, "lang=", 5)) {
+		    /* Ignore this */
+		    while (*m && *m++ != ';');
+		    SKIP_BLANKS(m);
+		}
+		else if (!strncmp(m, "charset=", 8)) {
+		    m += 8;
+		    charset = wc_charset_to_ces(m);
+		    if (!charset) {
+			err = Sprintf("Unknown charset: %s", hdr->ptr);
+			goto fail;
+		    }
+		    while (*m && *m++ != ';');
+		    SKIP_BLANKS(m);
+		}
+		else {
+		    err = Sprintf("Can't parse Gemini response header: %s", hdr->ptr);
+		    goto fail;
+		}
+	    }
+
+	    t_buf->buffername = parsedURL2Str(&pu)->ptr;
+	    t_buf->document_charset = charset;
+	    t_buf->type = t;
+	    pushText(t_buf->document_header, hdr->ptr);
+	    break;
+	case 30: /* REDIRECT - TEMPORARY */
+	case 31: /* REDIRECT - PERMANENT */
+	    p = meta->ptr;
+	    if (*p == '.' || *p == '/' || !strchr(p, ':')) /* relative URI */
+		p = Strnew_m_charp("gemini://", pu.host, "/", meta->ptr,
+				   NULL)->ptr;
+	    tpath = url_encode(p, NULL, 0);
+	    request = NULL;
+	    UFclose(&f);
+	    current = New(ParsedURL);
+	    copyParsedURL(current, &pu);
+	    t_buf = newBuffer(INIT_BUFFER_WIDTH);
+	    t_buf->bufferprop |= BP_REDIRECTED;
+	    status = HTST_NORMAL;
+	    goto load_doc;
+	case 40: /* TEMPORARY FAILURE */
+	    err = Sprintf("TEMPORARY FAILURE: %s", hdr->ptr);
+	    goto fail;
+	case 41: /* SERVER UNAVAILABLE */
+	    err = Sprintf("SERVER UNAVAILABLE: %s", hdr->ptr);
+	    goto fail;
+	case 42: /* CGI ERROR */
+	    err = Sprintf("CGI ERROR: %s", hdr->ptr);
+	    goto fail;
+	case 43: /* PROXY ERROR */
+	    err = Sprintf("PROXY ERROR: %s", hdr->ptr);
+	    goto fail;
+	case 44: /* SLOW DOWN */
+	    err = Sprintf("Status code %d not implemented", status);
+	    goto fail;
+	case 50: /* PERMANENT FAILURE */
+	    err = Sprintf("PERMANENT FAILURE: %s", hdr->ptr);
+	    goto fail;
+	case 51: /* NOT FOUND */
+	    err = Sprintf("NOT FOUND: %s", hdr->ptr);
+	    goto fail;
+	case 52: /* GONE */
+	    err = Sprintf("GONE: %s", hdr->ptr);
+	    goto fail;
+	case 53: /* PROXY REQUEST REFUSED */
+	    err = Sprintf("PROXY REQUEST REFUSED: %s", hdr->ptr);
+	    goto fail;
+	case 59: /* BAD REQUEST */
+	    err = Sprintf("BAD REQUEST: %s", hdr->ptr);
+	    goto fail;
+	case 60: /* CLIENT CERTIFICATE REQUIRED */
+	    err = Sprintf("CLIENT CERTIFICATE REQUIRED: %s", hdr->ptr);
+	    goto fail;
+	case 61: /* CERTIFICATE NOT AUTHORISED */
+	    err = Sprintf("CERTIFICATE NOT AUTHORISED: %s", hdr->ptr);
+	    goto fail;
+	case 62: /* CERTIFICATE NOT VALID */
+	    err = Sprintf("CERTIFICATE NOT VALID: %s", hdr->ptr);
+	    goto fail;
+	default:
+	    err = Sprintf("Unknown status code %d", status);
+fail:
+	    TRAP_OFF;
+	    disp_err_message(err->ptr, FALSE);
+	    UFclose(&f);
+	    return NULL;
+	}
+    }
     else if (searchHeader) {
 	searchHeader = SearchHeader = FALSE;
 	if (t_buf == NULL)
@@ -2184,6 +2346,8 @@ loadGeneralFile(char *path, ParsedURL *volatile current, char *referer,
 
     if (is_html_type(t))
 	proc = loadHTMLBuffer;
+    else if (!strcmp(t, "text/gemini"))
+	proc = loadGeminiBuffer;
     else if (is_plain_text_type(t))
 	proc = loadBuffer;
 #ifdef USE_IMAGE
@@ -2437,7 +2601,6 @@ is_boundary(const unsigned char *ch1, const unsigned char *ch2)
 
     return 1;
 }
-
 
 static void
 set_breakpoint(struct readbuffer *obuf, int tag_length)
@@ -7484,6 +7647,130 @@ loadGopherSearch0(ParsedURL *pu)
     return tmp;
 }
 #endif				/* USE_GOPHER */
+
+Buffer *
+loadGeminiBuffer(URLFile *uf, Buffer *volatile buf)
+{
+    Anchor *a;
+    FILE *src = NULL;
+    wc_ces charset;
+    Str l, line, tmpf;
+    char *spacer, *p, *q;
+    int hseq, len, nlines, pre = 0;
+    size_t linelen = 0, trbyte = 0;
+    Lineprop *propBuf = NULL;
+    void(*volatile prevtrap) (SIGNAL_ARG) = NULL;
+
+    if (SETJMP(AbortLoading) != 0) {
+	goto _end;
+    }
+    TRAP_ON;
+
+    charset = buf->document_charset;
+    hseq = nlines = 0;
+    if (buf->sourcefile == NULL &&
+	(uf->scheme != SCM_LOCAL || buf->mailcap)) {
+	tmpf = tmpfname(TMPF_SRC, NULL);
+	if (!(src = fopen(tmpf->ptr, "w"))) {
+	    TRAP_OFF;
+	    disp_err_message(Sprintf("Cannot open %s, aborting!", tmpf->ptr)->ptr,
+			     FALSE);
+	    return NULL;
+	}
+	buf->sourcefile = tmpf->ptr;
+    }
+
+    while ((line = StrmyISgets(uf->stream)) && line->length) {
+	if (src)
+	    Strfputs(line, src);
+	linelen += line->length;
+	line = convertLine(uf, line, PAGER_MODE, &charset, charset);
+	Strchop(line);
+
+	p = line->ptr;
+	if (!strncmp(p, "```", 3)) {
+	    pre = !pre;
+	    continue;
+	}
+
+	++nlines;
+	showProgress(&linelen, &trbyte);
+
+	if (pre) {
+	    line = checkType(line, &propBuf, NULL);
+	    addnewline(buf, line->ptr, propBuf, NULL,
+		       line->length, FOLD_BUFFER_WIDTH, nlines);
+	    continue;
+	}
+
+	if (!strncmp(p, "=>", 2)) {
+	    p += 2;
+	    SKIP_BLANKS(p);
+	    q = p;
+	    while(*q && !IS_SPACE(*q)) q++;
+	    if (*q)
+		*q++ = '\0';
+	    SKIP_BLANKS(q);
+	    if (!*q)
+		q = p;
+	    buf->href = putAnchor(buf->href,
+				  url_encode(p, baseURL(buf), charset),
+				  NULL, &a, NO_REFERER, q, '\0', nlines, 0);
+	    buf->hmarklist = putHmarker(buf->hmarklist, currentLn(buf),
+					0, hseq);
+	    if (displayLinkNumber)
+		line = Sprintf("[%d]: %s", hseq + 1 - !!zeroBasedLinkNo, q);
+	    else
+		line = Sprintf("%s", q);
+	    line = checkType(line, &propBuf, NULL);
+	    for (int i = 0; i < line->length; i++)
+		propBuf[i] |= PE_ANCHOR;
+	    a->end.line = nlines;
+	    a->end.pos = line->length;
+	    a->hseq = hseq++;
+	    addnewline(buf, line->ptr, propBuf, NULL,
+		       line->length, FOLD_BUFFER_WIDTH, nlines);
+	    continue;
+	}
+
+	len = line->length;
+	spacer = "";
+	if (*p == '>') {
+	    spacer = "    ";
+	    p++;
+	    SKIP_BLANKS(p);
+	}
+	while (len > buf->width) {
+	    q = &p[buf->width - (strlen(spacer) + 1)];
+	    while(!IS_SPACE(*q) && q != p) q--;
+	    if (q == p)
+		break;
+	    *q = '\0';
+	    l = checkType(Strnew_m_charp(spacer, p, NULL), &propBuf, NULL);
+	    addnewline(buf, l->ptr, propBuf, NULL, l->length, -1, nlines);
+	    nlines++;
+	    len -= (l->length - strlen(spacer));
+	    if (line->ptr[0] == '*')
+		spacer = "  ";
+	    p = q + 1;
+	}
+	l = checkType(Strnew_m_charp(spacer, p, NULL), &propBuf, NULL);
+	addnewline(buf, l->ptr, propBuf, NULL, l->length, FOLD_BUFFER_WIDTH,
+		   nlines);
+    }
+  _end:
+    TRAP_OFF;
+    if (src)
+	fclose(src);
+    UFclose(uf);
+    buf->topLine = buf->firstLine;
+    buf->lastLine = buf->currentLine;
+    buf->currentLine = buf->firstLine;
+    buf->trbyte = trbyte + linelen;
+    buf->type = "text/gemini";
+
+    return buf;
+}
 
 /* 
  * loadBuffer: read file and make new buffer

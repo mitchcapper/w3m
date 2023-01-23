@@ -39,6 +39,8 @@ struct rc_search_table {
 static struct rc_search_table *RC_search_table;
 static int RC_table_size;
 
+int ssl_known_hosts = 1;
+
 #define P_INT      0
 #define P_SHORT    1
 #define P_CHARINT  2
@@ -226,6 +228,7 @@ static int OptionEncode = FALSE;
 #define CMT_SSL_CA_PATH N_("Path to directory for PEM encoded certificates of CAs")
 #define CMT_SSL_CA_FILE N_("File consisting of PEM encoded certificates of CAs")
 #define CMT_SSL_CA_DEFAULT N_("Use default locations for PEM encoded certificates of CAs")
+#define CMT_SSL_KNOWN_HOSTS N_("Remember accepted self signed certificates")
 #endif				/* USE_SSL_VERIFY */
 #define CMT_SSL_FORBID_METHOD N_("List of forbidden SSL methods (2: SSLv2, 3: SSLv3, t: TLSv1.0, 5: TLSv1.1, 6: TLSv1.2, 7: TLSv1.3)")
 #ifdef SSL_CTX_set_min_proto_version
@@ -667,6 +670,8 @@ struct param_ptr params7[] = {
      NULL},
     {"ssl_ca_default", P_INT, PI_ONOFF, (void *)&ssl_ca_default,
      CMT_SSL_CA_DEFAULT, NULL},
+    {"ssl_known_hosts", P_INT, PI_ONOFF, (void *)&ssl_known_hosts,
+     CMT_SSL_KNOWN_HOSTS, NULL},
 #endif				/* USE_SSL_VERIFY */
     {NULL, 0, 0, NULL, NULL, NULL},
 };

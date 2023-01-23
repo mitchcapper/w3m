@@ -98,6 +98,9 @@ typedef struct base_stream *BaseStream;
 
 typedef union input_stream *InputStream;
 
+extern TextList *known_hosts;
+extern char *known_hosts_file;
+
 extern InputStream newInputStream(int des);
 extern InputStream newFileStream(FILE * f, int (*closep) (FILE *));
 extern InputStream newStrStream(Str s);
@@ -119,7 +122,7 @@ int ISread_n(InputStream stream, unsigned char *dst, int bufsize);
 extern int ISfileno(InputStream stream);
 extern int ISeos(InputStream stream);
 #ifdef USE_SSL
-extern void ssl_accept_this_site(char *hostname);
+extern void ssl_accept_this_site(char *hostname, X509 *x, int perm);
 extern Str ssl_get_certificate(SSL * ssl, char *hostname);
 #endif
 

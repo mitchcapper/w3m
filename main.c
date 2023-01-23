@@ -408,6 +408,32 @@ die_oom(size_t bytes)
     return NULL;
 }
 
+/* TODO(rkta): header */
+TextList * load_known_hosts(void);
+
+TextList *
+load_known_hosts(void)
+{
+    FILE *f;
+    Str l;
+    TextList *kh;
+
+    kh = newTextList();
+
+    if (!(f = fopen(known_hosts_file, "r")))
+	return kh;
+
+    while (!feof(f)) {
+	l = Strfgets(f);
+	if (!l->length)
+	    continue;
+	Strchop(l);
+	pushText(kh, l->ptr);
+    }
+    fclose(f);
+    return kh;
+}
+
 int
 main(int argc, char **argv)
 {
@@ -923,6 +949,9 @@ main(int argc, char **argv)
     if (UseHistory)
 	loadUrlHistory();
 #endif				/* not USE_HISTORY */
+    known_hosts_file = rcFile("known_hosts");
+    if (ssl_known_hosts)
+	known_hosts = load_known_hosts();
 
     /* Restore a previously saved session */
     if (opt_restore) {
@@ -2598,10 +2627,36 @@ DEFUN(movRW, NEXT_WORD, "Move to the next word")
     displayBuffer(Currentbuf, B_NORMAL);
 }
 
+static int
+save_known_hosts(void)
+{
+    FILE *fp;
+    TextListItem *host;
+    char *khf, *tmpf;
+
+    if (!known_hosts)
+	return 0;
+
+    tmpf = tmpfname(TMPF_HIST, NULL)->ptr;
+    khf = rcFile("known_hosts");
+    if (!(fp = fopen(tmpf, "w")))
+	return 1;
+
+    for (host = known_hosts->first; host; host = host->next)
+	fprintf(fp, "%s\n", host->ptr);
+
+    fclose(fp);
+    if (rename(tmpf, khf))
+	return 1;
+
+    return 0;
+}
+
 static void
 _quitfm(int confirm)
 {
     const char *ans = "y";
+    int err = 0;
 
     if (checkDownloadList())
 	/* FIXME: gettextize? */
@@ -2627,6 +2682,8 @@ _quitfm(int confirm)
     if (UseHistory && SaveURLHist)
 	saveUrlHistory();
 #endif				/* USE_HISTORY */
+    if ((err = save_known_hosts()))
+	perror(_("Cannot save known hosts"));
     if (deprecated)
 	fprintf(stderr, "%s\n%s\n%s\n",
 		"DEPRECATION WARNING",
@@ -4986,6 +5043,13 @@ DEFUN(vwSrc, SOURCE VIEW, "Toggle between HTML shown or processed")
 	displayBuffer(Currentbuf, B_NORMAL);
 	return;
     }
+
+    /* TODO(rkta): keep && document this */
+    if (!strcmp(Currentbuf->type, "text/gemini")) {
+	geminize();
+	return;
+    }
+
     if (Currentbuf->sourcefile == NULL) {
 	if (Currentbuf->pagerSource &&
 	    !strcasecmp(Currentbuf->type, "text/plain")) {
@@ -5069,6 +5133,93 @@ DEFUN(foldPre, FOLD_PRE, "Fold long lines in <pre> elements")
     Currentbuf->need_reshape = TRUE;
     displayBuffer(Currentbuf, B_FORCE_REDRAW);
     fold_pre = FoldPre;
+}
+
+DEFUN(geminize, GEMINIZE, "Toggle between text/gemini shown or processed")
+{
+    Buffer *buf;
+
+    if (Currentbuf->type == NULL || Currentbuf->bufferprop & BP_FRAME)
+	return;
+    if ((buf = Currentbuf->linkBuffer[LB_SOURCE]) != NULL ||
+	(buf = Currentbuf->linkBuffer[LB_N_SOURCE]) != NULL) {
+	Currentbuf = buf;
+	displayBuffer(Currentbuf, B_NORMAL);
+	return;
+    }
+
+    if (Currentbuf->sourcefile == NULL) {
+	if (Currentbuf->pagerSource &&
+	    !strcasecmp(Currentbuf->type, "text/plain")) {
+#ifdef USE_M17N
+	    wc_ces old_charset;
+	    wc_bool old_fix_width_conv;
+#endif
+	    FILE *f;
+	    Str tmpf = tmpfname(TMPF_SRC, NULL);
+	    f = fopen(tmpf->ptr, "w");
+	    if (f == NULL)
+		return;
+#ifdef USE_M17N
+	    old_charset = DisplayCharset;
+	    old_fix_width_conv = WcOption.fix_width_conv;
+	    DisplayCharset = (Currentbuf->document_charset != WC_CES_US_ASCII)
+		? Currentbuf->document_charset : 0;
+	    WcOption.fix_width_conv = WC_FALSE;
+#endif
+	    saveBufferBody(Currentbuf, f, TRUE);
+#ifdef USE_M17N
+	    DisplayCharset = old_charset;
+	    WcOption.fix_width_conv = old_fix_width_conv;
+#endif
+	    fclose(f);
+	    Currentbuf->sourcefile = tmpf->ptr;
+	}
+	else {
+	    return;
+	}
+    }
+
+    buf = newBuffer(INIT_BUFFER_WIDTH);
+
+    if (!strcmp(Currentbuf->type, "text/gemini")) {
+	buf->type = "text/plain";
+	buf->real_type = Currentbuf->real_type;
+	buf->buffername = Sprintf("source of %s", Currentbuf->buffername)->ptr;
+	buf->linkBuffer[LB_N_SOURCE] = Currentbuf;
+	Currentbuf->linkBuffer[LB_SOURCE] = buf;
+    }
+    else if (!strcasecmp(Currentbuf->type, "text/plain")) {
+	buf->type = "text/gemini";
+	if (Currentbuf->real_type &&
+	    !strcasecmp(Currentbuf->real_type, "text/plain"))
+	    buf->real_type = "text/gemini";
+	else
+	    buf->real_type = Currentbuf->real_type;
+	buf->buffername = Sprintf("Gemini view of %s",
+				  Currentbuf->buffername)->ptr;
+	buf->linkBuffer[LB_SOURCE] = Currentbuf;
+	Currentbuf->linkBuffer[LB_N_SOURCE] = buf;
+    }
+    else {
+	return;
+    }
+    buf->currentURL = Currentbuf->currentURL;
+    buf->real_scheme = Currentbuf->real_scheme;
+    buf->filename = Currentbuf->filename;
+    buf->sourcefile = Currentbuf->sourcefile;
+    buf->header_source = Currentbuf->header_source;
+    buf->search_header = Currentbuf->search_header;
+#ifdef USE_M17N
+    buf->document_charset = Currentbuf->document_charset;
+#endif
+    buf->clone = Currentbuf->clone;
+    (*buf->clone)++;
+
+    buf->need_reshape = TRUE;
+    reshapeBuffer(buf);
+    pushBuffer(buf);
+    displayBuffer(Currentbuf, B_NORMAL);
 }
 
 /* reload */
@@ -5291,6 +5442,7 @@ chkURLBuffer(Buffer *buf)
 	"https?://[a-zA-Z0-9:%\\-\\./_@]*\\[[a-fA-F0-9:][a-fA-F0-9:\\.]*\\][a-zA-Z0-9:%\\-\\./?=~_\\&+@#,\\$;]*",
 	"ftp://[a-zA-Z0-9:%\\-\\./_@]*\\[[a-fA-F0-9:][a-fA-F0-9:\\.]*\\][a-zA-Z0-9:%\\-\\./=_+@#,\\$]*",
 #endif				/* INET6 */
+	"gemini:/[a-zA-Z0-9:%\\-\\./=_\\+@#,\\$;]*",
 	NULL
     };
     int i;

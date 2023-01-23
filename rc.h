@@ -5,4 +5,6 @@
 extern void show_params(FILE * fp);
 extern int str_to_bool(const char *value, int old);
 
+extern int ssl_known_hosts;
+
 #endif /* RC_H */

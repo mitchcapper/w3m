@@ -78,6 +78,7 @@ static int
     70,				/* gophers */
 #ifdef USE_SSL
     443,			/* https */
+    1965			/* gemini */
 #endif				/* USE_SSL */
 };
 
@@ -100,6 +101,7 @@ struct cmdtable schemetable[] = {
 #ifdef USE_SSL
     {"https", SCM_HTTPS},
 #endif				/* USE_SSL */
+    {"gemini", SCM_GEMINI},
     {NULL, SCM_UNKNOWN},
 };
 
@@ -241,6 +243,7 @@ DefaultFile(int scheme)
     case SCM_LOCAL_CGI:
     case SCM_FTP:
     case SCM_FTPDIR:
+    case SCM_GEMINI:
 	return allocStr("/", -1);
     }
     return NULL;
@@ -261,7 +264,7 @@ free_ssl_ctx(void)
     if (ssl_ctx != NULL)
 	SSL_CTX_free(ssl_ctx);
     ssl_ctx = NULL;
-    ssl_accept_this_site(NULL);
+    ssl_accept_this_site(NULL, NULL, 0);
 }
 
 #if SSLEAY_VERSION_NUMBER >= 0x00905100
@@ -1263,6 +1266,7 @@ _parsedURL2Str(const ParsedURL *pu, int pass, int user, int label)
 	"gophers",
 #ifdef USE_SSL
 	"https",
+	"gemini",
 #endif				/* USE_SSL */
     };
 
@@ -1986,6 +1990,35 @@ openURL(char *url, ParsedURL *pu, ParsedURL *current,
 	}
 	return uf;
 #endif				/* USE_GOPHER */
+    case SCM_GEMINI:
+	sock = openSocket(pu->host, schemeNumToName(pu->scheme), pu->port);
+	if (sock < 0) {
+	    *status = HTST_MISSING;
+	    return uf;
+	}
+	if (!(sslh = openSSLHandle(sock, pu->host,
+				   &uf.ssl_certificate))) {
+	    *status = HTST_MISSING;
+	    return uf;
+	}
+	hr->flag |= HR_FLAG_LOCAL;
+	tmp = Strnew_m_charp("gemini://", pu->host, pu->file,
+			     pu->query ?
+				     Strnew_m_charp("?", pu ->query, NULL)->ptr :
+				     "",
+			     "\r\n", NULL);
+	*status = HTST_NORMAL;
+	uf.stream = newSSLStream(sslh, sock);
+	SSL_write(sslh, tmp->ptr, tmp->length);
+	if(w3m_reqlog){
+	    FILE *ff = fopen(w3m_reqlog, "a");
+	    if (ff == NULL)
+		return uf;
+	    fputs("GEMINI: request via SSL\n", ff);
+	    fwrite(tmp->ptr, sizeof(char), tmp->length, ff);
+	    fclose(ff);
+	}
+	return uf;
 #ifdef USE_NNTP
     case SCM_NNTP:
     case SCM_NNTP_GROUP:

@@ -407,7 +407,8 @@ displayBuffer(Buffer *buf, int mode)
     if (buf->height == 0)
 	buf->height = LASTLINE + 1;
     if ((buf->width != INIT_BUFFER_WIDTH &&
-	 (is_html_type(buf->type) || FoldLine))
+	 (is_html_type(buf->type) || FoldLine || !strcmp(buf->type,
+							 "text/gemini")))
 	|| buf->need_reshape) {
 	reshapeBuffer(buf);
     }

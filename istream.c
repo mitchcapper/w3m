@@ -1,6 +1,7 @@
 /* vi: set sw=4 ts=8 ai sm noet : */
 #include "fm.h"
 #include "myctype.h"
+#include "rc.h"
 #include "istream.h"
 #include <signal.h>
 #ifdef USE_SSL
@@ -316,15 +317,43 @@ ISfileno(InputStream stream)
 }
 
 #ifdef USE_SSL
-static Str accept_this_site;
+TextList *known_hosts;
+char *known_hosts_file;
+static Str _accept_this_site;
+
+static Str
+X509_fingerprint(X509 *x)
+{
+    Str fp = Strnew();
+    const EVP_MD *digest;
+    unsigned n;
+    unsigned char md[EVP_MAX_MD_SIZE];
+
+    digest = EVP_get_digestbyname("sha1");
+    X509_digest(x, digest, md, &n);
+    for(int i = 0; i < n - 1; i++)
+	Strcat(fp, Sprintf("%02x:", md[i]));
+    Strcat(fp, Sprintf("%02x", md[n - 1]));
+
+    return fp;
+}
 
 void
-ssl_accept_this_site(char *hostname)
+ssl_accept_this_site(char *hostname, X509 *x, int perm)
 {
-    if (hostname)
-	accept_this_site = Strnew_charp(hostname);
-    else
-	accept_this_site = NULL;
+
+    if (!hostname)
+	return;
+
+    if (!perm) {
+	_accept_this_site = Strnew_charp(hostname);
+    }
+    else {
+	pushText(known_hosts, Strnew_m_charp(hostname,
+					     " ",
+					     X509_fingerprint(x)->ptr,
+					     NULL)->ptr);
+    }
 }
 
 static int
@@ -460,6 +489,50 @@ ssl_check_cert_ident(X509 * x, char *hostname)
     return ret;
 }
 
+/* TODO(rkta): header */
+TextList * load_known_hosts(void);
+
+/* Return true if the host's cert was manually accepted before */
+static int
+accept_this_site(const char *hostname, X509 *x)
+{
+    Str fp;
+    TextListItem *host;
+    char *h;
+    size_t n;
+
+    if (!ssl_known_hosts) {
+	if (!_accept_this_site)
+	    return 0;
+	return !strncasecmp(_accept_this_site->ptr,
+			    hostname,
+			    _accept_this_site->length);
+    }
+
+    if (!known_hosts && (!(known_hosts = load_known_hosts())))
+	known_hosts = newTextList();
+
+    if (!(host = known_hosts->last)) /* Empty list */
+	return 0;
+
+    n = strlen(hostname);
+    fp = X509_fingerprint(x);
+    if (!strncasecmp(host->ptr, hostname, n)
+	&& !strncmp(host->ptr + n + 1, fp->ptr, fp->length))
+	return 1;
+
+    for (host = host->prev; host; host = host->prev) {
+	if (!strncasecmp(host->ptr, hostname, n)
+	    && !strncmp(host->ptr + n + 1, fp->ptr, fp->length)) {
+	    h = host->ptr;
+	    delText(known_hosts, host);
+	    pushText(known_hosts, h);
+	    return 1;
+	}
+    }
+    return 0;
+}
+
 Str
 ssl_get_certificate(SSL * ssl, char *hostname)
 {
@@ -467,7 +540,7 @@ ssl_get_certificate(SSL * ssl, char *hostname)
     X509 *x;
     X509_NAME *xn;
     char *p;
-    int len;
+    int len, perm;
     Str s;
     char buf[2048];
     Str amsg = NULL;
@@ -476,10 +549,10 @@ ssl_get_certificate(SSL * ssl, char *hostname)
 
     if (ssl == NULL)
 	return NULL;
+
     x = SSL_get_peer_certificate(ssl);
     if (x == NULL) {
-	if (accept_this_site
-	    && strcasecmp(accept_this_site->ptr, hostname) == 0)
+	if (accept_this_site(hostname, x))
 	    ans = 1;
 	else
 	    ans = confirm(Strnew_charp(_("No SSL peer certificate: accept?")));
@@ -496,7 +569,7 @@ ssl_get_certificate(SSL * ssl, char *hostname)
 	}
 	if (amsg)
 	    disp_err_message(amsg->ptr, FALSE);
-	ssl_accept_this_site(hostname);
+	ssl_accept_this_site(hostname, x, 0);
 	s = amsg ? amsg : Strnew_charp(_("valid certificate"));
 	return s;
     }
@@ -505,37 +578,47 @@ ssl_get_certificate(SSL * ssl, char *hostname)
      * The chain length is automatically checked by OpenSSL when we
      * set the verify depth in the ctx.
      */
+    perm = 0;
     if (ssl_verify_server) {
 	long verr;
 	if ((verr = SSL_get_verify_result(ssl))
 	    != X509_V_OK) {
 	    const char *em = X509_verify_cert_error_string(verr);
-	    if (accept_this_site
-		&& strcasecmp(accept_this_site->ptr, hostname) == 0)
-		ans = 1;
+	    if (accept_this_site(hostname, x))
+		ans = 'y';
 	    else {
 		/* FIXME: gettextize? */
-		ans = confirm(Sprintf("%s: accept?", em));
-	    }
-	    if (ans) {
-		/* FIXME: gettextize? */
-		amsg = Sprintf("Accept unsecure SSL session: "
-			       "unverified: %s", em);
-	    }
-	    else {
-		char *e =
-		    Sprintf(_("This SSL session was rejected: %s"), em)->ptr;
-		disp_err_message(e, FALSE);
-		free_ssl_ctx();
-		return NULL;
+		if (ssl_known_hosts)
+		    emsg = Sprintf("%s: accept? (y)es/(n)o/(a)lways)", em);
+		else
+		    emsg = Sprintf("%s: accept? (y/n)", em);
+		ans = confirm_multi(emsg->ptr);
+		if (ans == 'y') {
+		    /* FIXME: gettextize? */
+		    amsg = Sprintf("Accept unsecure SSL session: "
+				   "unverified: %s", em);
+		}
+		else if (ssl_known_hosts && ans == 'a') {
+		    amsg = Sprintf("Permanently accepted unverified SSL"
+				   "session: %s", em);
+		    perm = 1;
+		}
+		else {
+		    /* FIXME: gettextize? */
+		    char *e =
+			Sprintf("This SSL session was rejected: %s", em)->ptr;
+		    disp_err_message(e, FALSE);
+		    free_ssl_ctx();
+		    return NULL;
+		}
 	    }
 	}
+	ssl_accept_this_site(hostname, x, perm);
     }
 #endif
     emsg = ssl_check_cert_ident(x, hostname);
     if (emsg != NULL) {
-	if (accept_this_site
-	    && strcasecmp(accept_this_site->ptr, hostname) == 0)
+	if (accept_this_site(hostname, x))
 	    ans = 1;
 	else {
 	    Str ep = Strdup(emsg);
@@ -556,10 +639,10 @@ ssl_get_certificate(SSL * ssl, char *hostname)
 	    free_ssl_ctx();
 	    return NULL;
 	}
+	ssl_accept_this_site(hostname, x, 0);
     }
     if (amsg)
 	disp_err_message(amsg->ptr, FALSE);
-    ssl_accept_this_site(hostname);
     s = amsg ? amsg : Strnew_charp(_("valid certificate"));
     Strcat_charp(s, "\n");
     xn = X509_get_subject_name(x);

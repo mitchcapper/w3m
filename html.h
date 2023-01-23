@@ -425,6 +425,7 @@ struct environment {
 #define SCM_GOPHERS	13
 #ifdef USE_SSL
 #define SCM_HTTPS       14
+#define SCM_GEMINI	15
 #endif				/* USE_SSL */
 
 #endif				/* _HTML_H */
