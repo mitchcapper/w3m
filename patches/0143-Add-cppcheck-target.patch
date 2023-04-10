@@ -1,0 +1,19 @@
+From 4420786934d306377d757cf33ab09c773d28ff85 Mon Sep 17 00:00:00 2001
+From: Rene Kita <mail@rkta.de>
+Date: Sat, 11 Dec 2021 11:55:39 +0100
+Subject: [PATCH 143/172] Add cppcheck target
+
+---
+ Makefile.in |    4 ++++
+ 1 file changed, 4 insertions(+)
+
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -348,3 +348,7 @@ dist:
+ bindist:
+ 	cd ..; tar cvfz w3m-$(VERSION)-$(MODEL).tar.gz w3m/w3m* w3m/doc* w3m/Bonus* w3m/README w3m/scripts 
+ 
++.PHONY: cppcheck
++cppcheck:
++	cppcheck --force -q --std=c99 --error-exitcode=1 --suppress=shadowArgument --suppress=shadowFunction --suppress=shadowVariable --suppress=variableScope --suppress=missingIncludeSystem --suppress=ConfigurationNotChecked -I. --template gcc --enable=all *.[ch]
++:

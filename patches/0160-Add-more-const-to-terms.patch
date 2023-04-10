@@ -1,0 +1,81 @@
+From 8000fb11cb10d37f42a3eede8c30cf0037b9eb34 Mon Sep 17 00:00:00 2001
+From: Rene Kita <mail@rkta.de>
+Date: Thu, 13 Jan 2022 13:32:48 +0100
+Subject: [PATCH 160/172] Add more const to terms
+
+---
+ proto.h |    6 +++---
+ terms.c |   12 ++++++------
+ 2 files changed, 9 insertions(+), 9 deletions(-)
+
+--- a/proto.h
++++ b/proto.h
+@@ -457,7 +457,7 @@ extern pid_t open_pipe_rw(FILE ** fr, FI
+ extern int initscr(void);
+ extern void move(int line, int column);
+ #ifdef USE_M17N
+-extern void addmch(char *p, size_t len);
++extern void addmch(const char *p, size_t len);
+ #endif
+ extern void addch(char c);
+ extern void standout(void);
+@@ -482,8 +482,8 @@ extern void rscroll(int);
+ #endif
+ extern void clrtoeolx(void);
+ extern void clrtobotx(void);
+-extern void addstr(char *s);
+-extern void addnstr(char *s, int n);
++extern void addstr(const char *s);
++extern void addnstr(const char *s, int n);
+ extern void addnstr_sup(char *s, int n);
+ extern void crmode(void);
+ extern void term_noecho(void);
+--- a/terms.c
++++ b/terms.c
+@@ -1346,13 +1346,13 @@ move(int line, int column)
+ 
+ static int
+ #ifdef USE_M17N
+-need_redraw(char *c1, l_prop pr1, char *c2, l_prop pr2)
++need_redraw(char *c1, l_prop pr1, const char *c2, l_prop pr2)
+ {
+     if (!c1 || !c2 || strcmp(c1, c2))
+ 	return 1;
+     if (*c1 == ' ')
+ #else
+-need_redraw(char c1, l_prop pr1, char c2, l_prop pr2)
++need_redraw(char c1, l_prop pr1, const char c2, l_prop pr2)
+ {
+     if (c1 != c2)
+ 	return 1;
+@@ -1382,10 +1382,10 @@ addch(char c)
+ }
+ 
+ void
+-addmch(char *pc, size_t len)
++addmch(const char *pc, size_t len)
+ #else
+ void
+-addch(char pc)
++addch(const char pc)
+ #endif
+ {
+     l_prop *pr;
+@@ -2084,7 +2084,7 @@ clrtobotx(void)
+ }
+ 
+ void
+-addstr(char *s)
++addstr(const char *s)
+ {
+ #ifdef USE_M17N
+     int len;
+@@ -2101,7 +2101,7 @@ addstr(char *s)
+ }
+ 
+ void
+-addnstr(char *s, int n)
++addnstr(const char *s, int n)
+ {
+     int i;
+ #ifdef USE_M17N

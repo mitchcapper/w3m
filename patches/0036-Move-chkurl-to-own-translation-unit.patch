@@ -1,0 +1,178 @@
+From de43049e85dec0b28eeb3ffe54e06c16cfffe2e6 Mon Sep 17 00:00:00 2001
+From: Rene Kita <mail@rkta.de>
+Date: Sun, 30 Jan 2022 13:38:24 +0100
+Subject: [PATCH 036/172] Move chkurl to own translation unit
+
+Also, make url_like_pat a static global. This is in preparation to add a
+second function which needs url_like_pat.
+---
+ Makefile.in |  4 ++--
+ buffer.c    |  1 +
+ chkurl.c    | 37 +++++++++++++++++++++++++++++++++++++
+ chkurl.h    |  8 ++++++++
+ file.c      |  3 ++-
+ main.c      | 35 +----------------------------------
+ proto.h     |  1 -
+ 7 files changed, 51 insertions(+), 38 deletions(-)
+ create mode 100644 chkurl.c
+ create mode 100644 chkurl.h
+
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -110,11 +110,11 @@ MODEL=@W3M_TARGET@-@W3M_LANG@
+ SRCS=main.c file.c buffer.c display.c etc.c search.c linein.c table.c local.c \
+ 	form.c map.c frame.c rc.c menu.c mailcap.c image.c \
+ 	symbol.c entity.c terms.c url.c ftp.c mimehead.c regex.c news.c \
+-	func.c cookie.c history.c backend.c $(KEYBIND_SRC)
++	func.c cookie.c history.c backend.c $(KEYBIND_SRC) chkurl.c
+ OBJS=main.o file.o buffer.o display.o etc.o search.o linein.o table.o local.o\
+ 	form.o map.o frame.o rc.o menu.o mailcap.o image.o \
+ 	symbol.o entity.o terms.o url.o ftp.o mimehead.o regex.o news.o \
+-	func.o cookie.o history.o backend.o $(KEYBIND_OBJ)
++	func.o cookie.o history.o backend.o $(KEYBIND_OBJ) chkurl.o
+ LSRCS=anchor.c parsetagx.c tagtable.c istream.c
+ LOBJS=anchor.o parsetagx.o tagtable.o istream.o
+ LLOBJS=version.o
+--- a/buffer.c
++++ b/buffer.c
+@@ -1,5 +1,6 @@
+ /* $Id: buffer.c,v 1.30 2010/07/18 14:10:09 htrb Exp $ */
+ #include "fm.h"
++#include "chkurl.h"
+ 
+ #ifdef USE_MOUSE
+ #ifdef USE_GPM
+--- /dev/null
++++ b/chkurl.c
+@@ -0,0 +1,37 @@
++#include "chkurl.h"
++#include "regex.h"
++
++static char *url_like_pat[] = {
++    "https?://[a-zA-Z0-9][a-zA-Z0-9:%\\-\\./?=~_\\&+@#,\\$;]*[a-zA-Z0-9_/=\\-]",
++    "file:/[a-zA-Z0-9:%\\-\\./=_\\+@#,\\$;]*",
++#ifdef USE_GOPHER
++    "gopher://[a-zA-Z0-9][a-zA-Z0-9:%\\-\\./_~]*",
++#endif				/* USE_GOPHER */
++    "ftp://[a-zA-Z0-9][a-zA-Z0-9:%\\-\\./=_+@#,\\$]*[a-zA-Z0-9_/]",
++#ifdef USE_NNTP
++    "news:[^<> 	][^<> 	]*",
++    "nntp://[a-zA-Z0-9][a-zA-Z0-9:%\\-\\./_]*",
++#endif				/* USE_NNTP */
++#ifndef USE_W3MMAILER		/* see also chkExternalURIBuffer() */
++    "mailto:[^<> 	][^<> 	]*@[a-zA-Z0-9][a-zA-Z0-9\\-\\._]*[a-zA-Z0-9]",
++#endif
++#ifdef INET6
++    "https?://[a-zA-Z0-9:%\\-\\./_@]*\\[[a-fA-F0-9:][a-fA-F0-9:\\.]*\\][a-zA-Z0-9:%\\-\\./?=~_\\&+@#,\\$;]*",
++    "ftp://[a-zA-Z0-9:%\\-\\./_@]*\\[[a-fA-F0-9:][a-fA-F0-9:\\.]*\\][a-zA-Z0-9:%\\-\\./=_+@#,\\$]*",
++#endif				/* INET6 */
++    NULL
++};
++
++/* mark URL-like patterns as anchors */
++void
++chkURLBuffer(Buffer *buf)
++{
++    int i;
++    for (i = 0; url_like_pat[i]; i++) {
++	reAnchor(buf, url_like_pat[i]);
++    }
++#ifdef USE_EXTERNAL_URI_LOADER
++    chkExternalURIBuffer(buf);
++#endif
++    buf->check_url |= CHK_URL;
++}
+--- /dev/null
++++ b/chkurl.h
+@@ -0,0 +1,8 @@
++#ifndef W3M_CHKURL_H__
++#define W3M_CHKURL_H__
++
++#include "fm.h"
++
++void chkURLBuffer(Buffer *buf);
++
++#endif
+--- a/file.c
++++ b/file.c
+@@ -15,9 +15,10 @@
+ #include <utime.h>
+ /* foo */
+ 
++#include "chkurl.h"
+ #include "html.h"
+-#include "parsetagx.h"
+ #include "local.h"
++#include "parsetagx.h"
+ #include "regex.h"
+ 
+ #ifndef max
+--- a/main.c
++++ b/main.c
+@@ -15,6 +15,7 @@
+ #if defined(__CYGWIN__) && defined(USE_BINMODE_STREAM)
+ #include <io.h>
+ #endif
++#include "chkurl.h"
+ #include "terms.h"
+ #include "myctype.h"
+ #include "regex.h"
+@@ -5017,40 +5018,6 @@ DEFUN(defCSet, DEFAULT_CHARSET, "Change
+ }
+ #endif
+ 
+-/* mark URL-like patterns as anchors */
+-void
+-chkURLBuffer(Buffer *buf)
+-{
+-    static char *url_like_pat[] = {
+-	"https?://[a-zA-Z0-9][a-zA-Z0-9:%\\-\\./?=~_\\&+@#,\\$;]*[a-zA-Z0-9_/=\\-]",
+-	"file:/[a-zA-Z0-9:%\\-\\./=_\\+@#,\\$;]*",
+-#ifdef USE_GOPHER
+-	"gopher://[a-zA-Z0-9][a-zA-Z0-9:%\\-\\./_~]*",
+-#endif				/* USE_GOPHER */
+-	"ftp://[a-zA-Z0-9][a-zA-Z0-9:%\\-\\./=_+@#,\\$]*[a-zA-Z0-9_/]",
+-#ifdef USE_NNTP
+-	"news:[^<> 	][^<> 	]*",
+-	"nntp://[a-zA-Z0-9][a-zA-Z0-9:%\\-\\./_]*",
+-#endif				/* USE_NNTP */
+-#ifndef USE_W3MMAILER		/* see also chkExternalURIBuffer() */
+-	"mailto:[^<> 	][^<> 	]*@[a-zA-Z0-9][a-zA-Z0-9\\-\\._]*[a-zA-Z0-9]",
+-#endif
+-#ifdef INET6
+-	"https?://[a-zA-Z0-9:%\\-\\./_@]*\\[[a-fA-F0-9:][a-fA-F0-9:\\.]*\\][a-zA-Z0-9:%\\-\\./?=~_\\&+@#,\\$;]*",
+-	"ftp://[a-zA-Z0-9:%\\-\\./_@]*\\[[a-fA-F0-9:][a-fA-F0-9:\\.]*\\][a-zA-Z0-9:%\\-\\./=_+@#,\\$]*",
+-#endif				/* INET6 */
+-	NULL
+-    };
+-    int i;
+-    for (i = 0; url_like_pat[i]; i++) {
+-	reAnchor(buf, url_like_pat[i]);
+-    }
+-#ifdef USE_EXTERNAL_URI_LOADER
+-    chkExternalURIBuffer(buf);
+-#endif
+-    buf->check_url |= CHK_URL;
+-}
+-
+ DEFUN(chkURL, MARK_URL, "Turn URL-like strings into hyperlinks")
+ {
+     chkURLBuffer(Currentbuf);
+--- a/proto.h
++++ b/proto.h
+@@ -99,7 +99,6 @@ extern void vwSrc(void);
+ extern void reload(void);
+ extern void reshape(void);
+ extern void chkURL(void);
+-extern void chkURLBuffer(Buffer *buf);
+ extern void chkWORD(void);
+ #ifdef USE_NNTP
+ extern void chkNMID(void);
+--- a/display.c
++++ b/display.c
+@@ -1,4 +1,5 @@
+ /* $Id: display.c,v 1.71 2010/07/18 14:10:09 htrb Exp $ */
++#include "chkurl.h"
+ #include <signal.h>
+ #include "fm.h"
+ 

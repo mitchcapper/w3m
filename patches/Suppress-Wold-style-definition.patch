@@ -1,0 +1,24 @@
+---
+ display.c |    4 ++++
+ 1 file changed, 4 insertions(+)
+
+--- a/display.c
++++ b/display.c
+@@ -5,6 +5,9 @@
+ #include "fm.h"
+ 
+ /* *INDENT-OFF* */
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Wold-style-definition"
++
+ #ifdef USE_COLOR
+ 
+ #define EFFECT_ANCHOR_START       effect_anchor_start()
+@@ -156,6 +159,7 @@ EFFECT_VISITED_END
+ #define EFFECT_MARK_START         standout()
+ #define EFFECT_MARK_END           standend()
+ #endif				/* not USE_COLOR */
++#pragma GCC diagnostic pop
+ /* *INDENT-ON* */
+ 
+ void

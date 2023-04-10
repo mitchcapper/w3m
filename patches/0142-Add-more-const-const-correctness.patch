@@ -1,0 +1,329 @@
+From f6c203252b5b893dbe3ca46f04842f37617158b0 Mon Sep 17 00:00:00 2001
+From: Rene Kita <mail@rkta.de>
+Date: Thu, 23 Dec 2021 22:01:05 +0100
+Subject: [PATCH 142/172] Add more const const correctness
+
+---
+ anchor.c   |   10 +++++-----
+ buffer.c   |    4 ++--
+ etc.c      |    2 +-
+ file.c     |    2 +-
+ istream.c  |    2 +-
+ matrix.c   |    2 +-
+ matrix.h   |    2 +-
+ mimehead.c |   28 ++++++++++++++--------------
+ proto.h    |   14 +++++++-------
+ table.c    |   22 +++++++++++-----------
+ 10 files changed, 44 insertions(+), 44 deletions(-)
+
+--- a/anchor.c
++++ b/anchor.c
+@@ -191,7 +191,7 @@ searchURLLabel(Buffer *buf, char *url)
+ 
+ #ifdef USE_NNTP
+ static Anchor *
+-_put_anchor_news(Buffer *buf, char *p1, char *p2, int line, int pos)
++_put_anchor_news(Buffer *buf, char *p1, const char *p2, int line, int pos)
+ {
+     Str tmp;
+ 
+@@ -210,7 +210,7 @@ _put_anchor_news(Buffer *buf, char *p1,
+ #endif				/* USE_NNTP */
+ 
+ static Anchor *
+-_put_anchor_all(Buffer *buf, char *p1, char *p2, int line, int pos)
++_put_anchor_all(Buffer *buf, char *p1, const char *p2, int line, int pos)
+ {
+     Str tmp;
+ 
+@@ -222,7 +222,7 @@ _put_anchor_all(Buffer *buf, char *p1, c
+ }
+ 
+ static void
+-reseq_anchor0(AnchorList *al, short *seqmap)
++reseq_anchor0(AnchorList *al, const short *seqmap)
+ {
+     int i;
+     Anchor *a;
+@@ -296,7 +296,7 @@ reseq_anchor(Buffer *buf)
+ 
+ static char *
+ reAnchorPos(Buffer *buf, Line *l, char *p1, char *p2,
+-	    Anchor *(*anchorproc) (Buffer *, char *, char *, int, int))
++	    Anchor *(*anchorproc) (Buffer *, char *, const char *, int, int))
+ {
+     Anchor *a;
+     int spos, epos;
+@@ -347,7 +347,7 @@ reAnchorWord(Buffer *buf, Line *l, int s
+ /* returns error message if any               */
+ static char *
+ reAnchorAny(Buffer *buf, char *re,
+-	    Anchor *(*anchorproc) (Buffer *, char *, char *, int, int))
++	    Anchor *(*anchorproc) (Buffer *, char *, const char *, int, int))
+ {
+     Line *l;
+     char *p = NULL, *p1, *p2;
+--- a/buffer.c
++++ b/buffer.c
+@@ -310,7 +310,7 @@ gotoRealLine(Buffer *buf, int n)
+ 
+ 
+ static Buffer *
+-listBuffer(Buffer *top, Buffer *current)
++listBuffer(Buffer *top, const Buffer *current)
+ {
+     int i, c = 0;
+     Buffer *buf = top;
+@@ -603,7 +603,7 @@ copyBuffer(Buffer *a, Buffer *b)
+ }
+ 
+ Buffer *
+-prevBuffer(Buffer *first, Buffer *buf)
++prevBuffer(Buffer *first, const Buffer *buf)
+ {
+     Buffer *b;
+ 
+--- a/etc.c
++++ b/etc.c
+@@ -521,7 +521,7 @@ checkType(Str s, Lineprop **oprop, Linec
+ }
+ 
+ static int
+-nextColumn(int n, char *p, Lineprop *pr)
++nextColumn(int n, char *p, const Lineprop *pr)
+ {
+     if (*pr & PC_CTRL) {
+ 	if (*p == '\t')
+--- a/file.c
++++ b/file.c
+@@ -4436,7 +4436,7 @@ process_n_form(void)
+ static void
+ clear_ignore_p_flag(int cmd, struct readbuffer *obuf)
+ {
+-    static int clear_flag_cmd[] = {
++    static const int clear_flag_cmd[] = {
+ 	HTML_HR, HTML_UNKNOWN
+     };
+     int i;
+--- a/istream.c
++++ b/istream.c
+@@ -776,7 +776,7 @@ static int
+ ens_read(struct ens_handle *handle, char *buf, int len)
+ {
+     if (handle->pos == handle->gb.length) {
+-	char *p;
++	const char *p;
+ 	struct growbuf gbtmp;
+ 
+ 	ISgets_to_growbuf(handle->is, &handle->gb, TRUE);
+--- a/matrix.c
++++ b/matrix.c
+@@ -119,7 +119,7 @@ LUfactor(Matrix A, int *indexarray)
+  */
+ 
+ int
+-LUsolve(Matrix A, int *indexarray, Vector b, Vector x)
++LUsolve(Matrix A, const int *indexarray, Vector b, Vector x)
+ {
+     int i, dim = A->dim;
+ 
+--- a/matrix.h
++++ b/matrix.h
+@@ -59,7 +59,7 @@ typedef int PERM;
+ extern int LUfactor(Matrix, int *);
+ extern Matrix m_inverse(Matrix, Matrix);
+ extern Matrix LUinverse(Matrix, int *, Matrix);
+-extern int LUsolve(Matrix, int *, Vector, Vector);
++extern int LUsolve(Matrix, const int *, Vector, Vector);
+ extern int Lsolve(Matrix, Vector, Vector, double);
+ extern int Usolve(Matrix, Vector, Vector, double);
+ extern Matrix new_matrix(int);
+--- a/mimehead.c
++++ b/mimehead.c
+@@ -62,7 +62,7 @@ ha2d(char x, char y)
+ }
+ 
+ Str
+-decodeB(char *ww)
++decodeB(const char *ww)
+ {
+     struct growbuf gb;
+ 
+@@ -72,10 +72,10 @@ decodeB(char *ww)
+ }
+ 
+ void
+-decodeB_to_growbuf(struct growbuf *gb, char *ww)
++decodeB_to_growbuf(struct growbuf *gb, const char *ww)
+ {
+     unsigned char c[4];
+-    char *wp = ww;
++    const char *wp = ww;
+     char d[3];
+     int i, n_pad;
+ 
+@@ -123,10 +123,10 @@ last:
+ }
+ 
+ void
+-decodeU_to_growbuf(struct growbuf *gb, char *ww)
++decodeU_to_growbuf(struct growbuf *gb, const char *ww)
+ {
+     unsigned char c1, c2;
+-    char *w = ww;
++    const char *w = ww;
+     int n, i;
+ 
+     if (*w <= 0x20 || *w >= 0x60)
+@@ -152,9 +152,9 @@ decodeU_to_growbuf(struct growbuf *gb, c
+ 
+ /* RFC2047 (4.2. The "Q" encoding) */
+ Str
+-decodeQ(char *ww)
++decodeQ(const char *ww)
+ {
+-    char *w = ww;
++    const char *w = ww;
+     Str a = Strnew_size(strlen(w));
+ 
+     for (; *w != '\0' && *w != '?'; w++) {
+@@ -174,9 +174,9 @@ decodeQ(char *ww)
+ }
+ 
+ void
+-decodeQP_to_growbuf(struct growbuf *gb, char *ww)
++decodeQP_to_growbuf(struct growbuf *gb, const char *ww)
+ {
+-    char *w = ww;
++    const char *w = ww;
+ 
+     growbuf_reserve(gb, strlen(w) + 1);
+     for (; *w != '\0'; w++) {
+@@ -205,16 +205,16 @@ decodeQP_to_growbuf(struct growbuf *gb,
+ 
+ #ifdef USE_M17N
+ Str
+-decodeWord(char *ow, wc_ces * charset)
++decodeWord(const char *ow, wc_ces * charset)
+ #else
+ Str
+-decodeWord0(char *ow)
++decodeWord0(const char *ow)
+ #endif
+ {
+ #ifdef USE_M17N
+     wc_ces c;
+ #endif
+-    char *p, *w = ow;
++    const char *p, *w = ow;
+     char method;
+     Str a = Strnew();
+     Str tmp = Strnew();
+@@ -280,8 +280,8 @@ Str
+ decodeMIME0(Str orgstr)
+ #endif
+ {
+-    char *org = orgstr->ptr, *endp = org + orgstr->length;
+-    char *org0, *p;
++    const char *org = orgstr->ptr, *endp = org + orgstr->length;
++    const char *org0, *p;
+     Str cnv = NULL;
+ 
+ #ifdef USE_M17N
+--- a/proto.h
++++ b/proto.h
+@@ -307,7 +307,7 @@ extern Buffer *selectBuffer(Buffer *firs
+ 			    char *selectchar);
+ extern void reshapeBuffer(Buffer *buf);
+ extern void copyBuffer(Buffer *a, Buffer *b);
+-extern Buffer *prevBuffer(Buffer *first, Buffer *buf);
++extern Buffer *prevBuffer(Buffer *first, const Buffer *buf);
+ extern int writeBufferCache(Buffer *buf);
+ extern int readBufferCache(Buffer *buf);
+ extern void displayBuffer(Buffer *buf, int mode);
+@@ -581,13 +581,13 @@ extern void shiftAnchorPosition(AnchorLi
+ extern char *getAnchorText(Buffer *buf, AnchorList *al, Anchor *a);
+ extern Buffer *link_list_panel(Buffer *buf);
+ 
+-extern Str decodeB(char *ww);
+-extern void decodeB_to_growbuf(struct growbuf *gb, char *ww);
+-extern Str decodeQ(char *ww);
+-extern void decodeQP_to_growbuf(struct growbuf *gb, char *ww);
+-extern void decodeU_to_growbuf(struct growbuf *gb, char *ww);
++extern Str decodeB(const char *ww);
++extern void decodeB_to_growbuf(struct growbuf *gb, const char *ww);
++extern Str decodeQ(const char *ww);
++extern void decodeQP_to_growbuf(struct growbuf *gb, const char *ww);
++extern void decodeU_to_growbuf(struct growbuf *gb, const char *ww);
+ #ifdef USE_M17N
+-extern Str decodeWord(char *ow, wc_ces * charset);
++extern Str decodeWord(const char *ow, wc_ces * charset);
+ extern Str decodeMIME(Str orgstr, wc_ces * charset);
+ #else
+ extern Str decodeWord0(char *ow);
+--- a/table.c
++++ b/table.c
+@@ -103,8 +103,8 @@ weight3(int x)
+ #endif				/* not MATRIX */
+ 
+ static int
+-bsearch_2short(short e1, short *ent1, short e2, short *ent2, int base,
+-	       short *indexarray, int nent)
++bsearch_2short(short e1, const short *ent1, short e2, const short *ent2,
++	       int base, const short *indexarray, int nent)
+ {
+     int n = nent;
+     int k = 0;
+@@ -130,7 +130,7 @@ bsearch_2short(short e1, short *ent1, sh
+ }
+ 
+ static int
+-bsearch_double(double e, double *ent, short *indexarray, int nent)
++bsearch_double(double e, const double *ent, const short *indexarray, int nent)
+ {
+     int n = nent;
+     int k = 0;
+@@ -853,9 +853,9 @@ table_rule_width(struct table *t)
+ }
+ 
+ static void
+-check_cell_height(int *tabheight, int *cellheight,
+-		 short *row, short *rowspan, short maxcell,
+-		 short *indexarray, int space, int dir)
++check_cell_height(int *tabheight, const int *cellheight,
++		 const short *row, const short *rowspan, short maxcell,
++		 const short *indexarray, int space, int dir)
+ {
+     int i, j, k, brow, erow;
+     int sheight, height;
+@@ -886,9 +886,9 @@ check_cell_height(int *tabheight, int *c
+ }
+ 
+ static void
+-check_cell_width(short *tabwidth, short *cellwidth,
+-		 short *col, short *colspan, short maxcell,
+-		 short *indexarray, int space, int dir)
++check_cell_width(short *tabwidth, const short *cellwidth,
++		 const short *col, const short *colspan, short maxcell,
++		 const short *indexarray, int space, int dir)
+ {
+     int i, j, k, bcol, ecol;
+     int swidth, width;
+@@ -3444,7 +3444,7 @@ correct_table_matrix2(struct table *t, i
+ }
+ 
+ static void
+-correct_table_matrix3(struct table *t, int col, char *flags, double s,
++correct_table_matrix3(struct table *t, int col, const char *flags, double s,
+ 		      double b)
+ {
+     int i, j;
+@@ -3471,7 +3471,7 @@ correct_table_matrix3(struct table *t, i
+ }
+ 
+ static void
+-correct_table_matrix4(struct table *t, int col, int cspan, char *flags,
++correct_table_matrix4(struct table *t, int col, int cspan, const char *flags,
+ 		      double s, double b)
+ {
+     int i, j;

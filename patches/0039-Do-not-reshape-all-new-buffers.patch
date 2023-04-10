@@ -1,0 +1,22 @@
+From cbd5e8af0018b6e151a6029933e46e58a85b461e Mon Sep 17 00:00:00 2001
+From: Rene Kita <mail@rkta.de>
+Date: Wed, 12 Jan 2022 12:30:44 +0100
+Subject: [PATCH 039/172] Do not reshape all new buffers
+
+---
+ buffer.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+--- a/buffer.c
++++ b/buffer.c
+@@ -48,8 +48,8 @@ newBuffer(int width)
+ #ifdef USE_M17N
+     n->auto_detect = WcOption.auto_detect;
+ #endif
+-    n->check_url = MarkAllPages; /* use default from -o mark_all_pages */
+-    n->need_reshape = 1;	 /* always reshape new buffers to mark URLs */
++    n->check_url = MarkAllPages;     /* use default from -o mark_all_pages */
++    n->need_reshape = MarkAllPages;  /* always reshape new buffers to mark URLs */
+     return n;
+ }
+ 

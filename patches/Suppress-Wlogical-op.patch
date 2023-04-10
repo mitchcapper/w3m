@@ -1,0 +1,42 @@
+---
+ libwc/ucs.c |    8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+--- a/libwc/ucs.c
++++ b/libwc/ucs.c
+@@ -39,6 +39,9 @@ wc_get_ucs_table(wc_ccs ccs)
+ {
+     int f = WC_CCS_INDEX(ccs);
+ 
++/* TODO(rkta): Figure out what the intent was and fix the conditions. */
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Wlogical-op"
+     switch (WC_CCS_TYPE(ccs)) {
+     case WC_CCS_A_CS94:
+ 	if (f < WC_F_ISO_BASE || f > WC_F_CS94_END)
+@@ -71,6 +74,7 @@ wc_get_ucs_table(wc_ccs ccs)
+     default:
+ 	return NULL;
+     }
++#pragma GCC diagnostic pop
+ }
+ 
+ wc_wchar_t
+@@ -150,6 +154,9 @@ wc_any_to_ucs(wc_wchar_t cc)
+ 	map = cs96_ucs_map[f - WC_F_ISO_BASE];
+ 	cc.code &= 0x7f;
+ 	break;
++/* TODO(rkta): Figure out what the intent was and fix the conditions. */
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Wlogical-op"
+     case WC_CCS_A_CS96W:
+ 	if (f < WC_F_ISO_BASE || f > WC_F_CS96W_END)
+ 	    return WC_C_UCS4_ERROR;
+@@ -163,6 +170,7 @@ wc_any_to_ucs(wc_wchar_t cc)
+ 	map = cs942_ucs_map[f - WC_F_ISO_BASE];
+ 	cc.code &= 0x7f;
+ 	break;
++#pragma GCC diagnostic pop
+     case WC_CCS_A_PCS:
+ 	if (f < WC_F_PCS_BASE || f > WC_F_PCS_END)
+ 	    return WC_C_UCS4_ERROR;

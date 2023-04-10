@@ -1,0 +1,14 @@
+---
+ Makefile.in |    1 +
+ 1 file changed, 1 insertion(+)
+
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -45,6 +45,7 @@ DEFAULTS += -Werror=vla
+ DEFAULTS += -Wlogical-op
+ DEFAULTS += -Wmissing-declarations
+ DEFAULTS += -Wnested-externs
++DEFAULTS += -Wno-deprecated-declarations
+ DEFAULTS += -Wno-missing-field-initializers
+ DEFAULTS += -Wno-unused-result
+ DEFAULTS += -Wnull-dereference

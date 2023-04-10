@@ -1,0 +1,10 @@
+--- a/display.c
++++ b/display.c
+@@ -10,6 +10,7 @@
+ 
+ #ifdef USE_COLOR
+ 
++/* TODO(rkta): This does not play well with -Wold-style-definition */
+ #define EFFECT_ANCHOR_START       effect_anchor_start()
+ #define EFFECT_ANCHOR_END         effect_anchor_end()
+ #define EFFECT_IMAGE_START        effect_image_start()

@@ -1,0 +1,67 @@
+---
+ file.c |    4 ++--
+ fm.h   |    1 +
+ main.c |    2 +-
+ rc.c   |    3 +++
+ 4 files changed, 7 insertions(+), 3 deletions(-)
+
+--- a/rc.c
++++ b/rc.c
+@@ -78,6 +78,7 @@ static int OptionEncode = FALSE;
+ #define CMT_OPEN_TAB_DL_LIST N_("Open download list panel on new tab")
+ #define CMT_DISPLINK     N_("Display link URL automatically")
+ #define CMT_DISPLINKNUMBER N_("Display link numbers")
++#define CMT_ZEROBASEDLINKNO N_("Use 0 as first link number")
+ #define CMT_DECODE_URL   N_("Display decoded URL")
+ #define CMT_DISPLINEINFO N_("Display current line number")
+ #define CMT_DISP_IMAGE   N_("Display inline images")
+@@ -402,6 +403,8 @@ struct param_ptr params1[] = {
+      NULL},
+     {"display_link_number", P_INT, PI_ONOFF, (void *)&displayLinkNumber,
+      CMT_DISPLINKNUMBER, NULL},
++    {"zero_based_link_no", P_INT, PI_ONOFF, (void *)&zeroBasedLinkNo,
++     CMT_ZEROBASEDLINKNO, NULL},
+     {"decode_url", P_INT, PI_ONOFF, (void *)&DecodeURL, CMT_DECODE_URL, NULL},
+     {"display_lineinfo", P_INT, PI_ONOFF, (void *)&displayLineInfo,
+      CMT_DISPLINEINFO, NULL},
+--- a/file.c
++++ b/file.c
+@@ -1707,7 +1707,7 @@ checkRedirection(ParsedURL *pu)
+ Str
+ getLinkNumberStr(int correction)
+ {
+-    return Sprintf("[%d]", cur_hseq + correction);
++    return Sprintf("[%d]", cur_hseq + correction - !!zeroBasedLinkNo);
+ }
+ 
+ /* 
+@@ -7795,7 +7795,7 @@ loadGeminiBuffer(URLFile *uf, Buffer *vo
+ 	    buf->hmarklist = putHmarker(buf->hmarklist, currentLn(buf),
+ 					0, hseq);
+ 	    if (displayLinkNumber)
+-		line = Sprintf("[%d]: %s", hseq + 1, q);
++		line = Sprintf("[%d]: %s", hseq + 1 - !!zeroBasedLinkNo, q);
+ 	    else
+ 		line = Sprintf("%s", q);
+ 	    line = checkType(line, &propBuf, NULL);
+--- a/fm.h
++++ b/fm.h
+@@ -977,6 +977,7 @@ global int nextpage_topline init(FALSE);
+ global char *displayTitleTerm init(NULL);
+ global int displayLink init(FALSE);
+ global int displayLinkNumber init(FALSE);
++global int zeroBasedLinkNo init(FALSE);
+ global int displayLineInfo init(FALSE);
+ global int DecodeURL init(FALSE);
+ global int retryAsHttp init(TRUE);
+--- a/main.c
++++ b/main.c
+@@ -3667,7 +3667,7 @@ DEFUN(topA, LINK_BEGIN, "Move to the fir
+     if (prec_num > hl->nmark)
+ 	hseq = hl->nmark - 1;
+     else if (prec_num > 0)
+-	hseq = prec_num - 1;
++	hseq = prec_num - 1 + !!zeroBasedLinkNo;
+     do {
+ 	if (hseq >= hl->nmark)
+ 	    return;

@@ -1,0 +1,54 @@
+---
+ display.c   |    1 +
+ linein.c    |    3 +++
+ parsetagx.c |    3 +++
+ 3 files changed, 7 insertions(+)
+
+--- a/parsetagx.c
++++ b/parsetagx.c
+@@ -17,6 +17,8 @@ static int toAlign(char *, int *);
+ static int toVAlign(char *, int *);
+ 
+ /* *INDENT-OFF* */
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Wstrict-prototypes"
+ static int (*toValFunc[]) () = {
+     noConv,		/* VTYPE_NONE    */
+     noConv,		/* VTYPE_STR     */
+@@ -30,6 +32,7 @@ static int (*toValFunc[]) () = {
+     noConv,		/* VTYPE_MLENGTH */
+     noConv,		/* VTYPE_TYPE    */
+ };
++#pragma GCC diagnostic pop
+ /* *INDENT-ON* */
+ 
+ static int
+--- a/display.c
++++ b/display.c
+@@ -7,6 +7,7 @@
+ /* *INDENT-OFF* */
+ #pragma GCC diagnostic push
+ #pragma GCC diagnostic ignored "-Wold-style-definition"
++#pragma GCC diagnostic ignored "-Wstrict-prototypes"
+ 
+ #ifdef USE_COLOR
+ 
+--- a/linein.c
++++ b/linein.c
+@@ -50,6 +50,8 @@ static void next_dcompl(int next);
+ static Str doComplete(Str ifn, int *status, int next);
+ 
+ /* *INDENT-OFF* */
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Wstrict-prototypes"
+ void (*InputKeymap[32]) () = {
+ /*  C-@     C-a     C-b     C-c     C-d     C-e     C-f     C-g     */
+     _compl, _mvB,   _mvL,   _inbrk, delC,   _mvE,   _mvR,   _inbrk,
+@@ -60,6 +62,7 @@ void (*InputKeymap[32]) () = {
+ /*  C-x     C-y     C-z     C-[     C-\     C-]     C-^     C-_     */
+     _tcompl,_mvRw,  iself,  _esc,   iself,  iself,  iself,  iself,
+ };
++#pragma GCC diagnostic pop
+ /* *INDENT-ON* */
+ 
+ static int setStrType(Str str, Lineprop *prop);

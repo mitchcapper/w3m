@@ -1,0 +1,40 @@
+From 94781e60cdc22ee242959f17b786e50d37f0659e Mon Sep 17 00:00:00 2001
+From: Rene Kita <mail@rkta.de>
+Date: Mon, 25 Apr 2022 10:07:42 +0200
+Subject: [PATCH 149/172] Use https with USE_SSL and retry_http
+
+---
+ rc.c  |    4 ++++
+ url.c |    5 +++++
+ 2 files changed, 9 insertions(+)
+
+--- a/rc.c
++++ b/rc.c
+@@ -188,7 +188,11 @@ static int OptionEncode = FALSE;
+ #endif				/* USE_DICT */
+ #define CMT_IGNORE_NULL_IMG_ALT	N_("Display link name for images lacking ALT")
+ #define CMT_IFILE        N_("Index file for directories")
++#ifdef USE_SSL
++#define CMT_RETRY_HTTP   N_("Prepend https:// to URL automatically")
++#else
+ #define CMT_RETRY_HTTP   N_("Prepend http:// to URL automatically")
++#endif				/* USE_SSL */
+ #define CMT_DEFAULT_URL  N_("Default value for open-URL command")
+ #define CMT_DECODE_CTE   N_("Decode Content-Transfer-Encoding when saving")
+ #define CMT_PRESERVE_TIMESTAMP N_("Preserve timestamp when saving")
+--- a/url.c
++++ b/url.c
+@@ -1742,8 +1742,13 @@ openURL(char *url, ParsedURL *pu, Parsed
+ 	}
+ 	if (uf.stream == NULL && retryAsHttp && url[0] != '/') {
+ 	    if (scheme == SCM_MISSING || scheme == SCM_UNKNOWN) {
++#ifdef USE_SSL
++		/* retry it as "https://" */
++		u = Strnew_m_charp("https://", url, NULL)->ptr;
++#else
+ 		/* retry it as "http://" */
+ 		u = Strnew_m_charp("http://", url, NULL)->ptr;
++#endif
+ 		goto retry;
+ 	    }
+ 	}

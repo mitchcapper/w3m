@@ -1,0 +1,15 @@
+---
+ file.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+--- a/file.c
++++ b/file.c
+@@ -1722,7 +1722,7 @@ loadGeneralFile(char *path, ParsedURL *v
+     Buffer *b = NULL;
+     Buffer *(*volatile proc)(URLFile *, Buffer *);
+     char *volatile tpath;
+-    char *volatile t = "text/plain", *p, *volatile real_type = NULL;
++    char *t = "text/plain", *p, *volatile real_type = NULL;
+     Buffer *volatile t_buf = NULL;
+     int volatile searchHeader = SearchHeader;
+     int volatile searchHeader_through = TRUE;

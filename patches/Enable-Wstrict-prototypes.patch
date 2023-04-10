@@ -1,0 +1,14 @@
+---
+ Makefile.in |    1 +
+ 1 file changed, 1 insertion(+)
+
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -51,6 +51,7 @@ DEFAULTS += -Wnull-dereference
+ DEFAULTS += -Wold-style-declaration
+ DEFAULTS += -Wold-style-definition
+ DEFAULTS += -Wredundant-decls
++DEFAULTS += -Wstrict-prototypes
+ DEFAULTS += -Wstring-compare
+ DEFAULTS += -Wtype-limits
+ DEFAULTS += -Wuninitialized

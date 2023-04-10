@@ -1,0 +1,32 @@
+---
+ etc.c |   12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
+
+--- a/etc.c
++++ b/etc.c
+@@ -393,7 +393,11 @@ checkType(Str s, Lineprop **oprop, Linec
+ 			    if (color)
+ 				color -= plen;
+ #endif
+-			    plen = *(--plens);
++			    if (plens == plens_buffer)
++				plen = 0;
++			    else
++				plen = *(--plens);
++			    plen = *plens;
+ 			    str += 2;
+ 			}
+ 		    }
+@@ -419,7 +423,11 @@ checkType(Str s, Lineprop **oprop, Linec
+ 			    if (color)
+ 				color -= plen;
+ #endif
+-			    plen = *(--plens);
++			    if (plens == plens_buffer)
++				plen = 0;
++			    else
++				plen = *(--plens);
++			    plen = *plens;
+ 			    str++;
+ 			}
+ #else

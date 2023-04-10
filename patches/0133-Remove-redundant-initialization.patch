@@ -1,0 +1,24 @@
+From 07a4a797b2a64f747671982838353b44cd376a0c Mon Sep 17 00:00:00 2001
+From: Rene Kita <mail@rkta.de>
+Date: Thu, 23 Dec 2021 11:29:07 +0100
+Subject: [PATCH 133/172] Remove redundant initialization
+
+file.c|6315 col 10| warning: Redundant initialization for 'mode'. The
+initialized value is overwritten before it is read.
+[redundantInitialization]
+||     mode = IS_CNTRL(ech) ? PC_CTRL : PC_ASCII;
+---
+ file.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+--- a/file.c
++++ b/file.c
+@@ -6482,7 +6482,7 @@ proc_escape(struct readbuffer *obuf, cha
+     char *str = *str_return, *estr;
+     int ech = getescapechar(str_return);
+     int width, n_add = *str_return - str;
+-    Lineprop mode = PC_ASCII;
++    Lineprop mode;
+ 
+     if (ech < 0) {
+ 	*str_return = str;

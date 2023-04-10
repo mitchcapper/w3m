@@ -1,0 +1,2048 @@
+From 5e2527910c92d7dbad9c4d3856f44bfdcbb2366c Mon Sep 17 00:00:00 2001
+From: Rene Kita <mail@rkta.de>
+Date: Sun, 20 Nov 2022 17:52:47 +0100
+Subject: [PATCH 172/172] const
+
+---
+ Str.c            |    4 +-
+ Str.h            |    2 -
+ anchor.c         |   16 ++++----
+ backend.c        |    4 +-
+ buffer.c         |    2 -
+ display.c        |    6 +--
+ etc.c            |   34 +++++++++---------
+ file.c           |  102 +++++++++++++++++++++++++++----------------------------
+ fm.h             |   14 +++----
+ form.c           |    2 -
+ func.c           |    6 +--
+ func.h           |    2 -
+ hash.c           |    8 ++--
+ hash.h           |    6 +--
+ history.c        |    8 ++--
+ history.h        |    8 ++--
+ html.h           |   14 +++----
+ indep.c          |   31 ++++++++--------
+ indep.h          |   16 ++++----
+ istream.c        |   10 ++---
+ libwc/charset.c  |   10 ++---
+ libwc/wc.h       |    6 +--
+ libwc/wtf.c      |   12 +++---
+ libwc/wtf.h      |    6 +--
+ linein.c         |   10 ++---
+ local.c          |   12 +++---
+ mailcap.c        |   12 +++---
+ main.c           |   22 +++++------
+ menu.c           |    2 -
+ news.c           |    2 -
+ parsetag.c       |    2 -
+ parsetag.h       |    2 -
+ proto.h          |   74 +++++++++++++++++++--------------------
+ rc.c             |   18 ++++-----
+ rc.h             |    2 -
+ regex.c          |    2 -
+ table.c          |    2 -
+ terms.c          |   27 +++++++-------
+ url.c            |    6 +--
+ version.c.in     |    2 -
+ w3mbookmark.c    |   16 ++++----
+ w3mhelperpanel.c |    2 -
+ 42 files changed, 274 insertions(+), 270 deletions(-)
+
+--- a/Str.c
++++ b/Str.c
+@@ -498,12 +498,12 @@ Stralign_center(Str s, int width)
+ #define SP_PREC2  2
+ 
+ Str
+-Sprintf(char *fmt, ...)
++Sprintf(const char *fmt, ...)
+ {
+     int len = 0;
+     int status = SP_NORMAL;
+     int p = 0;
+-    char *f;
++    const char *f;
+     Str s;
+     va_list ap;
+ 
+--- a/Str.h
++++ b/Str.h
+@@ -60,7 +60,7 @@ Str Stralign_left(Str, int);
+ Str Stralign_right(Str, int);
+ Str Stralign_center(Str, int);
+ 
+-Str Sprintf(char *fmt, ...);
++Str Sprintf(const char *fmt, ...);
+ 
+ Str Strfgets(FILE *);
+ Str Strfgetall(FILE *);
+--- a/backend.c
++++ b/backend.c
+@@ -13,7 +13,7 @@
+ #else				/* ! HAVE_READLINE */
+ static char *readline(char *);
+ #endif				/* ! HAVE_READLINE */
+-static TextList *split(char *);
++static TextList *split(const char *);
+ 
+ 
+ /* Prototype declaration of command functions */
+@@ -331,7 +331,7 @@ readline(char *prompt)
+ 
+ /* Splits a string into a list of tokens and returns that list. */
+ static TextList *
+-split(char *p)
++split(const char *p)
+ {
+     int in_double_quote = FALSE, in_single_quote = FALSE;
+     Str s = Strnew();
+--- a/buffer.c
++++ b/buffer.c
+@@ -15,7 +15,7 @@ extern int do_getch(void); /* TODO(rkta)
+ #include <sys/kbdscan.h>
+ #include <strings.h>
+ #endif
+-char *NullLine = "";
++const char *NullLine = "";
+ Lineprop NullProp[] = { 0 };
+ 
+ 
+--- a/display.c
++++ b/display.c
+@@ -1185,7 +1185,7 @@ addChar(char c, Lineprop mode)
+ static GeneralList *message_list = NULL;
+ 
+ void
+-record_err_message(char *s)
++record_err_message(const char *s)
+ {
+     if (fmInitialized) {
+ 	if (!message_list)
+@@ -1231,7 +1231,7 @@ message(const char *s, int return_x, int
+ }
+ 
+ void
+-disp_err_message(char *s, int redraw_current)
++disp_err_message(const char *s, int redraw_current)
+ {
+     record_err_message(s);
+     disp_message(s, redraw_current);
+@@ -1279,7 +1279,7 @@ disp_message_nomouse(char *s, int redraw
+ #endif
+ 
+ void
+-set_delayed_message(char *s)
++set_delayed_message(const char *s)
+ {
+     delayed_msg = allocStr(s, -1);
+ }
+--- a/etc.c
++++ b/etc.c
+@@ -122,11 +122,11 @@ currentLineSkip(Buffer *buf, Line *line,
+ #define MAX_CMD_LEN 128
+ 
+ int
+-gethtmlcmd(char *s)
++gethtmlcmd(const char *s)
+ {
+     char cmdstr[MAX_CMD_LEN];
+     char *p = cmdstr;
+-    char *save = s;
++    const char *save = s;
+     int cmd;
+ 
+     s++;
+@@ -605,9 +605,9 @@ columnLen(Line *line, int column)
+ }
+ 
+ char *
+-lastFileName(char *path)
++lastFileName(const char *path)
+ {
+-    char *p, *q;
++    const char *p, *q;
+ 
+     p = q = path;
+     while (*p != '\0') {
+@@ -643,9 +643,9 @@ lrand48(void)
+ #endif
+ 
+ char *
+-mybasename(char *s)
++mybasename(const char *s)
+ {
+-    char *p = s;
++    const char *p = s;
+     while (*p)
+ 	p++;
+     while (s <= p && *p != '/')
+@@ -658,9 +658,9 @@ mybasename(char *s)
+ }
+ 
+ char *
+-mydirname(char *s)
++mydirname(const char *s)
+ {
+-    char *p = s;
++    const char *p = s;
+     while (*p)
+ 	p++;
+     if (s != p)
+@@ -686,7 +686,7 @@ strerror(int errno)
+ #endif				/* not HAVE_STRERROR */
+ 
+ int
+-next_status(char c, int *status)
++next_status(const char c, int *status)
+ {
+     switch (*status) {
+     case R_ST_NORMAL:
+@@ -1506,10 +1506,10 @@ mySystem(char *command, int background)
+ }
+ 
+ Str
+-myExtCommand(char *cmd, char *arg, int redirect)
++myExtCommand(const char *cmd, const char *arg, int redirect)
+ {
+     Str tmp = NULL;
+-    char *p;
++    const char *p;
+     int set_arg = FALSE;
+ 
+     for (p = cmd; *p; p++) {
+@@ -1535,10 +1535,10 @@ myExtCommand(char *cmd, char *arg, int r
+ }
+ 
+ Str
+-myEditor(char *cmd, char *file, int line)
++myEditor(const char *cmd, const char *file, int line)
+ {
+     Str tmp = NULL;
+-    char *p;
++    const char *p;
+     int set_file = FALSE, set_line = FALSE;
+ 
+     for (p = cmd; *p; p++) {
+@@ -1709,13 +1709,13 @@ url_unquote_conv0(const char *url)
+     return tmp->ptr;
+ }
+ 
+-static char *tmpf_base[MAX_TMPF_TYPE] = {
++static const char *tmpf_base[MAX_TMPF_TYPE] = {
+     "tmp", "src", "frame", "cache", "cookie", "hist",
+ };
+ static unsigned int tmpf_seq[MAX_TMPF_TYPE];
+ 
+ Str
+-tmpfname(int type, char *ext)
++tmpfname(int type, const char *ext)
+ {
+     Str tmpf;
+     char *dir;
+@@ -1741,7 +1741,7 @@ tmpfname(int type, char *ext)
+     return tmpf;
+ }
+ 
+-static char *monthtbl[] = {
++static const char *monthtbl[] = {
+     "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+     "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+ };
+@@ -2081,7 +2081,7 @@ void (*mySignal(int signal_number, void
+ #endif
+ }
+ 
+-static char Base64Table[] =
++static const char Base64Table[] =
+     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+ 
+ Str
+--- a/file.c
++++ b/file.c
+@@ -37,11 +37,11 @@ char * conv_entity(unsigned int c); /* T
+ static int frame_source = 0;
+ static int need_number = 0;
+ 
+-static char *guess_filename(char *file);
+-static int _MoveFile(char *path1, char *path2);
++static char *guess_filename(const char *file);
++static int _MoveFile(const char *path1, const char *path2);
+ static void uncompress_stream(URLFile *uf, char **src);
+-static FILE *lessopen_stream(char *path);
+-static Buffer *loadcmdout(char *cmd,
++static FILE *lessopen_stream(const char *path);
++static Buffer *loadcmdout(const char *cmd,
+ 			  Buffer *(*loadproc) (URLFile *, Buffer *),
+ 			  Buffer *defaultbuf);
+ #ifndef USE_ANSI_COLOR
+@@ -145,7 +145,7 @@ static int cur_iseq;
+ #ifdef USE_COOKIE
+ /* This array should be somewhere else */
+ /* FIXME: gettextize? */
+-char *violations[COO_EMAX] = {
++const char *violations[COO_EMAX] = {
+     "internal error",
+     "tail match failed",
+     "wrong number of dots",
+@@ -256,7 +256,7 @@ loadSomething(URLFile *f,
+ }
+ 
+ int
+-dir_exist(char *path)
++dir_exist(const char *path)
+ {
+     struct stat stbuf;
+ 
+@@ -268,7 +268,7 @@ dir_exist(char *path)
+ }
+ 
+ static int
+-is_dump_text_type(char *type)
++is_dump_text_type(const char *type)
+ {
+     struct mailcap *mcap;
+     return (type && (mcap = searchExtViewer(type)) &&
+@@ -276,7 +276,7 @@ is_dump_text_type(char *type)
+ }
+ 
+ static int
+-is_text_type(char *type)
++is_text_type(const char *type)
+ {
+     return (type == NULL || type[0] == '\0' ||
+ 	    strncasecmp(type, "text/", 5) == 0 ||
+@@ -286,21 +286,21 @@ is_text_type(char *type)
+ }
+ 
+ static int
+-is_plain_text_type(char *type)
++is_plain_text_type(const char *type)
+ {
+     return ((type && strcasecmp(type, "text/plain") == 0) ||
+ 	    (is_text_type(type) && !is_dump_text_type(type)));
+ }
+ 
+ int
+-is_html_type(char *type)
++is_html_type(const char *type)
+ {
+     return (type && (strcasecmp(type, "text/html") == 0 ||
+ 		     strcasecmp(type, "application/xhtml+xml") == 0));
+ }
+ 
+ static void
+-check_compression(char *path, URLFile *uf)
++check_compression(const char *path, URLFile *uf)
+ {
+     int len;
+     struct compression_decoder *d;
+@@ -336,7 +336,7 @@ compress_application_type(int compressio
+ }
+ 
+ static char *
+-uncompressed_file_type(char *path, char **ext)
++uncompressed_file_type(const char *path, char **ext)
+ {
+     int len, slen;
+     Str fn;
+@@ -369,7 +369,7 @@ uncompressed_file_type(char *path, char
+ }
+ 
+ static int
+-setModtime(char *path, time_t modtime)
++setModtime(const char *path, time_t modtime)
+ {
+     struct utimbuf t;
+     struct stat st;
+@@ -424,7 +424,7 @@ examineFile(char *path, URLFile *uf)
+ #define S_IXANY	(S_IXUSR|S_IXGRP|S_IXOTH)
+ 
+ static int
+-check_command(char *cmd, int auxbin_p)
++check_command(const char *cmd, int auxbin_p)
+ {
+     static char *path = NULL;
+     Str dirs;
+@@ -503,10 +503,10 @@ convertLine0(URLFile *uf, Str line, int
+ }
+ 
+ int
+-matchattr(char *p, char *attr, int len, Str *value)
++matchattr(const char *p, const char *attr, int len, Str *value)
+ {
+     int quoted;
+-    char *q = NULL;
++    const char *q = NULL;
+ 
+     if (strncasecmp(p, attr, len) == 0) {
+ 	p += len;
+@@ -581,7 +581,7 @@ readHeader(URLFile *uf, Buffer *newBuf,
+ {
+     char *p, *q;
+ #ifdef USE_COOKIE
+-    char *emsg;
++    const char *emsg;
+ #endif
+     char c;
+     Str lineBuf2 = NULL;
+@@ -856,7 +856,7 @@ readHeader(URLFile *uf, Buffer *newBuf,
+ 		    add_cookie(pu, name, value, expires, domain, path, flag,
+ 			       comment, version, port, commentURL);
+ 		if (err) {
+-		    char *ans = (accept_bad_cookie == ACCEPT_BAD_COOKIE_ACCEPT)
++		    const char *ans = (accept_bad_cookie == ACCEPT_BAD_COOKIE_ACCEPT)
+ 			? "y" : NULL;
+ 		    if (fmInitialized && (err & COO_OVERRIDE_OK) &&
+ 			accept_bad_cookie == ACCEPT_BAD_COOKIE_ASK) {
+@@ -925,7 +925,7 @@ readHeader(URLFile *uf, Buffer *newBuf,
+ }
+ 
+ char *
+-checkHeader(Buffer *buf, char *field)
++checkHeader(Buffer *buf, const char *field)
+ {
+     int len;
+     TextListItem *i;
+@@ -1168,7 +1168,7 @@ extract_auth_param(char *q, struct auth_
+ }
+ 
+ static Str
+-get_auth_param(struct auth_param *auth, char *name)
++get_auth_param(struct auth_param *auth, const char *name)
+ {
+     struct auth_param *ap;
+     for (ap = auth; ap->name != NULL; ap++) {
+@@ -1233,9 +1233,9 @@ MD5(const unsigned char *d, unsigned lon
+ 
+ 
+ static Str
+-digest_hex(unsigned char *p)
++digest_hex(const unsigned char *p)
+ {
+-    char *h = "0123456789abcdef";
++    const char *h = "0123456789abcdef";
+     Str tmp = Strnew_size(MD5_DIGEST_LENGTH * 2 + 1);
+     int i;
+     for (i = 0; i < MD5_DIGEST_LENGTH; i++, p++) {
+@@ -2518,7 +2518,7 @@ push_link(int cmd, int offset, int pos)
+ }
+ 
+ static int
+-is_period_char(unsigned char *ch)
++is_period_char(const unsigned char *ch)
+ {
+     switch (*ch) {
+     case ',':
+@@ -2538,7 +2538,7 @@ is_period_char(unsigned char *ch)
+ }
+ 
+ static int
+-is_beginning_char(unsigned char *ch)
++is_beginning_char(const unsigned char *ch)
+ {
+     switch (*ch) {
+     case '(':
+@@ -2553,7 +2553,7 @@ is_beginning_char(unsigned char *ch)
+ }
+ 
+ static int
+-is_word_char(unsigned char *ch)
++is_word_char(const unsigned char *ch)
+ {
+     Lineprop ctype = get_mctype(ch);
+ 
+@@ -2600,7 +2600,7 @@ is_word_char(unsigned char *ch)
+ 
+ #ifdef USE_M17N
+ static int
+-is_combining_char(unsigned char *ch)
++is_combining_char(const unsigned char *ch)
+ {
+     Lineprop ctype = get_mctype(ch);
+ 
+@@ -2611,7 +2611,7 @@ is_combining_char(unsigned char *ch)
+ #endif
+ 
+ int
+-is_boundary(unsigned char *ch1, unsigned char *ch2)
++is_boundary(const unsigned char *ch1, const unsigned char *ch2)
+ {
+     if (!*ch1 || !*ch2)
+ 	return 1;
+@@ -2720,7 +2720,7 @@ append_tags(struct readbuffer *obuf)
+ }
+ 
+ static void
+-push_tag(struct readbuffer *obuf, char *cmdname, int cmd)
++push_tag(struct readbuffer *obuf, const char *cmdname, int cmd)
+ {
+     obuf->tag_stack[obuf->tag_sp] = New(struct cmdtable);
+     obuf->tag_stack[obuf->tag_sp]->cmdname = allocStr(cmdname, -1);
+@@ -2732,7 +2732,7 @@ push_tag(struct readbuffer *obuf, char *
+ 
+ static void
+ push_nchars(struct readbuffer *obuf, int width,
+-	    char *str, int len, Lineprop mode)
++	    const char *str, int len, Lineprop mode)
+ {
+     append_tags(obuf);
+     Strcat_charp_n(obuf->line, str, len);
+@@ -2751,7 +2751,7 @@ push_nchars(obuf, width, str, strlen(str
+ push_nchars(obuf, width, str->ptr, str->length, mode)
+ 
+ static void
+-check_breakpoint(struct readbuffer *obuf, int pre_mode, char *ch)
++check_breakpoint(struct readbuffer *obuf, int pre_mode, const char *ch)
+ {
+     int tlen, len = obuf->line->length;
+ 
+@@ -2761,12 +2761,12 @@ check_breakpoint(struct readbuffer *obuf
+     tlen = obuf->line->length - len;
+     if (tlen > 0
+ 	|| is_boundary((unsigned char *)obuf->prevchar->ptr,
+-		       (unsigned char *)ch))
++		       (const unsigned char *)ch))
+ 	set_breakpoint(obuf, tlen);
+ }
+ 
+ static void
+-push_char(struct readbuffer *obuf, int pre_mode, char ch)
++push_char(struct readbuffer *obuf, int pre_mode, const char ch)
+ {
+     check_breakpoint(obuf, pre_mode, &ch);
+     Strcat_char(obuf->line, ch);
+@@ -3181,7 +3181,7 @@ flushline(struct html_feed_environ *h_en
+ 	    Strcat_charp(tmp, html_quote(obuf->anchor.title));
+ 	}
+ 	if (obuf->anchor.accesskey) {
+-	    char *c = html_quote_char(obuf->anchor.accesskey);
++	    const char *c = html_quote_char(obuf->anchor.accesskey);
+ 	    Strcat_charp(tmp, "\" ACCESSKEY=\"");
+ 	    if (c)
+ 		Strcat_charp(tmp, c);
+@@ -3738,7 +3738,7 @@ process_img(struct parsed_tag *tag, int
+ }
+ 
+ Str
+-process_anchor(struct parsed_tag *tag, char *tagbuf)
++process_anchor(struct parsed_tag *tag, const char *tagbuf)
+ {
+     if (parsedtag_need_reconstruct(tag)) {
+ 	parsedtag_set_value(tag, ATTR_HSEQ, Sprintf("%d", cur_hseq++)->ptr);
+@@ -4566,10 +4566,10 @@ ul_type(struct parsed_tag *tag, int defa
+ }
+ 
+ int
+-getMetaRefreshParam(char *q, Str *refresh_uri)
++getMetaRefreshParam(const char *q, Str *refresh_uri)
+ {
+     int refresh_interval;
+-    char *r;
++    const char *r;
+     Str s_tmp = NULL;
+ 
+     if (q == NULL || refresh_uri == NULL)
+@@ -6800,7 +6800,7 @@ HTMLlineproc0(char *line, struct html_fe
+ 		    str++;
+ 		}
+ 		else if (obuf->flag & RB_PLAIN) {
+-		    char *p = html_quote_char(*str);
++		    const char *p = html_quote_char(*str);
+ 		    if (p) {
+ 			push_charp(obuf, 1, p, PC_ASCII);
+ 			str++;
+@@ -7060,7 +7060,7 @@ loadHTMLBuffer(URLFile *f, Buffer *newBu
+     return newBuf;
+ }
+ 
+-static char *_size_unit[] = { "b", "kb", "Mb", "Gb", "Tb",
++static const char *_size_unit[] = { "b", "kb", "Mb", "Gb", "Tb",
+     "Pb", "Eb", "Zb", "Bb", "Yb", NULL
+ };
+ 
+@@ -7069,7 +7069,7 @@ convert_size(clen_t size, int usefloat)
+ {
+     float csize;
+     int sizepos = 0;
+-    char **sizes = _size_unit;
++    const char **sizes = _size_unit;
+ 
+     csize = (float)size;
+     while (csize >= 999.495 && sizes[sizepos + 1]) {
+@@ -7083,7 +7083,7 @@ convert_size(clen_t size, int usefloat)
+ char *
+ convert_size2(clen_t size1, clen_t size2, int usefloat)
+ {
+-    char **sizes = _size_unit;
++    const char **sizes = _size_unit;
+     float csize, factor = 1;
+     int sizepos = 0;
+ 
+@@ -8107,7 +8107,7 @@ saveBufferBody(Buffer *buf, FILE * f, in
+ }
+ 
+ static Buffer *
+-loadcmdout(char *cmd,
++loadcmdout(const char *cmd,
+ 	   Buffer *(*loadproc) (URLFile *, Buffer *), Buffer *defaultbuf)
+ {
+     FILE *f;
+@@ -8389,7 +8389,7 @@ getNextPage(Buffer *buf, int plen)
+ }
+ 
+ int
+-save2tmp(URLFile uf, char *tmpf)
++save2tmp(URLFile uf, const char *tmpf)
+ {
+     FILE *ff;
+     clen_t linelen = 0, trbyte = 0;
+@@ -8457,7 +8457,7 @@ save2tmp(URLFile uf, char *tmpf)
+ }
+ 
+ Buffer *
+-doExternal(URLFile uf, char *type, Buffer *defaultbuf)
++doExternal(URLFile uf, const char *type, Buffer *defaultbuf)
+ {
+     Str tmpf, command;
+     struct mailcap *mcap;
+@@ -8558,7 +8558,7 @@ doExternal(URLFile uf, char *type, Buffe
+ }
+ 
+ static int
+-_MoveFile(char *path1, char *path2)
++_MoveFile(const char *path1, const char *path2)
+ {
+     InputStream f1;
+     FILE *f2;
+@@ -8721,7 +8721,7 @@ doFileMove(char *tmpf, char *defstr)
+ }
+ 
+ int
+-doFileSave(URLFile uf, char *defstr)
++doFileSave(URLFile uf, const char *defstr)
+ {
+ #ifndef __MINGW32_VERSION
+     Str msg;
+@@ -8816,7 +8816,7 @@ doFileSave(URLFile uf, char *defstr)
+ }
+ 
+ int
+-checkCopyFile(char *path1, char *path2)
++checkCopyFile(const char *path1, const char *path2)
+ {
+     struct stat st1, st2;
+ 
+@@ -8829,7 +8829,7 @@ checkCopyFile(char *path1, char *path2)
+ }
+ 
+ int
+-checkSaveFile(InputStream stream, char *path2)
++checkSaveFile(InputStream stream, const char *path2)
+ {
+     struct stat st1, st2;
+     int des = ISfileno(stream);
+@@ -8845,7 +8845,7 @@ checkSaveFile(InputStream stream, char *
+ }
+ 
+ int
+-checkOverWrite(char *path)
++checkOverWrite(const char *path)
+ {
+     struct stat st;
+     char *ans;
+@@ -8861,7 +8861,7 @@ checkOverWrite(char *path)
+ }
+ 
+ char *
+-inputAnswer(char *prompt)
++inputAnswer(const char *prompt)
+ {
+     char *ans;
+ 
+@@ -8978,7 +8978,7 @@ uncompress_stream(URLFile *uf, char **sr
+ 
+ 
+ static FILE *
+-lessopen_stream(char *path)
++lessopen_stream(const char *path)
+ {
+     char *lessopen;
+     FILE *fp;
+@@ -9027,7 +9027,7 @@ lessopen_stream(char *path)
+ }
+ 
+ static char *
+-guess_filename(char *file)
++guess_filename(const char *file)
+ {
+     char *p = NULL, *s;
+ 
+--- a/fm.h
++++ b/fm.h
+@@ -994,7 +994,7 @@ global int image_map_list init(TRUE);
+ global int displayImage init(FALSE);	/* XXX: emacs-w3m use display_image=off */
+ #endif
+ global int pseudoInlines init(TRUE);
+-global char *Editor init(DEF_EDITOR);
++global const char *Editor init(DEF_EDITOR);
+ #ifdef USE_W3MMAILER
+ global char *Mailer init(NULL);
+ #else
+@@ -1038,10 +1038,10 @@ global int WrapSearch init(FALSE);
+ global int squeezeBlankLine init(FALSE);
+ global char *BookmarkFile init(NULL);
+ global int UseExternalDirBuffer init(TRUE);
+-global char *DirBufferCommand init("file:///$LIB/dirlist" CGI_EXTENSION);
++global const char *DirBufferCommand init("file:///$LIB/dirlist" CGI_EXTENSION);
+ #ifdef USE_DICT
+ global int UseDictCommand init(TRUE);
+-global char *DictCommand init("file:///$LIB/w3mdict" CGI_EXTENSION);
++global const char *DictCommand init("file:///$LIB/w3mdict" CGI_EXTENSION);
+ #endif				/* USE_DICT */
+ global int ignore_null_img_alt init(TRUE);
+ #define DISPLAY_INS_DEL_SIMPLE	0
+@@ -1229,10 +1229,10 @@ global int use_lessopen init(FALSE);
+ global char *keymap_file init(KEYMAP_FILE);
+ 
+ #ifdef USE_M17N
+-#define get_mctype(c) ((Lineprop)wtf_type((wc_uchar *)(c)) << 8)
+-#define get_mclen(c) wtf_len1((wc_uchar *)(c))
+-#define get_mcwidth(c) wtf_width((wc_uchar *)(c))
+-#define get_strwidth(c) wtf_strwidth((wc_uchar *)(c))
++#define get_mctype(c) ((Lineprop)wtf_type((const wc_uchar *)(c)) << 8)
++#define get_mclen(c) wtf_len1((const wc_uchar *)(c))
++#define get_mcwidth(c) wtf_width((const wc_uchar *)(c))
++#define get_strwidth(c) wtf_strwidth((const wc_uchar *)(c))
+ #define get_Str_strwidth(c) wtf_strwidth((wc_uchar *)((c)->ptr))
+ #else
+ #define get_mctype(c) (IS_CNTRL(*(c)) ? PC_CTRL : PC_ASCII)
+--- a/form.c
++++ b/form.c
+@@ -762,7 +762,7 @@ form_write_from_file(FILE * f, char *bou
+     FILE *fd;
+     struct stat st;
+     int c;
+-    char *type;
++    const char *type;
+ 
+     fprintf(f, "--%s\r\n", boundary);
+     fprintf(f,
+--- a/func.c
++++ b/func.c
+@@ -210,9 +210,9 @@ getKeyData(int key)
+ }
+ 
+ static int
+-getKey2(char **str)
++getKey2(const char **str)
+ {
+-    char *s = *str;
++    const char *s = *str;
+     int c, esc = 0, ctrl = 0;
+ 
+     if (s == NULL || *s == '\0')
+@@ -346,7 +346,7 @@ getKey2(char **str)
+ }
+ 
+ int
+-getKey(char *s)
++getKey(const char *s)
+ {
+     int c, c2;
+ 
+--- a/func.h
++++ b/func.h
+@@ -18,7 +18,7 @@
+ #define MULTI_KEY(c) (((c) >> 16) & 0x77F)
+ 
+ typedef struct _FuncList {
+-    char *id;
++    const char *id;
+     void (*func) (void);
+ } FuncList;
+ 
+--- a/hash.c
++++ b/hash.c
+@@ -4,7 +4,7 @@
+ #include <gc.h>
+ 
+ static unsigned int
+-hashfunc(char *s)
++hashfunc(const char *s)
+ {
+     unsigned int h = 0;
+     while (*s) {
+@@ -23,8 +23,8 @@ hashfunc(char *s)
+ #define keycomp(x,y) !strcmp(x,y)
+ 
+ /* *INDENT-OFF* */
+-defhashfunc(char *, int, si)
+-defhashfunc(char *, char *, ss)
+-defhashfunc(char *, void *, sv)
++defhashfunc(const char *, int, si)
++defhashfunc(const char *, const char *, ss)
++defhashfunc(const char *, void *, sv)
+ defhashfunc_i(int, void *, iv)
+ /* *INDENT-ON* */
+--- a/hash.h
++++ b/hash.h
+@@ -18,9 +18,9 @@ extern Hash_##sym *newHash_##sym(int siz
+ extern void putHash_##sym(Hash_##sym *t, keytype key, type value); \
+ extern type getHash_##sym(Hash_##sym *t, keytype key, type failval);
+ 
+-defhash(char *, int, si)
+-defhash(char *, char *, ss)
+-defhash(char *, void *, sv)
++defhash(const char *, int, si)
++defhash(const char *, const char *, ss)
++defhash(const char *, void *, sv)
+ defhash(int, void *, iv)
+ #define defhashfunc(keytype,type,sym) \
+ Hash_##sym * \
+--- a/history.c
++++ b/history.c
+@@ -154,7 +154,7 @@ copyHist(Hist *hist)
+ }
+ 
+ HistItem *
+-unshiftHist(Hist *hist, char *ptr)
++unshiftHist(Hist *hist, const char *ptr)
+ {
+     HistItem *item;
+ 
+@@ -173,7 +173,7 @@ unshiftHist(Hist *hist, char *ptr)
+ }
+ 
+ HistItem *
+-pushHist(Hist *hist, char *ptr)
++pushHist(Hist *hist, const char *ptr)
+ {
+     HistItem *item;
+ 
+@@ -194,7 +194,7 @@ pushHist(Hist *hist, char *ptr)
+ /* Don't mix pushHashHist() and pushHist()/unshiftHist(). */
+ 
+ HistItem *
+-pushHashHist(Hist *hist, char *ptr)
++pushHashHist(Hist *hist, const char *ptr)
+ {
+     HistItem *item;
+ 
+@@ -219,7 +219,7 @@ pushHashHist(Hist *hist, char *ptr)
+ }
+ 
+ HistItem *
+-getHashHist(Hist *hist, char *ptr)
++getHashHist(Hist *hist, const char *ptr)
+ {
+     HistItem *item;
+ 
+--- a/history.h
++++ b/history.h
+@@ -21,10 +21,10 @@ typedef struct {
+ 
+ extern Hist *newHist(void);
+ extern Hist *copyHist(Hist *hist);
+-extern HistItem *unshiftHist(Hist *hist, char *ptr);
+-extern HistItem *pushHist(Hist *hist, char *ptr);
+-extern HistItem *pushHashHist(Hist *hist, char *ptr);
+-extern HistItem *getHashHist(Hist *hist, char *ptr);
++extern HistItem *unshiftHist(Hist *hist, const char *ptr);
++extern HistItem *pushHist(Hist *hist, const char *ptr);
++extern HistItem *pushHashHist(Hist *hist, const char *ptr);
++extern HistItem *getHashHist(Hist *hist, const char *ptr);
+ extern char *lastHist(Hist *hist);
+ extern char *nextHist(Hist *hist);
+ extern char *prevHist(Hist *hist);
+--- a/html.h
++++ b/html.h
+@@ -349,10 +349,10 @@ typedef struct {
+ /* HTML Tag Information Table */
+ 
+ typedef struct html_tag_info {
+-    char *name;
+-    unsigned char *accept_attribute;
+-    unsigned char max_attribute;
+-    unsigned char flag;
++    const char *name;
++    const unsigned char *accept_attribute;
++    const unsigned char max_attribute;
++    const unsigned char flag;
+ } TagInfo;
+ 
+ #define TFLG_END	1
+@@ -361,9 +361,9 @@ typedef struct html_tag_info {
+ /* HTML Tag Attribute Information Table */
+ 
+ typedef struct tag_attribute_info {
+-    char *name;
+-    unsigned char vtype;
+-    unsigned char flag;
++    const char *name;
++    const unsigned char vtype;
++    const unsigned char flag;
+ } TagAttrInfo;
+ 
+ #define AFLG_INT	1
+--- a/indep.c
++++ b/indep.c
+@@ -149,9 +149,10 @@ currentdir(void)
+ }
+ 
+ char *
+-cleanupName(char *name)
++cleanupName(const char *name)
+ {
+-    char *buf, *p, *q;
++    char *buf, *p;
++    const char *q;
+ 
+     buf = allocStr(name, -1);
+     p = buf;
+@@ -347,7 +348,7 @@ remove_space(char *str)
+ }
+ 
+ int
+-non_null(char *s)
++non_null(const char *s)
+ {
+     if (s == NULL)
+ 	return FALSE;
+@@ -511,7 +512,7 @@ html_unquote(char *str)
+     return str;
+ }
+ 
+-static char xdigit[0x10] = "0123456789ABCDEF";
++static const char xdigit[0x10] = "0123456789ABCDEF";
+ 
+ #define url_unquote_char(pstr) \
+   ((IS_XDIGIT((*(pstr))[1]) && IS_XDIGIT((*(pstr))[2])) ? \
+@@ -522,7 +523,7 @@ char *
+ url_quote(char *str)
+ {
+     Str tmp = NULL;
+-    char *p;
++    const char *p;
+ 
+     for (p = str; *p; p++) {
+ 	if (is_url_quote(*p)) {
+@@ -660,11 +661,11 @@ Str_url_unquote(Str x, int is_form, int
+     return x;
+ }
+ 
+-char *
+-shell_quote(char *str)
++const char *
++shell_quote(const char *str)
+ {
+     Str tmp = NULL;
+-    char *p;
++    const char *p;
+ 
+     for (p = str; *p; p++) {
+ 	if (is_shell_unsafe(*p)) {
+@@ -788,8 +789,8 @@ growbuf_append(struct growbuf *gb, const
+     gb->length += len;
+ }
+ 
+-static char *
+-w3m_dir(const char *name, char *dft)
++static const char *
++w3m_dir(const char *name, const char *dft)
+ {
+ #ifdef USE_PATH_ENVVAR
+     char *value = getenv(name);
+@@ -799,32 +800,32 @@ w3m_dir(const char *name, char *dft)
+ #endif
+ }
+ 
+-char *
++const char *
+ w3m_auxbin_dir(void)
+ {
+     return w3m_dir("W3M_AUXBIN_DIR", AUXBIN_DIR);
+ }
+ 
+-char *
++const char *
+ w3m_lib_dir(void)
+ {
+     /* FIXME: use W3M_CGIBIN_DIR? */
+     return w3m_dir("W3M_LIB_DIR", CGIBIN_DIR);
+ }
+ 
+-char *
++const char *
+ w3m_etc_dir(void)
+ {
+     return w3m_dir("W3M_ETC_DIR", ETC_DIR);
+ }
+ 
+-char *
++const char *
+ w3m_conf_dir(void)
+ {
+     return w3m_dir("W3M_CONF_DIR", CONF_DIR);
+ }
+ 
+-char *
++const char *
+ w3m_help_dir(void)
+ {
+     return w3m_dir("W3M_HELP_DIR", HELP_DIR);
+--- a/indep.h
++++ b/indep.h
+@@ -46,7 +46,7 @@ extern char *getescapecmd(char **s);
+ extern char *allocStr(const char *s, int len);
+ extern int strCmp(const void *s1, const void *s2);
+ extern char *currentdir(void);
+-extern char *cleanupName(char *name);
++extern char *cleanupName(const char *name);
+ extern char *expandPath(char *name);
+ #ifndef HAVE_STRCHR
+ extern char *strchr(const char *s, int c);
+@@ -60,7 +60,7 @@ extern char *strcasestr(const char *s1,
+ #endif
+ int strmatchlen(const char *s1, const char *s2, int maxlen);
+ extern char *remove_space(char *str);
+-extern int non_null(char *s);
++extern int non_null(const char *s);
+ extern void cleanup_line(Str s, int mode);
+ extern char *html_quote(char *str);
+ extern char *html_unquote(char *str);
+@@ -70,7 +70,7 @@ extern char *url_quote(char *str);
+ extern Str Str_url_unquote(Str x, int is_form, int safe);
+ extern Str Str_form_quote(Str x);
+ #define Str_form_unquote(x) Str_url_unquote((x), TRUE, FALSE)
+-extern char *shell_quote(char *str);
++extern const char *shell_quote(const char *str);
+ #define xmalloc(s) xrealloc(NULL, s)
+ extern void *xrealloc(void *ptr, size_t size);
+ extern void xfree(void *ptr);
+@@ -84,11 +84,11 @@ extern void growbuf_reserve(struct growb
+ extern void growbuf_append(struct growbuf *gb, const unsigned char *src, int len);
+ #define GROWBUF_ADD_CHAR(gb,ch) ((((gb)->length>=(gb)->area_size)?growbuf_reserve(gb,(gb)->length+1):(void)0),(void)((gb)->ptr[(gb)->length++] = (ch)))
+ 
+-extern char *w3m_auxbin_dir(void);
+-extern char *w3m_lib_dir(void);
+-extern char *w3m_etc_dir(void);
+-extern char *w3m_conf_dir(void);
+-extern char *w3m_help_dir(void);
++extern const char *w3m_auxbin_dir(void);
++extern const char *w3m_lib_dir(void);
++extern const char *w3m_etc_dir(void);
++extern const char *w3m_conf_dir(void);
++extern const char *w3m_help_dir(void);
+ 
+ #define NewWithoutGC(type)	((type*)xmalloc(sizeof(type)))
+ #define NewWithoutGC_N(type,n)	((type*)xmalloc((n)*sizeof(type)))
+--- a/istream.c
++++ b/istream.c
+@@ -64,7 +64,7 @@ buffer_read(StreamBuffer sb, unsigned ch
+ }
+ 
+ static void
+-init_buffer(BaseStream base, char *buf, int bufsize)
++init_buffer(BaseStream base, const char *buf, int bufsize)
+ {
+     StreamBuffer sb = &base->stream;
+     sb->size = bufsize;
+@@ -363,7 +363,7 @@ ssl_accept_this_site(char *hostname, X50
+ }
+ 
+ static int
+-ssl_match_cert_ident(char *ident, int ilen, char *hostname)
++ssl_match_cert_ident(const char *ident, int ilen, char *hostname)
+ {
+     /* RFC2818 3.1.  Server Identity
+      * Names may contain the wildcard
+@@ -555,7 +555,7 @@ ssl_get_certificate(SSL * ssl, char *hos
+     char buf[2048];
+     Str amsg = NULL;
+     Str emsg;
+-    char *ans;
++    const char *ans;
+ 
+     if (ssl == NULL)
+ 	return NULL;
+@@ -575,7 +575,7 @@ ssl_get_certificate(SSL * ssl, char *hos
+ 		("Accept SSL session without any peer certificate");
+ 	else {
+ 	    /* FIXME: gettextize? */
+-	    char *e = "This SSL session was rejected "
++	    const char *e = "This SSL session was rejected "
+ 		"to prevent security violation: no peer certificate";
+ 	    disp_err_message(e, FALSE);
+ 	    free_ssl_ctx();
+@@ -648,7 +648,7 @@ ssl_get_certificate(SSL * ssl, char *hos
+ 	}
+ 	else {
+ 	    /* FIXME: gettextize? */
+-	    char *e = "This SSL session was rejected "
++	    const char *e = "This SSL session was rejected "
+ 		"to prevent security violation";
+ 	    disp_err_message(e, FALSE);
+ 	    free_ssl_ctx();
+--- a/libwc/charset.c
++++ b/libwc/charset.c
+@@ -83,7 +83,7 @@ wc_guess_charset(char *charset, wc_ces o
+ }
+ 
+ wc_ces
+-wc_guess_charset_short(char *charset, wc_ces orig)
++wc_guess_charset_short(const char *charset, wc_ces orig)
+ {
+     wc_ces guess;
+ 
+@@ -105,9 +105,9 @@ wc_guess_locale_charset(char *locale, wc
+ }
+ 
+ wc_ces
+-wc_charset_to_ces(char *charset)
++wc_charset_to_ces(const char *charset)
+ {
+-    char *p = charset;
++    const char *p = charset;
+     char buf[16];
+     int n;
+ 
+@@ -276,9 +276,9 @@ wc_charset_to_ces(char *charset)
+ }
+ 
+ wc_ces
+-wc_charset_short_to_ces(char *charset)
++wc_charset_short_to_ces(const char *charset)
+ {
+-    char *p = charset;
++    const char *p = charset;
+     char buf[16];
+     wc_ces ces;
+     int n;
+--- a/libwc/wc.h
++++ b/libwc/wc.h
+@@ -63,10 +63,10 @@ extern void   wc_create_detect_map(wc_ce
+ extern wc_ces wc_auto_detect(char *is, size_t len, wc_ces hint);
+ 
+ extern wc_ces       wc_guess_charset(char *charset, wc_ces orig);
+-extern wc_ces       wc_guess_charset_short(char *charset, wc_ces orig);
++extern wc_ces       wc_guess_charset_short(const char *charset, wc_ces orig);
+ extern wc_ces       wc_guess_locale_charset(char *locale, wc_ces orig);
+-extern wc_ces       wc_charset_to_ces(char *charset);
+-extern wc_ces       wc_charset_short_to_ces(char *charset);
++extern wc_ces       wc_charset_to_ces(const char *charset);
++extern wc_ces       wc_charset_short_to_ces(const char *charset);
+ extern wc_ces       wc_locale_to_ces(char *locale);
+ extern wc_ces       wc_guess_8bit_charset(wc_ces orig);
+ extern char        *wc_ces_to_charset(wc_ces ces);
+--- a/libwc/wtf.c
++++ b/libwc/wtf.c
+@@ -109,10 +109,10 @@ wtf_init(wc_ces ces1, wc_ces ces2)
+ }
+ 
+ int
+-wtf_strwidth(wc_uchar *p)
++wtf_strwidth(const wc_uchar *p)
+ {
+     int w = 0;
+-    wc_uchar *q = p + strlen((char *)p);
++    const wc_uchar *q = p + strlen((const char *)p);
+ 
+     while (p < q) {
+ 	w += wtf_width(p);
+@@ -122,7 +122,7 @@ wtf_strwidth(wc_uchar *p)
+ }
+ 
+ size_t
+-wtf_len1(wc_uchar *p)
++wtf_len1(const wc_uchar *p)
+ {
+     size_t len, len_max = WTF_LEN_MAP[*p];
+ 
+@@ -135,10 +135,10 @@ wtf_len1(wc_uchar *p)
+ }
+ 
+ size_t
+-wtf_len(wc_uchar *p)
++wtf_len(const wc_uchar *p)
+ {
+-    wc_uchar *q = p;
+-    wc_uchar *strz = p + strlen((char *)p);
++    const wc_uchar *q = p;
++    const wc_uchar *strz = p + strlen((const char *)p);
+ 
+     q += WTF_LEN_MAP[*q];
+     while (q < strz && ! WTF_WIDTH_MAP[*q])
+--- a/libwc/wtf.h
++++ b/libwc/wtf.h
+@@ -58,9 +58,9 @@ extern void       wtf_init(wc_ces ces1,
+ /* extern int     wtf_width(wc_uchar *p); */
+ #define wtf_width(p) (WcOption.use_wide ? (int)WTF_WIDTH_MAP[(wc_uchar)*(p)] \
+ 		      : ((int)WTF_WIDTH_MAP[(wc_uchar)*(p)] ? 1 : 0))
+-extern int        wtf_strwidth(wc_uchar *p);
+-extern size_t     wtf_len1(wc_uchar *p);
+-extern size_t     wtf_len(wc_uchar *p);
++extern int        wtf_strwidth(const wc_uchar *p);
++extern size_t     wtf_len1(const wc_uchar *p);
++extern size_t     wtf_len(const wc_uchar *p);
+ /* extern int     wtf_type(wc_uchar *p); */
+ #define wtf_type(p) WTF_TYPE_MAP[(wc_uchar)*(p)]
+ 
+--- a/linein.c
++++ b/linein.c
+@@ -83,8 +83,8 @@ static void ins_char(Str str);
+ #endif
+ 
+ char *
+-inputLineHistSearch(const char *prompt, const char *def_str, int flag,
+-		    Hist *hist,
++inputLineHistSearch(const char *prompt, const char *def_str,
++		    int flag, Hist *hist,
+ 		    int (*incrfunc) (int ch, Str str, Lineprop *prop))
+ {
+     int opos, x, y, lpos, rpos, epos;
+@@ -382,7 +382,7 @@ addStr(char *p, Lineprop *pr, int len, i
+ static void
+ ins_char(Str str)
+ {
+-    char *p = str->ptr, *ep = p + str->length;
++    const char *p = str->ptr, *ep = p + str->length;
+     Lineprop ctype;
+     int len;
+ 
+@@ -584,7 +584,7 @@ _enter(void)
+ }
+ 
+ static void
+-insertself(char c)
++insertself(const char c)
+ {
+     if (CLen >= STR_LEN)
+ 	return;
+@@ -1098,7 +1098,7 @@ setStrType(Str str, Lineprop *prop)
+ }
+ 
+ static int
+-terminated(unsigned char c)
++terminated(const unsigned char c)
+ {
+     int termchar[] = { '/', '&', '?', ' ', -1 };
+     int *tp;
+--- a/local.c
++++ b/local.c
+@@ -184,7 +184,7 @@ loadLocalDir(char *dname)
+ }
+ 
+ static int
+-check_local_cgi(char *file, int status)
++check_local_cgi(const char *file, int status)
+ {
+     struct stat st;
+ 
+@@ -202,7 +202,7 @@ check_local_cgi(char *file, int status)
+ }
+ 
+ void
+-set_environ(char *var, char *value)
++set_environ(const char *var, const char *value)
+ {
+ #ifdef HAVE_SETENV
+     if (var != NULL && value != NULL)
+@@ -253,7 +253,7 @@ set_environ(char *var, char *value)
+ }
+ 
+ static void
+-set_cgi_environ(char *name, char *fn, char *req_uri)
++set_cgi_environ(const char *name, const char *fn, const char *req_uri)
+ {
+     set_environ("SERVER_SOFTWARE", w3m_version);
+     set_environ("SERVER_PROTOCOL", "HTTP/1.0");
+@@ -269,7 +269,7 @@ set_cgi_environ(char *name, char *fn, ch
+ }
+ 
+ static Str
+-checkPath(char *fn, char *path)
++checkPath(const char *fn, char *path)
+ {
+     char *p;
+     Str tmp;
+@@ -292,7 +292,7 @@ checkPath(char *fn, char *path)
+ }
+ 
+ static int
+-cgi_filename(char *uri, char **fn, char **name, char **path_info)
++cgi_filename(const char *uri, const char **fn, const char **name, const char **path_info)
+ {
+     Str tmp;
+     int offset;
+@@ -353,7 +353,7 @@ localcgi_post(char *uri, char *qstr, For
+     FILE *fr = NULL, *fw = NULL;
+     int status;
+     pid_t pid;
+-    char *file = uri, *name = uri, *path_info = NULL, *tmpf = NULL;
++    const char *file = uri, *name = uri, *path_info = NULL, *tmpf = NULL;
+ #ifdef HAVE_CHDIR
+     char *cgi_dir;
+ #endif
+--- a/mailcap.c
++++ b/mailcap.c
+@@ -16,7 +16,7 @@ static TextList *mailcap_list;
+ static struct mailcap **UserMailcap;
+ 
+ int
+-mailcapMatch(struct mailcap *mcap, char *type)
++mailcapMatch(struct mailcap *mcap, const char *type)
+ {
+     char *cap = mcap->type, *p;
+     int level;
+@@ -47,7 +47,7 @@ mailcapMatch(struct mailcap *mcap, char
+ }
+ 
+ struct mailcap *
+-searchMailcap(struct mailcap *table, char *type)
++searchMailcap(struct mailcap *table, const char *type)
+ {
+     int level = 0;
+     struct mailcap *mcap = NULL;
+@@ -283,7 +283,7 @@ acceptableMimeTypes(void)
+ }
+ 
+ struct mailcap *
+-searchExtViewer(char *type)
++searchExtViewer(const char *type)
+ {
+     struct mailcap *p;
+     int i;
+@@ -309,7 +309,7 @@ searchExtViewer(char *type)
+ #define MCF_DQUOTED (1 << 1)
+ 
+ static Str
+-quote_mailcap(char *s, int flag)
++quote_mailcap(const char *s, int flag)
+ {
+     Str d;
+ 
+@@ -349,7 +349,7 @@ quote_mailcap(char *s, int flag)
+ 
+ 
+ static Str
+-unquote_mailcap_loop(char *qstr, char *type, char *name, char *attr,
++unquote_mailcap_loop(char *qstr, const char *type, char *name, char *attr,
+ 		     int *mc_stat, int flag0)
+ {
+     Str str, tmp, test, then;
+@@ -465,7 +465,7 @@ unquote_mailcap_loop(char *qstr, char *t
+ }
+ 
+ Str
+-unquote_mailcap(char *qstr, char *type, char *name, char *attr, int *mc_stat)
++unquote_mailcap(char *qstr, const char *type, char *name, char *attr, int *mc_stat)
+ {
+     return unquote_mailcap_loop(qstr, type, name, attr, mc_stat, 0);
+ }
+--- a/main.c
++++ b/main.c
+@@ -112,7 +112,7 @@ void set_buffer_environ(Buffer *);
+ static void save_buffer_position(Buffer *buf);
+ 
+ static void _followForm(int);
+-static void _goLine(char *);
++static void _goLine(const char *);
+ static void _newT(void);
+ static void followTab(TabBuffer * tab);
+ static void moveTab(TabBuffer * t, TabBuffer * t2, int right);
+@@ -1811,7 +1811,7 @@ srchcore(const char *str, int (*func) (B
+ }
+ 
+ static void
+-disp_srchresult(int result, char *prompt, const char *str)
++disp_srchresult(int result, const char *prompt, const char *str)
+ {
+     if (str == NULL)
+ 	str = "";
+@@ -1896,7 +1896,7 @@ dispincsrch(int ch, Str buf, Lineprop *p
+ }
+ 
+ static void
+-isrch(int (*func) (Buffer *, const char *), char *prompt)
++isrch(int (*func) (Buffer *, const char *), const char *prompt)
+ {
+     char *str;
+     Buffer sbuf;
+@@ -1912,7 +1912,7 @@ isrch(int (*func) (Buffer *, const char
+ }
+ 
+ static void
+-srch(int (*func) (Buffer *, const char *), char *prompt)
++srch(int (*func) (Buffer *, const char *), const char *prompt)
+ {
+     const char *str;
+     int result;
+@@ -2582,7 +2582,7 @@ save_known_hosts(void)
+ static void
+ _quitfm(int confirm)
+ {
+-    char *ans = "y";
++    const char *ans = "y";
+     int err = 0;
+ 
+     if (checkDownloadList())
+@@ -2709,7 +2709,7 @@ DEFUN(susp, INTERRUPT SUSPEND, "Suspend
+ 
+ /* Go to specified line */
+ static void
+-_goLine(char *l)
++_goLine(const char *l)
+ {
+     if (l == NULL || *l == '\0' || Currentbuf->currentLine == NULL) {
+ 	displayBuffer(Currentbuf, B_FORCE_REDRAW);
+@@ -4219,7 +4219,7 @@ cmd_loadURL(char *url, ParsedURL *curren
+ 
+ /* go to specified URL */
+ static void
+-goURL0(char *prompt, int relative)
++goURL0(const char *prompt, int relative)
+ {
+     char *url, *referer;
+     ParsedURL p_url, *current;
+@@ -5269,10 +5269,10 @@ DEFUN(rFrame, FRAME, "Toggle rendering H
+ 
+ /* spawn external browser */
+ static void
+-invoke_browser(char *url)
++invoke_browser(const char *url)
+ {
+     Str cmd;
+-    char *browser = NULL;
++    const char *browser = NULL;
+     int bg = 0, len;
+ 
+     CurrentKeyData = NULL;	/* not allowed in w3m-control: */
+@@ -5927,7 +5927,7 @@ GetWord(Buffer *buf)
+ 
+ #ifdef USE_DICT
+ static void
+-execdict(char *word)
++execdict(const char *word)
+ {
+     char *w, *dictcmd;
+     Buffer *buf;
+@@ -6594,7 +6594,7 @@ DEFUN(tabA, TAB_LINK, "Follow current hy
+ }
+ 
+ static void
+-tabURL0(TabBuffer * tab, char *prompt, int relative)
++tabURL0(TabBuffer * tab, const char *prompt, int relative)
+ {
+     Buffer *buf;
+ 
+--- a/menu.c
++++ b/menu.c
+@@ -1597,7 +1597,7 @@ initSelTabMenu(void)
+     Str str;
+     char **label;
+     char *p;
+-    static char *comment = " SPC for select / D for delete tab ";
++    static char *comment = "char  SPC for select / D for delete tab ";
+ 
+     SelTabV = -1;
+     for (i = 0, tab = LastTab; tab != NULL; i++, tab = tab->prevTab) {
+--- a/news.c
++++ b/news.c
+@@ -158,7 +158,7 @@ static char *
+ html_quote_s(char *str)
+ {
+     Str tmp = NULL;
+-    char *p, *q;
++    const char *p, *q;
+     int space = TRUE;
+ 
+     if (!str)
+--- a/parsetag.c
++++ b/parsetag.c
+@@ -5,7 +5,7 @@
+ #include "parsetag.h"
+ 
+ char *
+-tag_get_value(struct parsed_tagarg *t, char *arg)
++tag_get_value(struct parsed_tagarg *t, const char *arg)
+ {
+     for (; t; t = t->next) {
+ 	if (!strcasecmp(t->arg, arg))
+--- a/parsetag.h
++++ b/parsetag.h
+@@ -7,6 +7,6 @@ struct parsed_tagarg {
+     struct parsed_tagarg *next;
+ };
+ 
+-extern char *tag_get_value(struct parsed_tagarg *t, char *arg);
++extern char *tag_get_value(struct parsed_tagarg *t, const char *arg);
+ extern struct parsed_tagarg *cgistr2tagarg(char *cgistr);
+ #endif				/* not PARSETAG_H */
+--- a/rc.c
++++ b/rc.c
+@@ -856,7 +856,7 @@ create_option_search_table(void)
+ }
+ 
+ static struct param_ptr *
+-search_param(char *name)
++search_param(const char *name)
+ {
+     size_t b, e, i;
+     int cmp;
+@@ -976,7 +976,7 @@ show_params(FILE * fp)
+ }
+ 
+ int
+-str_to_bool(char *value, int old)
++str_to_bool(const char *value, int old)
+ {
+     if (value == NULL)
+ 	return 1;
+@@ -1004,7 +1004,7 @@ str_to_bool(char *value, int old)
+ 
+ #ifdef USE_COLOR
+ static int
+-str_to_color(char *value)
++str_to_color(const char *value)
+ {
+     if (value == NULL)
+ 	return 8;		/* terminal */
+@@ -1045,7 +1045,7 @@ str_to_color(char *value)
+ #endif
+ 
+ static int
+-set_param(char *name, char *value)
++set_param(const char *name, char *value)
+ {
+     struct param_ptr *p;
+     double ppc;
+@@ -1077,7 +1077,7 @@ set_param(char *name, char *value)
+ 	*(char *)p->varptr = value[0];
+ 	break;
+     case P_STRING:
+-	*(char **)p->varptr = value;
++	*(const char **)p->varptr = value;
+ 	break;
+ #if defined(USE_SSL) && defined(USE_SSL_VERIFY)
+     case P_SSLPATH:
+@@ -1679,26 +1679,26 @@ rcFile(char *base)
+ }
+ 
+ char *
+-auxbinFile(char *base)
++auxbinFile(const char *base)
+ {
+     return expandPath(Strnew_m_charp(w3m_auxbin_dir(), "/", base, NULL)->ptr);
+ }
+ 
+ char *
+-etcFile(char *base)
++etcFile(const char *base)
+ {
+     return expandPath(Strnew_m_charp(w3m_etc_dir(), "/", base, NULL)->ptr);
+ }
+ 
+ char *
+-confFile(char *base)
++confFile(const char *base)
+ {
+     return expandPath(Strnew_m_charp(w3m_conf_dir(), "/", base, NULL)->ptr);
+ }
+ 
+ #ifndef USE_HELP_CGI
+ char *
+-helpFile(char *base)
++helpFile(const char *base)
+ {
+     return expandPath(Strnew_m_charp(w3m_help_dir(), "/", base, NULL)->ptr);
+ }
+--- a/table.c
++++ b/table.c
+@@ -420,7 +420,7 @@ suspend_or_pushdata(struct table *tbl, c
+ 
+ int visible_length_offset = 0;
+ int
+-visible_length(char *str)
++visible_length(const char *str)
+ {
+     int len = 0, n, max_len = 0;
+     int status = R_ST_NORMAL;
+--- a/terms.c
++++ b/terms.c
+@@ -542,7 +542,8 @@ put_image_kitty(char *url, int x, int y,
+     int sh, int cols, int rows)
+ {
+     Str buf, base64;
+-    char *cbuf, *type, *tmpf;
++    char *cbuf, *tmpf;
++    const char *type;
+     char *argv[4];
+     FILE *fp;
+     int c, i, j, m, t, is_anim;
+@@ -1320,7 +1321,7 @@ initscr(void)
+ }
+ 
+ static int
+-write1(char c)
++write1(const char c)
+ {
+     putc(c, ttyf);
+ #ifdef SCREEN_DEBUG
+@@ -1346,13 +1347,13 @@ move(int line, int column)
+ 
+ static int
+ #ifdef USE_M17N
+-need_redraw(char *c1, l_prop pr1, const char *c2, l_prop pr2)
++need_redraw(const char *c1, l_prop pr1, const char *c2, l_prop pr2)
+ {
+     if (!c1 || !c2 || strcmp(c1, c2))
+ 	return 1;
+     if (*c1 == ' ')
+ #else
+-need_redraw(char c1, l_prop pr1, const char c2, l_prop pr2)
++need_redraw(const char c1, l_prop pr1, const char c2, l_prop pr2)
+ {
+     if (c1 != c2)
+ 	return 1;
+@@ -1376,7 +1377,7 @@ need_redraw(char c1, l_prop pr1, const c
+ 
+ #ifdef USE_M17N
+ void
+-addch(char c)
++addch(const char c)
+ {
+     addmch(&c, 1);
+ }
+@@ -1394,7 +1395,7 @@ addch(const char pc)
+     static Str tmp = NULL;
+     char **p;
+     char c = *pc;
+-    int width = wtf_width((wc_uchar *) pc);
++    int width = wtf_width((const wc_uchar *) pc);
+ 
+     if (tmp == NULL)
+ 	tmp = Strnew();
+@@ -2090,7 +2091,7 @@ addstr(const char *s)
+     int len;
+ 
+     while (*s != '\0') {
+-	len = wtf_len((wc_uchar *) s);
++	len = wtf_len((const wc_uchar *) s);
+ 	addmch(s, len);
+ 	s += len;
+     }
+@@ -2108,10 +2109,10 @@ addnstr(const char *s, int n)
+     int len, width;
+ 
+     for (i = 0; *s != '\0';) {
+-	width = wtf_width((wc_uchar *) s);
++	width = wtf_width((const wc_uchar *) s);
+ 	if (i + width > n)
+ 	    break;
+-	len = wtf_len((wc_uchar *) s);
++	len = wtf_len((const wc_uchar *) s);
+ 	addmch(s, len);
+ 	s += len;
+ 	i += width;
+@@ -2123,17 +2124,17 @@ addnstr(const char *s, int n)
+ }
+ 
+ void
+-addnstr_sup(char *s, int n)
++addnstr_sup(const char *s, int n)
+ {
+     int i;
+ #ifdef USE_M17N
+     int len, width;
+ 
+     for (i = 0; *s != '\0';) {
+-	width = wtf_width((wc_uchar *) s);
++	width = wtf_width((const wc_uchar *) s);
+ 	if (i + width > n)
+ 	    break;
+-	len = wtf_len((wc_uchar *) s);
++	len = wtf_len((const wc_uchar *) s);
+ 	addmch(s, len);
+ 	s += len;
+ 	i += width;
+@@ -2224,7 +2225,7 @@ term_cbreak(void)
+ }
+ 
+ void
+-term_title(char *s)
++term_title(const char *s)
+ {
+     if (!fmInitialized)
+         return;
+--- a/url.c
++++ b/url.c
+@@ -2057,10 +2057,10 @@ add_index_file(ParsedURL *pu, URLFile *u
+ }
+ 
+ static char *
+-guessContentTypeFromTable(struct table2 *table, char *filename)
++guessContentTypeFromTable(struct table2 *table, const char *filename)
+ {
+     struct table2 *t;
+-    char *p;
++    const char *p;
+     if (table == NULL)
+ 	return NULL;
+     p = &filename[strlen(filename) - 1];
+@@ -2081,7 +2081,7 @@ guessContentTypeFromTable(struct table2
+ }
+ 
+ char *
+-guessContentType(char *filename)
++guessContentType(const char *filename)
+ {
+     char *ret;
+     int i;
+--- a/version.c.in
++++ b/version.c.in
+@@ -2,5 +2,5 @@
+ #define CURRENT_VERSION "w3m/0.5.3+gitYYYYMMDD"
+ 
+ #ifndef FM_H
+-char *w3m_version = CURRENT_VERSION;
++const char *w3m_version = CURRENT_VERSION;
+ #endif				/* not FM_H */
+--- a/w3mbookmark.c
++++ b/w3mbookmark.c
+@@ -18,7 +18,7 @@
+ #define DEFAULT_SECTION "Miscellaneous"
+ #endif
+ 
+-static char *bkmark_src1 =
++static const char *bkmark_src1 =
+     "<html>\n\
+ <head>\n\
+ <title>" BKMARK_TITLE "</title>\n\
+@@ -31,7 +31,7 @@ static char *bkmark_src1 =
+ <input type=hidden name=cookie value=\"%s\">\n\
+ <table cellpadding=0>\n";
+ 
+-static char *bkmark_src2 =
++static const char *bkmark_src2 =
+     "<tr><td>New&nbsp;Section:<td><input type=text name=newsection size=60>\n\
+ <tr><td>URL:<td><input type=text name=url value=\"%s\" size=60>\n\
+ <tr><td>Title:<td><input type=text name=title value=\"%s\" size=60>\n\
+@@ -46,13 +46,14 @@ static char *bkmark_src2 =
+ #undef TRUE
+ #define TRUE 1
+ 
+-static char end_section[] =
++static const char end_section[] =
+     "<!--End of section (do not delete this comment)-->\n";
+ 
+ static char *Local_cookie = NULL;
+ 
+ static void
+-print_bookmark_panel(char *bmark, char *url, char *title, char *charset)
++print_bookmark_panel(char *bmark, char *url, char *title,
++		     const char *charset)
+ {
+     Str tmp, tmp2;
+     FILE *f;
+@@ -86,8 +87,8 @@ print_bookmark_panel(char *bmark, char *
+ 
+ /* create new bookmark */
+ static int
+-create_new_bookmark(char *bmark, char *section, char *title, char *url,
+-		    char *mode)
++create_new_bookmark(const char *bmark, const char *section, const char *title,
++		    const char *url, const char *mode)
+ {
+     FILE *f;
+     f = fopen(bmark, mode);
+@@ -110,7 +111,8 @@ create_new_bookmark(char *bmark, char *s
+ static int
+ insert_bookmark(char *bmark, struct parsed_tagarg *data)
+ {
+-    char *url, *title, *section;
++    char *url;
++    char *section, *title;
+     FILE *f;
+     TextList *tl = newTextList();
+     int section_found = 0;
+--- a/w3mhelperpanel.c
++++ b/w3mhelperpanel.c
+@@ -119,7 +119,7 @@ printMailcapPanel(char *mailcap)
+ }
+ 
+ static void
+-editMailcap(char *mailcap, struct parsed_tagarg *args)
++editMailcap(const char *mailcap, struct parsed_tagarg *args)
+ {
+     TextList *t = newTextList();
+     TextListItem *ti;
+--- a/anchor.c
++++ b/anchor.c
+@@ -191,7 +191,7 @@ searchURLLabel(Buffer *buf, char *url)
+ 
+ #ifdef USE_NNTP
+ static Anchor *
+-_put_anchor_news(Buffer *buf, char *p1, const char *p2, int line, int pos)
++_put_anchor_news(Buffer *buf, const char *p1, const char *p2, int line, int pos)
+ {
+     Str tmp;
+ 
+@@ -210,7 +210,7 @@ _put_anchor_news(Buffer *buf, char *p1,
+ #endif				/* USE_NNTP */
+ 
+ static Anchor *
+-_put_anchor_all(Buffer *buf, char *p1, const char *p2, int line, int pos)
++_put_anchor_all(Buffer *buf, const char *p1, const char *p2, int line, int pos)
+ {
+     Str tmp;
+ 
+@@ -294,9 +294,9 @@ reseq_anchor(Buffer *buf)
+     reseq_anchor0(buf->formitem, seqmap);
+ }
+ 
+-static char *
+-reAnchorPos(Buffer *buf, Line *l, char *p1, char *p2,
+-	    Anchor *(*anchorproc) (Buffer *, char *, const char *, int, int))
++static const char *
++reAnchorPos(Buffer *buf, Line *l, const char *p1, const char *p2,
++	    Anchor *(*anchorproc) (Buffer *, const char *, const char *, int, int))
+ {
+     Anchor *a;
+     int spos, epos;
+@@ -345,9 +345,9 @@ reAnchorWord(Buffer *buf, Line *l, int s
+ 
+ /* search regexp and register them as anchors */
+ /* returns error message if any               */
+-static char *
+-reAnchorAny(Buffer *buf, char *re,
+-	    Anchor *(*anchorproc) (Buffer *, char *, const char *, int, int))
++static const char *
++reAnchorAny(Buffer *buf, const char *re,
++	    Anchor *(*anchorproc) (Buffer *, const char *, const char *, int, int))
+ {
+     Line *l;
+     const char *p = NULL, *p1, *p2;
+--- a/proto.h
++++ b/proto.h
+@@ -182,8 +182,8 @@ extern char *url_decode0(const char *url
+ #endif /* !defined(USE_M17N) */
+ extern void examineFile(char *path, URLFile *uf);
+ extern char *acceptableEncoding(void);
+-extern int dir_exist(char *path);
+-extern int is_html_type(char *type);
++extern int dir_exist(const char *path);
++extern int is_html_type(const char *type);
+ #ifdef USE_M17N
+ extern char **get_symbol(wc_ces charset, int *width);
+ extern char **set_symbol(int width);
+@@ -200,7 +200,7 @@ extern void update_utf8_symbol(void);
+ #endif
+ extern Buffer *loadGeneralFile(char *path, ParsedURL *current, char *referer,
+ 			       int flag, FormList *request);
+-extern int is_boundary(unsigned char *, unsigned char *);
++extern int is_boundary(const unsigned char *, const unsigned char *);
+ extern void push_render_image(Str str, int width, int limit,
+ 			      struct html_feed_environ *h_env);
+ extern void flushline(struct html_feed_environ *h_env, struct readbuffer *obuf,
+@@ -220,7 +220,7 @@ extern ImageCache *getImage(Image * imag
+ extern int getImageSize(ImageCache * cache);
+ #endif
+ extern Str process_img(struct parsed_tag *tag, int width);
+-extern Str process_anchor(struct parsed_tag *tag, char *tagbuf);
++extern Str process_anchor(struct parsed_tag *tag, const char *tagbuf);
+ extern Str process_input(struct parsed_tag *tag);
+ extern Str process_button(struct parsed_tag *tag);
+ extern Str process_n_button(void);
+@@ -233,7 +233,7 @@ extern Str process_n_textarea(void);
+ extern void feed_textarea(char *str);
+ extern Str process_form(struct parsed_tag *tag);
+ extern Str process_n_form(void);
+-extern int getMetaRefreshParam(char *q, Str *refresh_uri);
++extern int getMetaRefreshParam(const char *q, Str *refresh_uri);
+ extern int HTMLtagproc1(struct parsed_tag *tag,
+ 			struct html_feed_environ *h_env);
+ extern void HTMLlineproc2(Buffer *buf, TextLineList *tl);
+@@ -273,19 +273,19 @@ extern Buffer *getpipe(char *cmd);
+ extern Buffer *openPagerBuffer(InputStream stream, Buffer *buf);
+ extern Buffer *openGeneralPagerBuffer(InputStream stream);
+ extern Line *getNextPage(Buffer *buf, int plen);
+-extern int save2tmp(URLFile uf, char *tmpf);
+-extern Buffer *doExternal(URLFile uf, char *type, Buffer *defaultbuf);
++extern int save2tmp(URLFile uf, const char *tmpf);
++extern Buffer *doExternal(URLFile uf, const char *type, Buffer *defaultbuf);
+ extern int _doFileCopy(char *tmpf, char *defstr, int download);
+ #define doFileCopy(tmpf, defstr) _doFileCopy(tmpf, defstr, FALSE);
+ extern int doFileMove(char *tmpf, char *defstr);
+-extern int doFileSave(URLFile uf, char *defstr);
+-extern int checkCopyFile(char *path1, char *path2);
+-extern int checkSaveFile(InputStream stream, char *path);
+-extern int checkOverWrite(char *path);
+-extern char *inputAnswer(char *prompt);
+-extern int matchattr(char *p, char *attr, int len, Str *value);
++extern int doFileSave(URLFile uf, const char *defstr);
++extern int checkCopyFile(const char *path1, const char *path2);
++extern int checkSaveFile(InputStream stream, const char *path);
++extern int checkOverWrite(const char *path);
++extern char *inputAnswer(const char *prompt);
++extern int matchattr(const char *p, const char *attr, int len, Str *value);
+ extern void readHeader(URLFile *uf, Buffer *newBuf, int thru, ParsedURL *pu);
+-extern char *checkHeader(Buffer *buf, char *field);
++extern char *checkHeader(Buffer *buf, const char *field);
+ extern TabBuffer *newTab(void);
+ extern void calcTabPos(void);
+ extern TabBuffer *deleteTab(TabBuffer * tab);
+@@ -315,10 +315,10 @@ extern void addChar(char c, Lineprop mod
+ #ifdef USE_M17N
+ extern void addMChar(char *c, Lineprop mode, size_t len);
+ #endif
+-extern void record_err_message(char *s);
++extern void record_err_message(const char *s);
+ extern Buffer *message_list_panel(void);
+ extern void message(const char *s, int return_x, int return_y);
+-extern void disp_err_message(char *s, int redraw_current);
++extern void disp_err_message(const char *s, int redraw_current);
+ extern void disp_message_nsec(const char *s, int redraw_current, int sec,
+ 			      int purge, int mouse);
+ extern void disp_message(const char *s, int redraw_current);
+@@ -327,7 +327,7 @@ extern void disp_message_nomouse(char *s
+ #else
+ #define disp_message_nomouse disp_message
+ #endif
+-extern void set_delayed_message(char *s);
++extern void set_delayed_message(const char *s);
+ extern void cursorUp0(Buffer *buf, int n);
+ extern void cursorUp(Buffer *buf, int n);
+ extern void cursorDown0(Buffer *buf, int n);
+@@ -344,13 +344,13 @@ extern int columnPos(Line *line, int col
+ extern int columnLen(Line *line, int column);
+ extern Line *lineSkip(Buffer *buf, Line *line, int offset, int last);
+ extern Line *currentLineSkip(Buffer *buf, Line *line, int offset, int last);
+-extern int gethtmlcmd(char *s);
++extern int gethtmlcmd(const char *s);
+ extern Str checkType(Str s, Lineprop **oprop, Linecolor **ocolor);
+ extern int calcPosition(char *l, Lineprop *pr, int len, int pos, int bpos,
+ 			int mode);
+-extern char *lastFileName(char *path);
+-extern char *mybasename(char *s);
+-extern char *mydirname(char *s);
++extern char *lastFileName(const char *path);
++extern char *mybasename(const char *s);
++extern char *mydirname(const char *s);
+ extern int next_status(char c, int *status);
+ extern int read_token(Str buf, char **instr, int *status, int pre, int append);
+ extern Str correct_irrtag(int status);
+@@ -379,7 +379,7 @@ extern Buffer *historyBuffer(Hist *hist)
+ #endif				/* not USE_HISTORY */
+ extern struct table *newTable(void);
+ extern void pushdata(struct table *t, int row, int col, char *data);
+-extern int visible_length(char *str);
++extern int visible_length(const char *str);
+ extern void align(TextLine *lbuf, int width, int mode);
+ extern void print_item(struct table *t, int row, int col, int width, Str buf);
+ extern void print_sep(struct table *t, int row, int type, int maxcol, Str buf);
+@@ -484,13 +484,13 @@ extern void clrtoeolx(void);
+ extern void clrtobotx(void);
+ extern void addstr(const char *s);
+ extern void addnstr(const char *s, int n);
+-extern void addnstr_sup(char *s, int n);
++extern void addnstr_sup(const char *s, int n);
+ extern void crmode(void);
+ extern void term_noecho(void);
+ extern void term_raw(void);
+ extern void term_cooked(void);
+ extern void term_cbreak(void);
+-extern void term_title(char *s);
++extern void term_title(const char *s);
+ extern void toggle_stand(void);
+ extern void bell(void);
+ extern int sleep_till_anykey(int sec, int purge);
+@@ -515,14 +515,14 @@ extern URLFile openURL(char *url, Parsed
+ 		       URLOption *option, FormList *request,
+ 		       TextList *extra_header, URLFile *ouf,
+ 		       HRequest *hr, unsigned char *status);
+-extern int mailcapMatch(struct mailcap *mcap, char *type);
+-extern struct mailcap *searchMailcap(struct mailcap *table, char *type);
++extern int mailcapMatch(struct mailcap *mcap, const char *type);
++extern struct mailcap *searchMailcap(struct mailcap *table, const char *type);
+ extern void initMailcap(void);
+ extern char *acceptableMimeTypes(void);
+-extern struct mailcap *searchExtViewer(char *type);
+-extern Str unquote_mailcap(char *qstr, char *type, char *name, char *attr,
++extern struct mailcap *searchExtViewer(const char *type);
++extern Str unquote_mailcap(char *qstr, const char *type, char *name, char *attr,
+ 			   int *mc_stat);
+-extern char *guessContentType(char *filename);
++extern char *guessContentType(const char *filename);
+ extern TextList *make_domain_list(char *domain_list);
+ extern int check_no_proxy(char *domain);
+ extern InputStream openFTPStream(ParsedURL *pu, URLFile *uf);
+@@ -604,14 +604,14 @@ extern Buffer *load_option_panel(void);
+ extern void panel_set_option(struct parsed_tagarg *);
+ extern void sync_with_option(void);
+ extern char *rcFile(char *base);
+-extern char *etcFile(char *base);
+-extern char *confFile(char *base);
+-extern char *auxbinFile(char *base);
++extern char *etcFile(const char *base);
++extern char *confFile(const char *base);
++extern char *auxbinFile(const char *base);
+ extern char *helpFile(char *base);
+ extern void *querySiteconf(ParsedURL *query_pu, int field);
+ extern Str localCookie(void);
+ extern Str loadLocalDir(char *dirname);
+-extern void set_environ(char *var, char *value);
++extern void set_environ(const char *var, const char *value);
+ extern FILE *localcgi_post(char *, char *, FormList *, char *);
+ #define localcgi_get(u, q, r) localcgi_post((u), (q), NULL, (r))
+ extern FILE *openSecretFile(char *fname);
+@@ -629,8 +629,8 @@ extern Str romanAlphabet(int n);
+ extern void setup_child(int child, int i, int f);
+ extern void myExec(char *command);
+ extern void mySystem(char *command, int background);
+-extern Str myExtCommand(char *cmd, char *arg, int redirect);
+-extern Str myEditor(char *cmd, char *file, int line);
++extern Str myExtCommand(const char *cmd, const char *arg, int redirect);
++extern Str myEditor(const char *cmd, const char *file, int line);
+ extern int is_localhost(const char *host);
+ extern char *file_to_url(char *file);
+ #ifdef USE_M17N
+@@ -640,7 +640,7 @@ extern char *url_unquote_conv0(const cha
+ #define url_unquote_conv(url, charset) url_unquote_conv0(url)
+ #endif
+ extern char *expandName(char *name);
+-extern Str tmpfname(int type, char *ext);
++extern Str tmpfname(int type, const char *ext);
+ extern time_t mymktime(char *timestr);
+ extern void (*mySignal(int signal_number, void (*action) (int))) (int);
+ #ifdef USE_COOKIE
+@@ -718,7 +718,7 @@ extern char *searchKeyData(void);
+ extern void setKeymap(char *p, int lineno, int verbose);
+ extern void initKeymap(int force);
+ extern int getFuncList(char *id);
+-extern int getKey(char *s);
++extern int getKey(const char *s);
+ extern char *getKeyData(int key);
+ extern char *getWord(char **str);
+ extern char *getQWord(char **str);
+--- a/regex.c
++++ b/regex.c
+@@ -56,7 +56,7 @@ int verbose;
+ #endif				/* REGEX_DEBUG */
+ 
+ #ifdef USE_M17N
+-#define get_mclen(c) wtf_len1((wc_uchar *)(c))
++#define get_mclen(c) wtf_len1((const wc_uchar *)(c))
+ #else
+ #define get_mclen(c) 1
+ #endif
+--- a/rc.h
++++ b/rc.h
+@@ -2,7 +2,7 @@
+ #define RC_H
+ 
+ extern void show_params(FILE * fp);
+-extern int str_to_bool(char *value, int old);
++extern int str_to_bool(const char *value, int old);
+ 
+ extern int ssl_known_hosts;
+ 

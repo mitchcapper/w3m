@@ -1,0 +1,78 @@
+From 6663dcc98fa8beb944b492cb46dde8b48c82f062 Mon Sep 17 00:00:00 2001
+From: Rene Kita <mail@rkta.de>
+Date: Sun, 26 Dec 2021 17:44:57 +0100
+Subject: [PATCH 079/172] Make usage of variable length arrays an error
+
+The previous patch removed the last and only usage of VLAs in the code
+base. Since C11 variable length arrays are optional and we are already
+using a garbage collector. Prevent the usage of VLAs by making in an
+error.
+---
+ Makefile.in            |    1 +
+ libwc/Makefile.in      |    1 +
+ w3mimg/Makefile.in     |    1 +
+ w3mimg/fb/Makefile.in  |    1 +
+ w3mimg/win/Makefile.in |    1 +
+ w3mimg/x11/Makefile.in |    1 +
+ 6 files changed, 6 insertions(+)
+
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -39,6 +39,7 @@ DEFAULTS = -Wall
+ DEFAULTS += -D_FORTIFY_SOURCE=2
+ DEFAULTS += -O3 -g3 -flto
+ DEFAULTS += -Wcast-qual
++DEFAULTS += -Werror=vla
+ DEFAULTS += -Wno-missing-field-initializers
+ DEFAULTS += -Wno-unused-result
+ DEFAULTS += -Wnull-dereference
+--- a/libwc/Makefile.in
++++ b/libwc/Makefile.in
+@@ -10,6 +10,7 @@ DEFAULTS= -Wall
+ DEFAULTS += -D_FORTIFY_SOURCE=2
+ DEFAULTS += -O3 -g3 -flto
+ DEFAULTS += -Wcast-qual
++DEFAULTS += -Werror=vla
+ DEFAULTS += -Wno-missing-field-initializers
+ DEFAULTS += -Wno-unused-result
+ DEFAULTS += -Wnull-dereference
+--- a/w3mimg/fb/Makefile.in
++++ b/w3mimg/fb/Makefile.in
+@@ -11,6 +11,7 @@ DEFAULTS= -Wall
+ DEFAULTS += -D_FORTIFY_SOURCE=2
+ DEFAULTS += -O3 -g3 -flto
+ DEFAULTS += -Wcast-qual
++DEFAULTS += -Werror=vla
+ DEFAULTS += -Wno-missing-field-initializers
+ DEFAULTS += -Wno-unused-result
+ DEFAULTS += -Wnull-dereference
+--- a/w3mimg/win/Makefile.in
++++ b/w3mimg/win/Makefile.in
+@@ -11,6 +11,7 @@ DEFAULTS= -Wall
+ DEFAULTS += -D_FORTIFY_SOURCE=2
+ DEFAULTS += -O3 -g3 -flto
+ DEFAULTS += -Wcast-qual
++DEFAULTS += -Werror=vla
+ DEFAULTS += -Wno-missing-field-initializers
+ DEFAULTS += -Wno-unused-result
+ DEFAULTS += -Wnull-dereference
+--- a/w3mimg/x11/Makefile.in
++++ b/w3mimg/x11/Makefile.in
+@@ -11,6 +11,7 @@ DEFAULTS= -Wall
+ DEFAULTS += -D_FORTIFY_SOURCE=2
+ DEFAULTS += -O3 -g3 -flto
+ DEFAULTS += -Wcast-qual
++DEFAULTS += -Werror=vla
+ DEFAULTS += -Wno-missing-field-initializers
+ DEFAULTS += -Wno-unused-result
+ DEFAULTS += -Wnull-dereference
+--- a/w3mimg/Makefile.in
++++ b/w3mimg/Makefile.in
+@@ -10,6 +10,7 @@ DEFAULTS= -Wall
+ DEFAULTS += -D_FORTIFY_SOURCE=2
+ DEFAULTS += -O3 -g3 -flto
+ DEFAULTS += -Wcast-qual
++DEFAULTS += -Werror=vla
+ DEFAULTS += -Wno-missing-field-initializers
+ DEFAULTS += -Wno-unused-result
+ DEFAULTS += -Wnull-dereference

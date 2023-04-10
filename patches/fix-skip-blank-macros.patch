@@ -1,0 +1,32 @@
+Fix skip blanks macros
+
+GCC 12 starts warning about misleading indentation when the SKIP_BLANKS
+macro is used after a while loop without curly braces. This is because
+the SKIP_BLANKS and SKIP_NON_BLANKS macros use a basic block (start with
+a {).
+
+The offending code may look like:
+
+while (*m && *m++ != ';');
+SKIP_BLANKS(m);
+
+Which after preprocessing will be:
+while (*m && *m++ != ';');
+{while(*(p)&&IS_SPACE(*(p)))(p)++;}
+---
+ fm.h |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+--- a/fm.h
++++ b/fm.h
+@@ -301,8 +301,8 @@ extern int REV_LB[];
+ #endif				/* __EMX__ */
+ 
+ 
+-#define SKIP_BLANKS(p) {while(*(p)&&IS_SPACE(*(p)))(p)++;}
+-#define SKIP_NON_BLANKS(p) {while(*(p)&&!IS_SPACE(*(p)))(p)++;}
++#define SKIP_BLANKS(p) do{while(*(p)&&IS_SPACE(*(p)))(p)++;}while(0)
++#define SKIP_NON_BLANKS(p) do{while(*(p)&&!IS_SPACE(*(p)))(p)++;}while(0)
+ #define IS_ENDL(c) ((c)=='\0'||(c)=='\r'||(c)=='\n')
+ #define IS_ENDT(c) (IS_ENDL(c)||(c)==';')
+ 

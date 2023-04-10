@@ -1,0 +1,20 @@
+From ae22ac640df6befc6e32e3598632a3a3fecf6b3d Mon Sep 17 00:00:00 2001
+From: Rene Kita <mail@rkta.de>
+Date: Thu, 23 Dec 2021 12:08:38 +0100
+Subject: [PATCH 136/172] Remove redundant NULL check
+
+---
+ main.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+--- a/main.c
++++ b/main.c
+@@ -3917,7 +3917,7 @@ _prevA(int visited)
+ 	    }
+ 	    x = an->start.pos;
+ 	    y = an->start.line;
+-	    if (visited == TRUE && an) {
++	    if (visited == TRUE) {
+ 		parseURL2(an->url, &url, baseURL(Currentbuf));
+ 		if (getHashHist(URLHist, parsedURL2Str(&url)->ptr)) {
+ 		    goto _end;

@@ -1,0 +1,71 @@
+From ec12006d6d150d657847ef5c4070e92b1f9f94d5 Mon Sep 17 00:00:00 2001
+From: Rene Kita <mail@rkta.de>
+Date: Wed, 8 Sep 2021 12:19:48 +0200
+Subject: [PATCH 068/172] Remove unused variable
+
+---
+ file.c  |   15 ++++-----------
+ fm.h    |    2 --
+ terms.c |    2 --
+ 3 files changed, 4 insertions(+), 15 deletions(-)
+
+--- a/fm.h
++++ b/fm.h
+@@ -43,8 +43,6 @@
+ #ifdef USE_M17N
+ #include "wc.h"
+ #include "wtf.h"
+-#else
+-typedef int wc_ces;	/* XXX: not used */
+ #endif
+ 
+ #ifdef HAVE_LOCALE_H
+--- a/file.c
++++ b/file.c
+@@ -8742,7 +8742,6 @@ doFileSave(URLFile uf, char *defstr)
+     char *p, *q;
+     pid_t pid;
+     char *lock;
+-    char *tmpf = NULL; 
+ #if !(defined(HAVE_SYMLINK) && defined(HAVE_LSTAT))
+     FILE *f;
+ #endif
+@@ -8778,11 +8777,8 @@ doFileSave(URLFile uf, char *defstr)
+ 	pid = fork();
+ 	if (!pid) {
+ 	    int err;
+-	    if ((uf.content_encoding != CMP_NOCOMPRESS) && AutoUncompress) {
+-		uncompress_stream(&uf, &tmpf);
+-		if (tmpf)
+-		    unlink(tmpf);
+-	    }
++	    if ((uf.content_encoding != CMP_NOCOMPRESS) && AutoUncompress)
++		uncompress_stream(&uf, NULL);
+ 	    setup_child(FALSE, 0, UFfileno(&uf));
+ 	    err = save2tmp(uf, p);
+ 	    if (err == 0 && PreserveTimestamp && uf.modtime != -1)
+@@ -8818,11 +8814,8 @@ doFileSave(URLFile uf, char *defstr)
+ 	    printf("Can't save. Load file and %s are identical.", p);
+ 	    return -1;
+ 	}
+-	if (uf.content_encoding != CMP_NOCOMPRESS && AutoUncompress) {
+-	    uncompress_stream(&uf, &tmpf);
+-	    if (tmpf)
+-		unlink(tmpf);
+-	}
++	if (uf.content_encoding != CMP_NOCOMPRESS && AutoUncompress)
++	    uncompress_stream(&uf, NULL);
+ 	if (save2tmp(uf, p) < 0) {
+ 	    /* FIXME: gettextize? */
+ 	    printf("Can't save to %s\n", p);
+--- a/terms.c
++++ b/terms.c
+@@ -160,8 +160,6 @@ read_win32_console_input(void)
+ static int
+ read_win32_console(char *s, int n)
+ {
+-    KEY_EVENT_RECORD *ker;
+-
+     if (hConIn == INVALID_HANDLE_VALUE)
+ 	return read(tty, s, n);
+ 

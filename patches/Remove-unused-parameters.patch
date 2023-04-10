@@ -1,0 +1,388 @@
+---
+ file.c  |   56 +++++++++++++++++++++++---------------------------------
+ menu.c  |   12 ++++++------
+ proto.h |   11 +++++------
+ table.c |   16 ++++++++--------
+ 4 files changed, 42 insertions(+), 53 deletions(-)
+
+--- a/file.c
++++ b/file.c
+@@ -1996,7 +1996,7 @@ loadGeneralFile(char *path, ParsedURL *v
+ 		page = loadGopherDir(&f, &pu, &charset);
+ 		t = "gopher:directory";
+ 	    } else {
+-		page = loadGopherSearch(&f, &pu, &charset);
++		page = loadGopherSearch(&pu, &charset);
+ 		t = "gopher:search";
+ 	    }
+ 	    TRAP_OFF;
+@@ -3225,7 +3225,7 @@ flushline(struct html_feed_environ *h_en
+ 
+ void
+ do_blankline(struct html_feed_environ *h_env, struct readbuffer *obuf,
+-	     int indent, int indent_incr, int width)
++	     int indent, int width)
+ {
+     if (h_env->blank_lines == 0)
+ 	flushline(h_env, obuf, indent, 1, width);
+@@ -3376,7 +3376,7 @@ process_title(struct parsed_tag *tag)
+ }
+ 
+ static Str
+-process_n_title(struct parsed_tag *tag)
++process_n_title(void)
+ {
+     Str tmp;
+ 
+@@ -4725,8 +4725,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+ 	CLOSE_A;
+ 	if (!(obuf->flag & RB_IGNORE_P)) {
+ 	    flushline(h_env, obuf, envs[h_env->envc].indent, 1, h_env->limit);
+-	    do_blankline(h_env, obuf, envs[h_env->envc].indent, 0,
+-			 h_env->limit);
++	    do_blankline(h_env, obuf, envs[h_env->envc].indent, h_env->limit);
+ 	}
+ 	obuf->flag |= RB_IGNORE_P;
+ 	if (cmd == HTML_P) {
+@@ -4743,8 +4742,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+     case HTML_H:
+ 	if (!(obuf->flag & (RB_PREMODE | RB_IGNORE_P))) {
+ 	    flushline(h_env, obuf, envs[h_env->envc].indent, 0, h_env->limit);
+-	    do_blankline(h_env, obuf, envs[h_env->envc].indent, 0,
+-			 h_env->limit);
++	    do_blankline(h_env, obuf, envs[h_env->envc].indent, h_env->limit);
+ 	}
+ 	HTMLlineproc1("<b>", h_env);
+ 	set_alignment(obuf, tag);
+@@ -4754,7 +4752,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+ 	if (!(obuf->flag & RB_PREMODE)) {
+ 	    flushline(h_env, obuf, envs[h_env->envc].indent, 0, h_env->limit);
+ 	}
+-	do_blankline(h_env, obuf, envs[h_env->envc].indent, 0, h_env->limit);
++	do_blankline(h_env, obuf, envs[h_env->envc].indent, h_env->limit);
+ 	RB_RESTORE_FLAG(obuf);
+ 	close_anchor(h_env, obuf);
+ 	obuf->flag |= RB_IGNORE_P;
+@@ -4767,8 +4765,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+ 	    flushline(h_env, obuf, envs[h_env->envc].indent, 0, h_env->limit);
+ 	    if (!(obuf->flag & RB_PREMODE) &&
+ 		(h_env->envc == 0 || cmd == HTML_BLQ))
+-		do_blankline(h_env, obuf, envs[h_env->envc].indent, 0,
+-			     h_env->limit);
++		do_blankline(h_env, obuf, envs[h_env->envc].indent, h_env->limit);
+ 	}
+ 	PUSH_ENV(cmd);
+ 	if (cmd == HTML_UL || cmd == HTML_OL) {
+@@ -4800,8 +4797,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+ 	    if (!(obuf->flag & RB_PREMODE) &&
+ 		(h_env->envc == 0 || cmd == HTML_N_BLQ)) {
+ 		do_blankline(h_env, obuf,
+-			     envs[h_env->envc].indent,
+-			     INDENT_INCR, h_env->limit);
++			     envs[h_env->envc].indent, h_env->limit);
+ 		obuf->flag |= RB_IGNORE_P;
+ 	    }
+ 	}
+@@ -4814,7 +4810,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+ 	    if (!(obuf->flag & RB_PREMODE) && envs[h_env->envc].env != HTML_DL
+ 		    && envs[h_env->envc].env != HTML_DL_COMPACT
+ 		    && envs[h_env->envc].env != HTML_DD)
+-		do_blankline(h_env, obuf, envs[h_env->envc].indent, 0,
++		do_blankline(h_env, obuf, envs[h_env->envc].indent,
+ 			     h_env->limit);
+ 	}
+ 	PUSH_ENV_NOINDENT(cmd);
+@@ -4965,7 +4961,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+ 	    return 1;
+ 	obuf->flag &= ~RB_TITLE;
+ 	obuf->end_tag = 0;
+-	tmp = process_n_title(tag);
++	tmp = process_n_title();
+ 	if (tmp)
+ 	    HTMLlineproc1(tmp->ptr, h_env);
+ 	return 1;
+@@ -5022,7 +5018,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+ 	if (!(obuf->flag & RB_IGNORE_P)) {
+ 	    flushline(h_env, obuf, envs[h_env->envc].indent, 0, h_env->limit);
+ 	    if (!x)
+-		do_blankline(h_env, obuf, envs[h_env->envc].indent, 0,
++		do_blankline(h_env, obuf, envs[h_env->envc].indent,
+ 			     h_env->limit);
+ 	}
+ 	else
+@@ -5033,8 +5029,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+     case HTML_N_PRE:
+ 	flushline(h_env, obuf, envs[h_env->envc].indent, 0, h_env->limit);
+ 	if (!(obuf->flag & RB_IGNORE_P)) {
+-	    do_blankline(h_env, obuf, envs[h_env->envc].indent, 0,
+-			 h_env->limit);
++	    do_blankline(h_env, obuf, envs[h_env->envc].indent, h_env->limit);
+ 	    obuf->flag |= RB_IGNORE_P;
+ 	    h_env->blank_lines++;
+ 	}
+@@ -5071,8 +5066,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+ 	CLOSE_A;
+ 	if (!(obuf->flag & RB_IGNORE_P)) {
+ 	    flushline(h_env, obuf, envs[h_env->envc].indent, 0, h_env->limit);
+-	    do_blankline(h_env, obuf, envs[h_env->envc].indent, 0,
+-			 h_env->limit);
++	    do_blankline(h_env, obuf, envs[h_env->envc].indent, h_env->limit);
+ 	}
+ 	obuf->flag |= (RB_PRE | RB_IGNORE_P);
+ 	return 1;
+@@ -5080,8 +5074,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+ 	CLOSE_A;
+ 	if (!(obuf->flag & RB_IGNORE_P)) {
+ 	    flushline(h_env, obuf, envs[h_env->envc].indent, 0, h_env->limit);
+-	    do_blankline(h_env, obuf, envs[h_env->envc].indent, 0,
+-			 h_env->limit);
++	    do_blankline(h_env, obuf, envs[h_env->envc].indent, h_env->limit);
+ 	    obuf->flag |= RB_IGNORE_P;
+ 	}
+ 	obuf->flag &= ~RB_PRE;
+@@ -5092,8 +5085,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+ 	CLOSE_A;
+ 	if (!(obuf->flag & RB_IGNORE_P)) {
+ 	    flushline(h_env, obuf, envs[h_env->envc].indent, 0, h_env->limit);
+-	    do_blankline(h_env, obuf, envs[h_env->envc].indent, 0,
+-			 h_env->limit);
++	    do_blankline(h_env, obuf, envs[h_env->envc].indent, h_env->limit);
+ 	}
+ 	obuf->flag |= (RB_PLAIN | RB_IGNORE_P);
+ 	switch (cmd) {
+@@ -5113,8 +5105,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+ 	CLOSE_A;
+ 	if (!(obuf->flag & RB_IGNORE_P)) {
+ 	    flushline(h_env, obuf, envs[h_env->envc].indent, 0, h_env->limit);
+-	    do_blankline(h_env, obuf, envs[h_env->envc].indent, 0,
+-			 h_env->limit);
++	    do_blankline(h_env, obuf, envs[h_env->envc].indent, h_env->limit);
+ 	    obuf->flag |= RB_IGNORE_P;
+ 	}
+ 	obuf->flag &= ~RB_PLAIN;
+@@ -5468,7 +5459,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+ 		tmp = Sprintf("Refresh (%d sec)", refresh_interval);
+ 	    if (tmp) {
+ 		HTMLlineproc1(tmp->ptr, h_env);
+-		do_blankline(h_env, obuf, envs[h_env->envc].indent, 0,
++		do_blankline(h_env, obuf, envs[h_env->envc].indent,
+ 			     h_env->limit);
+ 		if (!is_redisplay &&
+ 		    !((obuf->flag & RB_NOFRAMES) && RenderFrame)) {
+@@ -6519,8 +6510,7 @@ proc_escape(struct readbuffer *obuf, cha
+ 
+ 
+ static int
+-need_flushline(struct html_feed_environ *h_env, struct readbuffer *obuf,
+-	       Lineprop mode)
++need_flushline(struct html_feed_environ *h_env, struct readbuffer *obuf)
+ {
+     char ch;
+ 
+@@ -6719,7 +6709,7 @@ HTMLlineproc0(char *line, struct html_fe
+ 		if (tbl->vspace > 0 && !(obuf->flag & RB_IGNORE_P)) {
+ 		    int indent = h_env->envs[h_env->envc].indent;
+ 		    flushline(h_env, obuf, indent, 0, h_env->limit);
+-		    do_blankline(h_env, obuf, indent, 0, h_env->limit);
++		    do_blankline(h_env, obuf, indent,h_env->limit);
+ 		}
+ 		save_fonteffect(h_env, obuf);
+ 		initRenderTable();
+@@ -6728,7 +6718,7 @@ HTMLlineproc0(char *line, struct html_fe
+ 		obuf->flag &= ~RB_IGNORE_P;
+ 		if (tbl->vspace > 0) {
+ 		    int indent = h_env->envs[h_env->envc].indent;
+-		    do_blankline(h_env, obuf, indent, 0, h_env->limit);
++		    do_blankline(h_env, obuf, indent, h_env->limit);
+ 		    obuf->flag |= RB_IGNORE_P;
+ 		}
+ 		set_space_to_prevchar(obuf->prevchar);
+@@ -6874,7 +6864,7 @@ HTMLlineproc0(char *line, struct html_fe
+ 				   mode);
+ 		}
+ 	    }
+-	    if (need_flushline(h_env, obuf, mode)) {
++	    if (need_flushline(h_env, obuf)) {
+ 		char *bp = obuf->line->ptr + obuf->bp.len;
+ 		char *tp = bp - obuf->bp.tlen;
+ 		int i = 0;
+@@ -7708,10 +7698,10 @@ loadGopherDir0(URLFile *uf, ParsedURL *p
+ 
+ #ifdef USE_M17N
+ Str
+-loadGopherSearch(URLFile *uf, ParsedURL *pu, wc_ces * charset)
++loadGopherSearch(ParsedURL *pu, wc_ces * charset)
+ #else
+ Str
+-loadGopherSearch0(URLFile *uf, ParsedURL *pu)
++loadGopherSearch0(ParsedURL *pu)
+ #endif
+ {
+     Str tmp;
+--- a/menu.c
++++ b/menu.c
+@@ -346,7 +346,7 @@ new_menu(Menu *menu, MenuItem *item)
+ }
+ 
+ void
+-geom_menu(Menu *menu, int x, int y, int mselect)
++geom_menu(Menu *menu, int mselect)
+ {
+     int win_x, win_y, win_w, win_h;
+ 
+@@ -631,7 +631,7 @@ popup_menu(Menu *parent, Menu *menu)
+ 	menu->cursorY = parent->cursorY;
+ 	guess_menu_xy(parent, menu->width, &menu->x, &menu->y);
+     }
+-    geom_menu(menu, menu->x, menu->y, menu->select);
++    geom_menu(menu, menu->select);
+ 
+     CurrentMenu = menu;
+     while (active) {
+@@ -1489,7 +1489,7 @@ smDelBuf(char c)
+     CurrentMenu->x = x;
+     CurrentMenu->y = y;
+ 
+-    geom_menu(CurrentMenu, x, y, 0);
++    geom_menu(CurrentMenu, 0);
+ 
+     CurrentMenu->select = (mselect <= CurrentMenu->nitem - 2) ? mselect
+ 	: (CurrentMenu->nitem - 2);
+@@ -1525,7 +1525,7 @@ smMovUp(char c)
+     initSelectMenu();
+     CurrentMenu->x = x;
+     CurrentMenu->y = y;
+-    geom_menu(CurrentMenu, 0, 0, 0);
++    geom_menu(CurrentMenu, 0);
+     CurrentMenu->select = --mselect;
+     displayBuffer(Currentbuf, B_FORCE_REDRAW);
+     draw_all_menu(CurrentMenu);
+@@ -1562,7 +1562,7 @@ smMovDn(char c)
+     initSelectMenu();
+     CurrentMenu->x = x;
+     CurrentMenu->y = y;
+-    geom_menu(CurrentMenu, 0, 0, 0);
++    geom_menu(CurrentMenu, 0);
+     CurrentMenu->select = ++mselect;
+     displayBuffer(Currentbuf, B_FORCE_REDRAW);
+     draw_all_menu(CurrentMenu);
+@@ -1700,7 +1700,7 @@ smDelTab(char c)
+     CurrentMenu->x = x;
+     CurrentMenu->y = y;
+ 
+-    geom_menu(CurrentMenu, x, y, 0);
++    geom_menu(CurrentMenu, 0);
+ 
+     CurrentMenu->select = (mselect <= CurrentMenu->nitem - 2) ? mselect
+ 	: (CurrentMenu->nitem - 2);
+--- a/proto.h
++++ b/proto.h
+@@ -206,8 +206,7 @@ extern void push_render_image(Str str, i
+ extern void flushline(struct html_feed_environ *h_env, struct readbuffer *obuf,
+ 		      int indent, int force, int width);
+ extern void do_blankline(struct html_feed_environ *h_env,
+-			 struct readbuffer *obuf, int indent, int indent_incr,
+-			 int width);
++			 struct readbuffer *obuf, int indent, int width);
+ extern void purgeline(struct html_feed_environ *h_env);
+ extern void save_fonteffect(struct html_feed_environ *h_env,
+ 			    struct readbuffer *obuf);
+@@ -255,12 +254,12 @@ extern Buffer *loadHTMLString(Str page);
+ #ifdef USE_GOPHER
+ #ifdef USE_M17N
+ extern Str loadGopherDir(URLFile *uf, ParsedURL *pu, wc_ces * charset);
+-extern Str loadGopherSearch(URLFile *uf, ParsedURL *pu, wc_ces * charset);
++extern Str loadGopherSearch(ParsedURL *pu, wc_ces * charset);
+ #else
+ extern Str loadGopherDir0(URLFile *uf, ParsedURL *pu);
+-extern Str loadGopherSearch0(URLFile *uf, ParsedURL *pu);
++extern Str loadGopherSearch0(ParsedURL *pu);
+ #define loadGopherDir(uf,pu,charset) loadGopherDir0(uf,pu)
+-#define loadGopherSearch(uf,pu,charset) loadGopherSearch0(uf,pu)
++#define loadGopherSearch(pu,charset) loadGopherSearch0(pu)
+ #endif
+ #endif				/* USE_GOPHER */
+ extern Buffer *loadBuffer(URLFile *uf, Buffer *newBuf);
+@@ -730,7 +729,7 @@ extern void initMouseAction(void);
+ 
+ #ifdef USE_MENU
+ extern void new_menu(Menu *menu, MenuItem *item);
+-extern void geom_menu(Menu *menu, int x, int y, int mselect);
++extern void geom_menu(Menu *menu, int mselect);
+ extern void draw_all_menu(Menu *menu);
+ extern void draw_menu(Menu *menu);
+ extern void draw_menu_item(Menu *menu, int mselect);
+--- a/table.c
++++ b/table.c
+@@ -759,7 +759,7 @@ do_refill(struct table *tbl, int row, in
+     if (h_env.limit > maxlimit)
+ 	h_env.limit = maxlimit;
+     if (tbl->border_mode != BORDER_NONE && tbl->vcellpadding > 0)
+-	do_blankline(&h_env, &obuf, 0, 0, h_env.limit);
++	do_blankline(&h_env, &obuf, 0, h_env.limit);
+     for (l = orgdata->first; l != NULL; l = l->next) {
+ 	if (TAG_IS(l->ptr, "<table_alt", 10)) {
+ 	    int id = -1;
+@@ -776,7 +776,7 @@ do_refill(struct table *tbl, int row, in
+ 		save_fonteffect(&h_env, h_env.obuf);
+ 		flushline(&h_env, &obuf, 0, 2, h_env.limit);
+ 		if (t->vspace > 0 && !(obuf.flag & RB_IGNORE_P))
+-		    do_blankline(&h_env, &obuf, 0, 0, h_env.limit);
++		    do_blankline(&h_env, &obuf, 0, h_env.limit);
+ 		if (RB_GET_ALIGN(h_env.obuf) == RB_CENTER)
+ 		    alignment = ALIGN_CENTER;
+ 		else if (RB_GET_ALIGN(h_env.obuf) == RB_RIGHT)
+@@ -796,7 +796,7 @@ do_refill(struct table *tbl, int row, in
+ 		obuf.flag &= ~RB_IGNORE_P;
+ 		h_env.blank_lines = 0;
+ 		if (t->vspace > 0) {
+-		    do_blankline(&h_env, &obuf, 0, 0, h_env.limit);
++		    do_blankline(&h_env, &obuf, 0, h_env.limit);
+ 		    obuf.flag |= RB_IGNORE_P;
+ 		}
+ 	    }
+@@ -814,7 +814,7 @@ do_refill(struct table *tbl, int row, in
+ 	int rowspan = table_rowspan(tbl, row, col);
+ 	if (row + rowspan <= tbl->maxrow) {
+ 	    if (tbl->vcellpadding > 0 && !(obuf.flag & RB_IGNORE_P))
+-		do_blankline(&h_env, &obuf, 0, 0, h_env.limit);
++		do_blankline(&h_env, &obuf, 0, h_env.limit);
+ 	}
+ 	else {
+ 	    if (tbl->vspace > 0)
+@@ -824,7 +824,7 @@ do_refill(struct table *tbl, int row, in
+     else {
+ 	if (tbl->vcellpadding > 0) {
+ 	    if (!(obuf.flag & RB_IGNORE_P))
+-		do_blankline(&h_env, &obuf, 0, 0, h_env.limit);
++		do_blankline(&h_env, &obuf, 0, h_env.limit);
+ 	}
+ 	else
+ 	    purgeline(&h_env);
+@@ -2147,7 +2147,7 @@ check_minimum0(struct table *t, int min)
+ }
+ 
+ static int
+-setwidth0(struct table *t, struct table_mode *mode)
++setwidth0(struct table *t)
+ {
+     int w;
+     int width = t->tabcontentssize;
+@@ -2175,7 +2175,7 @@ setwidth0(struct table *t, struct table_
+ static void
+ setwidth(struct table *t, struct table_mode *mode)
+ {
+-    int width = setwidth0(t, mode);
++    int width = setwidth0(t);
+     if (width < 0)
+ 	return;
+ #ifdef NOWRAP
+@@ -3112,7 +3112,7 @@ feed_table_tag(struct table *tbl, char *
+ 		    tbl->fixed_width[tbl->col] = w;
+ 	    }
+ #endif
+-	    setwidth0(tbl, mode);
++	    setwidth0(tbl);
+ 	    clearcontentssize(tbl, mode);
+ 	}
+ 	break;

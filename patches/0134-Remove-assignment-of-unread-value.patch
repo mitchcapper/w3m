@@ -1,0 +1,20 @@
+From c59cea76aeb6e96e66c14d337fb6f830c6ece6bf Mon Sep 17 00:00:00 2001
+From: Rene Kita <mail@rkta.de>
+Date: Thu, 23 Dec 2021 11:50:10 +0100
+Subject: [PATCH 134/172] Remove assignment of unread value
+
+---
+ indep.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+--- a/indep.c
++++ b/indep.c
+@@ -383,7 +383,7 @@ cleanup_line(Str s, int mode)
+ int
+ getescapechar(char **str)
+ {
+-    int dummy = -1;
++    int dummy;
+     char *p = *str, *q;
+     int strict_entity = TRUE;
+ 

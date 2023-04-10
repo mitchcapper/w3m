@@ -1,0 +1,174 @@
+From 6d91a41efdc9d54e126b6e045b8e5421cbe574c9 Mon Sep 17 00:00:00 2001
+From: Rene Kita <mail@rkta.de>
+Date: Thu, 30 Dec 2021 18:24:43 +0100
+Subject: [PATCH 037/172] Make MARK_URL work with display_link_numbers
+
+This fixes #180 'Treat URL-like strings as links in all pages' does not
+mix well with 'Display link numbers'.
+
+This has the side effect that link numbers will also by displayed when
+using VIEW ('v') on a non-HTML file.
+---
+ chkurl.c | 25 +++++++++++++++++++++++++
+ chkurl.h |  2 ++
+ file.c   | 27 +++++++++++++++++++++++----
+ main.c   |  3 ++-
+ proto.h  |  4 ++--
+ table.c  |  4 ++--
+ 6 files changed, 56 insertions(+), 9 deletions(-)
+
+--- a/chkurl.c
++++ b/chkurl.c
+@@ -22,6 +22,31 @@ static char *url_like_pat[] = {
+     NULL
+ };
+ 
++/*
++ * Try to match a URL-like pattern against a given string
++ * Returns the length of the match, stores the address of the begin and end in
++ * **char and **end, respectivly.
++ */
++int
++chk_url_regex(Str tok, const char **begin, const char **end)
++{
++    char *p = NULL, *p1 = NULL, *p2 = NULL;
++    int i, len;
++
++    p = tok->ptr;
++    len = tok->length;
++
++    for (i = 0; url_like_pat[i]; i++) {
++	if (regexCompile(url_like_pat[i], 1))
++	    continue;
++	if (regexMatch(p, &tok->ptr[len] - p, p == tok->ptr))
++	    matchedPosition(&p1, &p2);
++    }
++    *begin = p1;
++    *end = p2;
++    return p2 - p1;
++}
++
+ /* mark URL-like patterns as anchors */
+ void
+ chkURLBuffer(Buffer *buf)
+--- a/chkurl.h
++++ b/chkurl.h
+@@ -2,7 +2,9 @@
+ #define W3M_CHKURL_H__
+ 
+ #include "fm.h"
++#include "Str.h"
+ 
++int chk_url_regex(Str tok, const char **begin, const char **end);
+ void chkURLBuffer(Buffer *buf);
+ 
+ #endif
+--- a/file.c
++++ b/file.c
+@@ -6359,20 +6359,22 @@ table_width(struct html_feed_environ *h_
+ 
+ /* HTML processing first pass */
+ void
+-HTMLlineproc0(char *line, struct html_feed_environ *h_env, int internal)
++HTMLlineproc0(char *line, struct html_feed_environ *h_env, int internal, int check_url)
+ {
+     Lineprop mode;
+     int cmd;
+     struct readbuffer *obuf = h_env->obuf;
+     int indent, delta;
+     struct parsed_tag *tag;
+-    Str tokbuf;
++    Str newtok, tokbuf;
+     struct table *tbl = NULL;
+     struct table_mode *tbl_mode = NULL;
+     int tbl_width = 0;
+ #ifdef USE_M17N
+     int is_hangul, prev_is_hangul = 0;
+ #endif
++    const char *begin, *end;
++    int len;
+ 
+ #ifdef DEBUG
+     if (w3m_debug) {
+@@ -6436,6 +6438,23 @@ HTMLlineproc0(char *line, struct html_fe
+ 	    if (obuf->status != R_ST_NORMAL)	/* R_ST_AMP ? */
+ 		obuf->status = R_ST_NORMAL;
+ 	    str = tokbuf->ptr;
++	    if (!internal) {
++		if (check_url && cmd != HTML_A
++			&& !(tbl_mode && (tbl_mode->pre_mode & TBLM_ANCHOR))
++			&& (len = chk_url_regex(tokbuf, &begin, &end))) {
++		    newtok = Strnew();
++		    Strcat_charp_n(newtok, str, begin - str);
++		    Strcat_charp(newtok, "<a href=\"");
++		    Strcat_charp_n(newtok, begin, len);
++		    Strcat_charp(newtok, "\">");
++		    Strcat_charp_n(newtok, begin, len);
++		    Strcat_charp(newtok, "</a>");
++		    Strcat_charp_n(newtok, end, strlen(end));
++		    Strcat_charp(newtok, line);
++		    line = newtok->ptr;
++		    continue;
++		}
++	    }
+ 	    if (need_number) {
+ 		str = Strnew_m_charp(getLinkNumberStr(-1)->ptr, str, NULL)->ptr;
+ 		need_number = 0;
+@@ -7299,10 +7318,10 @@ loadHTMLstream(URLFile *f, Buffer *newBu
+ #ifdef USE_M17N
+ 	cur_document_charset = charset;
+ #endif
+-	HTMLlineproc0(lineBuf2->ptr, &htmlenv1, internal);
++	HTMLlineproc0(lineBuf2->ptr, &htmlenv1, internal, newBuf->check_url);
+     }
+     if (obuf.status != R_ST_NORMAL) {
+-	HTMLlineproc0("\n", &htmlenv1, internal);
++	HTMLlineproc0("\n", &htmlenv1, internal, newBuf->check_url);
+     }
+     obuf.status = R_ST_NORMAL;
+     completeHTMLstream(&htmlenv1, &obuf);
+--- a/main.c
++++ b/main.c
+@@ -5020,7 +5020,8 @@ DEFUN(defCSet, DEFAULT_CHARSET, "Change
+ 
+ DEFUN(chkURL, MARK_URL, "Turn URL-like strings into hyperlinks")
+ {
+-    chkURLBuffer(Currentbuf);
++    Currentbuf->need_reshape = 1;
++    Currentbuf->check_url = 1;
+     displayBuffer(Currentbuf, B_FORCE_REDRAW);
+ }
+ 
+--- a/proto.h
++++ b/proto.h
+@@ -235,8 +235,8 @@ extern int HTMLtagproc1(struct parsed_ta
+ 			struct html_feed_environ *h_env);
+ extern void HTMLlineproc2(Buffer *buf, TextLineList *tl);
+ extern void HTMLlineproc0(char *istr, struct html_feed_environ *h_env,
+-			  int internal);
+-#define HTMLlineproc1(x,y) HTMLlineproc0(x,y,TRUE)
++			  int internal, int check_url);
++#define HTMLlineproc1(x,y) HTMLlineproc0(x,y,TRUE, FALSE)
+ extern Buffer *loadHTMLBuffer(URLFile *f, Buffer *newBuf);
+ extern char *convert_size(clen_t size, int usefloat);
+ extern char *convert_size2(clen_t size1, clen_t size2, int usefloat);
+--- a/table.c
++++ b/table.c
+@@ -1718,7 +1718,7 @@ make_caption(struct table *t, struct htm
+     init_henv(&henv, &obuf, envs, MAX_ENV_LEVEL, newTextLineList(),
+ 	      limit, h_env->envs[h_env->envc].indent);
+     HTMLlineproc1("<center>", &henv);
+-    HTMLlineproc0(t->caption->ptr, &henv, FALSE);
++    HTMLlineproc0(t->caption->ptr, &henv, FALSE, FALSE);
+     HTMLlineproc1("</center>", &henv);
+ 
+     if (t->total_width < henv.maxlimit)
+@@ -1726,7 +1726,7 @@ make_caption(struct table *t, struct htm
+     limit = h_env->limit;
+     h_env->limit = t->total_width;
+     HTMLlineproc1("<center>", h_env);
+-    HTMLlineproc0(t->caption->ptr, h_env, FALSE);
++    HTMLlineproc0(t->caption->ptr, h_env, FALSE, FALSE);
+     HTMLlineproc1("</center>", h_env);
+     h_env->limit = limit;
+ }

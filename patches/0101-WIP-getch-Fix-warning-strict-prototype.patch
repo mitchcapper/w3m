@@ -1,0 +1,81 @@
+From 89f28135dd6edeedd561cfda89ac7f3cc968af8e Mon Sep 17 00:00:00 2001
+From: Rene Kita <mail@rkta.de>
+Date: Sun, 5 Sep 2021 21:18:16 +0200
+Subject: [PATCH 101/172] WIP getch Fix warning (strict-prototype)
+
+---
+ buffer.c |    4 ++--
+ linein.c |    4 ++--
+ main.c   |    2 +-
+ menu.c   |    4 ++--
+ terms.c  |    2 ++
+ 5 files changed, 9 insertions(+), 7 deletions(-)
+
+--- a/buffer.c
++++ b/buffer.c
+@@ -6,8 +6,8 @@
+ #include <gpm.h>
+ #endif
+ #if defined(USE_GPM) || defined(USE_SYSMOUSE)
+-extern int do_getch();
+-#define getch()	do_getch()
++extern int do_getch(void); /* TODO(rkta): header, found in other file */
++#define getch(void)	do_getch(void)
+ #endif				/* USE_GPM */
+ #endif				/* USE_MOUSE */
+ 
+--- a/linein.c
++++ b/linein.c
+@@ -8,8 +8,8 @@
+ #include <gpm.h>
+ #endif
+ #if defined(USE_GPM) || defined(USE_SYSMOUSE)
+-extern int do_getch();
+-#define getch()	do_getch()
++extern int do_getch(void); /* TODO(rkta): move extern to header, is found in other file too */
++#define getch(void)	do_getch(void)
+ #endif				/* USE_GPM */
+ #endif				/* USE_MOUSE */
+ 
+--- a/main.c
++++ b/main.c
+@@ -33,7 +33,7 @@
+ #endif				/* USE_GPM */
+ #if defined(USE_GPM) || defined(USE_SYSMOUSE)
+ extern int do_getch();
+-#define getch()	do_getch()
++#define getch(void)	do_getch(void)
+ #endif				/* defined(USE_GPM) || defined(USE_SYSMOUSE) */
+ #endif
+ 
+--- a/menu.c
++++ b/menu.c
+@@ -24,8 +24,8 @@ extern int sysm_process_mouse(int, int,
+ #if defined(USE_GPM) || defined(USE_SYSMOUSE)
+ #define X_MOUSE_SELECTED (char)0xff
+ static int X_Mouse_Selection;
+-extern int do_getch();
+-#define getch()	do_getch()
++extern int do_getch(void);
++#define getch(void)	do_getch(void)
+ #endif				/* defined(USE_GPM) || defined(USE_SYSMOUSE) */
+ #endif				/* USE_MOUSE */
+ 
+--- a/terms.c
++++ b/terms.c
+@@ -2274,6 +2274,7 @@ getch(void)
+  * E.g. SELECT_MENU will segfault if you remove it.
+  * TODO(rkta): wgetch belongs to libcurses, something fishy is going on here.
+  */
++char wgetch(void *); /* TODO(rkta): curses shenanigans... */
+ char
+ wgetch(void *p)
+ {
+@@ -2290,6 +2291,7 @@ wgetch(void *p)
+     return c;
+ }
+ 
++extern int do_getch(void); /* TODO(rkta): header, found in other file */
+ int
+ do_getch()
+ {

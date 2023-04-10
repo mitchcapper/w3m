@@ -1,0 +1,31 @@
+---
+ history.h |    1 +
+ main.c    |    7 +++++++
+ 2 files changed, 8 insertions(+)
+
+--- a/history.h
++++ b/history.h
+@@ -33,6 +33,7 @@ extern char *prevHist(Hist *hist);
+ extern int loadHistory(Hist *hist);
+ extern void saveHistory(Hist *hist, size_t size);
+ extern void ldHist(void);
++extern void svHist(void);
+ #else				/* not USE_HISTORY */
+ #define ldHist nulcmd
+ #endif				/* not USE_HISTORY */
+--- a/main.c
++++ b/main.c
+@@ -4559,6 +4559,13 @@ DEFUN(ldHist, HISTORY, "Show browsing hi
+ {
+     cmd_loadBuffer(historyBuffer(URLHist), BP_NO_URL, LB_NOLINK);
+ }
++
++/* Save history */
++DEFUN(svHist, SAVE_HISTORY, "Save browsing history")
++{
++    saveHistory(URLHist, URLHistSize);
++    disp_message_nsec("History written", TRUE, 1, FALSE, TRUE);
++}
+ #endif				/* USE_HISTORY */
+ 
+ /* download HREF link */

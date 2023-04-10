@@ -1,0 +1,20 @@
+From 0e3057008d209c14611db0e95b76ce693699ccd6 Mon Sep 17 00:00:00 2001
+From: Rene Kita <mail@rkta.de>
+Date: Sun, 12 Dec 2021 19:44:34 +0100
+Subject: [PATCH 132/172] Remove if that is always false
+
+---
+ url.c |    2 --
+ 1 file changed, 2 deletions(-)
+
+--- a/url.c
++++ b/url.c
+@@ -562,8 +562,6 @@ openSocket(char *const hostname,
+ #ifdef SOCK_DEBUG
+ 	sock_log("openSocket() failed. reason: user abort\n");
+ #endif
+-	if (sock >= 0)
+-	    close(sock);
+ 	goto error;
+     }
+     TRAP_ON;

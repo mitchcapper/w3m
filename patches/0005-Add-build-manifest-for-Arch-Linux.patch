@@ -1,0 +1,65 @@
+From 2e2bf88271af286152f4d9f5b77dff798a21d3c4 Mon Sep 17 00:00:00 2001
+From: Rene Kita <mail@rkta.de>
+Date: Sat, 12 Feb 2022 12:35:34 +0100
+Subject: [PATCH 005/172] Add build manifest for Arch Linux
+
+---
+ .builds/archlinux.yml | 46 +++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 46 insertions(+)
+ create mode 100644 .builds/archlinux.yml
+
+diff --git a/.builds/archlinux.yml b/.builds/archlinux.yml
+new file mode 100644
+index 00000000..05e29fde
+--- /dev/null
++++ b/.builds/archlinux.yml
+@@ -0,0 +1,46 @@
++image: archlinux
++sources:
++  - https://git.sr.ht/~rkta/w3m
++packages:
++  - imlib2
++  - gdk-pixbuf-xlib
++triggers:
++  - action: email
++    condition: failure
++    to: mail@rkta.de
++tasks:
++  - everything: |
++      cd w3m
++      make distclean || :
++      ./configure \
++        --with-x --enable-m17n --enable-unicode --enable-messagel10n \
++        --enable-japanese --enable-nls --enable-color --enable-ansi_color \
++        --enable-bgcolor --enable-image --enable-xface --enable-keymap=w3m \
++        --enable-menu --enable-mouse --enable-history --enable-alarm \
++        --enable-cookie --enable-nntp --enable-gopher --enable-dict \
++        --enable-help_cgi --enable-external_uri_loader --enable-w3mmailer \
++        --with-migemo --with-editor --with-mailer --with-browser \
++        --enable-ipv6 --with-ssl --enable-sslverify --enable-digest_auth \
++        --with-termlib --with-gc
++      make -j4 OPTS=-Werror
++      cd tests
++      sh run_tests
++  - debian: |
++      cd w3m
++      make distclean || :
++      ./configure \
++        --enable-m17n --enable-image --enable-color --enable-ansi_color \
++        --enable-mouse --enable-menu --enable-cookie --with-ssl \
++        --enable-sslverify --enable-external_uri_loader --enable-w3mmailer \
++        --enable-nntp --enable-gopher --enable-ipv6 --enable-alarm \
++        --with-migemo
++      make -j4 OPTS=-Werror
++      cd tests
++      sh run_tests
++  - default: |
++      cd w3m
++      make distclean || :
++      ./configure
++      make -j4 OPTS=-Werror
++      cd tests
++      sh run_tests
+-- 
+2.30.2
+

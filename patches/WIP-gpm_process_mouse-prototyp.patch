@@ -1,0 +1,34 @@
+---
+ main.c  |    2 ++
+ terms.c |    2 +-
+ 2 files changed, 3 insertions(+), 1 deletion(-)
+
+--- a/main.c
++++ b/main.c
+@@ -5743,6 +5743,8 @@ DEFUN(sgrmouse, SGRMOUSE, "SGR 1006 mous
+ }
+ 
+ #ifdef USE_GPM
++/* TODO(rkta): header file something */
++int gpm_process_mouse(Gpm_Event * event, void *data);
+ int
+ gpm_process_mouse(Gpm_Event * event, void *data)
+ {
+--- a/terms.c
++++ b/terms.c
+@@ -25,6 +25,7 @@
+ #ifdef USE_MOUSE
+ #ifdef USE_GPM
+ #include <gpm.h>
++extern int gpm_process_mouse(Gpm_Event *, void *); /* TODO(rkta): header */
+ #endif				/* USE_GPM */
+ #ifdef USE_SYSMOUSE
+ #include <osreldate.h>
+@@ -2424,7 +2425,6 @@ void
+ mouse_init()
+ {
+     Gpm_Connect conn;
+-    extern int gpm_process_mouse(Gpm_Event *, void *);
+     int r;
+ 
+     if (mouseActive)

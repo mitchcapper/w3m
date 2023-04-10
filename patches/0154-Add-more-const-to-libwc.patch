@@ -1,0 +1,156 @@
+From b14675aab9fd8864549d1cbcc2b8689979f3e42d Mon Sep 17 00:00:00 2001
+From: Rene Kita <mail@rkta.de>
+Date: Thu, 13 Jan 2022 13:27:46 +0100
+Subject: [PATCH 154/172] Add more const to libwc
+
+---
+ libwc/conv.c |    6 +++---
+ libwc/putc.c |    8 ++++----
+ libwc/wc.h   |    2 +-
+ libwc/wtf.c  |   24 ++++++++++++------------
+ libwc/wtf.h  |   10 +++++-----
+ 5 files changed, 25 insertions(+), 25 deletions(-)
+
+--- a/libwc/conv.c
++++ b/libwc/conv.c
+@@ -43,9 +43,9 @@ static Str
+ wc_conv_to_ces(Str is, wc_ces ces)
+ {
+     Str os;
+-    wc_uchar *sp = (wc_uchar *)is->ptr;
+-    wc_uchar *ep = sp + is->length;
+-    wc_uchar *p;
++    const wc_uchar *sp = (const wc_uchar *)is->ptr;
++    const wc_uchar *ep = sp + is->length;
++    const wc_uchar *p;
+     wc_status st;
+ 
+     switch (ces) {
+--- a/libwc/putc.c
++++ b/libwc/putc.c
+@@ -16,14 +16,14 @@ wc_putc_init(wc_ces f_ces, wc_ces t_ces)
+ }
+ 
+ void
+-wc_putc(char *c, FILE *f)
++wc_putc(const char *c, FILE *f)
+ {
+-    wc_uchar *p;
++    const wc_uchar *p;
+ 
+     if (putc_f_ces != WC_CES_WTF)
+-	p = (wc_uchar *)wc_conv(c, putc_f_ces, WC_CES_WTF)->ptr;
++	p = (const wc_uchar *)wc_conv(c, putc_f_ces, WC_CES_WTF)->ptr;
+     else
+-	p = (wc_uchar *)c;
++	p = (const wc_uchar *)c;
+ 
+     Strclear(putc_str);
+     while (*p)
+--- a/libwc/wc.h
++++ b/libwc/wc.h
+@@ -55,7 +55,7 @@ extern void wc_char_conv_init(wc_ces f_c
+ extern Str  wc_char_conv(char c);
+ 
+ extern void wc_putc_init(wc_ces f_ces, wc_ces t_ces);
+-extern void wc_putc(char *c, FILE *f);
++extern void wc_putc(const char *c, FILE *f);
+ extern void wc_putc_end(FILE *f);
+ extern void wc_putc_clear_status(void);
+ 
+--- a/libwc/wtf.c
++++ b/libwc/wtf.c
+@@ -379,9 +379,9 @@ wtf_push_unknown(Str os, wc_uchar *p, si
+ }
+ 
+ wc_wchar_t
+-wtf_parse1(wc_uchar **p)
++wtf_parse1(const wc_uchar **p)
+ {
+-    wc_uchar *q = *p;
++    const wc_uchar *q = *p;
+     wc_wchar_t cc;
+ 
+     if (*q < 0x80) {
+@@ -481,9 +481,9 @@ wtf_parse1(wc_uchar **p)
+ }
+ 
+ wc_wchar_t
+-wtf_parse(wc_uchar **p)
++wtf_parse(const wc_uchar **p)
+ {
+-    wc_uchar *q;
++    const wc_uchar *q;
+     wc_wchar_t cc, cc2;
+     wc_uint32 ucs, ucs2;
+ 
+@@ -544,13 +544,13 @@ wtf_parse(wc_uchar **p)
+ }
+ 
+ wc_ccs
+-wtf_get_ccs(wc_uchar *p)
++wtf_get_ccs(const wc_uchar *p)
+ {
+    return wtf_parse1(&p).ccs;
+ }
+ 
+ wc_uint32
+-wtf_get_code(wc_uchar *p)
++wtf_get_code(const wc_uchar *p)
+ {
+    return wtf_parse1(&p).code;
+ }
+@@ -581,10 +581,10 @@ wtf_is_hangul(wc_uchar *p)
+     return WC_FALSE;
+ }
+ 
+-char *
+-wtf_conv_fit(char *s, wc_ces ces)
++const char *
++wtf_conv_fit(const char *s, wc_ces ces)
+ {
+-    wc_uchar *p;
++    const wc_uchar *p;
+     Str os;
+     wc_wchar_t cc;
+     wc_ces major_ces;
+@@ -593,14 +593,14 @@ wtf_conv_fit(char *s, wc_ces ces)
+     if (ces == WC_CES_WTF || ces == WC_CES_US_ASCII)
+ 	return s;
+ 
+-    for (p = (wc_uchar *)s; *p && *p < 0x80; p++)
++    for (p = (const wc_uchar *)s; *p && *p < 0x80; p++)
+ 	;
+     if (! *p)
+ 	return s;
+ 
+     os = Strnew_size(strlen(s));
+-    if (p > (wc_uchar *)s)
+-	Strcopy_charp_n(os, s, (int)(p - (wc_uchar *)s));
++    if (p > (const wc_uchar *)s)
++	Strcopy_charp_n(os, s, (int)(p - (const wc_uchar *)s));
+ 
+     major_ces = wtf_major_ces;
+     pre_conv = WcOption.pre_conv;
+--- a/libwc/wtf.h
++++ b/libwc/wtf.h
+@@ -66,14 +66,14 @@ extern size_t     wtf_len(wc_uchar *p);
+ 
+ extern void       wtf_push(Str os, wc_ccs ccs, wc_uint32 code);
+ extern void       wtf_push_unknown(Str os, wc_uchar *p, size_t len);
+-extern wc_wchar_t wtf_parse(wc_uchar **p);
+-extern wc_wchar_t wtf_parse1(wc_uchar **p);
++extern wc_wchar_t wtf_parse(const wc_uchar **p);
++extern wc_wchar_t wtf_parse1(const wc_uchar **p);
+ 
+-extern wc_ccs     wtf_get_ccs(wc_uchar *p);
+-extern wc_uint32  wtf_get_code(wc_uchar *p);
++extern wc_ccs     wtf_get_ccs(const wc_uchar *p);
++extern wc_uint32  wtf_get_code(const wc_uchar *p);
+ 
+ extern wc_bool    wtf_is_hangul(wc_uchar *p);
+ 
+-extern char      *wtf_conv_fit(char *s, wc_ces ces);
++extern const char *wtf_conv_fit(const char *s, wc_ces ces);
+ 
+ #endif

@@ -1,0 +1,20 @@
+From fcc482e4249d2a016350937da4b18abacce88310 Mon Sep 17 00:00:00 2001
+From: Rene Kita <mail@rkta.de>
+Date: Fri, 25 Nov 2022 06:03:16 +0100
+Subject: [PATCH 120/172] Add a comment
+
+---
+ indep.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+--- a/indep.c
++++ b/indep.c
+@@ -111,7 +111,7 @@ allocStr(const char *s, int len)
+ }
+ 
+ int
+-strCmp(const void *s1, const void *s2)
++strCmp(const void *s1, const void *s2) /* helper for qsort */
+ {
+     return strcmp(*(const char * const *)s1, *(const char * const *)s2);
+ }

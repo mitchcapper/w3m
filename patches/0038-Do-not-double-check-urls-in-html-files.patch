@@ -1,0 +1,20 @@
+From a0dbfb37818e1f7bbf895eda73aeb2e8824446da Mon Sep 17 00:00:00 2001
+From: Rene Kita <mail@rkta.de>
+Date: Wed, 12 Jan 2022 12:06:14 +0100
+Subject: [PATCH 038/172] Do not double check urls in html files
+
+---
+ buffer.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+--- a/buffer.c
++++ b/buffer.c
+@@ -575,7 +575,7 @@ reshapeBuffer(Buffer *buf)
+ 	    buf->currentColumn = sbuf.currentColumn;
+ 	arrangeCursor(buf);
+     }
+-    if (buf->check_url & CHK_URL)
++    if (buf->check_url & CHK_URL && !is_html_type(buf->type))
+ 	chkURLBuffer(buf);
+ #ifdef USE_NNTP
+     if (buf->check_url & CHK_NMID)

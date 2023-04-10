@@ -1,0 +1,126 @@
+From robert@robalni.org Sun Sep 18 08:36:24 2022
+Received: (at submit) by bugs.debian.org; 18 Sep 2022 08:36:24 +0000
+X-Spam-Checker-Version: SpamAssassin 3.4.2-bugs.debian.org_2005_01_02
+	(2018-09-13) on buxtehude.debian.org
+X-Spam-Level: 
+X-Spam-Status: No, score=-10.0 required=4.0 tests=BAYES_00,DIGITS_LETTERS,
+	HAS_PACKAGE,MD5_SHA1_SUM,MURPHY_DRUGS_REL8,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no
+	version=3.4.2-bugs.debian.org_2005_01_02
+X-Spam-Bayes: score:0.0000 Tokens: new, 95; hammy, 118; neutral, 50; spammy,
+	2. spammytokens:0.995-1--Alm, 0.993-1--fmh hammytokens:0.000-+--100644,
+	 0.000-+--UD:github.com, 0.000-+--github.com, 0.000-+--githubcom,
+	0.000-+--GitHub
+Return-path: <robert@robalni.org>
+Received: from vsp-unauthed02.binero.net ([195.74.38.227]:31782)
+	by buxtehude.debian.org with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <robert@robalni.org>)
+	id 1oZpmq-0003U5-78
+	for submit@bugs.debian.org; Sun, 18 Sep 2022 08:36:24 +0000
+X-Halon-ID: 1d4a38d3-372c-11ed-8149-abede02233d2
+Authorized-sender: robert@robalni.org
+Received: from f (45-141-109-168.bredband.obenetwork.net [45.141.109.168])
+	by bin-vsp-out-01.atm.binero.net (Halon) with ESMTPSA
+	id 1d4a38d3-372c-11ed-8149-abede02233d2;
+	Sun, 18 Sep 2022 10:30:14 +0200 (CEST)
+Date: Sun, 18 Sep 2022 10:30:12 +0200
+From: Robert Alm Nilsson <robert@robalni.org>
+To: submit@bugs.debian.org
+Subject: w3m interprets <title> when not in <head> but in <svg>
+Message-ID: <YybXFJw9boTt8fyJ@f>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+X-Greylist: delayed 363 seconds by postgrey-1.36 at buxtehude; Sun, 18 Sep 2022 08:36:23 UTC
+Delivered-To: submit@bugs.debian.org
+Content-Length: 2724
+Lines: 91
+
+Package: w3m
+Version: 0.5.3+git20220429-1+b1
+
+When opening a page in w3m that contains an <svg> element that contains
+a <title> tag, w3m will use that svg title as the page title.
+
+An example of a page to demonstrate this problem is github.com.  The
+real title of github.com is "GitHub: Where the world builds software ·
+GitHub" but w3m displays the title "Go" (or the name of any other
+language) because the front page contains svg images for different
+programming languages with title tags.
+
+Here is a patch I made.  I don't know if this is the most optimal way to
+solve this but it seems to work in practice and I will use it locally
+until there in an upstream fix.
+
+commit f41db326e73fde685c1d0b79e46beec56336995e
+Author: Robert Alm Nilsson <robert@robalni.org>
+Date:   Sun Sep 18 09:51:29 2022 +0200
+
+    Only read title when in head
+    
+    Before this change, it was possible that w3m would interpret a title tag
+    under e.g. an svg tag as the page title.
+
+--- a/file.c
++++ b/file.c
+@@ -4817,19 +4817,23 @@ HTMLtagproc1(struct parsed_tag *tag, str
+ 	/* obuf->flag |= RB_IGNORE_P; */
+ 	return 1;
+     case HTML_TITLE:
+-	close_anchor(h_env, obuf);
+-	process_title(tag);
+-	obuf->flag |= RB_TITLE;
+-	obuf->end_tag = HTML_N_TITLE;
++	if (obuf->flag & RB_HEAD) {
++	    close_anchor(h_env, obuf);
++	    process_title(tag);
++	    obuf->flag |= RB_TITLE;
++	    obuf->end_tag = HTML_N_TITLE;
++	}
+ 	return 1;
+     case HTML_N_TITLE:
+-	if (!(obuf->flag & RB_TITLE))
+-	    return 1;
+-	obuf->flag &= ~RB_TITLE;
+-	obuf->end_tag = 0;
+-	tmp = process_n_title(tag);
+-	if (tmp)
+-	    HTMLlineproc1(tmp->ptr, h_env);
++	if (obuf->flag & RB_HEAD) {
++	    if (!(obuf->flag & RB_TITLE))
++		return 1;
++	    obuf->flag &= ~RB_TITLE;
++	    obuf->end_tag = 0;
++	    tmp = process_n_title(tag);
++	    if (tmp)
++		HTMLlineproc1(tmp->ptr, h_env);
++	}
+ 	return 1;
+     case HTML_TITLE_ALT:
+ 	if (parsedtag_get_value(tag, ATTR_TITLE, &p))
+@@ -5524,9 +5528,13 @@ HTMLtagproc1(struct parsed_tag *tag, str
+ 	    }
+ 	}
+     case HTML_N_HEAD:
++	obuf->flag &= ~RB_HEAD;
+ 	if (obuf->flag & RB_TITLE)
+ 	    HTMLlineproc1("</title>", h_env);
++	    return 1;
+     case HTML_HEAD:
++	obuf->flag |= RB_HEAD;
++	return 1;
+     case HTML_N_BODY:
+ 	return 1;
+     default:
+--- a/fm.h
++++ b/fm.h
+@@ -675,6 +675,7 @@ struct readbuffer {
+ #define RB_DEL		0x100000
+ #define RB_S		0x200000
+ #define RB_HTML5	0x400000
++#define RB_HEAD	0x800000
+ 
+ #define RB_GET_ALIGN(obuf) ((obuf)->flag&RB_ALIGN)
+ #define RB_SET_ALIGN(obuf,align) do{(obuf)->flag &= ~RB_ALIGN; (obuf)->flag |= (align); }while(0)

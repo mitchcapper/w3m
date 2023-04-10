@@ -1,0 +1,56 @@
+From: Rene Kita <mail@rkta.de>
+Subject: Add option to wrap long lines in pre mode
+
+Some bug trackers are really annoying to read, because the place
+comments in <pre> elements. They usually provide some CSS to make it
+readable.
+--- a/file.c
++++ b/file.c
+@@ -2771,7 +2771,7 @@ check_breakpoint(struct readbuffer *obuf
+     int tlen, len = obuf->line->length;
+ 
+     append_tags(obuf);
+-    if (pre_mode)
++    if (pre_mode && !FoldPre)
+ 	return;
+     tlen = obuf->line->length - len;
+     if (tlen > 0
+@@ -6862,7 +6862,8 @@ HTMLlineproc0(char *line, struct html_fe
+ 			proc_mchar(obuf, 1, delta, &str, mode);
+ 		}
+ 		if (obuf->flag & (RB_SPECIAL & ~RB_PRE_INT))
+-		    continue;
++		    if (!FoldPre)
++			continue;
+ 	    }
+ 	    else {
+ 		if (!IS_SPACE(*str))
+--- a/fm.h
++++ b/fm.h
+@@ -1056,6 +1056,7 @@ global int ignore_null_img_alt init(TRUE
+ #define DISPLAY_INS_DEL_FONTIFY	2
+ global int displayInsDel init(DISPLAY_INS_DEL_NORMAL);
+ global int FoldTextarea init(FALSE);
++global int FoldPre init(FALSE);
+ global int FoldLine init(FALSE);
+ #define DEFAULT_URL_EMPTY	0
+ #define DEFAULT_URL_CURRENT	1
+--- a/rc.c
++++ b/rc.c
+@@ -97,6 +97,7 @@ static int OptionEncode = FALSE;
+ #define CMT_DISP_BORDERS N_("Display table borders, ignore value of BORDER")
+ #define CMT_DISABLE_CENTER N_("Disable center alignment")
+ #define CMT_FOLD_TEXTAREA N_("Fold lines in TEXTAREA")
++#define CMT_FOLD_PRE N_("Fold lines in PRE")
+ #define CMT_DISP_INS_DEL N_("Display INS, DEL, S and STRIKE element")
+ #define CMT_COLOR        N_("Display with color")
+ #define CMT_HINTENSITY_COLOR N_("Use high-intensity colors")
+@@ -433,6 +434,8 @@ struct param_ptr params1[] = {
+      CMT_DISABLE_CENTER, NULL},
+     {"fold_textarea", P_CHARINT, PI_ONOFF, (void *)&FoldTextarea,
+      CMT_FOLD_TEXTAREA, NULL},
++    {"fold_pre", P_CHARINT, PI_ONOFF, (void *)&FoldPre,
++     CMT_FOLD_PRE, NULL},
+     {"display_ins_del", P_INT, PI_SEL_C, (void *)&displayInsDel,
+      CMT_DISP_INS_DEL, displayinsdel},
+     {"ignore_null_img_alt", P_INT, PI_ONOFF, (void *)&ignore_null_img_alt,

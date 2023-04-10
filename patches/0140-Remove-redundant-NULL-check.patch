@@ -1,0 +1,21 @@
+From a3f26f95067ba56d659f9227037d6e45e8f5758e Mon Sep 17 00:00:00 2001
+From: Rene Kita <mail@rkta.de>
+Date: Thu, 23 Dec 2021 12:29:44 +0100
+Subject: [PATCH 140/172] Remove redundant NULL check
+
+---
+ file.c |    3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+--- a/file.c
++++ b/file.c
+@@ -8000,8 +8000,7 @@ loadImageBuffer(URLFile *uf, Buffer *new
+     init_stream(&f, SCM_LOCAL, newStrStream(tmp));
+     loadHTMLstream(&f, newBuf, src, TRUE);
+     UFclose(&f);
+-    if (src)
+-	fclose(src);
++    fclose(src);
+ 
+     newBuf->topLine = newBuf->firstLine;
+     newBuf->lastLine = newBuf->currentLine;

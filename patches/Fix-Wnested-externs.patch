@@ -1,0 +1,106 @@
+---
+ etc.c            |    5 +++--
+ file.c           |    4 ++--
+ func.c           |    2 +-
+ indep.c          |    2 +-
+ w3mbookmark.c    |    1 -
+ w3mhelperpanel.c |    1 -
+ 6 files changed, 7 insertions(+), 8 deletions(-)
+
+--- a/file.c
++++ b/file.c
+@@ -8121,7 +8121,7 @@ static Buffer *
+ loadcmdout(char *cmd,
+ 	   Buffer *(*loadproc) (URLFile *, Buffer *), Buffer *defaultbuf)
+ {
+-    FILE *f, *popen(const char *, const char *);
++    FILE *f;
+     Buffer *buf;
+     URLFile uf;
+ 
+@@ -8159,7 +8159,7 @@ getshell(char *cmd)
+ Buffer *
+ getpipe(char *cmd)
+ {
+-    FILE *f, *popen(const char *, const char *);
++    FILE *f;
+     Buffer *buf;
+ 
+     if (cmd == NULL || *cmd == '\0')
+--- a/etc.c
++++ b/etc.c
+@@ -35,6 +35,8 @@ struct auth_pass {
+ 
+ struct auth_pass *passwords = NULL;
+ 
++extern Hash_si tagtable;
++
+ int
+ columnSkip(Buffer *buf, int offset)
+ {
+@@ -122,7 +124,6 @@ currentLineSkip(Buffer *buf, Line *line,
+ int
+ gethtmlcmd(char **s)
+ {
+-    extern Hash_si tagtable;
+     char cmdstr[MAX_CMD_LEN];
+     char *p = cmdstr;
+     char *save = *s;
+@@ -1581,7 +1582,7 @@ char *
+ expandName(char *name)
+ {
+     char *p;
+-    struct passwd *passent, *getpwnam(const char *);
++    struct passwd *passent;
+     Str extpath = NULL;
+ 
+     if (name == NULL)
+--- a/func.c
++++ b/func.c
+@@ -19,6 +19,7 @@ static Hash_iv *keyData = NULL;
+ static char keymap_initialized = FALSE;
+ static struct stat sys_current_keymap_file;
+ static struct stat current_keymap_file;
++extern int str_to_bool(char *value, int old);
+ 
+ void
+ setKeymap(char *p, int lineno, int verbose)
+@@ -127,7 +128,6 @@ interpret_keymap(FILE * kf, struct stat
+     wc_ces charset = SystemCharset;
+ #endif
+     int verbose = 1;
+-    extern int str_to_bool(char *value, int old);
+ 
+     if ((fd = fileno(kf)) < 0 || fstat(fd, &kstat) ||
+ 	(!force &&
+--- a/indep.c
++++ b/indep.c
+@@ -221,7 +221,7 @@ char *
+ expandPath(char *name)
+ {
+     char *p;
+-    struct passwd *passent, *getpwnam(const char *);
++    struct passwd *passent;
+     Str extpath = NULL;
+ 
+     if (name == NULL)
+--- a/w3mbookmark.c
++++ b/w3mbookmark.c
+@@ -183,7 +183,6 @@ insert_bookmark(char *bmark, struct pars
+ int
+ main(void)
+ {
+-    extern char *getenv();
+     char *p;
+     int length;
+     Str qs = NULL;
+--- a/w3mhelperpanel.c
++++ b/w3mhelperpanel.c
+@@ -167,7 +167,6 @@ int
+ main(void)
+ {
+     Str mailcapfile;
+-    extern char *getenv();
+     char *p;
+     int length;
+     Str qs = NULL;

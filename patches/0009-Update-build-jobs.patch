@@ -1,0 +1,334 @@
+From df8970521e7a891774c67fd47d819405b77cb480 Mon Sep 17 00:00:00 2001
+From: Rene Kita <mail@rkta.de>
+Date: Sun, 17 Apr 2022 12:02:08 +0200
+Subject: [PATCH 009/172] Update build jobs
+
+---
+ .builds/alpine.yml    | 50 +++++++++++++++++++++---
+ .builds/archlinux.yml | 89 ++++++++++++++++++++++++++++++++++++++++---
+ .builds/openbsd.yml   | 46 +++++++++++++++++++---
+ 3 files changed, 170 insertions(+), 15 deletions(-)
+
+diff --git a/.builds/alpine.yml b/.builds/alpine.yml
+index b3391d54..9182e56e 100644
+--- a/.builds/alpine.yml
++++ b/.builds/alpine.yml
+@@ -11,6 +11,7 @@ packages:
+   - ncurses-dev
+   - perl
+   - tcc
++  - tmux
+ triggers:
+   - action: email
+     condition: failure
+@@ -48,14 +49,17 @@ tasks:
+         --with-browser \
+         --with-editor \
+         --with-gc \
++        --with-imagelib=imlib2 \
+         --with-mailer \
+         --with-migemo \
++        --with-migemo="cmigemo -q -d /usr/share/cmigemo/utf-8/migemo-dict" \
+         --with-ssl \
+         --with-termlib \
+         --with-x
+-      make -j4 OPTS=-Werror
++      make -j4 OPTS='-Werror -flto'
+       cd tests
+       sh run_tests
++
+   - debian: |
+       cd w3m
+       make distclean || :
+@@ -71,21 +75,55 @@ tasks:
+         --enable-m17n \
+         --enable-menu \
+         --enable-mouse \
++        --enable-nls \
+         --enable-nntp \
+         --enable-sslverify \
++        --enable-unicode \
+         --enable-w3mmailer \
+-        --with-migemo \
++        --with-gc \
++        --with-imagelib=imlib2 \
++        --with-migemo="cmigemo -q -d /usr/share/cmigemo/utf-8/migemo-dict" \
+         --with-ssl
+-      make -j4 OPTS=-Werror
++      make -j4 OPTS='-Werror -flto'
+       cd tests
+       sh run_tests
++
++  - gdk-pixbuf: |
++      cd w3m
++      make distclean || :
++      ./configure \
++        --enable-alarm \
++        --enable-ansi_color \
++        --enable-color \
++        --enable-cookie \
++        --enable-external_uri_loader \
++        --enable-gopher \
++        --enable-image \
++        --enable-ipv6 \
++        --enable-m17n \
++        --enable-menu \
++        --enable-mouse \
++        --enable-nls \
++        --enable-nntp \
++        --enable-sslverify \
++        --enable-unicode \
++        --enable-w3mmailer \
++        --with-gc \
++        --with-imagelib=gdk-pixbuf \
++        --with-migemo="cmigemo -q -d /usr/share/cmigemo/utf-8/migemo-dict" \
++        --with-ssl
++      make -j4 OPTS='-Werror -flto'
++      cd tests
++      sh run_tests
++
+   - default: |
+       cd w3m
+       make distclean || :
+       ./configure
+-      make -j4 OPTS=-Werror
++      make -j4 OPTS='-Werror -flto'
+       cd tests
+       sh run_tests
++
+   - tcc: |
+       cd w3m
+       make distclean || :
+@@ -118,11 +156,13 @@ tasks:
+         --with-browser \
+         --with-editor \
+         --with-gc \
++        --with-imagelib=imlib2 \
+         --with-mailer \
+         --with-migemo \
++        --with-migemo="cmigemo -q -d /usr/share/cmigemo/utf-8/migemo-dict" \
+         --with-ssl \
+         --with-termlib \
+         --with-x
+-      make -j4 OPTS=-Werror
++      make -j4 OPTS='-Werror -flto'
+       cd tests
+       sh run_tests
+diff --git a/.builds/archlinux.yml b/.builds/archlinux.yml
+index 0fae0b7e..b5637ddd 100644
+--- a/.builds/archlinux.yml
++++ b/.builds/archlinux.yml
+@@ -4,6 +4,8 @@ sources:
+ packages:
+   - imlib2
+   - gdk-pixbuf-xlib
++  - tcc
++  - tmux
+ triggers:
+   - action: email
+     condition: failure
+@@ -41,14 +43,16 @@ tasks:
+         --with-browser \
+         --with-editor \
+         --with-gc \
++        --with-imagelib=imlib2 \
+         --with-mailer \
+-        --with-migemo \
++        --with-migemo="cmigemo -q -d /usr/share/cmigemo/utf-8/migemo-dict" \
+         --with-ssl \
+         --with-termlib \
+         --with-x
+-      make -j4 OPTS=-Werror
++      make -j4 OPTS='-Werror -flto'
+       cd tests
+       sh run_tests
++
+   - debian: |
+       cd w3m
+       make distclean || :
+@@ -64,18 +68,93 @@ tasks:
+         --enable-m17n \
+         --enable-menu \
+         --enable-mouse \
++        --enable-nls \
+         --enable-nntp \
+         --enable-sslverify \
++        --enable-unicode \
+         --enable-w3mmailer \
+-        --with-migemo \
++        --with-gc \
++        --with-imagelib=imlib2 \
++        --with-migemo="cmigemo -q -d /usr/share/cmigemo/utf-8/migemo-dict" \
+         --with-ssl
+-      make -j4 OPTS=-Werror
++      make -j4 OPTS='-Werror -flto'
+       cd tests
+       sh run_tests
++
++  - gdk-pixbuf: |
++      cd w3m
++      make distclean || :
++      ./configure \
++        --enable-alarm \
++        --enable-ansi_color \
++        --enable-color \
++        --enable-cookie \
++        --enable-external_uri_loader \
++        --enable-gopher \
++        --enable-image \
++        --enable-ipv6 \
++        --enable-m17n \
++        --enable-menu \
++        --enable-mouse \
++        --enable-nls \
++        --enable-nntp \
++        --enable-sslverify \
++        --enable-unicode \
++        --enable-w3mmailer \
++        --with-gc \
++        --with-imagelib=gdk-pixbuf \
++        --with-migemo="cmigemo -q -d /usr/share/cmigemo/utf-8/migemo-dict" \
++        --with-ssl
++      make -j4 OPTS='-Werror -flto'
++      cd tests
++      sh run_tests
++
+   - default: |
+       cd w3m
+       make distclean || :
+       ./configure
+-      make -j4 OPTS=-Werror
++      make -j4 OPTS='-Werror -flto'
++      cd tests
++      sh run_tests
++
++  - tcc: |
++      cd w3m
++      make distclean || :
++      env CC=tcc ./configure \
++        --enable-alarm \
++        --enable-ansi_color \
++        --enable-bgcolor \
++        --enable-color \
++        --enable-cookie \
++        --enable-dict \
++        --enable-digest_auth \
++        --enable-external_uri_loader \
++        --enable-gopher \
++        --enable-help_cgi \
++        --enable-history \
++        --enable-image \
++        --enable-ipv6 \
++        --enable-japanese \
++        --enable-keymap=w3m \
++        --enable-m17n \
++        --enable-menu \
++        --enable-messagel10n \
++        --enable-mouse \
++        --enable-nls \
++        --enable-nntp \
++        --enable-sslverify \
++        --enable-unicode \
++        --enable-w3mmailer \
++        --enable-xface \
++        --with-browser \
++        --with-editor \
++        --with-gc \
++        --with-imagelib=imlib2 \
++        --with-mailer \
++        --with-migemo="cmigemo -q -d /usr/share/cmigemo/utf-8/migemo-dict" \
++        --with-ssl \
++        --with-termlib \
++        --with-x
++      make -j4 OPTS='-Werror -flto'
+       cd tests
+       sh run_tests
+diff --git a/.builds/openbsd.yml b/.builds/openbsd.yml
+index b75d0058..6ed9767e 100644
+--- a/.builds/openbsd.yml
++++ b/.builds/openbsd.yml
+@@ -4,6 +4,7 @@ sources:
+ packages:
+   - boehm-gc
+   - gettext-tools
++  - tmux
+ triggers:
+   - action: email
+     condition: failure
+@@ -40,14 +41,16 @@ tasks:
+         --with-browser \
+         --with-editor \
+         --with-gc \
++        --with-imagelib=imlib2 \
+         --with-mailer \
+-        --with-migemo \
++        --with-migemo="cmigemo -q -d /usr/share/cmigemo/utf-8/migemo-dict" \
+         --with-ssl \
+         --with-termlib \
+         --with-x
+-      make -j4 OPTS='-Werror -Wno-invalid-source-encoding'
++      make -j4 OPTS='-Werror -Wno-invalid-source-encoding -flto'
+       cd tests
+       sh run_tests
++
+   - debian: |
+       cd w3m
+       make distclean || :
+@@ -63,18 +66,51 @@ tasks:
+         --enable-m17n \
+         --enable-menu \
+         --enable-mouse \
++        --enable-nls \
+         --enable-nntp \
+         --enable-sslverify \
++        --enable-unicode \
+         --enable-w3mmailer \
+-        --with-migemo
++        --with-gc \
++        --with-imagelib=imlib2 \
++        --with-migemo="cmigemo -q -d /usr/share/cmigemo/utf-8/migemo-dict" \
+         --with-ssl
+-      make -j4 OPTS='-Werror -Wno-invalid-source-encoding'
++      make -j4 OPTS='-Werror -Wno-invalid-source-encoding -flto'
+       cd tests
+       sh run_tests
++
++  - gdk-pixbuf: |
++      cd w3m
++      make distclean || :
++      ./configure \
++        --enable-alarm \
++        --enable-ansi_color \
++        --enable-color \
++        --enable-cookie \
++        --enable-external_uri_loader \
++        --enable-gopher \
++        --enable-image \
++        --enable-ipv6 \
++        --enable-m17n \
++        --enable-menu \
++        --enable-mouse \
++        --enable-nls \
++        --enable-nntp \
++        --enable-sslverify \
++        --enable-unicode \
++        --enable-w3mmailer \
++        --with-gc \
++        --with-imagelib=gdk-pixbuf \
++        --with-migemo="cmigemo -q -d /usr/share/cmigemo/utf-8/migemo-dict" \
++        --with-ssl
++      make -j4 OPTS='-Werror -Wno-invalid-source-encoding -flto'
++      cd tests
++      sh run_tests
++
+   - default: |
+       cd w3m
+       make distclean || :
+       ./configure
+-      make -j4 OPTS='-Werror -Wno-invalid-source-encoding'
++      make -j4 OPTS='-Werror -Wno-invalid-source-encoding -flto'
+       cd tests
+       sh run_tests
+-- 
+2.30.2
+

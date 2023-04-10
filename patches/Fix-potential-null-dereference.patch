@@ -1,0 +1,18 @@
+We either have a false positive from GCC 10 here or the comment is a lie.
+
+Needs -Wnull-derefence and -O3.
+---
+ rc.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+--- a/rc.c
++++ b/rc.c
+@@ -1508,7 +1508,7 @@ to_str(struct param_ptr *p)
+ 	return Sprintf("%g", *(double *)p->varptr);
+     }
+     /* not reached */
+-    return NULL;
++    return Strnew();
+ }
+ 
+ Buffer *

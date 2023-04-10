@@ -1,0 +1,53 @@
+From 678a43a06d259b4d7f10339066c44226cbe0911b Mon Sep 17 00:00:00 2001
+From: Rene Kita <mail@rkta.de>
+Date: Thu, 23 Dec 2021 21:40:37 +0100
+Subject: [PATCH 022/172] Remove unused function
+
+---
+ proto.h |  2 --
+ terms.c | 23 -----------------------
+ 2 files changed, 25 deletions(-)
+
+--- a/proto.h
++++ b/proto.h
+@@ -500,8 +500,6 @@ extern void addstr(char *s);
+ extern void addnstr(char *s, int n);
+ extern void addnstr_sup(char *s, int n);
+ extern void crmode(void);
+-extern void nocrmode(void);
+-extern void term_echo(void);
+ extern void term_noecho(void);
+ extern void term_raw(void);
+ extern void term_cooked(void);
+--- a/terms.c
++++ b/terms.c
+@@ -2170,29 +2170,6 @@ crmode(void)
+ #endif				/* HAVE_SGTTY_H */
+ 
+ void
+-nocrmode(void)
+-#ifndef HAVE_SGTTY_H
+-{
+-    ttymode_set(ICANON, 0);
+-#ifdef HAVE_TERMIOS_H
+-    set_cc(VMIN, 4);
+-#else				/* not HAVE_TERMIOS_H */
+-    set_cc(VEOF, 4);
+-#endif				/* not HAVE_TERMIOS_H */
+-}
+-#else				/* HAVE_SGTTY_H */
+-{
+-    ttymode_reset(CBREAK, 0);
+-}
+-#endif				/* HAVE_SGTTY_H */
+-
+-void
+-term_echo(void)
+-{
+-    ttymode_set(ECHO, 0);
+-}
+-
+-void
+ term_noecho(void)
+ {
+     ttymode_reset(ECHO, 0);

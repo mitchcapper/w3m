@@ -1,0 +1,303 @@
+From f7866a6827e347fd41db2874a657236f2188634c Mon Sep 17 00:00:00 2001
+From: Rene Kita <mail@rkta.de>
+Date: Sun, 17 Apr 2022 14:42:38 +0200
+Subject: [PATCH 008/172] Sort option in build jobs
+
+---
+ .builds/alpine.yml    | 105 +++++++++++++++++++++++++++++++++---------
+ .builds/archlinux.yml |  63 +++++++++++++++++++------
+ .builds/openbsd.yml   |  59 +++++++++++++++++++-----
+ 3 files changed, 178 insertions(+), 49 deletions(-)
+
+diff --git a/.builds/alpine.yml b/.builds/alpine.yml
+index 7bc7f60d..b3391d54 100644
+--- a/.builds/alpine.yml
++++ b/.builds/alpine.yml
+@@ -20,15 +20,39 @@ tasks:
+       cd w3m
+       make distclean || :
+       ./configure \
+-        --with-x --enable-m17n --enable-unicode --enable-messagel10n \
+-        --enable-japanese --enable-nls --enable-color --enable-ansi_color \
+-        --enable-bgcolor --enable-image --enable-xface --enable-keymap=w3m \
+-        --enable-menu --enable-mouse --enable-history --enable-alarm \
+-        --enable-cookie --enable-nntp --enable-gopher --enable-dict \
+-        --enable-help_cgi --enable-external_uri_loader --enable-w3mmailer \
+-        --with-migemo --with-editor --with-mailer --with-browser \
+-        --enable-ipv6 --with-ssl --enable-sslverify --enable-digest_auth \
+-        --with-termlib --with-gc
++        --enable-alarm \
++        --enable-ansi_color \
++        --enable-bgcolor \
++        --enable-color \
++        --enable-cookie \
++        --enable-dict \
++        --enable-digest_auth \
++        --enable-external_uri_loader \
++        --enable-gopher \
++        --enable-help_cgi \
++        --enable-history \
++        --enable-image \
++        --enable-ipv6 \
++        --enable-japanese \
++        --enable-keymap=w3m \
++        --enable-m17n \
++        --enable-menu \
++        --enable-messagel10n \
++        --enable-mouse \
++        --enable-nls \
++        --enable-nntp \
++        --enable-sslverify \
++        --enable-unicode \
++        --enable-w3mmailer \
++        --enable-xface \
++        --with-browser \
++        --with-editor \
++        --with-gc \
++        --with-mailer \
++        --with-migemo \
++        --with-ssl \
++        --with-termlib \
++        --with-x
+       make -j4 OPTS=-Werror
+       cd tests
+       sh run_tests
+@@ -36,11 +60,22 @@ tasks:
+       cd w3m
+       make distclean || :
+       ./configure \
+-        --enable-m17n --enable-image --enable-color --enable-ansi_color \
+-        --enable-mouse --enable-menu --enable-cookie --with-ssl \
+-        --enable-sslverify --enable-external_uri_loader --enable-w3mmailer \
+-        --enable-nntp --enable-gopher --enable-ipv6 --enable-alarm \
+-        --with-migemo
++        --enable-alarm \
++        --enable-ansi_color \
++        --enable-color \
++        --enable-cookie \
++        --enable-external_uri_loader \
++        --enable-gopher \
++        --enable-image \
++        --enable-ipv6 \
++        --enable-m17n \
++        --enable-menu \
++        --enable-mouse \
++        --enable-nntp \
++        --enable-sslverify \
++        --enable-w3mmailer \
++        --with-migemo \
++        --with-ssl
+       make -j4 OPTS=-Werror
+       cd tests
+       sh run_tests
+@@ -55,15 +90,39 @@ tasks:
+       cd w3m
+       make distclean || :
+       env CC=tcc ./configure \
+-        --with-x --enable-m17n --enable-unicode --enable-messagel10n \
+-        --enable-japanese --enable-nls --enable-color --enable-ansi_color \
+-        --enable-bgcolor --enable-image --enable-xface --enable-keymap=w3m \
+-        --enable-menu --enable-mouse --enable-history --enable-alarm \
+-        --enable-cookie --enable-nntp --enable-gopher --enable-dict \
+-        --enable-help_cgi --enable-external_uri_loader --enable-w3mmailer \
+-        --with-migemo --with-editor --with-mailer --with-browser \
+-        --enable-ipv6 --with-ssl --enable-sslverify --enable-digest_auth \
+-        --with-termlib --with-gc
++        --enable-alarm \
++        --enable-ansi_color \
++        --enable-bgcolor \
++        --enable-color \
++        --enable-cookie \
++        --enable-dict \
++        --enable-digest_auth \
++        --enable-external_uri_loader \
++        --enable-gopher \
++        --enable-help_cgi \
++        --enable-history \
++        --enable-image \
++        --enable-ipv6 \
++        --enable-japanese \
++        --enable-keymap=w3m \
++        --enable-m17n \
++        --enable-menu \
++        --enable-messagel10n \
++        --enable-mouse \
++        --enable-nls \
++        --enable-nntp \
++        --enable-sslverify \
++        --enable-unicode \
++        --enable-w3mmailer \
++        --enable-xface \
++        --with-browser \
++        --with-editor \
++        --with-gc \
++        --with-mailer \
++        --with-migemo \
++        --with-ssl \
++        --with-termlib \
++        --with-x
+       make -j4 OPTS=-Werror
+       cd tests
+       sh run_tests
+diff --git a/.builds/archlinux.yml b/.builds/archlinux.yml
+index 05e29fde..0fae0b7e 100644
+--- a/.builds/archlinux.yml
++++ b/.builds/archlinux.yml
+@@ -13,15 +13,39 @@ tasks:
+       cd w3m
+       make distclean || :
+       ./configure \
+-        --with-x --enable-m17n --enable-unicode --enable-messagel10n \
+-        --enable-japanese --enable-nls --enable-color --enable-ansi_color \
+-        --enable-bgcolor --enable-image --enable-xface --enable-keymap=w3m \
+-        --enable-menu --enable-mouse --enable-history --enable-alarm \
+-        --enable-cookie --enable-nntp --enable-gopher --enable-dict \
+-        --enable-help_cgi --enable-external_uri_loader --enable-w3mmailer \
+-        --with-migemo --with-editor --with-mailer --with-browser \
+-        --enable-ipv6 --with-ssl --enable-sslverify --enable-digest_auth \
+-        --with-termlib --with-gc
++        --enable-alarm \
++        --enable-ansi_color \
++        --enable-bgcolor \
++        --enable-color \
++        --enable-cookie \
++        --enable-dict \
++        --enable-digest_auth \
++        --enable-external_uri_loader \
++        --enable-gopher \
++        --enable-help_cgi \
++        --enable-history \
++        --enable-image \
++        --enable-ipv6 \
++        --enable-japanese \
++        --enable-keymap=w3m \
++        --enable-m17n \
++        --enable-menu \
++        --enable-messagel10n \
++        --enable-mouse \
++        --enable-nls \
++        --enable-nntp \
++        --enable-sslverify \
++        --enable-unicode \
++        --enable-w3mmailer \
++        --enable-xface \
++        --with-browser \
++        --with-editor \
++        --with-gc \
++        --with-mailer \
++        --with-migemo \
++        --with-ssl \
++        --with-termlib \
++        --with-x
+       make -j4 OPTS=-Werror
+       cd tests
+       sh run_tests
+@@ -29,11 +53,22 @@ tasks:
+       cd w3m
+       make distclean || :
+       ./configure \
+-        --enable-m17n --enable-image --enable-color --enable-ansi_color \
+-        --enable-mouse --enable-menu --enable-cookie --with-ssl \
+-        --enable-sslverify --enable-external_uri_loader --enable-w3mmailer \
+-        --enable-nntp --enable-gopher --enable-ipv6 --enable-alarm \
+-        --with-migemo
++        --enable-alarm \
++        --enable-ansi_color \
++        --enable-color \
++        --enable-cookie \
++        --enable-external_uri_loader \
++        --enable-gopher \
++        --enable-image \
++        --enable-ipv6 \
++        --enable-m17n \
++        --enable-menu \
++        --enable-mouse \
++        --enable-nntp \
++        --enable-sslverify \
++        --enable-w3mmailer \
++        --with-migemo \
++        --with-ssl
+       make -j4 OPTS=-Werror
+       cd tests
+       sh run_tests
+diff --git a/.builds/openbsd.yml b/.builds/openbsd.yml
+index cd70bc1d..b75d0058 100644
+--- a/.builds/openbsd.yml
++++ b/.builds/openbsd.yml
+@@ -13,14 +13,38 @@ tasks:
+       cd w3m
+       make distclean || :
+       ./configure \
+-      --with-x --enable-m17n --enable-unicode --enable-japanese --enable-nls \
+-      --enable-color --enable-ansi_color  --enable-bgcolor --enable-image \
+-      --enable-xface --enable-keymap=w3m  --enable-menu --enable-mouse \
+-      --enable-history --enable-alarm  --enable-cookie --enable-nntp \
+-      --enable-gopher --enable-dict  --enable-help_cgi \
+-      --enable-external_uri_loader --enable-w3mmailer  --with-migemo \
+-      --with-editor --with-mailer --with-browser  --enable-ipv6 --with-ssl \
+-      --enable-sslverify --enable-digest_auth  --with-termlib --with-gc
++        --enable-alarm \
++        --enable-ansi_color \
++        --enable-bgcolor \
++        --enable-color \
++        --enable-cookie \
++        --enable-dict \
++        --enable-digest_auth \
++        --enable-external_uri_loader \
++        --enable-gopher \
++        --enable-help_cgi \
++        --enable-history \
++        --enable-image \
++        --enable-ipv6 \
++        --enable-japanese \
++        --enable-keymap=w3m \
++        --enable-m17n \
++        --enable-menu \
++        --enable-mouse \
++        --enable-nls \
++        --enable-nntp \
++        --enable-sslverify \
++        --enable-unicode \
++        --enable-w3mmailer \
++        --enable-xface \
++        --with-browser \
++        --with-editor \
++        --with-gc \
++        --with-mailer \
++        --with-migemo \
++        --with-ssl \
++        --with-termlib \
++        --with-x
+       make -j4 OPTS='-Werror -Wno-invalid-source-encoding'
+       cd tests
+       sh run_tests
+@@ -28,11 +52,22 @@ tasks:
+       cd w3m
+       make distclean || :
+       ./configure \
+-        --enable-m17n --enable-image --enable-color --enable-ansi_color \
+-        --enable-mouse --enable-menu --enable-cookie --with-ssl \
+-        --enable-sslverify --enable-external_uri_loader --enable-w3mmailer \
+-        --enable-nntp --enable-gopher --enable-ipv6 --enable-alarm \
++        --enable-alarm \
++        --enable-ansi_color \
++        --enable-color \
++        --enable-cookie \
++        --enable-external_uri_loader \
++        --enable-gopher \
++        --enable-image \
++        --enable-ipv6 \
++        --enable-m17n \
++        --enable-menu \
++        --enable-mouse \
++        --enable-nntp \
++        --enable-sslverify \
++        --enable-w3mmailer \
+         --with-migemo
++        --with-ssl
+       make -j4 OPTS='-Werror -Wno-invalid-source-encoding'
+       cd tests
+       sh run_tests
+-- 
+2.30.2
+

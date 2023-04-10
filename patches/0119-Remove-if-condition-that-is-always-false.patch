@@ -1,0 +1,35 @@
+From dcd8dc75d949fb15347ce6ead0b3ddf77f5cb050 Mon Sep 17 00:00:00 2001
+From: Rene Kita <mail@rkta.de>
+Date: Thu, 24 Nov 2022 06:41:50 +0100
+Subject: [PATCH 119/172] Remove if condition that is always false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Compiling with 'gcc (Debian 10.2.1-6) 10.2.1 20210110' and
+-Wstring-compare gives the following warning:
+
+In function ‘wc_locale_to_ces’,
+    inlined from ‘wc_guess_locale_charset’ at libwc/charset.c:103:13,
+    inlined from ‘wc_guess_locale_charset’ at libwc/charset.c:97:1:
+libwc/charset.c:413:10: error: ‘strcmp’ of a string of length 8 and an array of size 8 evaluates to nonzero [-Werror=string-compare]
+  413 |     if (!strcmp(buf, "japanese"))
+      |          ^
+
+If strcmp is always true, this condition is always false and was never
+executed. It should be save to remove it.
+---
+ libwc/charset.c |    2 --
+ 1 file changed, 2 deletions(-)
+
+--- a/libwc/charset.c
++++ b/libwc/charset.c
+@@ -410,8 +410,6 @@ wc_locale_to_ces(char *locale)
+ 	return wc_charset_to_ces(p);
+     }
+ 
+-    if (!strcmp(buf, "japanese"))
+-	return WC_CES_SHIFT_JIS;
+     if (!strcmp(buf, "zh_tw") ||
+ 	!strcmp(buf, "zh_hk"))
+ 	return WC_CES_BIG5;

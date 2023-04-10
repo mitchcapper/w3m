@@ -1,0 +1,117 @@
+---
+ main.c                   |    4 ++--
+ terms.h                  |    4 ++--
+ w3mimg/fb/fb_gdkpixbuf.c |    2 +-
+ w3mimg/fb/fb_img.h       |    2 +-
+ w3mimg/fb/fb_imlib2.c    |    2 +-
+ w3mimg/fb/fb_w3mimg.c    |    2 +-
+ w3mimg/w3mimg.h          |    8 ++++----
+ 7 files changed, 12 insertions(+), 12 deletions(-)
+
+--- a/terms.h
++++ b/terms.h
+@@ -8,7 +8,7 @@ extern int LASTLINE;
+ #endif
+ 
+ void clear(void);
+-void flush_tty();
++void flush_tty(void);
+ void setlinescols(void);
+ 
+ #ifdef USE_MOUSE
+@@ -23,7 +23,7 @@ void setlinescols(void);
+ #define MOUSE_BTN_UP 3
+ #define MOUSE_BTN_RESET -1
+ 
+-void mouse_end();
++void mouse_end(void);
+ #endif
+ 
+ #ifdef __CYGWIN__
+--- a/w3mimg/w3mimg.h
++++ b/w3mimg/w3mimg.h
+@@ -44,16 +44,16 @@ typedef struct _w3mimg_op {
+ } w3mimg_op;
+ 
+ #ifdef USE_W3MIMG_X11
+-extern w3mimg_op *w3mimg_x11open();
++extern w3mimg_op *w3mimg_x11open(void);
+ #endif
+ #ifdef USE_W3MIMG_FB
+-extern w3mimg_op *w3mimg_fbopen();
++extern w3mimg_op *w3mimg_fbopen(void);
+ #endif
+ #ifdef USE_W3MIMG_WIN
+-extern w3mimg_op *w3mimg_winopen();
++extern w3mimg_op *w3mimg_winopen(void);
+ #endif
+ 
+-extern w3mimg_op *w3mimg_open();
++extern w3mimg_op *w3mimg_open(void);
+ 
+ #ifdef __cplusplus
+ }
+--- a/main.c
++++ b/main.c
+@@ -32,7 +32,7 @@
+ #include <gpm.h>
+ #endif				/* USE_GPM */
+ #if defined(USE_GPM) || defined(USE_SYSMOUSE)
+-extern int do_getch();
++extern int do_getch(void);
+ #define getch(void)	do_getch(void)
+ #endif				/* defined(USE_GPM) || defined(USE_SYSMOUSE) */
+ #endif
+@@ -1534,7 +1534,7 @@ static Str currentURL(void);
+ 
+ #ifdef USE_BUFINFO
+ void
+-saveBufferInfo()
++saveBufferInfo(void)
+ {
+     FILE *fp;
+ 
+--- a/w3mimg/fb/fb_gdkpixbuf.c
++++ b/w3mimg/fb/fb_gdkpixbuf.c
+@@ -81,7 +81,7 @@ get_animation_size(GdkPixbufAnimation *
+ #endif
+ 
+ void
+-fb_image_init()
++fb_image_init(void)
+ {
+ #if defined(USE_GTK2)
+     g_type_init();
+--- a/w3mimg/fb/fb_imlib2.c
++++ b/w3mimg/fb/fb_imlib2.c
+@@ -11,7 +11,7 @@ static void draw(FB_IMAGE * img, Imlib_I
+ static Imlib_Image resize_image(Imlib_Image image, int width, int height);
+ 
+ void
+-fb_image_init()
++fb_image_init(void)
+ {
+     return;
+ }
+--- a/w3mimg/fb/fb_w3mimg.c
++++ b/w3mimg/fb/fb_w3mimg.c
+@@ -169,7 +169,7 @@ check_tty_console(char *tty)
+ #endif
+ 
+ w3mimg_op *
+-w3mimg_fbopen()
++w3mimg_fbopen(void)
+ {
+     w3mimg_op *wop = NULL;
+     wop = (w3mimg_op *) malloc(sizeof(w3mimg_op));
+--- a/w3mimg/fb/fb_img.h
++++ b/w3mimg/fb/fb_img.h
+@@ -3,7 +3,7 @@
+ #define fb_img_header
+ #include "fb.h"
+ 
+-void fb_image_init();
++void fb_image_init(void);
+ FB_IMAGE **fb_image_load(char *filename, int w, int h, int n);
+ void fb_image_set_bg(int r, int g, int b);
+ int fb_image_clear(int x, int y, int w, int h);

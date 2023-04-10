@@ -1,0 +1,48 @@
+From 35d16923d09ae3d838f1d4740e30901bc567386d Mon Sep 17 00:00:00 2001
+From: Rene Kita <mail@rkta.de>
+Date: Thu, 23 Dec 2021 21:38:18 +0100
+Subject: [PATCH 019/172] Remove unused function
+
+---
+ buffer.c | 19 -------------------
+ proto.h  |  1 -
+ 2 files changed, 20 deletions(-)
+
+--- a/buffer.c
++++ b/buffer.c
+@@ -117,25 +117,6 @@ discardBuffer(Buffer *buf)
+ }
+ 
+ /* 
+- * namedBuffer: Select buffer which have specified name
+- */
+-Buffer *
+-namedBuffer(Buffer *first, char *name)
+-{
+-    Buffer *buf;
+-
+-    if (!strcmp(first->buffername, name)) {
+-	return first;
+-    }
+-    for (buf = first; buf->nextBuffer != NULL; buf = buf->nextBuffer) {
+-	if (!strcmp(buf->nextBuffer->buffername, name)) {
+-	    return buf->nextBuffer;
+-	}
+-    }
+-    return NULL;
+-}
+-
+-/* 
+  * deleteBuffer: delete buffer
+  */
+ Buffer *
+--- a/proto.h
++++ b/proto.h
+@@ -299,7 +299,6 @@ extern Buffer *newBuffer(int width);
+ extern Buffer *nullBuffer(void);
+ extern void clearBuffer(Buffer *buf);
+ extern void discardBuffer(Buffer *buf);
+-extern Buffer *namedBuffer(Buffer *first, char *name);
+ extern Buffer *deleteBuffer(Buffer *first, Buffer *delbuf);
+ extern Buffer *replaceBuffer(Buffer *first, Buffer *delbuf, Buffer *newbuf);
+ extern Buffer *nthBuffer(Buffer *firstbuf, int n);

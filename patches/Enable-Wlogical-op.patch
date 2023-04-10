@@ -1,0 +1,69 @@
+---
+ Makefile.in            |    1 +
+ libwc/Makefile.in      |    1 +
+ w3mimg/Makefile.in     |    1 +
+ w3mimg/fb/Makefile.in  |    1 +
+ w3mimg/win/Makefile.in |    1 +
+ w3mimg/x11/Makefile.in |    1 +
+ 6 files changed, 6 insertions(+)
+
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -42,6 +42,7 @@ DEFAULTS += -Wcast-qual
+ DEFAULTS += -Wduplicated-branches
+ DEFAULTS += -Wduplicated-cond
+ DEFAULTS += -Werror=vla
++DEFAULTS += -Wlogical-op
+ DEFAULTS += -Wmissing-declarations
+ DEFAULTS += -Wnested-externs
+ DEFAULTS += -Wno-missing-field-initializers
+--- a/libwc/Makefile.in
++++ b/libwc/Makefile.in
+@@ -13,6 +13,7 @@ DEFAULTS += -Wcast-qual
+ DEFAULTS += -Wduplicated-branches
+ DEFAULTS += -Wduplicated-cond
+ DEFAULTS += -Werror=vla
++DEFAULTS += -Wlogical-op
+ DEFAULTS += -Wmissing-declarations
+ DEFAULTS += -Wnested-externs
+ DEFAULTS += -Wold-style-declaration
+--- a/w3mimg/Makefile.in
++++ b/w3mimg/Makefile.in
+@@ -13,6 +13,7 @@ DEFAULTS += -Wcast-qual
+ DEFAULTS += -Wduplicated-branches
+ DEFAULTS += -Wduplicated-cond
+ DEFAULTS += -Werror=vla
++DEFAULTS += -Wlogical-op
+ DEFAULTS += -Wmissing-declarations
+ DEFAULTS += -Wold-style-declaration
+ DEFAULTS += -Wnested-externs
+--- a/w3mimg/fb/Makefile.in
++++ b/w3mimg/fb/Makefile.in
+@@ -14,6 +14,7 @@ DEFAULTS += -Wcast-qual
+ DEFAULTS += -Wduplicated-branches
+ DEFAULTS += -Wduplicated-cond
+ DEFAULTS += -Werror=vla
++DEFAULTS += -Wlogical-op
+ DEFAULTS += -Wmissing-declarations
+ DEFAULTS += -Wold-style-declaration
+ DEFAULTS += -Wnested-externs
+--- a/w3mimg/win/Makefile.in
++++ b/w3mimg/win/Makefile.in
+@@ -14,6 +14,7 @@ DEFAULTS += -Wcast-qual
+ DEFAULTS += -Wduplicated-branches
+ DEFAULTS += -Wduplicated-cond
+ DEFAULTS += -Werror=vla
++DEFAULTS += -Wlogical-op
+ DEFAULTS += -Wmissing-declarations
+ DEFAULTS += -Wold-style-declaration
+ DEFAULTS += -Wnested-externs
+--- a/w3mimg/x11/Makefile.in
++++ b/w3mimg/x11/Makefile.in
+@@ -14,6 +14,7 @@ DEFAULTS += -Wcast-qual
+ DEFAULTS += -Wduplicated-branches
+ DEFAULTS += -Wduplicated-cond
+ DEFAULTS += -Werror=vla
++DEFAULTS += -Wlogical-op
+ DEFAULTS += -Wmissing-declarations
+ DEFAULTS += -Wold-style-declaration
+ DEFAULTS += -Wnested-externs

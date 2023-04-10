@@ -1,0 +1,71 @@
+---
+ etc.c   |    7 ++++---
+ file.c  |    7 +++++--
+ proto.h |    2 +-
+ 3 files changed, 10 insertions(+), 6 deletions(-)
+
+--- a/etc.c
++++ b/etc.c
+@@ -1483,7 +1483,7 @@ myExec(char *command)
+     exit(127);
+ }
+ 
+-void
++int
+ mySystem(char *command, int background)
+ {
+ #ifndef __MINGW32_VERSION
+@@ -1494,15 +1494,16 @@ mySystem(char *command, int background)
+ 	    setup_child(FALSE, 0, -1);
+ 	    myExec(command);
+ 	}
++	return 0;
+ #else
+ 	Str cmd = Strnew_charp("start /f ");
+ 	Strcat_charp(cmd, command);
+-	system(cmd->ptr);
++	return system(cmd->ptr);
+ #endif
+     }
+     else
+ #endif /* __MINGW32_VERSION */
+-	system(command);
++	return system(command);
+ }
+ 
+ Str
+--- a/proto.h
++++ b/proto.h
+@@ -628,7 +628,7 @@ extern Str romanNumeral(int n);
+ extern Str romanAlphabet(int n);
+ extern void setup_child(int child, int i, int f);
+ extern void myExec(char *command);
+-extern void mySystem(char *command, int background);
++extern int mySystem(char *command, int background);
+ extern Str myExtCommand(const char *cmd, const char *arg, int redirect);
+ extern Str myEditor(const char *cmd, const char *file, int line);
+ extern int is_localhost(const char *host);
+--- a/file.c
++++ b/file.c
+@@ -8461,7 +8461,7 @@ doExternal(URLFile uf, const char *type,
+ {
+     Str tmpf, command;
+     struct mailcap *mcap;
+-    int mc_stat;
++    int err, mc_stat;
+     Buffer *buf = NULL;
+     char *header, *src = NULL, *ext = uf.ext;
+ 
+@@ -8537,8 +8537,11 @@ doExternal(URLFile uf, const char *type,
+     else {
+ 	if (mcap->flags & MAILCAP_NEEDSTERMINAL || !BackgroundExtViewer) {
+ 	    fmTerm();
+-	    mySystem(command->ptr, 0);
++	    err = mySystem(command->ptr, 0);
+ 	    fmInit();
++	    if (err)
++		disp_err_message(Sprintf("%s returned %d", command->ptr, err)->ptr,
++				 FALSE);
+ 	    if (CurrentTab && Currentbuf)
+ 		displayBuffer(Currentbuf, B_FORCE_REDRAW);
+ 	}
