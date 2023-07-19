@@ -18,7 +18,7 @@ make this behaviour permanent.
 
 --- a/file.c
 +++ b/file.c
-@@ -2624,7 +2624,7 @@ check_breakpoint(struct readbuffer *obuf
+@@ -2622,7 +2622,7 @@ check_breakpoint(struct readbuffer *obuf
      int tlen, len = obuf->line->length;
  
      append_tags(obuf);
@@ -27,7 +27,7 @@ make this behaviour permanent.
  	return;
      tlen = obuf->line->length - len;
      if (tlen > 0
-@@ -6715,7 +6715,8 @@ HTMLlineproc0(char *line, struct html_fe
+@@ -6713,7 +6713,8 @@ HTMLlineproc0(char *line, struct html_fe
  			proc_mchar(obuf, 1, delta, &str, mode);
  		}
  		if (obuf->flag & (RB_SPECIAL & ~RB_PRE_INT))
@@ -37,7 +37,7 @@ make this behaviour permanent.
  	    }
  	    else {
  		if (!IS_SPACE(*str))
-@@ -6943,6 +6944,7 @@ loadHTMLBuffer(URLFile *f, Buffer *newBu
+@@ -6941,6 +6942,7 @@ loadHTMLBuffer(URLFile *f, Buffer *newBu
  	if (src)
  	    newBuf->sourcefile = tmp->ptr;
      }

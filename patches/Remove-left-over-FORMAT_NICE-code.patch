@@ -21,7 +21,7 @@ The configure option was removed around 2003.
  #undef INET6
 --- a/file.c
 +++ b/file.c
-@@ -2642,9 +2642,6 @@ set_breakpoint(struct readbuffer *obuf,
+@@ -2640,9 +2640,6 @@ set_breakpoint(struct readbuffer *obuf,
      obuf->bp.pos = obuf->pos;
      obuf->bp.tlen = tag_length;
      obuf->bp.flag = obuf->flag;
@@ -31,7 +31,7 @@ The configure option was removed around 2003.
      obuf->bp.top_margin = obuf->top_margin;
      obuf->bp.bottom_margin = obuf->bottom_margin;
  
-@@ -3029,47 +3026,6 @@ flushline(struct html_feed_environ *h_en
+@@ -3027,47 +3024,6 @@ flushline(struct html_feed_environ *h_en
  	else if (RB_GET_ALIGN(obuf) == RB_LEFT && obuf->flag & RB_INTABLE) {
  	    align(lbuf, width, ALIGN_LEFT);
  	}
@@ -79,7 +79,7 @@ The configure option was removed around 2003.
  #ifdef TABLE_DEBUG
  	if (w3m_debug) {
  	    FILE *f = fopen("zzzproc1", "a");
-@@ -6877,15 +6833,8 @@ HTMLlineproc0(char *line, struct html_fe
+@@ -6875,15 +6831,8 @@ HTMLlineproc0(char *line, struct html_fe
  		    bp = obuf->line->ptr + obuf->bp.len;
  		    line = Strnew_charp(bp);
  		    Strshrink(obuf->line, obuf->line->length - obuf->bp.len);
@@ -95,7 +95,7 @@ The configure option was removed around 2003.
  		    HTMLlineproc1(line->ptr, h_env);
  		}
  	    }
-@@ -6906,13 +6855,7 @@ HTMLlineproc0(char *line, struct html_fe
+@@ -6904,13 +6853,7 @@ HTMLlineproc0(char *line, struct html_fe
  	    i = 1;
  	indent = h_env->envs[h_env->envc].indent;
  	if (obuf->pos - i > h_env->limit) {

@@ -1,4 +1,5 @@
-Fix skip blanks macros
+From: Rene Kita <mail@rkta.de>
+Subject: Fix skip blanks macros
 
 GCC 12 starts warning about misleading indentation when the SKIP_BLANKS
 macro is used after a while loop without curly braces. This is because
@@ -19,7 +20,7 @@ while (*m && *m++ != ';');
 
 --- a/fm.h
 +++ b/fm.h
-@@ -301,8 +301,8 @@ extern int REV_LB[];
+@@ -303,8 +303,8 @@ extern int REV_LB[];
  #endif				/* __EMX__ */
  
  

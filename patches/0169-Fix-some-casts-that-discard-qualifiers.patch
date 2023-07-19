@@ -17,7 +17,7 @@ Found with -Wcast-qual.
 
 --- a/etc.c
 +++ b/etc.c
-@@ -1022,7 +1022,7 @@ find_auth_pass_entry(char *host, int por
+@@ -1020,7 +1020,7 @@ find_auth_pass_entry(char *host, int por
  
  int
  find_auth_user_passwd(ParsedURL *pu, char *realm,
@@ -162,7 +162,7 @@ Found with -Wcast-qual.
  }
 --- a/file.c
 +++ b/file.c
-@@ -1574,7 +1574,7 @@ getAuthCookie(struct http_auth *hauth, c
+@@ -1572,7 +1572,7 @@ getAuthCookie(struct http_auth *hauth, c
      *uname = NULL;
      *pwd = NULL;
  

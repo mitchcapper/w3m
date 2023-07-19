@@ -1,5 +1,7 @@
-Fix-OOB-with-backspaces.patch
+fix-skip-blank-macros.patch
 Replace-deprecated-md5.patch
+reduce-scope-of-dangerous-macro.patch
+remove-unused-macros.patch
 Enable-folding-in-pre-tags.patch
 Fix-slow-backward-search.patch
 move-buffer.patch
@@ -93,9 +95,9 @@ Handle-errors-in-mySystem.patch
 Zero-based-link-no.patch
 Remove-left-over-FORMAT_NICE-code.patch
 save-history.patch
-no-deprecated.patch
-fix-skip-blank-macros.patch
 Store-session.patch
+remove-emx-support.patch
+simplify-reshapeBuffer.patch
 0036-Move-chkurl-to-own-translation-unit.patch
 0037-Make-MARK_URL-work-with-display_link_numbers.patch
 0038-Do-not-double-check-urls-in-html-files.patch

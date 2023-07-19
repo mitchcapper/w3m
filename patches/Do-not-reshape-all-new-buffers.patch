@@ -1,3 +1,5 @@
+From: Rene Kita <mail@rkta.de>
+
 Respect the user option instead of always reshaping every new buffer.
 ---
  buffer.c |    2 +-

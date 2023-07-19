@@ -26,7 +26,7 @@
       CMT_DISPLINEINFO, NULL},
 --- a/file.c
 +++ b/file.c
-@@ -1707,7 +1707,7 @@ checkRedirection(ParsedURL *pu)
+@@ -1705,7 +1705,7 @@ checkRedirection(ParsedURL *pu)
  Str
  getLinkNumberStr(int correction)
  {
@@ -35,7 +35,7 @@
  }
  
  /* 
-@@ -7795,7 +7795,7 @@ loadGeminiBuffer(URLFile *uf, Buffer *vo
+@@ -7793,7 +7793,7 @@ loadGeminiBuffer(URLFile *uf, Buffer *vo
  	    buf->hmarklist = putHmarker(buf->hmarklist, currentLn(buf),
  					0, hseq);
  	    if (displayLinkNumber)

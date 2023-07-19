@@ -1,6 +1,14 @@
+From: Rene Kita <mail@rkta.de>
+Subject: Replace deprecated MD5 function
+
+OpenSSL deprecated MD5 with Release 3.0. Provide a wrapper function around
+the new way to do it.
+
+As the old code did no error handling this patch does not do it either.
+
 ---
- file.c |   18 +++++++++++++++++-
- 1 file changed, 17 insertions(+), 1 deletion(-)
+ file.c |   16 +++++++++++++++-
+ 1 file changed, 15 insertions(+), 1 deletion(-)
 
 --- a/file.c
 +++ b/file.c
@@ -13,13 +21,13 @@
  
  /* RFC2617: 3.2.2 The Authorization Request Header
   * 
-@@ -1213,6 +1213,22 @@ AuthBasicCred(struct http_auth *ha, Str
+@@ -1213,6 +1213,20 @@ AuthBasicCred(struct http_auth *ha, Str
   *                     "c" | "d" | "e" | "f"
   */
  
 +#define MD5_DIGEST_LENGTH 16
 +
-+static unsigned char *
++static void
 +MD5(const unsigned char *d, unsigned long n, unsigned char *md)
 +{
 +    EVP_MD_CTX *ctx = EVP_MD_CTX_new();
@@ -28,8 +36,6 @@
 +    EVP_DigestUpdate(ctx, d, n);
 +    EVP_DigestFinal_ex(ctx, md, NULL);
 +    EVP_MD_CTX_free(ctx);
-+
-+    return md;
 +}
 +
 +
