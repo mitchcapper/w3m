@@ -38,7 +38,7 @@ it.
      if (showLineNum) {
 --- a/main.c
 +++ b/main.c
-@@ -4920,7 +4920,6 @@ DEFUN(vwSrc, SOURCE VIEW, "Toggle betwee
+@@ -4921,7 +4921,6 @@ DEFUN(vwSrc, SOURCE VIEW, "Toggle betwee
      buf->clone = Currentbuf->clone;
      (*buf->clone)++;
  
@@ -46,7 +46,7 @@ it.
      reshapeBuffer(buf);
      pushBuffer(buf);
      displayBuffer(Currentbuf, B_NORMAL);
-@@ -5011,7 +5010,6 @@ DEFUN(geminize, GEMINIZE, "Toggle betwee
+@@ -5012,7 +5011,6 @@ DEFUN(geminize, GEMINIZE, "Toggle betwee
      buf->clone = Currentbuf->clone;
      (*buf->clone)++;
  
@@ -54,7 +54,7 @@ it.
      reshapeBuffer(buf);
      pushBuffer(buf);
      displayBuffer(Currentbuf, B_NORMAL);
-@@ -5146,7 +5144,6 @@ DEFUN(reload, RELOAD, "Load current docu
+@@ -5147,7 +5145,6 @@ DEFUN(reload, RELOAD, "Load current docu
  /* reshape */
  DEFUN(reshape, RESHAPE, "Re-render document")
  {

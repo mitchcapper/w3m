@@ -1,10 +1,10 @@
 ---
  config.h.in |    1 
  fm.h        |    2 +
- main.c      |   85 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++--
+ main.c      |   86 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++--
  proto.h     |    1 
  rc.c        |    4 ++
- 5 files changed, 91 insertions(+), 2 deletions(-)
+ 5 files changed, 92 insertions(+), 2 deletions(-)
 
 --- a/config.h.in
 +++ b/config.h.in
@@ -65,7 +65,7 @@
  	    else if (!strcmp("-F", argv[i]))
  		RenderFrame = TRUE;
  	    else if (!strcmp("-W", argv[i])) {
-@@ -914,8 +927,41 @@ main(int argc, char **argv)
+@@ -914,8 +927,42 @@ main(int argc, char **argv)
      if (ssl_known_hosts)
  	known_hosts = load_known_hosts();
  
@@ -86,6 +86,7 @@
 +
 +	for (;;) {
 +	    line = Strfgets(fp);
++	    Strchop(line);
 +	    if (line->length == 0)
 +		break;
 +	    if (n > m) {
@@ -109,7 +110,7 @@
  
      if (w3m_backend)
  	backend();
-@@ -2612,6 +2658,8 @@ _quitfm(int confirm)
+@@ -2612,6 +2659,8 @@ _quitfm(int confirm)
  #endif				/* USE_HISTORY */
      if ((err = save_known_hosts()))
  	perror(NULL);
@@ -118,7 +119,7 @@
      w3m_exit(err);
  }
  
-@@ -4368,6 +4416,39 @@ DEFUN(adBmark, ADD_BOOKMARK, "Add curren
+@@ -4368,6 +4417,39 @@ DEFUN(adBmark, ADD_BOOKMARK, "Add curren
  		request);
  }
  
