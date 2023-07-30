@@ -1,4 +1,5 @@
 From: Rene Kita <mail@rkta.de>
+Subject: Do not reshape all new buffers
 
 Respect the user option instead of always reshaping every new buffer.
 ---

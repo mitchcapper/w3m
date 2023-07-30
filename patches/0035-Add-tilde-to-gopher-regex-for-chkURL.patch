@@ -12,7 +12,7 @@ user's home directory.
 
 --- a/main.c
 +++ b/main.c
-@@ -5167,7 +5167,7 @@ chkURLBuffer(Buffer *buf)
+@@ -5165,7 +5165,7 @@ chkURLBuffer(Buffer *buf)
  	"https?://[a-zA-Z0-9][a-zA-Z0-9:%\\-\\./?=~_\\&+@#,\\$;]*[a-zA-Z0-9_/=\\-]",
  	"file:/[a-zA-Z0-9:%\\-\\./=_\\+@#,\\$;]*",
  #ifdef USE_GOPHER

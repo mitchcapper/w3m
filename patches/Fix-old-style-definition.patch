@@ -15,7 +15,7 @@
 
 --- a/main.c
 +++ b/main.c
-@@ -6079,7 +6079,7 @@ getCodePage(void)
+@@ -6077,7 +6077,7 @@ getCodePage(void)
  #endif
  
  void
@@ -117,7 +117,7 @@
  	return Local_cookie;
 --- a/rc.c
 +++ b/rc.c
-@@ -811,7 +811,7 @@ compare_table(struct rc_search_table *a,
+@@ -814,7 +814,7 @@ compare_table(struct rc_search_table *a,
  }
  
  static void

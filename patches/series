@@ -6,7 +6,11 @@ Enable-folding-in-pre-tags.patch
 Fix-slow-backward-search.patch
 move-buffer.patch
 Do-not-reshape-all-new-buffers.patch
+Handle-errors-in-mySystem.patch
+display-error-for-unkown-command.patch
 gemini.patch
+Zero-based-link-no.patch
+simplify-reshapeBuffer.patch
 Fix-potential-null-dereference.patch
 Use-https-with-USE_SSL-and-retry_http.patch
 0002-Remove-TODO-file.patch
@@ -91,13 +95,12 @@ Remove-unnecessary-casts.patch
 0171-Add-more-const-correctness.patch
 0172-const.patch
 Remove-some-volatile.patch
-Handle-errors-in-mySystem.patch
-Zero-based-link-no.patch
 Remove-left-over-FORMAT_NICE-code.patch
 save-history.patch
 Store-session.patch
-remove-emx-support.patch
-simplify-reshapeBuffer.patch
+NO_BUFFER-stuff.patch
+Use-gettext-for-user-facing-strings.patch
+refactor-arg-loading.patch
 0036-Move-chkurl-to-own-translation-unit.patch
 0037-Make-MARK_URL-work-with-display_link_numbers.patch
 0038-Do-not-double-check-urls-in-html-files.patch
@@ -107,3 +110,4 @@ simplify-reshapeBuffer.patch
 Fix-Wunused-result.patch
 Enable-Wformat=2.patch
 Remove-all-volatile.patch
+remove-emx-support.patch

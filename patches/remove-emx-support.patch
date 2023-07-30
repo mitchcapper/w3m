@@ -353,7 +353,7 @@
      if (strncmp(uri, "/$LIB/", 6) == 0)
 --- a/main.c
 +++ b/main.c
-@@ -280,12 +280,6 @@ fusage(FILE * f, int err)
+@@ -275,12 +275,6 @@ fusage(FILE * f, int err)
      exit(err);
  }
  
@@ -366,7 +366,7 @@
  static GC_warn_proc orig_GC_warn_proc = NULL;
  #define GC_WARN_KEEP_MAX (20)
  
-@@ -447,9 +441,6 @@ main(int argc, char **argv)
+@@ -441,9 +435,6 @@ main(int argc, char **argv)
  #ifdef USE_M17N
      char *Locale = NULL;
      wc_uint8 auto_detect;
@@ -376,7 +376,7 @@
  #endif
  #if defined(DONT_CALL_GC_AFTER_FORK) && defined(USE_IMAGE)
      char **getimage_args = NULL;
-@@ -524,11 +515,6 @@ main(int argc, char **argv)
+@@ -518,11 +509,6 @@ main(int argc, char **argv)
  	DocumentCharset = wc_guess_locale_charset(Locale, DocumentCharset);
  	SystemCharset = wc_guess_locale_charset(Locale, SystemCharset);
      }
@@ -388,7 +388,7 @@
  #endif
  
      /* initializations */
-@@ -1481,18 +1467,6 @@ DEFUN(nulcmd, NOTHING NULL @@@, "Do noth
+@@ -1434,18 +1420,6 @@ DEFUN(nulcmd, NOTHING NULL @@@, "Do noth
  {				/* do nothing */
  }
  
@@ -407,7 +407,7 @@
  static void
  escKeyProc(int c, int esc, unsigned char *map)
  {
-@@ -6153,20 +6127,6 @@ searchKeyNum(void)
+@@ -6062,20 +6036,6 @@ searchKeyNum(void)
      return n * PREC_NUM;
  }
  
@@ -531,7 +531,7 @@
  {
 --- a/rc.c
 +++ b/rc.c
-@@ -178,11 +178,7 @@ static int OptionEncode = FALSE;
+@@ -176,11 +176,7 @@ static int OptionEncode = FALSE;
  #define CMT_WRAP         N_("Wrap search")
  #define CMT_VIEW_UNSEENOBJECTS N_("Display unseen objects (e.g. bgimage tag)")
  #define CMT_AUTO_UNCOMPRESS	N_("Uncompress compressed data automatically when downloading")
@@ -543,7 +543,7 @@
  #define CMT_EXT_DIRLIST  N_("Use external program for directory listing")
  #define CMT_DIRLIST_CMD  N_("URL of directory listing command")
  #ifdef USE_DICT
-@@ -1225,30 +1221,11 @@ parse_cookie(void)
+@@ -1221,30 +1217,11 @@ parse_cookie(void)
  }
  #endif
  

@@ -1,10 +1,11 @@
 ---
  config.h.in |    1 
+ doc/w3m.1   |   20 +++++++++++
  fm.h        |    2 +
- main.c      |   86 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++--
+ main.c      |  106 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++--
  proto.h     |    1 
  rc.c        |    4 ++
- 5 files changed, 92 insertions(+), 2 deletions(-)
+ 6 files changed, 132 insertions(+), 2 deletions(-)
 
 --- a/config.h.in
 +++ b/config.h.in
@@ -25,16 +26,17 @@
  #include "fm.h"
  #include <stdio.h>
  #include <signal.h>
-@@ -107,6 +108,8 @@ int prec_num = 0;
+@@ -107,6 +108,9 @@ int prec_num = 0;
  int prev_key = -1;
  int on_target = 1;
  static int add_download_list = FALSE;
 +static char *session_file = NULL;
 +static int unlink_session;
++static void _strSession(char *sf);
  
  void set_buffer_environ(Buffer *);
  static void save_buffer_position(Buffer *buf);
-@@ -212,6 +215,8 @@ fusage(FILE * f, int err)
+@@ -212,6 +216,8 @@ fusage(FILE * f, int err)
  #endif
      fprintf(f, "    -B               load bookmark\n");
      fprintf(f, "    -bookmark file   specify bookmark file\n");
@@ -43,7 +45,7 @@
      fprintf(f, "    -T type          specify content-type\n");
      fprintf(f, "    -m               internet message mode\n");
      fprintf(f, "    -v               visual startup mode\n");
-@@ -438,6 +443,7 @@ main(int argc, char **argv)
+@@ -438,6 +444,7 @@ main(int argc, char **argv)
      char *default_type = NULL;
      char *post_file = NULL;
      Str err_msg;
@@ -51,7 +53,7 @@
  #ifdef USE_M17N
      char *Locale = NULL;
      wc_uint8 auto_detect;
-@@ -658,6 +664,13 @@ main(int argc, char **argv)
+@@ -658,6 +665,13 @@ main(int argc, char **argv)
  		    BookmarkFile = cleanupName(tmp->ptr);
  		}
  	    }
@@ -65,21 +67,21 @@
  	    else if (!strcmp("-F", argv[i]))
  		RenderFrame = TRUE;
  	    else if (!strcmp("-W", argv[i])) {
-@@ -914,8 +927,42 @@ main(int argc, char **argv)
+@@ -914,8 +928,42 @@ main(int argc, char **argv)
      if (ssl_known_hosts)
  	known_hosts = load_known_hosts();
  
 -#ifdef USE_M17N
 -#endif
-+    if (!session_file)
-+	session_file = rcFile(SESSION_FILE);
-+    if (LoadSession || opt_restore) {
++    if (RestoreSession || opt_restore) {
 +	FILE *fp;
 +	Str line;
-+	char **session;
++	char *sf, **session;
 +	int m = 16, n = 0;
++
++	sf = session_file ? session_file : rcFile(SESSION_FILE);
 +	session = New_N(char *, m);
-+	if (!(fp = fopen(session_file, "r"))) {
++	if (!(fp = fopen(sf, "r"))) {
 +	    disp_err_message(strerror(errno), FALSE);
 +	    return 1;
 +	}
@@ -105,26 +107,28 @@
 +	}
 +	load_argv = session;
 +	load_argc = n;
-+	unlink_session = TRUE;
++	unlink_session = !session_file;
 +    }
  
      if (w3m_backend)
  	backend();
-@@ -2612,6 +2659,8 @@ _quitfm(int confirm)
+@@ -2612,6 +2660,10 @@ _quitfm(int confirm)
  #endif				/* USE_HISTORY */
      if ((err = save_known_hosts()))
  	perror(NULL);
-+    if (SaveSession)
-+	savSession();
++    if (StoreSession)
++	_strSession(NULL);
++    else if (unlink_session)
++	unlink(rcFile(SESSION_FILE));
      w3m_exit(err);
  }
  
-@@ -4368,6 +4417,39 @@ DEFUN(adBmark, ADD_BOOKMARK, "Add curren
+@@ -4368,6 +4420,56 @@ DEFUN(adBmark, ADD_BOOKMARK, "Add curren
  		request);
  }
  
-+/* Store session */
-+DEFUN(savSession, SAVSESS, "Store session")
++void
++_strSession(char *sf)
 +{
 +    Buffer *buf;
 +    FILE *f;
@@ -132,7 +136,9 @@
 +    ParsedURL *url;
 +    char *sep;
 +
-+    if (!(f = fopen(session_file, "w"))) goto fail;
++    if (!sf)
++	sf = session_file ? session_file : rcFile(SESSION_FILE);
++    if (!(f = fopen(sf, "w"))) goto fail;
 +
 +    sep = "";
 +    for (tab = CurrentTab; tab->prevTab; tab = tab->prevTab);
@@ -156,6 +162,21 @@
 +    return;
 +}
 +
++/* Store session */
++DEFUN(strSession, STRSESS, "Store session")
++{
++    char *def, *sf;
++
++    def = session_file ? session_file : rcFile(SESSION_FILE);
++    sf = inputFilenameHist(Strnew_m_charp("Session file [",
++					  def,
++					  "]? ", NULL)->ptr,
++			   NULL, LoadHist);
++    if (!*sf)
++	sf = def;
++    _strSession(sf);
++}
++
  /* option setting */
  DEFUN(ldOpt, OPTIONS, "Display options setting panel")
  {
@@ -165,7 +186,7 @@
  extern void gorURL(void);
  extern void ldBmark(void);
  extern void adBmark(void);
-+extern void savSession(void);
++extern void strSession(void);
  extern void ldOpt(void);
  extern void setOpt(void);
  extern void pginfo(void);
@@ -184,8 +205,8 @@
      {"history", P_INT, PI_TEXT, (void *)&URLHistSize, CMT_HISTSIZE, NULL},
      {"save_hist", P_INT, PI_ONOFF, (void *)&SaveURLHist, CMT_SAVEHIST, NULL},
  #endif				/* USE_HISTORY */
-+    {"load_sess", P_INT, PI_ONOFF, (void *)&LoadSession, CMT_LOADSESS, NULL},
-+    {"save_sess", P_INT, PI_ONOFF, (void *)&SaveSession, CMT_SAVESESS, NULL},
++    {"load_sess", P_INT, PI_ONOFF, (void *)&RestoreSession, CMT_LOADSESS, NULL},
++    {"save_sess", P_INT, PI_ONOFF, (void *)&StoreSession, CMT_SAVESESS, NULL},
      {"confirm_qq", P_INT, PI_ONOFF, (void *)&confirm_on_quit, CMT_CONFIRM_QQ,
       NULL},
      {"close_tab_back", P_INT, PI_ONOFF, (void *)&close_tab_back,
@@ -195,8 +216,51 @@
  global int URLHistSize init(100);
  global int SaveURLHist init(TRUE);
  #endif				/* USE_HISTORY */
-+global int LoadSession init(FALSE);
-+global int SaveSession init(FALSE);
++global int RestoreSession init(FALSE);
++global int StoreSession init(FALSE);
  global int multicolList init(FALSE);
  
  #ifdef USE_M17N
+--- a/doc/w3m.1
++++ b/doc/w3m.1
+@@ -61,6 +61,9 @@ use high-intensity colors
+ \fB\-M\fP
+ monochrome display
+ .TP
++\fB\-R\fP
++restore session
++.TP
+ \fB\-no-mouse\fP
+ deactivate mouse support
+ .TP
+@@ -203,6 +206,9 @@ use \fIfile\fR instead of the default bo
+ \fB\-config \fIfile\fR
+ use \fIfile\fR instead of the default configuration file
+ .TP
++\fB\-session \fIfile\fR
++use \fIfile\fR instead of the default session file
++.TP
+ \fB\-o \fIoption=value\fR
+ modify one configuration item with an explicitly given value;
+ without \fIoption=value\fR, equivalent to \fB\-show-option\fR
+@@ -212,6 +218,20 @@ use debug mode (only for debugging)
+ .TP
+ \fB\-reqlog\fP
+ log headers of HTTP communication in file \f(CW~/.w3m/request.log\fP
++.SH Session management
++If \fB\-R\fP is given, w3m will restore a session from a session file.
++If no session file is provided with \fB\-session\fR the default session file
++is used. The default session file will be deleted after restoring a session
++when exiting w3m.
++
++Without a given session file, when manually storing a session, w3m will ask
++for a filename.
++
++If a session file is given, it will not be deleted and will be overwritten if
++storing a session again.
++
++Automatic session storing and restoring can be configured via the options.
++
+ .SH EXAMPLES
+ .SS Pager-like usage
+ .TP

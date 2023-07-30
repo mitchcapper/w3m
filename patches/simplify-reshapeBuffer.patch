@@ -12,12 +12,12 @@ it.
 ---
  buffer.c  |    2 --
  display.c |    1 -
- main.c    |    3 ---
- 3 files changed, 6 deletions(-)
+ main.c    |    2 --
+ 3 files changed, 5 deletions(-)
 
 --- a/buffer.c
 +++ b/buffer.c
-@@ -473,8 +473,6 @@ reshapeBuffer(Buffer *buf)
+@@ -517,8 +517,6 @@ reshapeBuffer(Buffer *buf)
      wc_uint8 old_auto_detect = WcOption.auto_detect;
  #endif
  
@@ -38,7 +38,7 @@ it.
      if (showLineNum) {
 --- a/main.c
 +++ b/main.c
-@@ -4921,7 +4921,6 @@ DEFUN(vwSrc, SOURCE VIEW, "Toggle betwee
+@@ -4920,7 +4920,6 @@ DEFUN(vwSrc, SOURCE VIEW, "Toggle betwee
      buf->clone = Currentbuf->clone;
      (*buf->clone)++;
  
@@ -46,15 +46,7 @@ it.
      reshapeBuffer(buf);
      pushBuffer(buf);
      displayBuffer(Currentbuf, B_NORMAL);
-@@ -5012,7 +5011,6 @@ DEFUN(geminize, GEMINIZE, "Toggle betwee
-     buf->clone = Currentbuf->clone;
-     (*buf->clone)++;
- 
--    buf->need_reshape = TRUE;
-     reshapeBuffer(buf);
-     pushBuffer(buf);
-     displayBuffer(Currentbuf, B_NORMAL);
-@@ -5147,7 +5145,6 @@ DEFUN(reload, RELOAD, "Load current docu
+@@ -5146,7 +5145,6 @@ DEFUN(reload, RELOAD, "Load current docu
  /* reshape */
  DEFUN(reshape, RESHAPE, "Re-render document")
  {

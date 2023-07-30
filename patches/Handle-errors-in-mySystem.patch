@@ -6,7 +6,7 @@
 
 --- a/etc.c
 +++ b/etc.c
-@@ -1481,7 +1481,7 @@ myExec(char *command)
+@@ -1490,7 +1490,7 @@ myExec(char *command)
      exit(127);
  }
  
@@ -15,7 +15,7 @@
  mySystem(char *command, int background)
  {
  #ifndef __MINGW32_VERSION
-@@ -1492,15 +1492,16 @@ mySystem(char *command, int background)
+@@ -1501,15 +1501,16 @@ mySystem(char *command, int background)
  	    setup_child(FALSE, 0, -1);
  	    myExec(command);
  	}
@@ -36,18 +36,18 @@
  Str
 --- a/proto.h
 +++ b/proto.h
-@@ -628,7 +628,7 @@ extern Str romanNumeral(int n);
+@@ -662,7 +662,7 @@ extern Str romanNumeral(int n);
  extern Str romanAlphabet(int n);
  extern void setup_child(int child, int i, int f);
  extern void myExec(char *command);
 -extern void mySystem(char *command, int background);
 +extern int mySystem(char *command, int background);
- extern Str myExtCommand(const char *cmd, const char *arg, int redirect);
- extern Str myEditor(const char *cmd, const char *file, int line);
+ extern Str myExtCommand(char *cmd, char *arg, int redirect);
+ extern Str myEditor(char *cmd, char *file, int line);
  extern int is_localhost(const char *host);
 --- a/file.c
 +++ b/file.c
-@@ -8459,7 +8459,7 @@ doExternal(URLFile uf, const char *type,
+@@ -8272,7 +8272,7 @@ doExternal(URLFile uf, char *type, Buffe
  {
      Str tmpf, command;
      struct mailcap *mcap;
@@ -56,7 +56,7 @@
      Buffer *buf = NULL;
      char *header, *src = NULL, *ext = uf.ext;
  
-@@ -8535,8 +8535,11 @@ doExternal(URLFile uf, const char *type,
+@@ -8348,8 +8348,11 @@ doExternal(URLFile uf, char *type, Buffe
      else {
  	if (mcap->flags & MAILCAP_NEEDSTERMINAL || !BackgroundExtViewer) {
  	    fmTerm();

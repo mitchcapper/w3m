@@ -235,7 +235,7 @@ w3m-0.5.3+git20230121.
  static void
  set_breakpoint(struct readbuffer *obuf, int tag_length)
  {
-@@ -7659,6 +7822,129 @@ loadGopherSearch0(URLFile *uf, ParsedURL
+@@ -7657,6 +7820,129 @@ loadGopherSearch0(URLFile *uf, ParsedURL
  }
  #endif				/* USE_GOPHER */
  

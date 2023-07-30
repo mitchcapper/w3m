@@ -23,7 +23,7 @@ Subject: [PATCH 085/172] Remove redundant declarations
  #if defined(__CYGWIN__)
  extern int LASTLINE;
  #else				/* not defined(__CYGWIN__) */
-@@ -1144,7 +1143,6 @@ global char *config_file init(NULL);
+@@ -1145,7 +1144,6 @@ global char *config_file init(NULL);
  
  #ifdef USE_MOUSE
  global int use_mouse init(TRUE);

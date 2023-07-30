@@ -74,7 +74,7 @@ Subject: [PATCH 142/172] Add more const const correctness
  {
      int i, c = 0;
      Buffer *buf = top;
-@@ -603,7 +603,7 @@ copyBuffer(Buffer *a, Buffer *b)
+@@ -601,7 +601,7 @@ copyBuffer(Buffer *a, Buffer *b)
  }
  
  Buffer *

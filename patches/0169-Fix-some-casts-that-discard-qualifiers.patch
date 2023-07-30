@@ -26,7 +26,7 @@ Found with -Wcast-qual.
  {
      struct auth_pass *ent;
  
-@@ -2091,7 +2091,7 @@ base64_encode(const char *src, size_t le
+@@ -2092,7 +2092,7 @@ base64_encode(const char *src, size_t le
      unsigned long j;
      size_t k;
  

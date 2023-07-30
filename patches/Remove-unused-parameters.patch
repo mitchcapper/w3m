@@ -169,7 +169,7 @@
  			     h_env->limit);
  		if (!is_redisplay &&
  		    !((obuf->flag & RB_NOFRAMES) && RenderFrame)) {
-@@ -6517,8 +6508,7 @@ proc_escape(struct readbuffer *obuf, cha
+@@ -6515,8 +6506,7 @@ proc_escape(struct readbuffer *obuf, cha
  
  
  static int
@@ -179,7 +179,7 @@
  {
      char ch;
  
-@@ -6717,7 +6707,7 @@ HTMLlineproc0(char *line, struct html_fe
+@@ -6715,7 +6705,7 @@ HTMLlineproc0(char *line, struct html_fe
  		if (tbl->vspace > 0 && !(obuf->flag & RB_IGNORE_P)) {
  		    int indent = h_env->envs[h_env->envc].indent;
  		    flushline(h_env, obuf, indent, 0, h_env->limit);
@@ -188,7 +188,7 @@
  		}
  		save_fonteffect(h_env, obuf);
  		initRenderTable();
-@@ -6726,7 +6716,7 @@ HTMLlineproc0(char *line, struct html_fe
+@@ -6724,7 +6714,7 @@ HTMLlineproc0(char *line, struct html_fe
  		obuf->flag &= ~RB_IGNORE_P;
  		if (tbl->vspace > 0) {
  		    int indent = h_env->envs[h_env->envc].indent;
@@ -197,7 +197,7 @@
  		    obuf->flag |= RB_IGNORE_P;
  		}
  		set_space_to_prevchar(obuf->prevchar);
-@@ -6872,7 +6862,7 @@ HTMLlineproc0(char *line, struct html_fe
+@@ -6870,7 +6860,7 @@ HTMLlineproc0(char *line, struct html_fe
  				   mode);
  		}
  	    }
@@ -206,7 +206,7 @@
  		char *bp = obuf->line->ptr + obuf->bp.len;
  		char *tp = bp - obuf->bp.tlen;
  		int i = 0;
-@@ -7706,10 +7696,10 @@ loadGopherDir0(URLFile *uf, ParsedURL *p
+@@ -7704,10 +7694,10 @@ loadGopherDir0(URLFile *uf, ParsedURL *p
  
  #ifdef USE_M17N
  Str

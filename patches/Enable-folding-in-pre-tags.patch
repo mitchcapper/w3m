@@ -27,7 +27,7 @@ make this behaviour permanent.
  	return;
      tlen = obuf->line->length - len;
      if (tlen > 0
-@@ -6713,7 +6713,8 @@ HTMLlineproc0(char *line, struct html_fe
+@@ -6711,7 +6711,8 @@ HTMLlineproc0(char *line, struct html_fe
  			proc_mchar(obuf, 1, delta, &str, mode);
  		}
  		if (obuf->flag & (RB_SPECIAL & ~RB_PRE_INT))
@@ -37,7 +37,7 @@ make this behaviour permanent.
  	    }
  	    else {
  		if (!IS_SPACE(*str))
-@@ -6941,6 +6942,7 @@ loadHTMLBuffer(URLFile *f, Buffer *newBu
+@@ -6939,6 +6940,7 @@ loadHTMLBuffer(URLFile *f, Buffer *newBu
  	if (src)
  	    newBuf->sourcefile = tmp->ptr;
      }

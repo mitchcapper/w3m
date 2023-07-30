@@ -84,7 +84,7 @@
      n->width = width;
      n->COLS = COLS;
      n->LINES = LASTLINE;
-@@ -599,7 +599,7 @@ void
+@@ -597,7 +597,7 @@ void
  copyBuffer(Buffer *a, Buffer *b)
  {
      readBufferCache(b);
@@ -95,7 +95,7 @@
  Buffer *
 --- a/file.c
 +++ b/file.c
-@@ -6976,7 +6976,7 @@ addnewline(Buffer *buf, char *line, Line
+@@ -6974,7 +6974,7 @@ addnewline(Buffer *buf, char *line, Line
      if (pos > 0) {
  	s = allocStr(line, pos);
  	p = NewAtom_N(Lineprop, pos);
@@ -104,7 +104,7 @@
      }
      else {
  	s = NullLine;
-@@ -6985,7 +6985,7 @@ addnewline(Buffer *buf, char *line, Line
+@@ -6983,7 +6983,7 @@ addnewline(Buffer *buf, char *line, Line
  #ifdef USE_ANSI_COLOR
      if (pos > 0 && color) {
  	c = NewAtom_N(Linecolor, pos);
