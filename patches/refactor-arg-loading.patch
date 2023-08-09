@@ -1,0 +1,161 @@
+---
+ main.c |  141 ++++++++++++++++++++++++++++++++++-------------------------------
+ 1 file changed, 74 insertions(+), 67 deletions(-)
+
+--- a/main.c
++++ b/main.c
+@@ -414,6 +414,79 @@ load_known_hosts(void)
+     return kh;
+ }
+ 
++static void
++load_arg(char *arg)
++{
++    SearchHeader = search_header;
++    DefaultType = default_type;
++    char *url;
++    int retry = 0;
++
++    url = arg;
++    if (getURLScheme(&url) == SCM_MISSING && !ArgvIsURL)
++retry_as_local_file:
++	    url = file_to_url(arg);
++    else
++	url = url_encode(conv_from_system(arg), NULL, 0);
++    if (w3m_dump == DUMP_HEAD) {
++	request = New(FormList);
++	request->method = FORM_METHOD_HEAD;
++	newbuf = loadGeneralFile(url, NULL, NO_REFERER, 0, request);
++    }
++    else {
++	if (post_file && i == 0) {
++	    FILE *fp;
++	    Str body;
++	    if (!strcmp(post_file, "-"))
++		fp = stdin;
++	    else
++		fp = fopen(post_file, "r");
++	    if (fp == NULL) {
++		/* FIXME: gettextize? */
++		Strcat(err_msg,
++		       Sprintf("w3m: Can't open %s.\n", post_file));
++		return;
++	    }
++	    body = Strfgetall(fp);
++	    if (fp != stdin)
++		fclose(fp);
++	    request =
++		newFormList(NULL, "post", NULL, NULL, NULL, NULL,
++			    NULL);
++	    request->body = body->ptr;
++	    request->boundary = NULL;
++	    request->length = body->length;
++	}
++	else {
++	    request = NULL;
++	}
++	newbuf = loadGeneralFile(url, NULL, NO_REFERER, 0, request);
++    }
++    if (newbuf == NULL) {
++	if (ArgvIsURL && !retry) {
++	    retry = 1;
++	    goto retry_as_local_file;
++	}
++	/* FIXME: gettextize? */
++	Strcat(err_msg,
++	       Sprintf("w3m: Can't load %s.\n", arg));
++	return;
++    }
++    else if (newbuf == NO_BUFFER)
++	return;
++    switch (newbuf->real_scheme) {
++    case SCM_MAILTO:
++	break;
++    case SCM_LOCAL:
++    case SCM_LOCAL_CGI:
++	unshiftHist(LoadHist, url);
++    default:
++	pushHashHist(URLHist, parsedURL2Str(&newbuf->currentURL)->ptr);
++	break;
++    }
++
++}
++
+ int
+ main(int argc, char **argv)
+ {
+@@ -1003,73 +1076,7 @@ main(int argc, char **argv)
+     }
+     for (; i < load_argc; i++) {
+ 	if (i >= 0) {
+-	    SearchHeader = search_header;
+-	    DefaultType = default_type;
+-	    char *url;
+-	    int retry = 0;
+-
+-	    url = load_argv[i];
+-	    if (getURLScheme(&url) == SCM_MISSING && !ArgvIsURL)
+-	  retry_as_local_file:
+-		url = file_to_url(load_argv[i]);
+-	    else
+-		url = url_encode(conv_from_system(load_argv[i]), NULL, 0);
+-	    if (w3m_dump == DUMP_HEAD) {
+-		request = New(FormList);
+-		request->method = FORM_METHOD_HEAD;
+-		newbuf = loadGeneralFile(url, NULL, NO_REFERER, 0, request);
+-	    }
+-	    else {
+-		if (post_file && i == 0) {
+-		    FILE *fp;
+-		    Str body;
+-		    if (!strcmp(post_file, "-"))
+-			fp = stdin;
+-		    else
+-			fp = fopen(post_file, "r");
+-		    if (fp == NULL) {
+-			/* FIXME: gettextize? */
+-			Strcat(err_msg,
+-			       Sprintf("w3m: Can't open %s.\n", post_file));
+-			continue;
+-		    }
+-		    body = Strfgetall(fp);
+-		    if (fp != stdin)
+-			fclose(fp);
+-		    request =
+-			newFormList(NULL, "post", NULL, NULL, NULL, NULL,
+-				    NULL);
+-		    request->body = body->ptr;
+-		    request->boundary = NULL;
+-		    request->length = body->length;
+-		}
+-		else {
+-		    request = NULL;
+-		}
+-		newbuf = loadGeneralFile(url, NULL, NO_REFERER, 0, request);
+-	    }
+-	    if (newbuf == NULL) {
+-		if (ArgvIsURL && !retry) {
+-		    retry = 1;
+-		    goto retry_as_local_file;
+-		}
+-		/* FIXME: gettextize? */
+-		Strcat(err_msg,
+-		       Sprintf("w3m: Can't load %s.\n", load_argv[i]));
+-		continue;
+-	    }
+-	    else if (newbuf == NO_BUFFER)
+-		continue;
+-	    switch (newbuf->real_scheme) {
+-	    case SCM_MAILTO:
+-		break;
+-	    case SCM_LOCAL:
+-	    case SCM_LOCAL_CGI:
+-		unshiftHist(LoadHist, url);
+-	    default:
+-		pushHashHist(URLHist, parsedURL2Str(&newbuf->currentURL)->ptr);
+-		break;
+-	    }
++	    load_arg(load_arg[i])
+ 	}
+ 	else if (newbuf == NO_BUFFER)
+ 	    continue;

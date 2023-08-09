@@ -95,7 +95,7 @@
  Buffer *
 --- a/file.c
 +++ b/file.c
-@@ -6974,7 +6974,7 @@ addnewline(Buffer *buf, char *line, Line
+@@ -6917,7 +6917,7 @@ addnewline(Buffer *buf, char *line, Line
      if (pos > 0) {
  	s = allocStr(line, pos);
  	p = NewAtom_N(Lineprop, pos);
@@ -104,7 +104,7 @@
      }
      else {
  	s = NullLine;
-@@ -6983,7 +6983,7 @@ addnewline(Buffer *buf, char *line, Line
+@@ -6926,7 +6926,7 @@ addnewline(Buffer *buf, char *line, Line
  #ifdef USE_ANSI_COLOR
      if (pos > 0 && color) {
  	c = NewAtom_N(Linecolor, pos);
@@ -230,7 +230,7 @@
  	    else
  		p = q;
  	    Strcat_charp(src, "<li><a href=\"");
-@@ -149,7 +149,7 @@ copyHist(Hist *hist)
+@@ -147,7 +147,7 @@ copyHist(Hist *hist)
  	return NULL;
      new = newHist();
      for (item = hist->list->first; item; item = item->next)
@@ -239,7 +239,7 @@
      return new;
  }
  
-@@ -161,7 +161,7 @@ unshiftHist(Hist *hist, char *ptr)
+@@ -159,7 +159,7 @@ unshiftHist(Hist *hist, char *ptr)
      if (hist == NULL || hist->list == NULL ||
  	hist->list->nitem >= HIST_LIST_MAX)
  	return NULL;
@@ -248,7 +248,7 @@
  				   (ListItem *)hist->list->first, NULL);
      if (hist->list->first)
  	hist->list->first->prev = item;
-@@ -180,7 +180,7 @@ pushHist(Hist *hist, char *ptr)
+@@ -178,7 +178,7 @@ pushHist(Hist *hist, char *ptr)
      if (hist == NULL || hist->list == NULL ||
  	hist->list->nitem >= HIST_LIST_MAX)
  	return NULL;
@@ -257,7 +257,7 @@
  				   NULL, (ListItem *)hist->list->last);
      if (hist->list->last)
  	hist->list->last->next = item;
-@@ -214,7 +214,7 @@ pushHashHist(Hist *hist, char *ptr)
+@@ -212,7 +212,7 @@ pushHashHist(Hist *hist, char *ptr)
  	hist->list->nitem--;
      }
      item = pushHist(hist, ptr);
@@ -266,7 +266,7 @@
      return item;
  }
  
-@@ -228,7 +228,7 @@ getHashHist(Hist *hist, char *ptr)
+@@ -226,7 +226,7 @@ getHashHist(Hist *hist, char *ptr)
      if (hist->hash == NULL) {
  	hist->hash = newHash_sv(HIST_HASH_SIZE);
  	for (item = hist->list->first; item; item = item->next)
@@ -464,7 +464,7 @@
      n = searchKeyNum();
 --- a/terms.c
 +++ b/terms.c
-@@ -1284,7 +1284,7 @@ setupscreen(void)
+@@ -1283,7 +1283,7 @@ setupscreen(void)
  	for (i = 0; i < max_LINES; i++) {
  #ifdef USE_M17N
  	    ScreenElem[i].lineimage = New_N(char *, max_COLS);

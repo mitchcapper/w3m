@@ -1,0 +1,539 @@
+From 69ed67674fa26d3d4c353f6846a4a98989b3f7d3 Mon Sep 17 00:00:00 2001
+From: bptato <nincsnevem662@gmail.com>
+Date: Sat, 26 Mar 2022 13:57:30 +0100
+Subject: [PATCH 1/3] Add PIPE_LINK command
+
+Which pipes content directly to shell commands, without first loading it
+in w3m.
+---
+ doc-de/README.func     |   1 +
+ doc-jp/README.func     |   1 +
+ doc/README.func        |   1 +
+ file.c                 | 109 ++++++++++++++++++++++++++++++++++++++---
+ fm.h                   |   1 +
+ main.c                 |   8 +++
+ proto.h                |   2 +
+ scripts/w3mhelp.cgi.in |   2 +-
+ 8 files changed, 116 insertions(+), 9 deletions(-)
+
+diff --git a/doc-de/README.func b/doc-de/README.func
+index cb175db4..46a3c5ba 100644
+--- a/doc-de/README.func
++++ b/doc-de/README.func
+@@ -94,6 +94,7 @@ PEEK		Zeige aktuelle Adresse an
+ PEEK_IMG	Zeige Adresse des Bildes
+ PEEK_LINK	Zeige Zieladresse
+ PIPE_BUF	Leite aktuellen Pufferinhalt einem Shell-Befehl zu und zeige Ausgabe an
++PIPE_LINK	Leite den Inhalt des Links unter dem Cursor direkt an einem Shell-Befehl weiter
+ PIPE_SHELL	Führe Shell-Befehl aus und zeige Ausgabe an
+ PREV		Schalte zum vorherigen Puffer
+ PREV_HALF_PAGE	Scrolle eine halbe Seite aufwärts
+diff --git a/doc-jp/README.func b/doc-jp/README.func
+index 092656e4..571fdede 100644
+--- a/doc-jp/README.func
++++ b/doc-jp/README.func
+@@ -94,6 +94,7 @@ PEEK		現在の文書のURLを表示します
+ PEEK_IMG	現在カーソルがあるリンクを含む画像そのもののURLを表示します
+ PEEK_LINK      リンクが指す先のURLを表示します
+ PIPE_BUF       バッファの内容をパイプに渡します
++PIPE_LINK	リンクが指す先の内容をパイプに渡します
+ PIPE_SHELL	コマンドを実行し，結果を読みこみながら表示します
+ PREV		前のバッファを表示します
+ PREV_HALF_PAGE	半ページ上にスクロールします
+diff --git a/doc/README.func b/doc/README.func
+index 688b8ceb..de39892e 100644
+--- a/doc/README.func
++++ b/doc/README.func
+@@ -94,6 +94,7 @@ PEEK		Show current address
+ PEEK_IMG	Show image address
+ PEEK_LINK	Show target address
+ PIPE_BUF	Pipe current buffer through a shell command and display output
++PIPE_LINK	Pipe the contents of the current hyperlink directly to a shell command
+ PIPE_SHELL	Execute shell command and display output
+ PREV		Switch to the previous buffer
+ PREV_HALF_PAGE	Scroll up half a page
+diff --git a/file.c b/file.c
+index 9f8e97e3..45ee7637 100644
+--- a/file.c
++++ b/file.c
+@@ -2150,6 +2150,10 @@ loadGeneralFile(char *path, ParsedURL *volatile current, char *referer,
+ 	    doFileMove(tmp->ptr, file);
+ 	    return NO_BUFFER;
+ 	}
++	if (do_pipe) {
++	    return NO_BUFFER;
++	}
++
+ 	b = loadHTMLString(page);
+ 	if (b) {
+ 	    copyParsedURL(&b->currentURL, &pu);
+@@ -2196,6 +2200,19 @@ loadGeneralFile(char *path, ParsedURL *volatile current, char *referer,
+ 	return NO_BUFFER;
+     }
+ 
++    if (do_pipe) {
++	TRAP_OFF;
++	if (DecodeCTE && IStype(f.stream) != IST_ENCODED)
++	    f.stream = newEncodedStream(f.stream, f.encoding);
++	if (doFilePipe(f) == 0) {
++	    UFhalfclose(&f);
++	}
++	else {
++	    UFclose(&f);
++	}
++	return NO_BUFFER;
++    }
++
+     if ((f.content_encoding != CMP_NOCOMPRESS) && AutoUncompress
+ 	&& !(w3m_dump & DUMP_EXTRA)) {
+ 	uncompress_stream(&f, &pu.real_file);
+@@ -8186,20 +8203,16 @@ getNextPage(Buffer *buf, int plen)
+ }
+ 
+ int
+-save2tmp(URLFile uf, char *tmpf)
++save2file(URLFile uf, FILE *ff)
+ {
+     FILE *ff;
++    int check;
+     clen_t linelen = 0, trbyte = 0;
+     MySignalHandler(*volatile prevtrap) (SIGNAL_ARG) = NULL;
+     static JMP_BUF env_bak;
+     volatile int retval = 0;
+     char *volatile buf = NULL;
+ 
+-    ff = fopen(tmpf, "wb");
+-    if (ff == NULL) {
+-	/* fclose(f); */
+-	return -1;
+-    }
+     bcopy(AbortLoading, env_bak, sizeof(JMP_BUF));
+     if (SETJMP(AbortLoading) != 0) {
+ 	goto _end;
+@@ -8236,7 +8249,8 @@ save2tmp(URLFile uf, char *tmpf)
+ 
+ 	buf = NewWithoutGC_N(char, SAVE_BUF_SIZE);
+ 	while ((count = ISread_n(uf.stream, buf, SAVE_BUF_SIZE)) > 0) {
+-	    if (fwrite(buf, 1, count, ff) != count) {
++	    int c = fwrite(buf, 1, count, ff);
++	    if (c != count) {
+ 		retval = -2;
+ 		goto _end;
+ 	    }
+@@ -8248,11 +8262,26 @@ save2tmp(URLFile uf, char *tmpf)
+     bcopy(env_bak, AbortLoading, sizeof(JMP_BUF));
+     TRAP_OFF;
+     xfree(buf);
+-    fclose(ff);
+     current_content_length = 0;
+     return retval;
+ }
+ 
++int
++save2tmp(URLFile uf, char *tmpf)
++{
++    FILE *ff;
++    int r;
++
++    ff = fopen(tmpf, "wb");
++    if (ff == NULL) {
++	/* fclose(f); */
++	return -1;
++    }
++    r = save2file(uf, ff);
++    fclose(ff);
++    return r;
++}
++
+ Buffer *
+ doExternal(URLFile uf, char *type, Buffer *defaultbuf)
+ {
+@@ -8625,6 +8654,70 @@ doFileSave(URLFile uf, char *defstr)
+     return 0;
+ }
+ 
++int
++doFilePipe(URLFile uf)
++{
++#ifndef __MINGW32_VERSION
++    Str msg;
++    Str filen;
++    pid_t pid;
++    char *p, *q;
++
++    if (fmInitialized) {
++	p = searchKeyData();
++	if (p == NULL || *p == '\0') {
++	    /* FIXME: gettextize? */
++	    p = inputLineHist("(Download)Pipe into: ",
++			      "", IN_FILENAME, SaveHist);
++	    if (p == NULL || *p == '\0')
++		return -1;
++	    p = conv_to_system(p);
++	}
++	pid = fork();
++	if (!pid) {
++	    int err;
++	    if ((uf.content_encoding != CMP_NOCOMPRESS) && AutoUncompress) {
++		uncompress_stream(&uf, NULL);
++	    }
++	    setup_child(FALSE, 0, UFfileno(&uf));
++	    FILE *ff = popen(p, "w");
++	    err = save2file(uf, ff);
++
++	    pclose(ff);
++	    UFclose(&uf);
++	    if (err != 0)
++		exit(-err);
++	    exit(0);
++	}
++    } else {
++	q = searchKeyData();
++	if (q == NULL || *q == '\0') {
++	    /* FIXME: gettextize? */
++	    printf("(Download)Pipe into: ");
++	    fflush(stdout);
++	    filen = Strfgets(stdin);
++	    if (filen->length == 0)
++		return -1;
++	    q = filen->ptr;
++	}
++	for (p = q + strlen(q) - 1; IS_SPACE(*p); p--) ;
++	*(p + 1) = '\0';
++	if (*q == '\0')
++	    return -1;
++	p = expandPath(q);
++	if (uf.content_encoding != CMP_NOCOMPRESS && AutoUncompress) {
++	    uncompress_stream(&uf, NULL);
++	}
++	if (save2tmp(uf, p) < 0) {
++	    /* FIXME: gettextize? */
++	    printf("Couldn't pipe into %s\n", p);
++	    return -1;
++	}
++    }
++#endif /* __MINGW32_VERSION */
++    return 0;
++}
++
+ int
+ checkCopyFile(char *path1, char *path2)
+ {
+diff --git a/fm.h b/fm.h
+index e6c760ec..d8e1fc83 100644
+--- a/fm.h
++++ b/fm.h
+@@ -1030,6 +1030,7 @@ global char *siteconf_file init(SITECONF_FILE);
+ global char *ftppasswd init(NULL);
+ global int ftppass_hostnamegen init(TRUE);
+ global int do_download init(FALSE);
++global int do_pipe init(FALSE);
+ #ifdef USE_IMAGE
+ global char *image_source init(NULL);
+ #endif
+diff --git a/main.c b/main.c
+index 710db9c1..f74f757a 100644
+--- a/main.c
++++ b/main.c
+@@ -2160,6 +2160,14 @@ DEFUN(pipeBuf, PIPE_BUF, "Pipe current buffer through a shell command and displa
+     displayBuffer(Currentbuf, B_FORCE_REDRAW);
+ }
+ 
++DEFUN(pipeLink, PIPE_LINK, "Load and pipe a URL into a shell command")
++{
++    CurrentKeyData = NULL;	/* not allowed in w3m-control: */
++    do_pipe = TRUE;
++    followA();
++    do_pipe = FALSE;
++}
++
+ /* Execute shell command and read output ac pipe. */
+ DEFUN(pipesh, PIPE_SHELL, "Execute shell command and display output")
+ {
+diff --git a/proto.h b/proto.h
+index c833e9f9..3c7c5eee 100644
+--- a/proto.h
++++ b/proto.h
+@@ -30,6 +30,7 @@ extern void col1R(void);
+ extern void col1L(void);
+ extern void setEnv(void);
+ extern void pipeBuf(void);
++extern void pipeLink(void);
+ extern void pipesh(void);
+ extern void readsh(void);
+ extern void execsh(void);
+@@ -288,6 +289,7 @@ extern int _doFileCopy(char *tmpf, char *defstr, int download);
+ #define doFileCopy(tmpf, defstr) _doFileCopy(tmpf, defstr, FALSE);
+ extern int doFileMove(char *tmpf, char *defstr);
+ extern int doFileSave(URLFile uf, char *defstr);
++extern int doFilePipe(URLFile uf);
+ extern int checkCopyFile(char *path1, char *path2);
+ extern int checkSaveFile(InputStream stream, char *path);
+ extern int checkOverWrite(char *path);
+diff --git a/scripts/w3mhelp.cgi.in b/scripts/w3mhelp.cgi.in
+index 55358f8b..c3f7abbc 100644
+--- a/scripts/w3mhelp.cgi.in
++++ b/scripts/w3mhelp.cgi.in
+@@ -149,7 +149,7 @@ print "<P><A HREF=\"$keymap\">$head</A>\n";
+ 
+ &show_keymap('File/Stream Operations',
+ 	     split(" ", "goURL gorURL tabURL tabrURL ldfile readsh pipesh
+-		pipeBuf"));
++		pipeLink pipeBuf"));
+ 
+ &show_keymap('Buffer Operations',
+ 	     split(" ", "backBf nextBf prevBf goHome selMn selBuf vwSrc svSrc
+
+From b4e7ae901d22a843006f3b0b1874de80cc4fd697 Mon Sep 17 00:00:00 2001
+From: bptato <nincsnevem662@gmail.com>
+Date: Mon, 18 Apr 2022 18:01:58 +0200
+Subject: [PATCH 2/3] Add x-nosaveinput to mailcap
+
+---
+ doc-jp/README.mailcap | 20 ++++++++++++++--
+ file.c                | 55 +++++++++++++++++++++++++++++++------------
+ html.h                |  1 +
+ mailcap.c             |  3 +++
+ 4 files changed, 62 insertions(+), 17 deletions(-)
+
+diff --git a/doc-jp/README.mailcap b/doc-jp/README.mailcap
+index 212bed4d..3296d9d6 100644
+--- a/doc-jp/README.mailcap
++++ b/doc-jp/README.mailcap
+@@ -35,7 +35,7 @@ mailcap サポートについて
+     いかもしれません.
+     (2001/08/01) 坂本
+      htmloutput → x-htmloutput
+-   
++
+  ・ nametemplate= は外部コマンドに渡すファイル名の拡張子を指定します.
+     テンポラリファイルを作るとき, 通常元の URL の拡張子がファイル名に付けられま
+     すが, nametemplate= フィールドによって変更する事ができます.
+@@ -44,4 +44,20 @@ mailcap サポートについて
+     application/x-dvi;xdvi '%s';test=test -n "$DISPLAY";nametemplate=%s.dvi
+    
+  ・ needsterminal, edit については RFC 1524 を見てください.
+-   
++
++ ・ w3m の拡張フィールドとして, x-nosaveinput も使えます. この拡張フィールドが
++    mailcap エントリに存在する場合, 外部コマンドを実行する度にテンポラリファイ
++    ルが作られません.
++
++    入力データがローカルファイルである場合, そのパスは直接パス名として渡されま
++    す. 他の場合は入力データをパイプに渡して, パス名を - (マイナス) とします.
++    例:
++
++    video/mkv;mpv '%s';x-nosaveinput
++
++    と書けば, file:///tmp/test.mkv と言う URL のファイルを mpv /tmp/test.mkv
++    と言うコマンドで見られます. また, ftp://abcd/tmp/test.mkv と言う URL のフ
++    ァイルは mpv - と言うコマンドで見られます. (この場合はファイルがパイプに渡
++    たされます.)
++    (2023/07/29) bptato
++     x-nosaveinput を追加
+diff --git a/file.c b/file.c
+index 45ee7637..d705f95c 100644
+--- a/file.c
++++ b/file.c
+@@ -8205,8 +8205,6 @@ getNextPage(Buffer *buf, int plen)
+ int
+ save2file(URLFile uf, FILE *ff)
+ {
+-    FILE *ff;
+-    int check;
+     clen_t linelen = 0, trbyte = 0;
+     MySignalHandler(*volatile prevtrap) (SIGNAL_ARG) = NULL;
+     static JMP_BUF env_bak;
+@@ -8287,19 +8285,28 @@ doExternal(URLFile uf, char *type, Buffer *defaultbuf)
+ {
+     Str tmpf, command;
+     struct mailcap *mcap;
+-    int mc_stat;
++    int mc_stat, err;
+     Buffer *buf = NULL;
+     char *header, *src = NULL, *ext = uf.ext;
++    FILE *ff;
+ 
+     if (!(mcap = searchExtViewer(type)))
+ 	return NULL;
+ 
+-    if (mcap->nametemplate) {
+-	tmpf = unquote_mailcap(mcap->nametemplate, NULL, "", NULL, NULL);
+-	if (tmpf->ptr[0] == '.')
+-	    ext = tmpf->ptr;
++    if ((mcap->flags & MAILCAP_NOSAVEINPUT)) {
++	if (uf.scheme == SCM_LOCAL) {
++	    tmpf = Strnew_charp(uf.url);
++	} else {
++	    tmpf = Strnew_charp("-"); /* make it a pipe */
++	}
++    } else {
++	if (mcap->nametemplate) {
++	    tmpf = unquote_mailcap(mcap->nametemplate, NULL, "", NULL, NULL);
++	    if (tmpf->ptr[0] == '.')
++		ext = tmpf->ptr;
++	}
++	tmpf = tmpfname(TMPF_DFL, (ext && *ext) ? ext : NULL);
+     }
+-    tmpf = tmpfname(TMPF_DFL, (ext && *ext) ? ext : NULL);
+ 
+     if (IStype(uf.stream) != IST_ENCODED)
+ 	uf.stream = newEncodedStream(uf.stream, uf.encoding);
+@@ -8320,18 +8327,37 @@ doExternal(URLFile uf, char *type, Buffer *defaultbuf)
+ 	flush_tty();
+ 	if (!fork()) {
+ 	    setup_child(FALSE, 0, UFfileno(&uf));
+-	    if (save2tmp(uf, tmpf->ptr) < 0)
+-		exit(1);
+-	    UFclose(&uf);
+-	    myExec(command->ptr);
++	    if (!(mcap->flags & MAILCAP_NOSAVEINPUT)) {
++		if (save2tmp(uf, tmpf->ptr) < 0)
++		    exit(1);
++		UFclose(&uf);
++		myExec(command->ptr);
++	    } else {
++		if (uf.scheme == SCM_LOCAL) {
++		    /* local, so we don't need uf (pass the url itself) */
++		    UFclose(&uf);
++		    myExec(command->ptr);
++		} else {
++		    /* remote, so we pipe uf then close it */
++		    ff = popen(command->ptr, "w");
++		    err = save2file(uf, ff);
++
++		    pclose(ff);
++		    UFclose(&uf);
++		    if (err != 0)
++			exit(-err);
++		}
++	    }
+ 	}
+ 	return NO_BUFFER;
+     }
+     else
+ #endif
+     {
+-	if (save2tmp(uf, tmpf->ptr) < 0) {
+-	    return NULL;
++	if (!(mcap->flags & MAILCAP_NOSAVEINPUT)) {
++	    if (save2tmp(uf, tmpf->ptr) < 0) {
++		return NULL;
++	    }
+ 	}
+     }
+     if (mcap->flags & (MAILCAP_HTMLOUTPUT | MAILCAP_COPIOUSOUTPUT)) {
+@@ -8658,7 +8684,6 @@ int
+ doFilePipe(URLFile uf)
+ {
+ #ifndef __MINGW32_VERSION
+-    Str msg;
+     Str filen;
+     pid_t pid;
+     char *p, *q;
+diff --git a/html.h b/html.h
+index 2fd7e574..2cbc5deb 100644
+--- a/html.h
++++ b/html.h
+@@ -34,6 +34,7 @@ struct mailcap {
+ #define MAILCAP_NEEDSTERMINAL	0x01
+ #define MAILCAP_COPIOUSOUTPUT	0x02
+ #define MAILCAP_HTMLOUTPUT      0x04
++#define MAILCAP_NOSAVEINPUT	0x08
+ 
+ #define MCSTAT_REPNAME          0x01
+ #define MCSTAT_REPTYPE          0x02
+diff --git a/mailcap.c b/mailcap.c
+index cca13f97..2eec6032 100644
+--- a/mailcap.c
++++ b/mailcap.c
+@@ -158,6 +158,9 @@ extractMailcapEntry(char *mcap_entry, struct mailcap *mcap)
+ 		 matchMailcapAttr(p, "htmloutput", 10, NULL)) {
+ 	    mcap->flags |= MAILCAP_HTMLOUTPUT;
+ 	}
++	else if (matchMailcapAttr(p, "x-nosaveinput", 14, NULL)) {
++	    mcap->flags |= MAILCAP_NOSAVEINPUT;
++	}
+ 	else if (matchMailcapAttr(p, "test", 4, &tmp)) {
+ 	    mcap->test = allocStr(tmp->ptr, tmp->length);
+ 	}
+
+From 24fbe94d470c24c99776f753b32f8e239cec4a07 Mon Sep 17 00:00:00 2001
+From: bptato <nincsnevem662@gmail.com>
+Date: Sat, 29 Jul 2023 14:37:45 +0200
+Subject: [PATCH 3/3] Translate README.mailcap into English
+
+---
+ doc/README.mailcap | 63 ++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 63 insertions(+)
+ create mode 100644 doc/README.mailcap
+
+diff --git a/doc/README.mailcap b/doc/README.mailcap
+new file mode 100644
+index 00000000..d8331fd4
+--- /dev/null
++++ b/doc/README.mailcap
+@@ -0,0 +1,63 @@
++On mailcap support
++
++                                                     (11/07/2000) Okabe Katsuya
++                                                        okabek@guitar.ocn.ne.jp
++                                                     (translated from Japanese)
++
++ * Starting with the 10/6/2000 version, w3m follows the mailcap fields
++   `nametemplate', `needsterminal', `copiousoutput', `edit' (see RFC-1524).
++   Also, starting with the 10/26/2000 version, the path of mailcap and
++   mime.types may be set from the option settings panel.
++
++ * In mailcap, the %s is replaced with the path name passed to the external
++   command, and %t is replaced with the file's content type.
++
++ * When a mailcap entry contains a test=command field, the file will only be
++   opened if the test command returns true. e.g. if you write
++
++   image/gif; xv '%s'; test=test "$DISPLAY"
++
++   then xv will only be launched if the DISPLAY environment variable is set.
++
++ * When a mailcap entry contains the `copiousoutput' field, the external
++   command's output is read into a new buffer.
++   e.g.
++
++   application/x-troff-man;/usr/bin/nroff -mandoc;copiousoutput
++
++   For the most part, this functionality can substitute all uses of LESSOPEN.
++   Therefore, usage of LESSOPEN has been made optional.
++
++   w3m has an extension called `x-htmloutput'. Just like `copiousoutput',
++   this reads the command's output into the buffer. The difference is that
++   `x-htmloutput' renders the output as HTML. For interoperability with other
++   browsers, it may be best to place entries not containing x-htmloutput before
++   entries that do contain the flag.
++
++ * nametemplate= specifies the extension of files passed to the external
++   command.
++   Normally, when a temporary file is created, the file extension present
++   in the URL is used. This can be changed using the nametemplate= field.
++   e.g.
++
++   application/x-dvi;xdvi '%s';test=test -n "$DISPLAY";nametemplate=%s.dvi
++
++ * For the meaning of the `needsterminal' and `edit' fields, please consult
++   RFC 1524.
++
++ * w3m also has an extension field called `x-nosaveinput'. When this extension
++   field is found in a mailcap entry, files are passed to the external command
++   without temporary files being created.
++
++   In case of a local file, its path is directly used as the path name. For
++   external files, the path name is set to `-' (dash) and the data is passed
++   through a pipe.
++   e.g. if you write
++
++   video/mkv;mpv '%s';x-nosaveinput
++
++   for the URL `file:///tmp/test.mkv' the command "mpv /tmp/test.mkv"
++   is executed. For the URL `ftp://abcd/tmp/test.mkv' the command "mpv -" is
++   executed, and the file is piped into mpv.
++   (07/29/2023) bptato
++    x-nosaveinput added

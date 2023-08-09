@@ -96,7 +96,7 @@ Subject: [PATCH 014/172] Remove dead code
  	return buf->currentLine->linenumber + 1;
      else
  	return 1;
-@@ -1877,15 +1876,6 @@ loadGeneralFile(char *path, ParsedURL *v
+@@ -1876,15 +1875,6 @@ loadGeneralFile(char *path, ParsedURL *v
  	}
  	if (t_buf == NULL)
  	    t_buf = newBuffer(INIT_BUFFER_WIDTH);
@@ -112,7 +112,7 @@ Subject: [PATCH 014/172] Remove dead code
  	readHeader(&f, t_buf, FALSE, &pu);
  	if (((http_response_code >= 301 && http_response_code <= 303)
  	     || http_response_code == 307)
-@@ -2034,13 +2024,6 @@ loadGeneralFile(char *path, ParsedURL *v
+@@ -2033,13 +2023,6 @@ loadGeneralFile(char *path, ParsedURL *v
  	if (f.compression != CMP_NOCOMPRESS) {
  	    char *t1 = uncompressed_file_type(pu.file, NULL);
  	    real_type = f.guess_type;
@@ -126,7 +126,7 @@ Subject: [PATCH 014/172] Remove dead code
  	    if (t1)
  		t = t1;
  	    else
-@@ -2052,20 +2035,6 @@ loadGeneralFile(char *path, ParsedURL *v
+@@ -2051,20 +2034,6 @@ loadGeneralFile(char *path, ParsedURL *v
  		real_type = "text/plain";
  	    t = real_type;
  	}
@@ -147,7 +147,7 @@ Subject: [PATCH 014/172] Remove dead code
      }
      else if (pu.scheme == SCM_DATA) {
  	t = f.guess_type;
-@@ -2909,26 +2878,6 @@ passthrough(struct readbuffer *obuf, cha
+@@ -2904,26 +2873,6 @@ passthrough(struct readbuffer *obuf, cha
      }
  }
  
@@ -174,7 +174,7 @@ Subject: [PATCH 014/172] Remove dead code
  static void
  fillline(struct readbuffer *obuf, int indent)
  {
-@@ -6577,7 +6526,6 @@ need_flushline(struct html_feed_environ
+@@ -6533,7 +6482,6 @@ need_flushline(struct html_feed_environ
      }
  
      ch = Strlastchar(obuf->line);
@@ -182,7 +182,7 @@ Subject: [PATCH 014/172] Remove dead code
      if (ch == ' ')
  	return 0;
  
-@@ -7211,7 +7159,6 @@ showProgress(clen_t * linelen, clen_t *
+@@ -7154,7 +7102,6 @@ showProgress(clen_t * linelen, clen_t *
  	for (j = pos + 1; j <= i; j++)
  	    addch('|');
  	standend();
@@ -190,7 +190,7 @@ Subject: [PATCH 014/172] Remove dead code
  	refresh();
      }
      else {
-@@ -7367,32 +7314,6 @@ print_internal_information(struct html_f
+@@ -7310,32 +7257,6 @@ print_internal_information(struct html_f
  			   html_quote(henv->title), "\">", NULL);
  	pushTextLine(tl, newTextLine(s, 0));
      }
@@ -223,7 +223,7 @@ Subject: [PATCH 014/172] Remove dead code
  #ifdef MENU_SELECT
      if (n_select > 0) {
  	FormSelectOptionItem *ip;
-@@ -7534,10 +7455,6 @@ loadHTMLstream(URLFile *f, Buffer *newBu
+@@ -7477,10 +7398,6 @@ loadHTMLstream(URLFile *f, Buffer *newBu
  	doc_charset = WC_CES_UTF_8;
      meta_charset = 0;
  #endif
@@ -234,7 +234,7 @@ Subject: [PATCH 014/172] Remove dead code
      if (IStype(f->stream) != IST_ENCODED)
  	f->stream = newEncodedStream(f->stream, f->encoding);
      while ((lineBuf2 = StrmyUFgets(f)) && lineBuf2->length) {
-@@ -7546,9 +7463,6 @@ loadHTMLstream(URLFile *f, Buffer *newBu
+@@ -7489,9 +7406,6 @@ loadHTMLstream(URLFile *f, Buffer *newBu
  	    Strshrinkfirst(lineBuf2, 1);
  	    if (lineBuf2->ptr[0] == '\n' || lineBuf2->ptr[0] == '\r' ||
  		lineBuf2->ptr[0] == '\0') {
@@ -244,7 +244,7 @@ Subject: [PATCH 014/172] Remove dead code
  		break;
  	    }
  	}
-@@ -7561,10 +7475,6 @@ loadHTMLstream(URLFile *f, Buffer *newBu
+@@ -7504,10 +7418,6 @@ loadHTMLstream(URLFile *f, Buffer *newBu
  	if (w3m_dump & DUMP_SOURCE)
  	    continue;
  	showProgress(&linelen, &trbyte);
@@ -255,7 +255,7 @@ Subject: [PATCH 014/172] Remove dead code
  #ifdef USE_M17N
  	if (meta_charset) {	/* <META> */
  	    if (content_charset == 0 && UseContentCharset) {
-@@ -8853,12 +8763,6 @@ doFileSave(URLFile uf, char *defstr)
+@@ -8796,12 +8706,6 @@ doFileSave(URLFile uf, char *defstr)
  	    disp_err_message(msg->ptr, FALSE);
  	    return -1;
  	}
@@ -268,7 +268,7 @@ Subject: [PATCH 014/172] Remove dead code
  	lock = tmpfname(TMPF_DFL, ".lock")->ptr;
  #if defined(HAVE_SYMLINK) && defined(HAVE_LSTAT)
  	symlink(p, lock);
-@@ -9139,40 +9043,6 @@ lessopen_stream(char *path)
+@@ -9082,40 +8986,6 @@ lessopen_stream(char *path)
      return fp;
  }
  
@@ -844,7 +844,7 @@ Subject: [PATCH 014/172] Remove dead code
  {
 --- a/fm.h
 +++ b/fm.h
-@@ -918,10 +918,6 @@ global int CurrentPid;
+@@ -915,10 +915,6 @@ global int CurrentPid;
  #if defined(DONT_CALL_GC_AFTER_FORK) && defined(USE_IMAGE)
  global char *MyProgramName init("w3m");
  #endif /* defined(DONT_CALL_GC_AFTER_FORK) && defined(USE_IMAGE) */

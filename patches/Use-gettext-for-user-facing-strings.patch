@@ -1,0 +1,905 @@
+---
+ buffer.c       |   18 +++------
+ display.c      |    6 +--
+ file.c         |   58 ++++++++++-------------------
+ form.c         |    6 +--
+ frame.c        |    9 +---
+ func.c         |   12 ++----
+ history.c      |    5 +-
+ istream.c      |   27 ++++---------
+ linein.c       |    9 +---
+ main.c         |  111 +++++++++++++++++++--------------------------------------
+ po/POTFILES.in |   23 ++++++++++-
+ url.c          |    6 +--
+ 12 files changed, 110 insertions(+), 180 deletions(-)
+
+--- a/buffer.c
++++ b/buffer.c
+@@ -194,8 +194,7 @@ writeBufferName(Buffer *buf, int n)
+     if (all == 0 && buf->lastLine != NULL)
+ 	all = buf->lastLine->linenumber;
+     move(n, 0);
+-    /* FIXME: gettextize? */
+-    msg = Sprintf("<%s> [%d lines]", buf->buffername, all);
++    msg = Sprintf(N_("<%s> [%d lines]"), buf->buffername, all);
+     if (buf->filename != NULL) {
+ 	switch (buf->currentURL.scheme) {
+ 	case SCM_LOCAL:
+@@ -236,16 +235,14 @@ gotoLine(Buffer *buf, int n)
+ 	       (getNextPage(buf, 1) != NULL)) ;
+     }
+     if (l->linenumber > n) {
+-	/* FIXME: gettextize? */
+-	sprintf(msg, "First line is #%ld", l->linenumber);
++	sprintf(msg, _("First line is #%ld"), l->linenumber);
+ 	set_delayed_message(msg);
+ 	buf->topLine = buf->currentLine = l;
+ 	return;
+     }
+     if (buf->lastLine->linenumber < n) {
+ 	l = buf->lastLine;
+-	/* FIXME: gettextize? */
+-	sprintf(msg, "Last line is #%ld", buf->lastLine->linenumber);
++	sprintf(msg, _("Last line is #%ld"), buf->lastLine->linenumber);
+ 	set_delayed_message(msg);
+ 	buf->currentLine = l;
+ 	buf->topLine = lineSkip(buf, buf->currentLine, -(buf->LINES - 1),
+@@ -281,16 +278,14 @@ gotoRealLine(Buffer *buf, int n)
+ 	       (getNextPage(buf, 1) != NULL)) ;
+     }
+     if (l->real_linenumber > n) {
+-	/* FIXME: gettextize? */
+-	sprintf(msg, "First line is #%ld", l->real_linenumber);
++	sprintf(msg, _("First line is #%ld"), l->real_linenumber);
+ 	set_delayed_message(msg);
+ 	buf->topLine = buf->currentLine = l;
+ 	return;
+     }
+     if (buf->lastLine->real_linenumber < n) {
+ 	l = buf->lastLine;
+-	/* FIXME: gettextize? */
+-	sprintf(msg, "Last line is #%ld", buf->lastLine->real_linenumber);
++	sprintf(msg, _("Last line is #%ld"), buf->lastLine->real_linenumber);
+ 	set_delayed_message(msg);
+ 	buf->currentLine = l;
+ 	buf->topLine = lineSkip(buf, buf->currentLine, -(buf->LINES - 1),
+@@ -347,8 +342,7 @@ listBuffer(Buffer *top, const Buffer *cu
+ 	buf = buf->nextBuffer;
+     }
+     standout();
+-    /* FIXME: gettextize? */
+-    message("Buffer selection mode: SPC for select / D for delete buffer", 0,
++    message(_("Buffer selection mode: SPC for select / D for delete buffer"), 0,
+ 	    0);
+     standend();
+     move(c, 0);
+--- a/display.c
++++ b/display.c
+@@ -338,8 +338,7 @@ make_lastline_message(Buffer *buf)
+ 	Strcat(msg, Sprintf("%d/%d (%d%%)", cl, ll, r));
+     }
+     else
+-	/* FIXME: gettextize? */
+-	Strcat_charp(msg, "Viewing");
++	Strcat_charp(msg, _("Viewing"));
+ #ifdef USE_SSL
+     if (buf->ssl_certificate)
+ 	Strcat_charp(msg, "[SSL]");
+@@ -475,8 +474,7 @@ displayBuffer(Buffer *buf, int mode)
+ 
+     msg = make_lastline_message(buf);
+     if (buf->firstLine == NULL) {
+-	/* FIXME: gettextize? */
+-	Strcat_charp(msg, "\tNo Line");
++	Strcat_charp(msg, _("\tNo Line"));
+     }
+     if (delayed_msg != NULL) {
+ 	disp_message(delayed_msg, FALSE);
+--- a/file.c
++++ b/file.c
+@@ -1586,12 +1586,11 @@ getAuthCookie(struct http_auth *hauth, c
+ 	if (fmInitialized) {
+ 	    char *pp;
+ 	    term_raw();
+-	    /* FIXME: gettextize? */
+-	    if ((pp = inputStr(Sprintf("Username for %s: ", realm)->ptr,
++	    if ((pp = inputStr(Sprintf(_("Username for %s: "), realm)->ptr,
+ 			       NULL)) == NULL)
+ 		return;
+ 	    *uname = Str_conv_to_system(Strnew_charp(pp));
+-	    if ((pp = inputLine(Sprintf("Password for %s: ", realm)->ptr, NULL,
++	    if ((pp = inputLine(Sprintf(_("Password for %s: "), realm)->ptr, NULL,
+ 				IN_PASSWORD)) == NULL) {
+ 		*uname = NULL;
+ 		return;
+@@ -1608,12 +1607,11 @@ getAuthCookie(struct http_auth *hauth, c
+ 	     * (This is same behavior as lwp-request.)
+ 	     */
+ 	    if (feof(stdin) || ferror(stdin)) {
+-		/* FIXME: gettextize? */
+-		fprintf(stderr, "w3m: Authorization required for %s\n",
++		fprintf(stderr, _("w3m: Authorization required for %s\n"),
+ 			realm);
+ 		exit(1);
+ 	    }
+-	    
++
+ 	    /* FIXME: gettextize? */
+ 	    printf(proxy ? "Proxy Username for %s: " : "Username for %s: ",
+ 		   realm);
+@@ -1676,8 +1674,7 @@ checkRedirection(ParsedURL *pu)
+ 	return TRUE;
+     }
+     if (nredir >= FollowRedirection) {
+-	/* FIXME: gettextize? */
+-	tmp = Sprintf("Number of redirections exceeded %d at %s",
++	tmp = Sprintf(_("Number of redirections exceeded %d at %s"),
+ 		      FollowRedirection, parsedURL2Str(pu)->ptr);
+ 	disp_err_message(tmp->ptr, FALSE);
+ 	return FALSE;
+@@ -1686,8 +1683,7 @@ checkRedirection(ParsedURL *pu)
+ 	     (same_url_p(pu, &puv[(nredir - 1) % nredir_size]) ||
+ 	      (!(nredir % 2)
+ 	       && same_url_p(pu, &puv[(nredir / 2) % nredir_size])))) {
+-	/* FIXME: gettextize? */
+-	tmp = Sprintf("Redirection loop detected (%s)",
++	tmp = Sprintf(_("Redirection loop detected (%s)"),
+ 		      parsedURL2Str(pu)->ptr);
+ 	disp_err_message(tmp->ptr, FALSE);
+ 	return FALSE;
+@@ -1822,8 +1818,7 @@ loadGeneralFile(char *path, ParsedURL *v
+ 		return b;
+ 	    }
+ #endif
+-	    /* FIXME: gettextize? */
+-	    disp_err_message(Sprintf("Unknown URI: %s",
++	    disp_err_message(Sprintf(_("Unknown URI: %s"),
+ 				     parsedURL2Str(&pu)->ptr)->ptr, FALSE);
+ 	    break;
+ 	}
+@@ -1870,8 +1865,7 @@ loadGeneralFile(char *path, ParsedURL *v
+ 
+ 	if (fmInitialized) {
+ 	    term_cbreak();
+-	    /* FIXME: gettextize? */
+-	    message(Sprintf("%s contacted. Waiting for reply...", pu.host)->
++	    message(Sprintf(_("%s contacted. Waiting for reply..."), pu.host)->
+ 		    ptr, 0, 0);
+ 	    refresh();
+ 	}
+@@ -8561,8 +8555,7 @@ _doFileCopy(char *tmpf, char *defstr, in
+     if (fmInitialized) {
+ 	p = searchKeyData();
+ 	if (p == NULL || *p == '\0') {
+-	    /* FIXME: gettextize? */
+-	    q = inputLineHist("(Download)Save file to: ",
++	    q = inputLineHist(_("(Download)Save file to: "),
+ 			      defstr, IN_COMMAND, SaveHist);
+ 	    if (q == NULL || *q == '\0')
+ 		return FALSE;
+@@ -8580,16 +8573,14 @@ _doFileCopy(char *tmpf, char *defstr, in
+ 		return -1;
+ 	}
+ 	if (checkCopyFile(tmpf, p) < 0) {
+-	    /* FIXME: gettextize? */
+-	    msg = Sprintf("Can't copy. %s and %s are identical.",
++	    msg = Sprintf(_("Can't copy. %s and %s are identical."),
+ 			  conv_from_system(tmpf), conv_from_system(p));
+ 	    disp_err_message(msg->ptr, FALSE);
+ 	    return -1;
+ 	}
+ 	if (!download) {
+ 	    if (_MoveFile(tmpf, p) < 0) {
+-		/* FIXME: gettextize? */
+-		msg = Sprintf("Can't save to %s", conv_from_system(p));
++		msg = Sprintf(_("Can't save to %s"), conv_from_system(p));
+ 		disp_err_message(msg->ptr, FALSE);
+ 	    }
+ 	    return -1;
+@@ -8619,8 +8610,7 @@ _doFileCopy(char *tmpf, char *defstr, in
+     else {
+ 	q = searchKeyData();
+ 	if (q == NULL || *q == '\0') {
+-	    /* FIXME: gettextize? */
+-	    printf("(Download)Save file to: ");
++	    printf(_("(Download)Save file to: "));
+ 	    fflush(stdout);
+ 	    filen = Strfgets(stdin);
+ 	    if (filen->length == 0)
+@@ -8640,13 +8630,11 @@ _doFileCopy(char *tmpf, char *defstr, in
+ 		return -1;
+ 	}
+ 	if (checkCopyFile(tmpf, p) < 0) {
+-	    /* FIXME: gettextize? */
+-	    printf("Can't copy. %s and %s are identical.", tmpf, p);
++	    printf(_("Can't copy. %s and %s are identical."), tmpf, p);
+ 	    return -1;
+ 	}
+ 	if (_MoveFile(tmpf, p) < 0) {
+-	    /* FIXME: gettextize? */
+-	    printf("Can't save to %s\n", p);
++	    printf(_("Can't save to %s\n"), p);
+ 	    return -1;
+ 	}
+ 	if (PreserveTimestamp && !is_pipe && !stat(tmpf, &st))
+@@ -8680,8 +8668,7 @@ doFileSave(URLFile uf, const char *defst
+     if (fmInitialized) {
+ 	p = searchKeyData();
+ 	if (p == NULL || *p == '\0') {
+-	    /* FIXME: gettextize? */
+-	    p = inputLineHist("(Download)Save file to: ",
++	    p = inputLineHist(_("(Download)Save file to: "),
+ 			      defstr, IN_FILENAME, SaveHist);
+ 	    if (p == NULL || *p == '\0')
+ 		return -1;
+@@ -8690,8 +8677,7 @@ doFileSave(URLFile uf, const char *defst
+ 	if (checkOverWrite(p) < 0)
+ 	    return -1;
+ 	if (checkSaveFile(uf.stream, p) < 0) {
+-	    /* FIXME: gettextize? */
+-	    msg = Sprintf("Can't save. Load file and %s are identical.",
++	    msg = Sprintf(_("Can't save. Load file and %s are identical."),
+ 			  conv_from_system(p));
+ 	    disp_err_message(msg->ptr, FALSE);
+ 	    return -1;
+@@ -8725,8 +8711,7 @@ doFileSave(URLFile uf, const char *defst
+     else {
+ 	q = searchKeyData();
+ 	if (q == NULL || *q == '\0') {
+-	    /* FIXME: gettextize? */
+-	    printf("(Download)Save file to: ");
++	    printf(_("(Download)Save file to: "));
+ 	    fflush(stdout);
+ 	    filen = Strfgets(stdin);
+ 	    if (filen->length == 0)
+@@ -8741,15 +8726,13 @@ doFileSave(URLFile uf, const char *defst
+ 	if (checkOverWrite(p) < 0)
+ 	    return -1;
+ 	if (checkSaveFile(uf.stream, p) < 0) {
+-	    /* FIXME: gettextize? */
+-	    printf("Can't save. Load file and %s are identical.", p);
++	    printf(_("Can't save. Load file and %s are identical."), p);
+ 	    return -1;
+ 	}
+ 	if (uf.content_encoding != CMP_NOCOMPRESS && AutoUncompress)
+ 	    uncompress_stream(&uf, NULL);
+ 	if (save2tmp(uf, p) < 0) {
+-	    /* FIXME: gettextize? */
+-	    printf("Can't save to %s\n", p);
++	    printf(_("Can't save to %s\n"), p);
+ 	    return -1;
+ 	}
+ 	if (PreserveTimestamp && uf.modtime != -1)
+@@ -8796,8 +8779,7 @@ checkOverWrite(const char *path)
+ 
+     if (stat(path, &st) < 0)
+ 	return 0;
+-    /* FIXME: gettextize? */
+-    ans = inputAnswer("File exists. Overwrite? (y/n)");
++    ans = inputAnswer(_("File exists. Overwrite? (y/n)"));
+     if (ans && TOLOWER(*ans) == 'y')
+ 	return 0;
+     else
+--- a/form.c
++++ b/form.c
+@@ -596,8 +596,7 @@ input_textarea(FormItemList *fi)
+ 
+     f = fopen(tmpf, "w");
+     if (f == NULL) {
+-	/* FIXME: gettextize? */
+-	disp_err_message("Can't open temporary file", FALSE);
++	disp_err_message(_("Can't open temporary file"), FALSE);
+ 	return;
+     }
+     if (fi->value)
+@@ -611,8 +610,7 @@ input_textarea(FormItemList *fi)
+ 	goto input_end;
+     f = fopen(tmpf, "r");
+     if (f == NULL) {
+-	/* FIXME: gettextize? */
+-	disp_err_message("Can't open temporary file", FALSE);
++	disp_err_message(_("Can't open temporary file"), FALSE);
+ 	goto input_end;
+     }
+     fi->value = Strnew();
+--- a/frame.c
++++ b/frame.c
+@@ -468,8 +468,7 @@ createFrameFile(struct frameset *f, FILE
+ 	    }
+ 	    switch (frame.element->attr) {
+ 	    default:
+-		/* FIXME: gettextize? */
+-		fprintf(f1, "Frameset \"%s\" frame %d: type unrecognized",
++		fprintf(f1, _("Frameset \"%s\" frame %d: type unrecognized"),
+ 			html_quote(f->name), i + 1);
+ 		break;
+ 	    case F_UNLOADED:
+@@ -495,12 +494,10 @@ createFrameFile(struct frameset *f, FILE
+ 		if (f2.stream == NULL) {
+ 		    frame.body->attr = F_UNLOADED;
+ 		    if (frame.body->flags & FB_NO_BUFFER)
+-			/* FIXME: gettextize? */
+-			fprintf(f1, "Open %s with other method",
++			fprintf(f1, _("Open %s with other method"),
+ 				html_quote(frame.body->url));
+ 		    else if (frame.body->url)
+-			/* FIXME: gettextize? */
+-			fprintf(f1, "Can't open %s",
++			fprintf(f1, _("Can't open %s"),
+ 				html_quote(frame.body->url));
+ 		    else
+ 			/* FIXME: gettextize? */
+--- a/func.c
++++ b/func.c
+@@ -31,11 +31,9 @@ setKeymap(char *p, int lineno, int verbo
+     c = getKey(s);
+     if (c < 0) {		/* error */
+ 	if (lineno > 0)
+-	    /* FIXME: gettextize? */
+-	    emsg = Sprintf("line %d: unknown key '%s'", lineno, s)->ptr;
++	    emsg = Sprintf(_("line %d: unknown key '%s'"), lineno, s)->ptr;
+ 	else
+-	    /* FIXME: gettextize? */
+-	    emsg = Sprintf("defkey: unknown key '%s'", s)->ptr;
++	    emsg = Sprintf(_("defkey: unknown key '%s'"), s)->ptr;
+ 	record_err_message(emsg);
+ 	if (verbose)
+ 	    disp_message_nsec(emsg, FALSE, 1, TRUE, FALSE);
+@@ -45,11 +43,9 @@ setKeymap(char *p, int lineno, int verbo
+     f = getFuncList(s);
+     if (f < 0) {
+ 	if (lineno > 0)
+-	    /* FIXME: gettextize? */
+-	    emsg = Sprintf("line %d: invalid command '%s'", lineno, s)->ptr;
++	    emsg = Sprintf(_("line %d: invalid command '%s'"), lineno, s)->ptr;
+ 	else
+-	    /* FIXME: gettextize? */
+-	    emsg = Sprintf("defkey: invalid command '%s'", s)->ptr;
++	    emsg = Sprintf(_("defkey: invalid command '%s'"), s)->ptr;
+ 	record_err_message(emsg);
+ 	if (verbose)
+ 	    disp_message_nsec(emsg, FALSE, 1, TRUE, FALSE);
+--- a/history.c
++++ b/history.c
+@@ -22,9 +22,8 @@ historyBuffer(Hist *hist)
+     HistItem *item;
+     char *p, *q;
+ 
+-    /* FIXME: gettextize? */
+-    Strcat_charp(src, "<html>\n<head><title>History Page</title></head>\n");
+-    Strcat_charp(src, "<body>\n<h1>History Page</h1>\n<hr>\n");
++    Strcat_charp(src, _("<html>\n<head><title>History Page</title></head>\n"));
++    Strcat_charp(src, _("<body>\n<h1>History Page</h1>\n<hr>\n"));
+     Strcat_charp(src, "<ol>\n");
+     if (hist && hist->list) {
+ 	for (item = hist->list->last; item; item = item->prev) {
+--- a/istream.c
++++ b/istream.c
+@@ -464,8 +464,7 @@ ssl_check_cert_ident(X509 * x, char *hos
+ 	    if (i < n)		/* Found a match */
+ 		match_ident = TRUE;
+ 	    else if (seen_dnsname)
+-		/* FIXME: gettextize? */
+-		ret = Sprintf("Bad cert ident from %s: dNSName=%s", hostname,
++		ret = Sprintf(_("Bad cert ident from %s: dNSName=%s"), hostname,
+ 			      seen_dnsname->ptr);
+ 	}
+     }
+@@ -479,8 +478,7 @@ ssl_check_cert_ident(X509 * x, char *hos
+ 
+ 	slen = X509_NAME_get_text_by_NID(xn, NID_commonName, buf, sizeof(buf));
+ 	if ( slen == -1)
+-	    /* FIXME: gettextize? */
+-	    ret = Strnew_charp("Unable to get common name from peer cert");
++	    ret = Strnew_charp(_("Unable to get common name from peer cert"));
+ 	else if (slen != strlen(buf)
+ 		|| !ssl_match_cert_ident(buf, strlen(buf), hostname)) {
+ 	    /* replace \0 to make full string visible to user */
+@@ -491,8 +489,7 @@ ssl_check_cert_ident(X509 * x, char *hos
+ 			buf[i] = '!';
+ 		}
+ 	    }
+-	    /* FIXME: gettextize? */
+-	    ret = Sprintf("Bad cert ident %s from %s", buf, hostname);
++	    ret = Sprintf(_("Bad cert ident %s from %s"), buf, hostname);
+ 	}
+     }
+     return ret;
+@@ -565,14 +562,12 @@ ssl_get_certificate(SSL * ssl, char *hos
+ 	if (accept_this_site(hostname, x))
+ 	    ans = "y";
+ 	else {
+-	    /* FIXME: gettextize? */
+-	    emsg = Strnew_charp("No SSL peer certificate: accept? (y/n)");
++	    emsg = Strnew_charp(_("No SSL peer certificate: accept? (y/n)"));
+ 	    ans = inputAnswer(emsg->ptr);
+ 	}
+ 	if (ans && TOLOWER(*ans) == 'y')
+-	    /* FIXME: gettextize? */
+ 	    amsg = Strnew_charp
+-		("Accept SSL session without any peer certificate");
++		(_("Accept SSL session without any peer certificate"));
+ 	else {
+ 	    /* FIXME: gettextize? */
+ 	    const char *e = "This SSL session was rejected "
+@@ -584,8 +579,7 @@ ssl_get_certificate(SSL * ssl, char *hos
+ 	if (amsg)
+ 	    disp_err_message(amsg->ptr, FALSE);
+ 	ssl_accept_this_site(hostname, x, 0);
+-	/* FIXME: gettextize? */
+-	s = amsg ? amsg : Strnew_charp("valid certificate");
++	s = amsg ? amsg : Strnew_charp(_("valid certificate"));
+ 	return s;
+     }
+ #ifdef USE_SSL_VERIFY
+@@ -618,9 +612,8 @@ ssl_get_certificate(SSL * ssl, char *hos
+ 		    perm = 1;
+ 		}
+ 		else {
+-		    /* FIXME: gettextize? */
+ 		    char *e =
+-			Sprintf("This SSL session was rejected: %s", em)->ptr;
++			Sprintf(_("This SSL session was rejected: %s"), em)->ptr;
+ 		    disp_err_message(e, FALSE);
+ 		    free_ssl_ctx();
+ 		    return NULL;
+@@ -642,8 +635,7 @@ ssl_get_certificate(SSL * ssl, char *hos
+ 	    ans = inputAnswer(ep->ptr);
+ 	}
+ 	if (ans && TOLOWER(*ans) == 'y') {
+-	    /* FIXME: gettextize? */
+-	    amsg = Strnew_charp("Accept unsecure SSL session:");
++	    amsg = Strnew_charp(_("Accept unsecure SSL session:"));
+ 	    Strcat(amsg, emsg);
+ 	}
+ 	else {
+@@ -658,8 +650,7 @@ ssl_get_certificate(SSL * ssl, char *hos
+     }
+     if (amsg)
+ 	disp_err_message(amsg->ptr, FALSE);
+-    /* FIXME: gettextize? */
+-    s = amsg ? amsg : Strnew_charp("valid certificate");
++    s = amsg ? amsg : Strnew_charp(_("valid certificate"));
+     Strcat_charp(s, "\n");
+     xn = X509_get_subject_name(x);
+     if (X509_NAME_get_text_by_NID(xn, NID_commonName, buf, sizeof(buf)) == -1)
+--- a/linein.c
++++ b/linein.c
+@@ -814,8 +814,7 @@ next_dcompl(int next)
+ 	move(y, 0);
+ 	clrtoeolx();
+ 	bold();
+-	/* FIXME: gettextize? */
+-	addstr("----- Completion list -----");
++	addstr(_("----- Completion list -----"));
+ 	boldend();
+ 	y++;
+     }
+@@ -839,11 +838,9 @@ next_dcompl(int next)
+ 	clrtoeolx();
+ 	bold();
+ 	if (emacs_like_lineedit)
+-	    /* FIXME: gettextize? */
+-	    addstr("----- Press TAB to continue -----");
++	    addstr(_("----- Press TAB to continue -----"));
+ 	else
+-	    /* FIXME: gettextize? */
+-	    addstr("----- Press CTRL-D to continue -----");
++	    addstr(_("----- Press CTRL-D to continue -----"));
+ 	boldend();
+     }
+ }
+--- a/main.c
++++ b/main.c
+@@ -822,8 +822,7 @@ main(int argc, char **argv)
+ 		}
+ 		if (!set_param_option(argv[i])) {
+ 		    /* option set failed */
+-		    /* FIXME: gettextize? */
+-		    fprintf(stderr, "%s: bad option\n", argv[i]);
++		    fprintf(stderr, _("%s: bad option\n"), argv[i]);
+ 		    show_params_p = 1;
+ 		    usage();
+ 		}
+@@ -1090,9 +1089,8 @@ main(int argc, char **argv)
+ 		    else
+ 			fp = fopen(post_file, "r");
+ 		    if (fp == NULL) {
+-			/* FIXME: gettextize? */
+ 			Strcat(err_msg,
+-			       Sprintf("w3m: Can't open %s.\n", post_file));
++			       Sprintf(_("w3m: Can't open %s.\n"), post_file));
+ 			continue;
+ 		    }
+ 		    body = Strfgetall(fp);
+@@ -1115,9 +1113,8 @@ main(int argc, char **argv)
+ 		    retry = 1;
+ 		    goto retry_as_local_file;
+ 		}
+-		/* FIXME: gettextize? */
+ 		Strcat(err_msg,
+-		       Sprintf("w3m: Can't load %s.\n", load_argv[i]));
++		       Sprintf(_("w3m: Can't load %s.\n"), load_argv[i]));
+ 		continue;
+ 	    }
+ 	    else if (newbuf == NO_BUFFER)
+@@ -1200,8 +1197,7 @@ main(int argc, char **argv)
+     if (!FirstTab || !Firstbuf || Firstbuf == NO_BUFFER) {
+ 	if (newbuf == NO_BUFFER) {
+ 	    if (fmInitialized)
+-		/* FIXME: gettextize? */
+-		inputChar("Hit any key to quit w3m:");
++		inputChar(_("Hit any key to quit w3m:"));
+ 	}
+ 	if (fmInitialized)
+ 	    fmTerm();
+@@ -2027,8 +2023,7 @@ srch_nxtprv(int reverse)
+     /* *INDENT-ON* */
+ 
+     if (searchRoutine == NULL) {
+-	/* FIXME: gettextize? */
+-	disp_message("No previous regular expression", TRUE);
++	disp_message(_("No previous regular expression"), TRUE);
+ 	return;
+     }
+     if (reverse != 0)
+@@ -2169,8 +2164,7 @@ DEFUN(pipeBuf, PIPE_BUF, "Pipe current b
+     CurrentKeyData = NULL;	/* not allowed in w3m-control: */
+     cmd = searchKeyData();
+     if (cmd == NULL || *cmd == '\0') {
+-	/* FIXME: gettextize? */
+-	cmd = inputLineHist("Pipe buffer to: ", "", IN_COMMAND, ShellHist);
++	cmd = inputLineHist(_("Pipe buffer to: "), "", IN_COMMAND, ShellHist);
+     }
+     if (cmd != NULL)
+ 	cmd = conv_to_system(cmd);
+@@ -2181,8 +2175,7 @@ DEFUN(pipeBuf, PIPE_BUF, "Pipe current b
+     tmpf = tmpfname(TMPF_DFL, NULL)->ptr;
+     f = fopen(tmpf, "w");
+     if (f == NULL) {
+-	/* FIXME: gettextize? */
+-	disp_message(Sprintf("Can't save buffer to %s", cmd)->ptr, TRUE);
++	disp_message(Sprintf(_("Can't save buffer to %s"), cmd)->ptr, TRUE);
+ 	return;
+     }
+     saveBuffer(Currentbuf, f, TRUE);
+@@ -2260,8 +2253,7 @@ DEFUN(readsh, READ_SHELL, "Execute shell
+     mySignal(SIGINT, prevtrap);
+     term_raw();
+     if (buf == NULL) {
+-	/* FIXME: gettextize? */
+-	disp_message("Execution failed", TRUE);
++	disp_message(_("Execution failed"), TRUE);
+ 	return;
+     }
+     else {
+@@ -2289,8 +2281,7 @@ DEFUN(execsh, EXEC_SHELL SHELL, "Execute
+ 	fmTerm();
+ 	printf("\n");
+ 	(void)!system(cmd); /* We do not care about the exit code here! */
+-	/* FIXME: gettextize? */
+-	printf("\n[Hit any key]");
++	printf(_("\n[Hit any key]"));
+ 	fflush(stdout);
+ 	fmInit();
+ 	getch();
+@@ -2305,8 +2296,7 @@ DEFUN(ldfile, LOAD, "Open local file in
+ 
+     fn = searchKeyData();
+     if (fn == NULL || *fn == '\0') {
+-	/* FIXME: gettextize? */
+-	fn = inputFilenameHist("(Load)Filename? ", NULL, LoadHist);
++	fn = inputFilenameHist(_("(Load)Filename? "), NULL, LoadHist);
+     }
+     if (fn != NULL)
+ 	fn = conv_to_system(fn);
+@@ -2343,8 +2333,7 @@ cmd_loadfile(char *fn)
+ 
+     buf = loadGeneralFile(file_to_url(fn), NULL, NO_REFERER, 0, NULL);
+     if (buf == NULL) {
+-	/* FIXME: gettextize? */
+-	char *emsg = Sprintf("%s not found", conv_from_system(fn))->ptr;
++	char *emsg = Sprintf(_("%s not found"), conv_from_system(fn))->ptr;
+ 	disp_err_message(emsg, FALSE);
+     }
+     else if (buf != NO_BUFFER) {
+@@ -2638,8 +2627,7 @@ _quitfm(int confirm)
+ 	ans = inputChar("Download process retains. "
+ 			"Do you want to exit w3m? (y/n)");
+     else if (confirm)
+-	/* FIXME: gettextize? */
+-	ans = inputChar("Do you want to exit w3m? (y/n)");
++	ans = inputChar(_("Do you want to exit w3m? (y/n)"));
+     if (!(ans && TOLOWER(*ans) == 'y')) {
+ 	displayBuffer(Currentbuf, B_NORMAL);
+ 	return;
+@@ -2795,8 +2783,7 @@ DEFUN(goLine, GOTO_LINE, "Go to the spec
+     else if (str)
+ 	_goLine(str);
+     else
+-	/* FIXME: gettextize? */
+-	_goLine(inputStr("Goto line: ", ""));
++	_goLine(inputStr(_("Goto line: "), ""));
+ }
+ 
+ 
+@@ -2885,8 +2872,7 @@ DEFUN(editScr, EDIT_SCREEN, "Edit render
+     tmpf = tmpfname(TMPF_DFL, NULL)->ptr;
+     f = fopen(tmpf, "w");
+     if (f == NULL) {
+-	/* FIXME: gettextize? */
+-	disp_err_message(Sprintf("Can't open %s", tmpf)->ptr, TRUE);
++	disp_err_message(Sprintf(_("Can't open %s"), tmpf)->ptr, TRUE);
+ 	return;
+     }
+     saveBuffer(Currentbuf, f, TRUE);
+@@ -2941,8 +2927,7 @@ DEFUN(nextMk, NEXT_MARK, "Go to the next
+ 	l = l->next;
+ 	i = 0;
+     }
+-    /* FIXME: gettextize? */
+-    disp_message("No mark exist after here", TRUE);
++    disp_message(_("No mark exist after here"), TRUE);
+ }
+ 
+ /* Go to previous mark */
+@@ -2976,8 +2961,7 @@ DEFUN(prevMk, PREV_MARK, "Go to the prev
+ 	if (l != NULL)
+ 	    i = l->len - 1;
+     }
+-    /* FIXME: gettextize? */
+-    disp_message("No mark exist before here", TRUE);
++    disp_message(_("No mark exist before here"), TRUE);
+ }
+ 
+ /* Mark place to which the regular expression matches */
+@@ -3134,8 +3118,7 @@ gotoLabel(char *label)
+ 
+     al = searchURLLabel(Currentbuf, label);
+     if (al == NULL) {
+-	/* FIXME: gettextize? */
+-	disp_message(Sprintf("%s is not found", label)->ptr, TRUE);
++	disp_message(Sprintf(_("%s is not found"), label)->ptr, TRUE);
+ 	return;
+     }
+     buf = newBuffer(Currentbuf->width);
+@@ -3171,8 +3154,7 @@ handleMailto(char *url)
+ 	return 0;
+ #else
+     if (!non_null(Mailer)) {
+-	/* FIXME: gettextize? */
+-	disp_err_message("no mailer is specified", TRUE);
++	disp_err_message(_("no mailer is specified"), TRUE);
+ 	return 1;
+     }
+ #endif
+@@ -3277,13 +3259,11 @@ DEFUN(followI, VIEW_IMAGE, "Display imag
+     a = retrieveCurrentImg(Currentbuf);
+     if (a == NULL)
+ 	return;
+-    /* FIXME: gettextize? */
+-    message(Sprintf("loading %s", a->url)->ptr, 0, 0);
++    message(Sprintf(_("loading %s"), a->url)->ptr, 0, 0);
+     refresh();
+     buf = loadGeneralFile(a->url, baseURL(Currentbuf), NULL, 0, NULL);
+     if (buf == NULL) {
+-	/* FIXME: gettextize? */
+-	char *emsg = Sprintf("Can't load %s", a->url)->ptr;
++	char *emsg = Sprintf(_("Can't load %s"), a->url)->ptr;
+ 	disp_err_message(emsg, FALSE);
+     }
+     else if (buf != NO_BUFFER) {
+@@ -3535,8 +3515,7 @@ _followForm(int submit)
+ 	if (fi->readonly)
+ 	    /* FIXME: gettextize? */
+ 	    disp_message_nsec("Read only field!", FALSE, 1, TRUE, FALSE);
+-	/* FIXME: gettextize? */
+-	p = inputStrHist("TEXT:", fi->value ? fi->value->ptr : NULL, TextHist);
++	p = inputStrHist(_("TEXT:"), fi->value ? fi->value->ptr : NULL, TextHist);
+ 	if (p == NULL || fi->readonly)
+ 	    break;
+ 	fi->value = Strnew_charp(p);
+@@ -3550,8 +3529,7 @@ _followForm(int submit)
+ 	if (fi->readonly)
+ 	    /* FIXME: gettextize? */
+ 	    disp_message_nsec("Read only field!", FALSE, 1, TRUE, FALSE);
+-	/* FIXME: gettextize? */
+-	p = inputFilenameHist("Filename:", fi->value ? fi->value->ptr : NULL,
++	p = inputFilenameHist(_("Filename:"), fi->value ? fi->value->ptr : NULL,
+ 			      NULL);
+ 	if (p == NULL || fi->readonly)
+ 	    break;
+@@ -3568,8 +3546,7 @@ _followForm(int submit)
+ 	    disp_message_nsec("Read only field!", FALSE, 1, TRUE, FALSE);
+ 	    break;
+ 	}
+-	/* FIXME: gettextize? */
+-	p = inputLine("Password:", fi->value ? fi->value->ptr : NULL,
++	p = inputLine(_("Password:"), fi->value ? fi->value->ptr : NULL,
+ 		      IN_PASSWORD);
+ 	if (p == NULL)
+ 	    break;
+@@ -4199,8 +4176,7 @@ DEFUN(backBf, BACK, "Close current buffe
+ 	    displayBuffer(Currentbuf, B_FORCE_REDRAW);
+ 	}
+ 	else
+-	    /* FIXME: gettextize? */
+-	    disp_message("Can't go back...", TRUE);
++	    disp_message(_("Can't go back..."), TRUE);
+ 	return;
+     }
+ 
+@@ -4256,8 +4232,7 @@ cmd_loadURL(char *url, ParsedURL *curren
+     refresh();
+     buf = loadGeneralFile(url, current, referer, 0, request);
+     if (buf == NULL) {
+-	/* FIXME: gettextize? */
+-	char *emsg = Sprintf("Can't load %s", conv_from_system(url))->ptr;
++	char *emsg = Sprintf(_("Can't load %s"), conv_from_system(url))->ptr;
+ 	disp_err_message(emsg, FALSE);
+     }
+     else if (buf != NO_BUFFER) {
+@@ -4698,8 +4673,7 @@ DEFUN(svBuf, PRINT SAVE_SCREEN, "Save re
+     CurrentKeyData = NULL;	/* not allowed in w3m-control: */
+     file = searchKeyData();
+     if (file == NULL || *file == '\0') {
+-	/* FIXME: gettextize? */
+-	qfile = inputLineHist("Save buffer to: ", NULL, IN_COMMAND, SaveHist);
++	qfile = inputLineHist(_("Save buffer to: "), NULL, IN_COMMAND, SaveHist);
+ 	if (qfile == NULL || *qfile == '\0') {
+ 	    displayBuffer(Currentbuf, B_NORMAL);
+ 	    return;
+@@ -4724,8 +4698,7 @@ DEFUN(svBuf, PRINT SAVE_SCREEN, "Save re
+ 	is_pipe = FALSE;
+     }
+     if (f == NULL) {
+-	/* FIXME: gettextize? */
+-	char *emsg = Sprintf("Can't open %s", conv_from_system(file))->ptr;
++	char *emsg = Sprintf(_("Can't open %s"), conv_from_system(file))->ptr;
+ 	disp_err_message(emsg, TRUE);
+ 	return;
+     }
+@@ -5079,15 +5052,13 @@ DEFUN(reload, RELOAD, "Load current docu
+ 	    ldDL();
+ 	    return;
+ 	}
+-	/* FIXME: gettextize? */
+-	disp_err_message("Can't reload...", TRUE);
++	disp_err_message(_("Can't reload..."), TRUE);
+ 	return;
+     }
+     if (Currentbuf->currentURL.scheme == SCM_LOCAL &&
+ 	!strcmp(Currentbuf->currentURL.file, "-")) {
+ 	/* file is std input */
+-	/* FIXME: gettextize? */
+-	disp_err_message("Can't reload stdin", TRUE);
++	disp_err_message(_("Can't reload stdin"), TRUE);
+ 	return;
+     }
+     copyBuffer(&sbuf, Currentbuf);
+@@ -5139,8 +5110,7 @@ DEFUN(reload, RELOAD, "Load current docu
+ 	request = NULL;
+     }
+     url = parsedURL2Str(&Currentbuf->currentURL);
+-    /* FIXME: gettextize? */
+-    message("Reloading...", 0, 0);
++    message(_("Reloading..."), 0, 0);
+     refresh();
+ #ifdef USE_M17N
+     old_charset = DocumentCharset;
+@@ -5159,8 +5129,7 @@ DEFUN(reload, RELOAD, "Load current docu
+     if (multipart)
+ 	unlink(request->body);
+     if (buf == NULL) {
+-	/* FIXME: gettextize? */
+-	disp_err_message("Can't reload...", TRUE);
++	disp_err_message(_("Can't reload..."), TRUE);
+ 	return;
+     }
+     else if (buf == NO_BUFFER) {
+@@ -5238,8 +5207,7 @@ DEFUN(docCSet, CHARSET, "Change the char
+ 
+     cs = searchKeyData();
+     if (cs == NULL || *cs == '\0')
+-	/* FIXME: gettextize? */
+-	cs = inputStr("Document charset: ",
++	cs = inputStr(_("Document charset: "),
+ 		      wc_ces_to_charset(Currentbuf->document_charset));
+     charset = wc_guess_charset_short(cs, 0);
+     if (charset == 0) {
+@@ -5256,8 +5224,7 @@ DEFUN(defCSet, DEFAULT_CHARSET, "Change
+ 
+     cs = searchKeyData();
+     if (cs == NULL || *cs == '\0')
+-	/* FIXME: gettextize? */
+-	cs = inputStr("Default document charset: ",
++	cs = inputStr(_("Default document charset: "),
+ 		      wc_ces_to_charset(DocumentCharset));
+     charset = wc_guess_charset_short(cs, 0);
+     if (charset != 0)
+@@ -5445,15 +5412,13 @@ invoke_browser(const char *url)
+ DEFUN(extbrz, EXTERN, "Display using an external browser")
+ {
+     if (Currentbuf->bufferprop & BP_INTERNAL) {
+-	/* FIXME: gettextize? */
+-	disp_err_message("Can't browse...", TRUE);
++	disp_err_message(_("Can't browse..."), TRUE);
+ 	return;
+     }
+     if (Currentbuf->currentURL.scheme == SCM_LOCAL &&
+ 	!strcmp(Currentbuf->currentURL.file, "-")) {
+ 	/* file is std input */
+-	/* FIXME: gettextize? */
+-	disp_err_message("Can't browse stdin", TRUE);
++	disp_err_message(_("Can't browse stdin"), TRUE);
+ 	return;
+     }
+     invoke_browser(parsedURL2Str(&Currentbuf->currentURL)->ptr);
+@@ -5978,13 +5943,11 @@ DEFUN(wrapToggle, WRAP_TOGGLE, "Toggle w
+ {
+     if (WrapSearch) {
+ 	WrapSearch = FALSE;
+-	/* FIXME: gettextize? */
+-	disp_message("Wrap search off", TRUE);
++	disp_message(_("Wrap search off"), TRUE);
+     }
+     else {
+ 	WrapSearch = TRUE;
+-	/* FIXME: gettextize? */
+-	disp_message("Wrap search on", TRUE);
++	disp_message(_("Wrap search on"), TRUE);
+     }
+ }
+ 
+--- a/url.c
++++ b/url.c
+@@ -475,9 +475,8 @@ openSSLHandle(int sock, char *hostname,
+     close(sock);
+     if (handle)
+ 	SSL_free(handle);
+-    /* FIXME: gettextize? */
+     disp_err_message(Sprintf
+-		     ("SSL error: %s, a workaround might be: w3m -insecure",
++		     (_("SSL error: %s, a workaround might be: w3m -insecure"),
+ 		      ERR_error_string(ERR_get_error(), NULL))->ptr, FALSE);
+     return NULL;
+ }
+@@ -554,8 +553,7 @@ openSocket(char *const hostname,
+     MySignalHandler(*volatile prevtrap) (SIGNAL_ARG) = NULL;
+ 
+     if (fmInitialized) {
+-	/* FIXME: gettextize? */
+-	message(Sprintf("Opening socket...")->ptr, 0, 0);
++	message(Sprintf(_("Opening socket..."))->ptr, 0, 0);
+ 	refresh();
+     }
+     if (SETJMP(AbortLoading) != 0) {
+--- a/po/POTFILES.in
++++ b/po/POTFILES.in
+@@ -1,6 +1,23 @@
+ # List of source files containing translatable strings.
+-#main.c
+ menu.c
+ rc.c
+-#w3mbookmark.c
+-#w3mhelperpanel.c
++anchor.c
++buffer.c
++cookie.c
++display.c
++etc.c
++file.c
++fm.h
++form.c
++frame.c
++func.c
++history.c
++istream.c
++linein.c
++local.c
++main.c
++menu.c
++rc.c
++url.c
++w3mbookmark.c
++w3mhelperpanel.c

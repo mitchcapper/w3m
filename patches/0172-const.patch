@@ -14,7 +14,7 @@ Subject: [PATCH 172/172] const
  file.c           |  102 +++++++++++++++++++++++++++----------------------------
  fm.h             |   14 +++----
  form.c           |    2 -
- func.c           |    6 +--
+ func.c           |    7 +--
  func.h           |    2 -
  hash.c           |    8 ++--
  hash.h           |    6 +--
@@ -46,7 +46,7 @@ Subject: [PATCH 172/172] const
  version.c.in     |    2 -
  w3mbookmark.c    |   16 ++++----
  w3mhelperpanel.c |    2 -
- 42 files changed, 274 insertions(+), 270 deletions(-)
+ 42 files changed, 274 insertions(+), 271 deletions(-)
 
 --- a/Str.c
 +++ b/Str.c
@@ -469,7 +469,7 @@ Subject: [PATCH 172/172] const
  {
      if (!*ch1 || !*ch2)
  	return 1;
-@@ -2718,7 +2718,7 @@ append_tags(struct readbuffer *obuf)
+@@ -2715,7 +2715,7 @@ append_tags(struct readbuffer *obuf)
  }
  
  static void
@@ -478,7 +478,7 @@ Subject: [PATCH 172/172] const
  {
      obuf->tag_stack[obuf->tag_sp] = New(struct cmdtable);
      obuf->tag_stack[obuf->tag_sp]->cmdname = allocStr(cmdname, -1);
-@@ -2730,7 +2730,7 @@ push_tag(struct readbuffer *obuf, char *
+@@ -2727,7 +2727,7 @@ push_tag(struct readbuffer *obuf, char *
  
  static void
  push_nchars(struct readbuffer *obuf, int width,
@@ -487,7 +487,7 @@ Subject: [PATCH 172/172] const
  {
      append_tags(obuf);
      Strcat_charp_n(obuf->line, str, len);
-@@ -2749,7 +2749,7 @@ push_nchars(obuf, width, str, strlen(str
+@@ -2746,7 +2746,7 @@ push_nchars(obuf, width, str, strlen(str
  push_nchars(obuf, width, str->ptr, str->length, mode)
  
  static void
@@ -496,7 +496,7 @@ Subject: [PATCH 172/172] const
  {
      int tlen, len = obuf->line->length;
  
-@@ -2759,12 +2759,12 @@ check_breakpoint(struct readbuffer *obuf
+@@ -2756,12 +2756,12 @@ check_breakpoint(struct readbuffer *obuf
      tlen = obuf->line->length - len;
      if (tlen > 0
  	|| is_boundary((unsigned char *)obuf->prevchar->ptr,
@@ -511,7 +511,7 @@ Subject: [PATCH 172/172] const
  {
      check_breakpoint(obuf, pre_mode, &ch);
      Strcat_char(obuf->line, ch);
-@@ -3179,7 +3179,7 @@ flushline(struct html_feed_environ *h_en
+@@ -3135,7 +3135,7 @@ flushline(struct html_feed_environ *h_en
  	    Strcat_charp(tmp, html_quote(obuf->anchor.title));
  	}
  	if (obuf->anchor.accesskey) {
@@ -520,7 +520,7 @@ Subject: [PATCH 172/172] const
  	    Strcat_charp(tmp, "\" ACCESSKEY=\"");
  	    if (c)
  		Strcat_charp(tmp, c);
-@@ -3736,7 +3736,7 @@ process_img(struct parsed_tag *tag, int
+@@ -3692,7 +3692,7 @@ process_img(struct parsed_tag *tag, int
  }
  
  Str
@@ -529,7 +529,7 @@ Subject: [PATCH 172/172] const
  {
      if (parsedtag_need_reconstruct(tag)) {
  	parsedtag_set_value(tag, ATTR_HSEQ, Sprintf("%d", cur_hseq++)->ptr);
-@@ -4564,10 +4564,10 @@ ul_type(struct parsed_tag *tag, int defa
+@@ -4520,10 +4520,10 @@ ul_type(struct parsed_tag *tag, int defa
  }
  
  int
@@ -542,7 +542,7 @@ Subject: [PATCH 172/172] const
      Str s_tmp = NULL;
  
      if (q == NULL || refresh_uri == NULL)
-@@ -6796,7 +6796,7 @@ HTMLlineproc0(char *line, struct html_fe
+@@ -6754,7 +6754,7 @@ HTMLlineproc0(char *line, struct html_fe
  		    str++;
  		}
  		else if (obuf->flag & RB_PLAIN) {
@@ -551,7 +551,7 @@ Subject: [PATCH 172/172] const
  		    if (p) {
  			push_charp(obuf, 1, p, PC_ASCII);
  			str++;
-@@ -7056,7 +7056,7 @@ loadHTMLBuffer(URLFile *f, Buffer *newBu
+@@ -7001,7 +7001,7 @@ loadHTMLBuffer(URLFile *f, Buffer *newBu
      return newBuf;
  }
  
@@ -560,7 +560,7 @@ Subject: [PATCH 172/172] const
      "Pb", "Eb", "Zb", "Bb", "Yb", NULL
  };
  
-@@ -7065,7 +7065,7 @@ convert_size(clen_t size, int usefloat)
+@@ -7010,7 +7010,7 @@ convert_size(clen_t size, int usefloat)
  {
      float csize;
      int sizepos = 0;
@@ -569,7 +569,7 @@ Subject: [PATCH 172/172] const
  
      csize = (float)size;
      while (csize >= 999.495 && sizes[sizepos + 1]) {
-@@ -7079,7 +7079,7 @@ convert_size(clen_t size, int usefloat)
+@@ -7024,7 +7024,7 @@ convert_size(clen_t size, int usefloat)
  char *
  convert_size2(clen_t size1, clen_t size2, int usefloat)
  {
@@ -578,7 +578,7 @@ Subject: [PATCH 172/172] const
      float csize, factor = 1;
      int sizepos = 0;
  
-@@ -8103,7 +8103,7 @@ saveBufferBody(Buffer *buf, FILE * f, in
+@@ -8048,7 +8048,7 @@ saveBufferBody(Buffer *buf, FILE * f, in
  }
  
  static Buffer *
@@ -587,7 +587,7 @@ Subject: [PATCH 172/172] const
  	   Buffer *(*loadproc) (URLFile *, Buffer *), Buffer *defaultbuf)
  {
      FILE *f;
-@@ -8385,7 +8385,7 @@ getNextPage(Buffer *buf, int plen)
+@@ -8330,7 +8330,7 @@ getNextPage(Buffer *buf, int plen)
  }
  
  int
@@ -596,7 +596,7 @@ Subject: [PATCH 172/172] const
  {
      FILE *ff;
      clen_t linelen = 0, trbyte = 0;
-@@ -8453,7 +8453,7 @@ save2tmp(URLFile uf, char *tmpf)
+@@ -8398,7 +8398,7 @@ save2tmp(URLFile uf, char *tmpf)
  }
  
  Buffer *
@@ -605,7 +605,7 @@ Subject: [PATCH 172/172] const
  {
      Str tmpf, command;
      struct mailcap *mcap;
-@@ -8557,7 +8557,7 @@ doExternal(URLFile uf, char *type, Buffe
+@@ -8502,7 +8502,7 @@ doExternal(URLFile uf, char *type, Buffe
  }
  
  static int
@@ -614,7 +614,7 @@ Subject: [PATCH 172/172] const
  {
      InputStream f1;
      FILE *f2;
-@@ -8720,7 +8720,7 @@ doFileMove(char *tmpf, char *defstr)
+@@ -8665,7 +8665,7 @@ doFileMove(char *tmpf, char *defstr)
  }
  
  int
@@ -623,7 +623,7 @@ Subject: [PATCH 172/172] const
  {
  #ifndef __MINGW32_VERSION
      Str msg;
-@@ -8815,7 +8815,7 @@ doFileSave(URLFile uf, char *defstr)
+@@ -8760,7 +8760,7 @@ doFileSave(URLFile uf, char *defstr)
  }
  
  int
@@ -632,7 +632,7 @@ Subject: [PATCH 172/172] const
  {
      struct stat st1, st2;
  
-@@ -8828,7 +8828,7 @@ checkCopyFile(char *path1, char *path2)
+@@ -8773,7 +8773,7 @@ checkCopyFile(char *path1, char *path2)
  }
  
  int
@@ -641,7 +641,7 @@ Subject: [PATCH 172/172] const
  {
      struct stat st1, st2;
      int des = ISfileno(stream);
-@@ -8844,7 +8844,7 @@ checkSaveFile(InputStream stream, char *
+@@ -8789,7 +8789,7 @@ checkSaveFile(InputStream stream, char *
  }
  
  int
@@ -650,7 +650,7 @@ Subject: [PATCH 172/172] const
  {
      struct stat st;
      char *ans;
-@@ -8860,7 +8860,7 @@ checkOverWrite(char *path)
+@@ -8805,7 +8805,7 @@ checkOverWrite(char *path)
  }
  
  char *
@@ -659,7 +659,7 @@ Subject: [PATCH 172/172] const
  {
      char *ans;
  
-@@ -8977,7 +8977,7 @@ uncompress_stream(URLFile *uf, char **sr
+@@ -8922,7 +8922,7 @@ uncompress_stream(URLFile *uf, char **sr
  
  
  static FILE *
@@ -668,7 +668,7 @@ Subject: [PATCH 172/172] const
  {
      char *lessopen;
      FILE *fp;
-@@ -9026,7 +9026,7 @@ lessopen_stream(char *path)
+@@ -8971,7 +8971,7 @@ lessopen_stream(char *path)
  }
  
  static char *
@@ -679,7 +679,7 @@ Subject: [PATCH 172/172] const
  
 --- a/fm.h
 +++ b/fm.h
-@@ -995,7 +995,7 @@ global int image_map_list init(TRUE);
+@@ -992,7 +992,7 @@ global int image_map_list init(TRUE);
  global int displayImage init(FALSE);	/* XXX: emacs-w3m use display_image=off */
  #endif
  global int pseudoInlines init(TRUE);
@@ -688,7 +688,7 @@ Subject: [PATCH 172/172] const
  #ifdef USE_W3MMAILER
  global char *Mailer init(NULL);
  #else
-@@ -1039,10 +1039,10 @@ global int WrapSearch init(FALSE);
+@@ -1036,10 +1036,10 @@ global int WrapSearch init(FALSE);
  global int squeezeBlankLine init(FALSE);
  global char *BookmarkFile init(NULL);
  global int UseExternalDirBuffer init(TRUE);
@@ -701,7 +701,7 @@ Subject: [PATCH 172/172] const
  #endif				/* USE_DICT */
  global int ignore_null_img_alt init(TRUE);
  #define DISPLAY_INS_DEL_SIMPLE	0
-@@ -1230,10 +1230,10 @@ global int use_lessopen init(FALSE);
+@@ -1227,10 +1227,10 @@ global int use_lessopen init(FALSE);
  global char *keymap_file init(KEYMAP_FILE);
  
  #ifdef USE_M17N
@@ -729,7 +729,15 @@ Subject: [PATCH 172/172] const
      fprintf(f,
 --- a/func.c
 +++ b/func.c
-@@ -210,9 +210,9 @@ getKeyData(int key)
+@@ -19,7 +19,6 @@ static Hash_iv *keyData = NULL;
+ static char keymap_initialized = FALSE;
+ static struct stat sys_current_keymap_file;
+ static struct stat current_keymap_file;
+-extern int str_to_bool(char *value, int old);
+ 
+ void
+ setKeymap(char *p, int lineno, int verbose)
+@@ -211,9 +210,9 @@ getKeyData(int key)
  }
  
  static int
@@ -741,7 +749,7 @@ Subject: [PATCH 172/172] const
      int c, esc = 0, ctrl = 0;
  
      if (s == NULL || *s == '\0')
-@@ -346,7 +346,7 @@ getKey2(char **str)
+@@ -347,7 +346,7 @@ getKey2(char **str)
  }
  
  int
@@ -801,7 +809,7 @@ Subject: [PATCH 172/172] const
  Hash_##sym * \
 --- a/history.c
 +++ b/history.c
-@@ -154,7 +154,7 @@ copyHist(Hist *hist)
+@@ -152,7 +152,7 @@ copyHist(Hist *hist)
  }
  
  HistItem *
@@ -810,7 +818,7 @@ Subject: [PATCH 172/172] const
  {
      HistItem *item;
  
-@@ -173,7 +173,7 @@ unshiftHist(Hist *hist, char *ptr)
+@@ -171,7 +171,7 @@ unshiftHist(Hist *hist, char *ptr)
  }
  
  HistItem *
@@ -819,7 +827,7 @@ Subject: [PATCH 172/172] const
  {
      HistItem *item;
  
-@@ -194,7 +194,7 @@ pushHist(Hist *hist, char *ptr)
+@@ -192,7 +192,7 @@ pushHist(Hist *hist, char *ptr)
  /* Don't mix pushHashHist() and pushHist()/unshiftHist(). */
  
  HistItem *
@@ -828,7 +836,7 @@ Subject: [PATCH 172/172] const
  {
      HistItem *item;
  
-@@ -219,7 +219,7 @@ pushHashHist(Hist *hist, char *ptr)
+@@ -217,7 +217,7 @@ pushHashHist(Hist *hist, char *ptr)
  }
  
  HistItem *
@@ -1824,7 +1832,7 @@ Subject: [PATCH 172/172] const
      const char *p = NULL, *p1, *p2;
 --- a/proto.h
 +++ b/proto.h
-@@ -182,8 +182,8 @@ extern char *url_decode0(const char *url
+@@ -183,8 +183,8 @@ extern char *url_decode0(const char *url
  #endif /* !defined(USE_M17N) */
  extern void examineFile(char *path, URLFile *uf);
  extern char *acceptableEncoding(void);
@@ -1835,7 +1843,7 @@ Subject: [PATCH 172/172] const
  #ifdef USE_M17N
  extern char **get_symbol(wc_ces charset, int *width);
  extern char **set_symbol(int width);
-@@ -200,7 +200,7 @@ extern void update_utf8_symbol(void);
+@@ -201,7 +201,7 @@ extern void update_utf8_symbol(void);
  #endif
  extern Buffer *loadGeneralFile(char *path, ParsedURL *current, char *referer,
  			       int flag, FormList *request);
@@ -1844,7 +1852,7 @@ Subject: [PATCH 172/172] const
  extern void push_render_image(Str str, int width, int limit,
  			      struct html_feed_environ *h_env);
  extern void flushline(struct html_feed_environ *h_env, struct readbuffer *obuf,
-@@ -220,7 +220,7 @@ extern ImageCache *getImage(Image * imag
+@@ -221,7 +221,7 @@ extern ImageCache *getImage(Image * imag
  extern int getImageSize(ImageCache * cache);
  #endif
  extern Str process_img(struct parsed_tag *tag, int width);
@@ -1853,7 +1861,7 @@ Subject: [PATCH 172/172] const
  extern Str process_input(struct parsed_tag *tag);
  extern Str process_button(struct parsed_tag *tag);
  extern Str process_n_button(void);
-@@ -233,7 +233,7 @@ extern Str process_n_textarea(void);
+@@ -234,7 +234,7 @@ extern Str process_n_textarea(void);
  extern void feed_textarea(char *str);
  extern Str process_form(struct parsed_tag *tag);
  extern Str process_n_form(void);
@@ -1862,7 +1870,7 @@ Subject: [PATCH 172/172] const
  extern int HTMLtagproc1(struct parsed_tag *tag,
  			struct html_feed_environ *h_env);
  extern void HTMLlineproc2(Buffer *buf, TextLineList *tl);
-@@ -273,19 +273,19 @@ extern Buffer *getpipe(char *cmd);
+@@ -274,19 +274,19 @@ extern Buffer *getpipe(char *cmd);
  extern Buffer *openPagerBuffer(InputStream stream, Buffer *buf);
  extern Buffer *openGeneralPagerBuffer(InputStream stream);
  extern Line *getNextPage(Buffer *buf, int plen);
@@ -1891,7 +1899,7 @@ Subject: [PATCH 172/172] const
  extern TabBuffer *newTab(void);
  extern void calcTabPos(void);
  extern TabBuffer *deleteTab(TabBuffer * tab);
-@@ -315,10 +315,10 @@ extern void addChar(char c, Lineprop mod
+@@ -316,10 +316,10 @@ extern void addChar(char c, Lineprop mod
  #ifdef USE_M17N
  extern void addMChar(char *c, Lineprop mode, size_t len);
  #endif
@@ -1904,7 +1912,7 @@ Subject: [PATCH 172/172] const
  extern void disp_message_nsec(const char *s, int redraw_current, int sec,
  			      int purge, int mouse);
  extern void disp_message(const char *s, int redraw_current);
-@@ -327,7 +327,7 @@ extern void disp_message_nomouse(char *s
+@@ -328,7 +328,7 @@ extern void disp_message_nomouse(char *s
  #else
  #define disp_message_nomouse disp_message
  #endif
@@ -1913,7 +1921,7 @@ Subject: [PATCH 172/172] const
  extern void cursorUp0(Buffer *buf, int n);
  extern void cursorUp(Buffer *buf, int n);
  extern void cursorDown0(Buffer *buf, int n);
-@@ -344,13 +344,13 @@ extern int columnPos(Line *line, int col
+@@ -345,13 +345,13 @@ extern int columnPos(Line *line, int col
  extern int columnLen(Line *line, int column);
  extern Line *lineSkip(Buffer *buf, Line *line, int offset, int last);
  extern Line *currentLineSkip(Buffer *buf, Line *line, int offset, int last);
@@ -1931,7 +1939,7 @@ Subject: [PATCH 172/172] const
  extern int next_status(char c, int *status);
  extern int read_token(Str buf, char **instr, int *status, int pre, int append);
  extern Str correct_irrtag(int status);
-@@ -379,7 +379,7 @@ extern Buffer *historyBuffer(Hist *hist)
+@@ -380,7 +380,7 @@ extern Buffer *historyBuffer(Hist *hist)
  #endif				/* not USE_HISTORY */
  extern struct table *newTable(void);
  extern void pushdata(struct table *t, int row, int col, char *data);
@@ -1940,7 +1948,7 @@ Subject: [PATCH 172/172] const
  extern void align(TextLine *lbuf, int width, int mode);
  extern void print_item(struct table *t, int row, int col, int width, Str buf);
  extern void print_sep(struct table *t, int row, int type, int maxcol, Str buf);
-@@ -484,13 +484,13 @@ extern void clrtoeolx(void);
+@@ -485,13 +485,13 @@ extern void clrtoeolx(void);
  extern void clrtobotx(void);
  extern void addstr(const char *s);
  extern void addnstr(const char *s, int n);
@@ -1956,7 +1964,7 @@ Subject: [PATCH 172/172] const
  extern void toggle_stand(void);
  extern void bell(void);
  extern int sleep_till_anykey(int sec, int purge);
-@@ -515,14 +515,14 @@ extern URLFile openURL(char *url, Parsed
+@@ -516,14 +516,14 @@ extern URLFile openURL(char *url, Parsed
  		       URLOption *option, FormList *request,
  		       TextList *extra_header, URLFile *ouf,
  		       HRequest *hr, unsigned char *status);
@@ -1976,7 +1984,7 @@ Subject: [PATCH 172/172] const
  extern TextList *make_domain_list(char *domain_list);
  extern int check_no_proxy(char *domain);
  extern InputStream openFTPStream(ParsedURL *pu, URLFile *uf);
-@@ -604,14 +604,14 @@ extern Buffer *load_option_panel(void);
+@@ -605,14 +605,14 @@ extern Buffer *load_option_panel(void);
  extern void panel_set_option(struct parsed_tagarg *);
  extern void sync_with_option(void);
  extern char *rcFile(char *base);
@@ -1995,7 +2003,7 @@ Subject: [PATCH 172/172] const
  extern FILE *localcgi_post(char *, char *, FormList *, char *);
  #define localcgi_get(u, q, r) localcgi_post((u), (q), NULL, (r))
  extern FILE *openSecretFile(char *fname);
-@@ -629,8 +629,8 @@ extern Str romanAlphabet(int n);
+@@ -630,8 +630,8 @@ extern Str romanAlphabet(int n);
  extern void setup_child(int child, int i, int f);
  extern void myExec(char *command);
  extern int mySystem(char *command, int background);
@@ -2006,7 +2014,7 @@ Subject: [PATCH 172/172] const
  extern int is_localhost(const char *host);
  extern char *file_to_url(char *file);
  #ifdef USE_M17N
-@@ -640,7 +640,7 @@ extern char *url_unquote_conv0(const cha
+@@ -641,7 +641,7 @@ extern char *url_unquote_conv0(const cha
  #define url_unquote_conv(url, charset) url_unquote_conv0(url)
  #endif
  extern char *expandName(char *name);
@@ -2015,7 +2023,7 @@ Subject: [PATCH 172/172] const
  extern time_t mymktime(char *timestr);
  extern void (*mySignal(int signal_number, void (*action) (int))) (int);
  #ifdef USE_COOKIE
-@@ -718,7 +718,7 @@ extern char *searchKeyData(void);
+@@ -719,7 +719,7 @@ extern char *searchKeyData(void);
  extern void setKeymap(char *p, int lineno, int verbose);
  extern void initKeymap(int force);
  extern int getFuncList(char *id);

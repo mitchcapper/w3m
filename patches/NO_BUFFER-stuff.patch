@@ -1,0 +1,152 @@
+Check for NO_BUFFER not needed, can't get it at this stage. do_download is only
+set way later.
+---
+ main.c |   96 ++++++++++++++++++++++++++++++++++-------------------------------
+ 1 file changed, 51 insertions(+), 45 deletions(-)
+
+--- a/main.c
++++ b/main.c
+@@ -973,24 +973,23 @@ main(int argc, char **argv)
+ 	    newbuf = loadHTMLString(s_page);
+ 	    if (newbuf == NULL)
+ 		Strcat_charp(err_msg, "w3m: Can't load string.\n");
+-	    else if (newbuf != NO_BUFFER)
++	    else
+ 		newbuf->bufferprop |= (BP_INTERNAL | BP_NO_URL);
+ 	}
+-	/*
+ 	else if ((p = getenv("HTTP_HOME")) != NULL ||
+ 		 (p = getenv("WWW_HOME")) != NULL) {
+ 	    newbuf = loadGeneralFile(p, NULL, NO_REFERER, 0, NULL);
+ 	    if (newbuf == NULL)
+ 		Strcat(err_msg, Sprintf("w3m: Can't load %s.\n", p));
+-	    else if (newbuf != NO_BUFFER)
++	    else
+ 		pushHashHist(URLHist, parsedURL2Str(&newbuf->currentURL)->ptr);
+ 	}
+-	*/
+ 	else {
+ 	    if (fmInitialized)
+ 		fmTerm();
+ 	    usage();
+ 	}
++
+ 	if (newbuf == NULL) {
+ 	    if (fmInitialized)
+ 		fmTerm();
+@@ -998,13 +997,21 @@ main(int argc, char **argv)
+ 		fprintf(stderr, "%s", err_msg->ptr);
+ 	    w3m_exit(2);
+ 	}
+-	i = -1;
++
++	FirstTab = LastTab = CurrentTab = newTab();
++	if (!FirstTab) {
++	    fprintf(stderr, "%s\n","Can't allocated memory");
++	    exit(1);
++	}
++	nTab = 1;
++	Firstbuf = Currentbuf = newbuf;
++
++	if (w3m_dump)
++	    do_dump(Currentbuf);
+     }
++
+     else {
+-	i = 0;
+-    }
+-    for (; i < load_argc; i++) {
+-	if (i >= 0) {
++	for (; i < load_argc; i++) {
+ 	    SearchHeader = search_header;
+ 	    DefaultType = default_type;
+ 	    char *url;
+@@ -1060,8 +1067,6 @@ main(int argc, char **argv)
+ 		       Sprintf("w3m: Can't load %s.\n", load_argv[i]));
+ 		continue;
+ 	    }
+-	    else if (newbuf == NO_BUFFER)
+-		continue;
+ 	    switch (newbuf->real_scheme) {
+ 	    case SCM_MAILTO:
+ 		break;
+@@ -1072,44 +1077,45 @@ main(int argc, char **argv)
+ 		pushHashHist(URLHist, parsedURL2Str(&newbuf->currentURL)->ptr);
+ 		break;
+ 	    }
+-	}
+-	else if (newbuf == NO_BUFFER)
+-	    continue;
+-	if (newbuf->pagerSource ||
+-	    (newbuf->real_scheme == SCM_LOCAL && newbuf->header_source &&
+-	     newbuf->currentURL.file && strcmp(newbuf->currentURL.file, "-")))
+-	    newbuf->search_header = search_header;
+-	if (CurrentTab == NULL) {
+-	    FirstTab = LastTab = CurrentTab = newTab();
+-	    if (!FirstTab) {
+-		fprintf(stderr, "%s\n","Can't allocated memory");
+-		exit(1);
+-	    }
+-	    nTab = 1;
+-	    Firstbuf = Currentbuf = newbuf;
+-	}
+-	else if (open_new_tab) {
+-	    _newT();
+-	    Currentbuf->nextBuffer = newbuf;
+-	    delBuffer(Currentbuf);
+-	}
+-	else {
+-	    Currentbuf->nextBuffer = newbuf;
+-	    Currentbuf = newbuf;
+-	}
+-	if (!w3m_dump || w3m_dump == DUMP_BUFFER) {
+-	    if (Currentbuf->frameset != NULL && RenderFrame)
+-		rFrame();
+-	}
+-	if (w3m_dump)
+-	    do_dump(Currentbuf);
+-	else {
+-	    Currentbuf = newbuf;
++
++	    /* Post-processing new buffer ? */
++	    if (newbuf->pagerSource ||
++		(newbuf->real_scheme == SCM_LOCAL && newbuf->header_source &&
++		 newbuf->currentURL.file && strcmp(newbuf->currentURL.file, "-")))
++		newbuf->search_header = search_header;
++	    if (CurrentTab == NULL) {
++		FirstTab = LastTab = CurrentTab = newTab();
++		if (!FirstTab) {
++		    fprintf(stderr, "%s\n","Can't allocated memory");
++		    exit(1);
++		}
++		nTab = 1;
++		Firstbuf = Currentbuf = newbuf;
++	    }
++	    else if (open_new_tab) {
++		_newT();
++		Currentbuf->nextBuffer = newbuf;
++		delBuffer(Currentbuf);
++	    }
++	    else {
++		Currentbuf->nextBuffer = newbuf;
++		Currentbuf = newbuf;
++	    }
++	    if (!w3m_dump || w3m_dump == DUMP_BUFFER) {
++		if (Currentbuf->frameset != NULL && RenderFrame)
++		    rFrame();
++	    }
++	    if (w3m_dump)
++		do_dump(Currentbuf);
++	    else {
++		Currentbuf = newbuf;
+ #ifdef USE_BUFINFO
+-	    saveBufferInfo();
++		saveBufferInfo();
+ #endif
++	    }
+ 	}
+     }
++
+     if (w3m_dump) {
+ 	if (err_msg->length)
+ 	    fprintf(stderr, "%s", err_msg->ptr);

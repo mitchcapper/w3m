@@ -10,7 +10,7 @@ Subject: [PATCH 160/172] Add more const to terms
 
 --- a/proto.h
 +++ b/proto.h
-@@ -457,7 +457,7 @@ extern pid_t open_pipe_rw(FILE ** fr, FI
+@@ -458,7 +458,7 @@ extern pid_t open_pipe_rw(FILE ** fr, FI
  extern int initscr(void);
  extern void move(int line, int column);
  #ifdef USE_M17N
@@ -19,7 +19,7 @@ Subject: [PATCH 160/172] Add more const to terms
  #endif
  extern void addch(char c);
  extern void standout(void);
-@@ -482,8 +482,8 @@ extern void rscroll(int);
+@@ -483,8 +483,8 @@ extern void rscroll(int);
  #endif
  extern void clrtoeolx(void);
  extern void clrtobotx(void);

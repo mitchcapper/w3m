@@ -1,18 +1,43 @@
-We either have a false positive from GCC 10 here or the comment is a lie.
+From 27c77e15a4c00abb7b9c90d220bea960295e4333 Mon Sep 17 00:00:00 2001
+From: Rene Kita <mail@rkta.de>
+Date: Fri, 25 Nov 2022 07:13:04 +0100
+Subject: [PATCH 123/172] Fix potential null dereference
 
-Needs -Wnull-derefence and -O3.
 ---
- rc.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ news.c         |    6 +++++-
+ w3mimg/fb/fb.c |    2 +-
+ 2 files changed, 6 insertions(+), 2 deletions(-)
 
---- a/rc.c
-+++ b/rc.c
-@@ -1511,7 +1511,7 @@ to_str(struct param_ptr *p)
- 	return Sprintf("%g", *(double *)p->varptr);
-     }
-     /* not reached */
--    return NULL;
-+    return Strnew();
- }
+--- a/w3mimg/fb/fb.c
++++ b/w3mimg/fb/fb.c
+@@ -449,7 +449,7 @@ fb_frame_free(FB_IMAGE ** frame)
+ {
+     int i, n;
  
- Buffer *
+-    if (frame == NULL)
++    if (frame == NULL || frame[0] == NULL)
+ 	return;
+ 
+     n = frame[0]->num;
+--- a/news.c
++++ b/news.c
+@@ -115,7 +115,8 @@ name_from_address(char *str, int n)
+     char *s, *p;
+     int l, space = TRUE;
+ 
+-    s = allocStr(str, -1);
++    if (!(s = allocStr(str, -1)))
++	return NULL;
+     SKIP_BLANKS(s);
+     if (*s == '<' && (p = strchr(s, '>'))) {
+ 	*p++ = '\0';
+@@ -160,6 +161,9 @@ html_quote_s(char *str)
+     char *p, *q;
+     int space = TRUE;
+ 
++    if (!str)
++	return NULL;
++
+     for (p = str; *p; p++) {
+ 	if (IS_SPACE(*p)) {
+ 	    if (space)

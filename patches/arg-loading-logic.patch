@@ -1,0 +1,152 @@
+---
+ main.c |  130 ++++++++++++++++++++++++++++++++---------------------------------
+ 1 file changed, 64 insertions(+), 66 deletions(-)
+
+--- a/main.c
++++ b/main.c
+@@ -1057,81 +1057,79 @@ main(int argc, char **argv)
+ 		fprintf(stderr, "%s", err_msg->ptr);
+ 	    w3m_exit(2);
+ 	}
+-	i = -1;
+-    }
+-    else {
+-	i = 0;
++	if (newbuf != NO_BUFFER) {
++	    i = 0;
++	    goto setup_buf;
++	}
+     }
+-    for (; i < load_argc; i++) {
+-	if (i >= 0) {
+-	    SearchHeader = search_header;
+-	    DefaultType = default_type;
+-	    char *url;
+-	    int retry = 0;
+ 
+-	    url = load_argv[i];
+-	    if (getURLScheme(&url) == SCM_MISSING && !ArgvIsURL)
+-	  retry_as_local_file:
+-		url = file_to_url(load_argv[i]);
+-	    else
+-		url = url_encode(conv_from_system(load_argv[i]), NULL, 0);
+-	    if (w3m_dump == DUMP_HEAD) {
+-		request = New(FormList);
+-		request->method = FORM_METHOD_HEAD;
+-		newbuf = loadGeneralFile(url, NULL, NO_REFERER, 0, request);
+-	    }
+-	    else {
+-		if (post_file && i == 0) {
+-		    FILE *fp;
+-		    Str body;
+-		    if (!strcmp(post_file, "-"))
+-			fp = stdin;
+-		    else
+-			fp = fopen(post_file, "r");
+-		    if (fp == NULL) {
+-			Strcat(err_msg,
+-			       Sprintf(_("w3m: Can't open %s.\n"), post_file));
+-			continue;
+-		    }
+-		    body = Strfgetall(fp);
+-		    if (fp != stdin)
+-			fclose(fp);
+-		    request =
+-			newFormList(NULL, "post", NULL, NULL, NULL, NULL,
+-				    NULL);
+-		    request->body = body->ptr;
+-		    request->boundary = NULL;
+-		    request->length = body->length;
+-		}
+-		else {
+-		    request = NULL;
++    for (i = 0; i < load_argc; i++) {
++	SearchHeader = search_header;
++	DefaultType = default_type;
++	char *url;
++	int retry = 0;
++
++	url = load_argv[i];
++	if (getURLScheme(&url) == SCM_MISSING && !ArgvIsURL)
++      retry_as_local_file:
++	    url = file_to_url(load_argv[i]);
++	else
++	    url = url_encode(conv_from_system(load_argv[i]), NULL, 0);
++	if (w3m_dump == DUMP_HEAD) {
++	    request = New(FormList);
++	    request->method = FORM_METHOD_HEAD;
++	    newbuf = loadGeneralFile(url, NULL, NO_REFERER, 0, request);
++	}
++	else {
++	    if (post_file && i == 0) {
++		FILE *fp;
++		Str body;
++		if (!strcmp(post_file, "-"))
++		    fp = stdin;
++		else
++		    fp = fopen(post_file, "r");
++		if (fp == NULL) {
++		    Strcat(err_msg,
++			   Sprintf(_("w3m: Can't open %s.\n"), post_file));
++		    continue;
+ 		}
+-		newbuf = loadGeneralFile(url, NULL, NO_REFERER, 0, request);
++		body = Strfgetall(fp);
++		if (fp != stdin)
++		    fclose(fp);
++		request =
++		    newFormList(NULL, "post", NULL, NULL, NULL, NULL,
++				NULL);
++		request->body = body->ptr;
++		request->boundary = NULL;
++		request->length = body->length;
+ 	    }
+-	    if (newbuf == NULL) {
+-		if (ArgvIsURL && !retry) {
+-		    retry = 1;
+-		    goto retry_as_local_file;
+-		}
+-		Strcat(err_msg,
+-		       Sprintf(_("w3m: Can't load %s.\n"), load_argv[i]));
+-		continue;
++	    else {
++		request = NULL;
+ 	    }
+-	    else if (newbuf == NO_BUFFER)
+-		continue;
+-	    switch (newbuf->real_scheme) {
+-	    case SCM_MAILTO:
+-		break;
+-	    case SCM_LOCAL:
+-	    case SCM_LOCAL_CGI:
+-		unshiftHist(LoadHist, url);
+-	    default:
+-		pushHashHist(URLHist, parsedURL2Str(&newbuf->currentURL)->ptr);
+-		break;
++	    newbuf = loadGeneralFile(url, NULL, NO_REFERER, 0, request);
++	}
++	if (newbuf == NULL) {
++	    if (ArgvIsURL && !retry) {
++		retry = 1;
++		goto retry_as_local_file;
+ 	    }
++	    Strcat(err_msg,
++		   Sprintf(_("w3m: Can't load %s.\n"), load_argv[i]));
++	    continue;
+ 	}
+ 	else if (newbuf == NO_BUFFER)
+ 	    continue;
++	switch (newbuf->real_scheme) {
++	case SCM_MAILTO:
++	    break;
++	case SCM_LOCAL:
++	case SCM_LOCAL_CGI:
++	    unshiftHist(LoadHist, url);
++	default:
++	    pushHashHist(URLHist, parsedURL2Str(&newbuf->currentURL)->ptr);
++	    break;
++	}
++setup_buf:
+ 	if (newbuf->pagerSource ||
+ 	    (newbuf->real_scheme == SCM_LOCAL && newbuf->header_source &&
+ 	     newbuf->currentURL.file && strcmp(newbuf->currentURL.file, "-")))

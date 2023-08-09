@@ -1,0 +1,353 @@
+From d304191597644cb916e2f0bd71a77151ee535f72 Mon Sep 17 00:00:00 2001
+From: Rene Kita <mail@rkta.de>
+Date: Thu, 23 Dec 2021 21:37:08 +0100
+Subject: [PATCH 018/172] Remove unused function
+
+---
+ buffer.c   |   19 -------------------
+ display.c  |    8 --------
+ indep.c    |   34 ----------------------------------
+ indep.h    |    1 -
+ istream.c  |   29 -----------------------------
+ main.c     |   16 ----------------
+ menu.c     |    6 ------
+ mimehead.c |   21 ---------------------
+ parsetag.c |   10 ----------
+ parsetag.h |    1 -
+ proto.h    |    5 -----
+ terms.c    |   29 -----------------------------
+ 12 files changed, 179 deletions(-)
+
+--- a/display.c
++++ b/display.c
+@@ -1440,14 +1440,6 @@ cursorLeft(Buffer *buf, int n)
+     buf->cursorX = buf->visualpos - l->bwidth;
+ }
+ 
+-void
+-cursorHome(Buffer *buf)
+-{
+-    buf->visualpos = 0;
+-    buf->cursorX = buf->cursorY = 0;
+-}
+-
+-
+ /* 
+  * Arrange line,column and cursor position according to current line and
+  * current position.
+--- a/proto.h
++++ b/proto.h
+@@ -301,7 +301,6 @@ extern Buffer *newBuffer(int width);
+ extern Buffer *nullBuffer(void);
+ extern void clearBuffer(Buffer *buf);
+ extern void discardBuffer(Buffer *buf);
+-extern Buffer *namedBuffer(Buffer *first, char *name);
+ extern Buffer *deleteBuffer(Buffer *first, Buffer *delbuf);
+ extern Buffer *replaceBuffer(Buffer *first, Buffer *delbuf, Buffer *newbuf);
+ extern Buffer *nthBuffer(Buffer *firstbuf, int n);
+@@ -339,7 +338,6 @@ extern void cursorDown(Buffer *buf, int
+ extern void cursorUpDown(Buffer *buf, int n);
+ extern void cursorRight(Buffer *buf, int n);
+ extern void cursorLeft(Buffer *buf, int n);
+-extern void cursorHome(Buffer *buf);
+ extern void arrangeCursor(Buffer *buf);
+ extern void arrangeLine(Buffer *buf);
+ extern void cursorXY(Buffer *buf, int x, int y);
+@@ -492,14 +490,11 @@ extern void rscroll(int);
+ #endif
+ extern void clrtoeol(void);
+ extern void clrtoeolx(void);
+-extern void clrtobot(void);
+ extern void clrtobotx(void);
+ extern void addstr(char *s);
+ extern void addnstr(char *s, int n);
+ extern void addnstr_sup(char *s, int n);
+ extern void crmode(void);
+-extern void nocrmode(void);
+-extern void term_echo(void);
+ extern void term_noecho(void);
+ extern void term_raw(void);
+ extern void term_cooked(void);
+--- a/buffer.c
++++ b/buffer.c
+@@ -121,25 +121,6 @@ discardBuffer(Buffer *buf)
+ }
+ 
+ /* 
+- * namedBuffer: Select buffer which have specified name
+- */
+-Buffer *
+-namedBuffer(Buffer *first, char *name)
+-{
+-    Buffer *buf;
+-
+-    if (!strcmp(first->buffername, name)) {
+-	return first;
+-    }
+-    for (buf = first; buf->nextBuffer != NULL; buf = buf->nextBuffer) {
+-	if (!strcmp(buf->nextBuffer->buffername, name)) {
+-	    return buf->nextBuffer;
+-	}
+-    }
+-    return NULL;
+-}
+-
+-/* 
+  * deleteBuffer: delete buffer
+  */
+ Buffer *
+--- a/indep.c
++++ b/indep.c
+@@ -314,40 +314,6 @@ strcasestr(const char *s1, const char *s
+ }
+ #endif
+ 
+-static int
+-strcasematch(char *s1, char *s2)
+-{
+-    int x;
+-    while (*s1) {
+-	if (*s2 == '\0')
+-	    return 1;
+-	x = TOLOWER(*s1) - TOLOWER(*s2);
+-	if (x != 0)
+-	    break;
+-	s1++;
+-	s2++;
+-    }
+-    return (*s2 == '\0');
+-}
+-
+-/* search multiple strings */
+-int
+-strcasemstr(char *str, char *srch[], char **ret_ptr)
+-{
+-    int i;
+-    while (*str) {
+-	for (i = 0; srch[i]; i++) {
+-	    if (strcasematch(str, srch[i])) {
+-		if (ret_ptr)
+-		    *ret_ptr = str;
+-		return i;
+-	    }
+-	}
+-	str++;
+-    }
+-    return -1;
+-}
+-
+ int
+ strmatchlen(const char *s1, const char *s2, int maxlen)
+ {
+--- a/indep.h
++++ b/indep.h
+@@ -59,7 +59,6 @@ extern int strncasecmp(const char *s1, c
+ #ifndef HAVE_STRCASESTR
+ extern char *strcasestr(const char *s1, const char *s2);
+ #endif
+-extern int strcasemstr(char *str, char *srch[], char **ret_ptr);
+ int strmatchlen(const char *s1, const char *s2, int maxlen);
+ extern char *remove_space(char *str);
+ extern int non_null(char *s);
+--- a/terms.c
++++ b/terms.c
+@@ -2082,12 +2082,6 @@ clrtobot_eol(void (*clrtoeol) (void))
+ }
+ 
+ void
+-clrtobot(void)
+-{
+-    clrtobot_eol(clrtoeol);
+-}
+-
+-void
+ clrtobotx(void)
+ {
+     clrtobot_eol(clrtoeolx);
+@@ -2175,29 +2169,6 @@ crmode(void)
+ #endif				/* HAVE_SGTTY_H */
+ 
+ void
+-nocrmode(void)
+-#ifndef HAVE_SGTTY_H
+-{
+-    ttymode_set(ICANON, 0);
+-#ifdef HAVE_TERMIOS_H
+-    set_cc(VMIN, 4);
+-#else				/* not HAVE_TERMIOS_H */
+-    set_cc(VEOF, 4);
+-#endif				/* not HAVE_TERMIOS_H */
+-}
+-#else				/* HAVE_SGTTY_H */
+-{
+-    ttymode_reset(CBREAK, 0);
+-}
+-#endif				/* HAVE_SGTTY_H */
+-
+-void
+-term_echo(void)
+-{
+-    ttymode_set(ECHO, 0);
+-}
+-
+-void
+ term_noecho(void)
+ {
+     ttymode_reset(ECHO, 0);
+--- a/istream.c
++++ b/istream.c
+@@ -277,26 +277,6 @@ ISgets_to_growbuf(InputStream stream, st
+     return;
+ }
+ 
+-#ifdef unused
+-int
+-ISread(InputStream stream, Str buf, int count)
+-{
+-    int len;
+-
+-    if (count + 1 > buf->area_size) {
+-	char *newptr = GC_MALLOC_ATOMIC(count + 1);
+-	memcpy(newptr, buf->ptr, buf->length);
+-	newptr[buf->length] = '\0';
+-	buf->ptr = newptr;
+-	buf->area_size = count + 1;
+-    }
+-    len = ISread_n(stream, buf->ptr, count);
+-    buf->length = (len > 0) ? len : 0;
+-    buf->ptr[buf->length] = '\0';
+-    return (len > 0) ? 1 : 0;
+-}
+-#endif
+-
+ int
+ ISread_n(InputStream stream, unsigned char *dst, int count)
+ {
+@@ -341,15 +321,6 @@ ISfileno(InputStream stream)
+     }
+ }
+ 
+-int
+-ISeos(InputStream stream)
+-{
+-    BaseStream base = &stream->base;
+-    if (!base->iseos && MUST_BE_UPDATED(base))
+-	do_update(base);
+-    return base->iseos;
+-}
+-
+ #ifdef USE_SSL
+ TextList *known_hosts;
+ char *known_hosts_file;
+--- a/main.c
++++ b/main.c
+@@ -3214,15 +3214,6 @@ DEFUN(followA, GOTO_LINK, "Follow curren
+     displayBuffer(Currentbuf, B_NORMAL);
+ }
+ 
+-/* follow HREF link in the buffer */
+-void
+-bufferA(void)
+-{
+-    on_target = FALSE;
+-    followA();
+-    on_target = TRUE;
+-}
+-
+ /* view inline image */
+ DEFUN(followI, VIEW_IMAGE, "Display image in viewer")
+ {
+@@ -3470,13 +3461,6 @@ DEFUN(submitForm, SUBMIT, "Submit form")
+     _followForm(TRUE);
+ }
+ 
+-/* process form */
+-void
+-followForm(void)
+-{
+-    _followForm(FALSE);
+-}
+-
+ static void
+ _followForm(int submit)
+ {
+--- a/menu.c
++++ b/menu.c
+@@ -1329,12 +1329,6 @@ popupMenu(int x, int y, Menu *menu)
+     popup_menu(NULL, menu);
+ }
+ 
+-void
+-mainMenu(int x, int y)
+-{
+-    popupMenu(x, y, &MainMenu);
+-}
+-
+ DEFUN(mainMn, MAIN_MENU MENU, "Pop up menu")
+ {
+     Menu *menu = &MainMenu;
+--- a/mimehead.c
++++ b/mimehead.c
+@@ -122,16 +122,6 @@ last:
+     return;
+ }
+ 
+-Str
+-decodeU(char **ww)
+-{
+-    struct growbuf gb;
+-
+-    growbuf_init(&gb);
+-    decodeU_to_growbuf(&gb, ww);
+-    return growbuf_to_Str(&gb);
+-}
+-
+ void
+ decodeU_to_growbuf(struct growbuf *gb, char **ww)
+ {
+@@ -183,17 +173,6 @@ decodeQ(char **ww)
+     return a;
+ }
+ 
+-/* RFC2045 (6.7. Quoted-Printable Content-Transfer-Encoding) */
+-Str
+-decodeQP(char **ww)
+-{
+-    struct growbuf gb;
+-
+-    growbuf_init(&gb);
+-    decodeQP_to_growbuf(&gb, ww);
+-    return growbuf_to_Str(&gb);
+-}
+-
+ void
+ decodeQP_to_growbuf(struct growbuf *gb, char **ww)
+ {
+--- a/parsetag.c
++++ b/parsetag.c
+@@ -14,16 +14,6 @@ tag_get_value(struct parsed_tagarg *t, c
+     return NULL;
+ }
+ 
+-int
+-tag_exists(struct parsed_tagarg *t, char *arg)
+-{
+-    for (; t; t = t->next) {
+-	if (!strcasecmp(t->arg, arg))
+-	    return 1;
+-    }
+-    return 0;
+-}
+-
+ struct parsed_tagarg *
+ cgistr2tagarg(char *cgistr)
+ {
+--- a/parsetag.h
++++ b/parsetag.h
+@@ -8,6 +8,5 @@ struct parsed_tagarg {
+ };
+ 
+ extern char *tag_get_value(struct parsed_tagarg *t, char *arg);
+-extern int tag_exists(struct parsed_tagarg *t, char *arg);
+ extern struct parsed_tagarg *cgistr2tagarg(char *cgistr);
+ #endif				/* not PARSETAG_H */

@@ -1,11 +1,14 @@
 ---
- config.h.in |    1 
- doc/w3m.1   |   20 +++++++++++
- fm.h        |    2 +
- main.c      |  106 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++--
- proto.h     |    1 
- rc.c        |    4 ++
- 6 files changed, 132 insertions(+), 2 deletions(-)
+ config.h.in            |    1 
+ doc-de/README.func     |    1 
+ doc/README.func        |    1 
+ doc/w3m.1              |   20 +++++++++
+ fm.h                   |    2 
+ main.c                 |  106 ++++++++++++++++++++++++++++++++++++++++++++++++-
+ proto.h                |    1 
+ rc.c                   |    4 +
+ scripts/w3mhelp.cgi.in |    3 -
+ 9 files changed, 136 insertions(+), 3 deletions(-)
 
 --- a/config.h.in
 +++ b/config.h.in
@@ -264,3 +267,35 @@
  .SH EXAMPLES
  .SS Pager-like usage
  .TP
+--- a/doc-de/README.func
++++ b/doc-de/README.func
+@@ -133,6 +133,7 @@ SHIFT_LEFT	Anzeigebereich nach links ver
+ SHIFT_RIGHT	Anzeigebereich nach rechts versetzen
+ SOURCE		Wechsle zwischen HTML-Wiedergabe und -Verarbeitung
+ STOP_IMAGE	Bilder nicht mehr laden und anzeigen
++STRSESS		Speichere Session
+ SUBMIT		Formular übermitteln
+ SUSPEND 	w3m zum Hintergrundprozess machen
+ TAB_GOTO	Öffne das angegebene Dokument in einem neuen Reiter
+--- a/doc/README.func
++++ b/doc/README.func
+@@ -133,6 +133,7 @@ SHIFT_LEFT	Shift screen left
+ SHIFT_RIGHT	Shift screen right
+ SOURCE		Toggle between HTML shown or processed
+ STOP_IMAGE	Stop loading and drawing of images
++STRSESS		Store session
+ SUBMIT		Submit form
+ SUSPEND 	Suspend w3m to background
+ TAB_GOTO	Open specified document in a new tab
+--- a/scripts/w3mhelp.cgi.in
++++ b/scripts/w3mhelp.cgi.in
+@@ -172,7 +172,8 @@ print "<P><A HREF=\"$keymap\">$head</A>\
+ 	     split(" ", "_mark nextMk prevMk reMark"));
+ 
+ &show_keymap('Miscellaneous',
+-	     split(" ", "mainMn ldhelp ldOpt dispVer cooLst ldHist svHist ldDL
++	     split(" ", "mainMn ldhelp ldOpt dispVer cooLst ldHist svHist
++		strSession ldDL
+ 		docCSet defCSet
+ 		msgs msToggle wrapToggle execCmd setAlarm setOpt setEnv defKey
+ 		reinit execsh susp qquitfm quitfm"));

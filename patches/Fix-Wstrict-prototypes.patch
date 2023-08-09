@@ -59,7 +59,7 @@
  #if defined(USE_GPM) || defined(USE_SYSMOUSE)
 -extern int do_getch();
 +extern int do_getch(void);
- #define getch(void)	do_getch(void)
+ #define getch()	do_getch()
  #endif				/* defined(USE_GPM) || defined(USE_SYSMOUSE) */
  #endif
 @@ -1534,7 +1534,7 @@ static Str currentURL(void);

@@ -1,15 +1,15 @@
 ---
  etc.c            |    5 +++--
  file.c           |    4 ++--
- func.c           |    2 +-
+ func.c           |    1 +
  indep.c          |    2 +-
  w3mbookmark.c    |    1 -
  w3mhelperpanel.c |    1 -
- 6 files changed, 7 insertions(+), 8 deletions(-)
+ 6 files changed, 7 insertions(+), 7 deletions(-)
 
 --- a/file.c
 +++ b/file.c
-@@ -8117,7 +8117,7 @@ static Buffer *
+@@ -8050,7 +8050,7 @@ static Buffer *
  loadcmdout(char *cmd,
  	   Buffer *(*loadproc) (URLFile *, Buffer *), Buffer *defaultbuf)
  {
@@ -18,7 +18,7 @@
      Buffer *buf;
      URLFile uf;
  
-@@ -8155,7 +8155,7 @@ getshell(char *cmd)
+@@ -8088,7 +8088,7 @@ getshell(char *cmd)
  Buffer *
  getpipe(char *cmd)
  {
@@ -40,7 +40,7 @@
  {
 @@ -122,7 +124,6 @@ currentLineSkip(Buffer *buf, Line *line,
  int
- gethtmlcmd(char **s)
+ gethtmlcmd(char *s)
  {
 -    extern Hash_si tagtable;
      char cmdstr[MAX_CMD_LEN];
@@ -65,17 +65,9 @@
  
  void
  setKeymap(char *p, int lineno, int verbose)
-@@ -127,7 +128,6 @@ interpret_keymap(FILE * kf, struct stat
-     wc_ces charset = SystemCharset;
- #endif
-     int verbose = 1;
--    extern int str_to_bool(char *value, int old);
- 
-     if ((fd = fileno(kf)) < 0 || fstat(fd, &kstat) ||
- 	(!force &&
 --- a/indep.c
 +++ b/indep.c
-@@ -221,7 +221,7 @@ char *
+@@ -210,7 +210,7 @@ char *
  expandPath(char *name)
  {
      char *p;

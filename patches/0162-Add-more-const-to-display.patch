@@ -39,7 +39,7 @@ Subject: [PATCH 162/172] Add more const to display
  }
 --- a/proto.h
 +++ b/proto.h
-@@ -317,11 +317,11 @@ extern void addMChar(char *c, Lineprop m
+@@ -318,11 +318,11 @@ extern void addMChar(char *c, Lineprop m
  #endif
  extern void record_err_message(char *s);
  extern Buffer *message_list_panel(void);

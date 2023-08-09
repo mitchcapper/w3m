@@ -4,7 +4,7 @@
 
 --- a/Makefile.in
 +++ b/Makefile.in
-@@ -51,6 +51,7 @@ DEFAULTS += -Wnull-dereference
+@@ -50,6 +50,7 @@ DEFAULTS += -Wnull-dereference
  DEFAULTS += -Wold-style-declaration
  DEFAULTS += -Wold-style-definition
  DEFAULTS += -Wredundant-decls

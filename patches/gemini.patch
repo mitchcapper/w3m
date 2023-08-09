@@ -9,18 +9,21 @@ https://github.com/tats/w3m (commit c8223fed7cc631ad85d8e5665e509e7988bedbab)
 also to the releases w3m-0.5.3+git20210102, w3m-0.5.3-git20220429 and
 w3m-0.5.3+git20230121.
 ---
- buffer.c  |    9 +
- display.c |    3 
- file.c    |  292 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- html.h    |    1 
- istream.c |  141 +++++++++++++++++++++++------
- istream.h |    5 -
- main.c    |  150 +++++++++++++++++++++++++++++++
- proto.h   |    1 
- rc.c      |    5 +
- rc.h      |    2 
- url.c     |   35 +++++++
- 11 files changed, 607 insertions(+), 37 deletions(-)
+ buffer.c               |    9 +
+ display.c              |    3 
+ doc-de/README.func     |    1 
+ doc/README.func        |    1 
+ file.c                 |  292 ++++++++++++++++++++++++++++++++++++++++++++++++-
+ html.h                 |    1 
+ istream.c              |  141 ++++++++++++++++++-----
+ istream.h              |    5 
+ main.c                 |  150 +++++++++++++++++++++++++
+ proto.h                |    1 
+ rc.c                   |    5 
+ rc.h                   |    2 
+ scripts/w3mhelp.cgi.in |    5 
+ url.c                  |   35 +++++
+ 14 files changed, 612 insertions(+), 39 deletions(-)
 
 --- a/file.c
 +++ b/file.c
@@ -42,7 +45,7 @@ w3m-0.5.3+git20230121.
      return buf;
  }
  
-@@ -1716,7 +1718,7 @@ loadGeneralFile(char *path, ParsedURL *v
+@@ -1715,7 +1717,7 @@ loadGeneralFile(char *path, ParsedURL *v
      URLFile f, *volatile of = NULL;
      ParsedURL pu;
      Buffer *b = NULL;
@@ -51,7 +54,7 @@ w3m-0.5.3+git20230121.
      char *volatile tpath;
      char *volatile t = "text/plain", *p, *volatile real_type = NULL;
      Buffer *volatile t_buf = NULL;
-@@ -2068,6 +2070,166 @@ loadGeneralFile(char *path, ParsedURL *v
+@@ -2067,6 +2069,166 @@ loadGeneralFile(char *path, ParsedURL *v
      else if (pu.scheme == SCM_DATA) {
  	t = f.guess_type;
      }
@@ -218,7 +221,7 @@ w3m-0.5.3+git20230121.
      else if (searchHeader) {
  	searchHeader = SearchHeader = FALSE;
  	if (t_buf == NULL)
-@@ -2246,6 +2408,8 @@ loadGeneralFile(char *path, ParsedURL *v
+@@ -2244,6 +2406,8 @@ loadGeneralFile(char *path, ParsedURL *v
  
      if (is_html_type(t))
  	proc = loadHTMLBuffer;
@@ -227,7 +230,7 @@ w3m-0.5.3+git20230121.
      else if (is_plain_text_type(t))
  	proc = loadBuffer;
  #ifdef USE_IMAGE
-@@ -2500,7 +2664,6 @@ is_boundary(unsigned char *ch1, unsigned
+@@ -2498,7 +2662,6 @@ is_boundary(unsigned char *ch1, unsigned
      return 1;
  }
  
@@ -409,7 +412,7 @@ w3m-0.5.3+git20230121.
  }
  
  #if SSLEAY_VERSION_NUMBER >= 0x00905100
-@@ -1262,6 +1265,7 @@ _parsedURL2Str(ParsedURL *pu, int pass,
+@@ -1260,6 +1263,7 @@ _parsedURL2Str(ParsedURL *pu, int pass,
  	"news", "news", "data", "mailto",
  #ifdef USE_SSL
  	"https",
@@ -417,7 +420,7 @@ w3m-0.5.3+git20230121.
  #endif				/* USE_SSL */
      };
  
-@@ -1962,6 +1966,35 @@ openURL(char *url, ParsedURL *pu, Parsed
+@@ -1960,6 +1964,35 @@ openURL(char *url, ParsedURL *pu, Parsed
  	}
  	break;
  #endif				/* USE_GOPHER */
@@ -463,8 +466,8 @@ w3m-0.5.3+git20230121.
 +	 (is_html_type(buf->type) || FoldLine || !strcmp(buf->type,
 +							 "text/gemini")))
  	|| buf->need_reshape) {
- 	buf->need_reshape = TRUE;
  	reshapeBuffer(buf);
+     }
 --- a/buffer.c
 +++ b/buffer.c
 @@ -18,6 +18,10 @@ extern int do_getch();
@@ -487,7 +490,7 @@ w3m-0.5.3+git20230121.
  #ifdef USE_M17N
      wc_uint8 old_auto_detect = WcOption.auto_detect;
  #endif
-@@ -517,6 +523,7 @@ reshapeBuffer(Buffer *buf)
+@@ -515,6 +521,7 @@ reshapeBuffer(Buffer *buf)
      buf->width = INIT_BUFFER_WIDTH;
      if (buf->sourcefile == NULL)
  	return;
@@ -495,7 +498,7 @@ w3m-0.5.3+git20230121.
      init_stream(&f, SCM_LOCAL, NULL);
      examineFile(buf->mailcap_source ? buf->mailcap_source : buf->sourcefile,
  		&f);
-@@ -562,6 +569,8 @@ reshapeBuffer(Buffer *buf)
+@@ -560,6 +567,8 @@ reshapeBuffer(Buffer *buf)
  #endif
      if (is_html_type(buf->type))
  	loadHTMLBuffer(&f, buf);
@@ -609,7 +612,7 @@ w3m-0.5.3+git20230121.
      if (Currentbuf->sourcefile == NULL) {
  	if (Currentbuf->pagerSource &&
  	    !strcasecmp(Currentbuf->type, "text/plain")) {
-@@ -4870,6 +4932,91 @@ DEFUN(fold_pre, FOLD_PRE, "Fold long lin
+@@ -4869,6 +4931,91 @@ DEFUN(fold_pre, FOLD_PRE, "Fold long lin
  	reload();
  }
  
@@ -701,7 +704,7 @@ w3m-0.5.3+git20230121.
  /* reload */
  DEFUN(reload, RELOAD, "Load current document anew")
  {
-@@ -5096,6 +5243,7 @@ chkURLBuffer(Buffer *buf)
+@@ -5094,6 +5241,7 @@ chkURLBuffer(Buffer *buf)
  	"https?://[a-zA-Z0-9:%\\-\\./_@]*\\[[a-fA-F0-9:][a-fA-F0-9:\\.]*\\][a-zA-Z0-9:%\\-\\./?=~_\\&+@#,\\$;]*",
  	"ftp://[a-zA-Z0-9:%\\-\\./_@]*\\[[a-fA-F0-9:][a-fA-F0-9:\\.]*\\][a-zA-Z0-9:%\\-\\./=_+@#,\\$]*",
  #endif				/* INET6 */
@@ -711,7 +714,7 @@ w3m-0.5.3+git20230121.
      int i;
 --- a/proto.h
 +++ b/proto.h
-@@ -97,6 +97,7 @@ extern void peekURL(void);
+@@ -99,6 +99,7 @@ extern void peekURL(void);
  extern void peekIMG(void);
  extern void curURL(void);
  extern void vwSrc(void);
@@ -998,3 +1001,37 @@ w3m-0.5.3+git20230121.
 +extern int ssl_known_hosts;
 +
  #endif /* RC_H */
+--- a/doc-de/README.func
++++ b/doc-de/README.func
+@@ -32,6 +32,7 @@ EXIT		Sofort beenden
+ EXTERN		Verwende externen Browser zur Anzeige
+ EXTERN_LINK	Verwende externen Browser zur Anzeige des Linkziels
+ FRAME		Wechsle zwischen Kennung und Umsetzung von HTML-Frames
++GEMINIZE	Wechsle zwischen text/gemini-Wiedergabe und -Verarbeitung
+ GOTO		Öffne angegebenes Dokument in neuem Puffer
+ GOTO_HOME	Zurück zur Startseite (die Variablen HTTP_HOME oder WWW_HOME spezifiziert wurden)
+ GOTO_LINE	Gehe zur angebenen Zeile
+--- a/doc/README.func
++++ b/doc/README.func
+@@ -32,6 +32,7 @@ EXIT		Quit without confirmation
+ EXTERN		Display using an external browser
+ EXTERN_LINK	Display target using an external browser
+ FRAME		Toggle rendering HTML frames
++GEMINIZE	Toggle between text/gemini shown or processed
+ GOTO		Open specified document in a new buffer
+ GOTO_HOME	Return to the homepage (specified HTTP_HOME or WWW_HOME variable)
+ GOTO_LINE	Go to the specified line
+--- a/scripts/w3mhelp.cgi.in
++++ b/scripts/w3mhelp.cgi.in
+@@ -152,8 +152,9 @@ print "<P><A HREF=\"$keymap\">$head</A>\
+ 		pipeBuf"));
+ 
+ &show_keymap('Buffer Operations',
+-	     split(" ", "backBf nextBf prevBf goHome selMn selBuf vwSrc svSrc
+-		svBuf editBf editScr reload reshape rdrwSc dispI stopI"));
++	     split(" ", "backBf nextBf prevBf goHome selMn selBuf geminize
++		vwSrc svSrc svBuf editBf editScr reload reshape rdrwSc
++		dispI stopI"));
+ 
+ &show_keymap('Tab Operations',
+ 	     split(" ", "newT closeT nextT prevT tabMn tabR tabL"));

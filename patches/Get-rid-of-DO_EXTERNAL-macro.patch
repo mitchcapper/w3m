@@ -1,0 +1,53 @@
+From 2dc499613aef38a1a8c22604b78dae7302f53a1b Mon Sep 17 00:00:00 2001
+From: Rene Kita <mail@rkta.de>
+Date: Tue, 7 Sep 2021 17:55:58 +0200
+Subject: [PATCH 090/102] Get rid of DO_EXTERNAL macro
+
+DO_EXTERNAL was only used to carry state information. Instead of casting
+a real function to a function with a non-matching prototype, just reset
+the function pointer to NULL.
+
+While there, move the initial assignment closer to the first use of
+proc.^U
+
+While there, remove a redundant assignment.
+---
+ file.c |    6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
+
+--- a/file.c
++++ b/file.c
+@@ -1708,7 +1708,6 @@ getLinkNumberStr(int correction)
+ /* 
+  * loadGeneralFile: load file to buffer
+  */
+-#define DO_EXTERNAL ((Buffer *(*)(URLFile *, Buffer *))doExternal)
+ Buffer *
+ loadGeneralFile(char *path, ParsedURL *volatile current, char *referer,
+ 		int flag, FormList *volatile request)
+@@ -2180,7 +2179,6 @@ loadGeneralFile(char *path, ParsedURL *v
+ 
+     if (real_type == NULL)
+ 	real_type = t;
+-    proc = loadBuffer;
+ 
+     current_content_length = 0;
+     if ((p = checkHeader(t_buf, "Content-Length:")) != NULL)
+@@ -2260,7 +2258,7 @@ loadGeneralFile(char *path, ParsedURL *v
+ 		!gopher_download &&
+ #endif
+ 		searchExtViewer(t) != NULL) {
+-	    proc = DO_EXTERNAL;
++	    proc = NULL;
+ 	}
+ 	else {
+ 	    TRAP_OFF;
+@@ -2296,7 +2294,7 @@ loadGeneralFile(char *path, ParsedURL *v
+     t_buf->ssl_certificate = f.ssl_certificate;
+ #endif
+     frame_source = flag & RG_FRAME_SRC;
+-    if (proc == DO_EXTERNAL) {
++    if (proc == NULL) {
+ 	b = doExternal(f, t, t_buf);
+     } else {
+ 	b = loadSomething(&f, proc, t_buf);

@@ -9,7 +9,7 @@ Subject: [PATCH 143/172] Add cppcheck target
 
 --- a/Makefile.in
 +++ b/Makefile.in
-@@ -348,3 +348,7 @@ dist:
+@@ -347,3 +347,7 @@ dist:
  bindist:
  	cd ..; tar cvfz w3m-$(VERSION)-$(MODEL).tar.gz w3m/w3m* w3m/doc* w3m/Bonus* w3m/README w3m/scripts 
  

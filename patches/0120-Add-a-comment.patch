@@ -9,12 +9,12 @@ Subject: [PATCH 120/172] Add a comment
 
 --- a/indep.c
 +++ b/indep.c
-@@ -111,7 +111,7 @@ allocStr(const char *s, int len)
+@@ -106,7 +106,7 @@ allocStr(const char *s, int len)
  }
  
  int
 -strCmp(const void *s1, const void *s2)
 +strCmp(const void *s1, const void *s2) /* helper for qsort */
  {
-     return strcmp(*(const char * const *)s1, *(const char * const *)s2);
+     return strcmp(*(const char **)s1, *(const char **)s2);
  }

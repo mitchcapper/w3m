@@ -6,10 +6,9 @@ Subject: [PATCH 101/172] WIP getch Fix warning (strict-prototype)
 ---
  buffer.c |    4 ++--
  linein.c |    4 ++--
- main.c   |    2 +-
  menu.c   |    4 ++--
  terms.c  |    2 ++
- 5 files changed, 9 insertions(+), 7 deletions(-)
+ 4 files changed, 8 insertions(+), 6 deletions(-)
 
 --- a/buffer.c
 +++ b/buffer.c
@@ -37,17 +36,6 @@ Subject: [PATCH 101/172] WIP getch Fix warning (strict-prototype)
  #endif				/* USE_GPM */
  #endif				/* USE_MOUSE */
  
---- a/main.c
-+++ b/main.c
-@@ -33,7 +33,7 @@
- #endif				/* USE_GPM */
- #if defined(USE_GPM) || defined(USE_SYSMOUSE)
- extern int do_getch();
--#define getch()	do_getch()
-+#define getch(void)	do_getch(void)
- #endif				/* defined(USE_GPM) || defined(USE_SYSMOUSE) */
- #endif
- 
 --- a/menu.c
 +++ b/menu.c
 @@ -24,8 +24,8 @@ extern int sysm_process_mouse(int, int,
@@ -63,7 +51,7 @@ Subject: [PATCH 101/172] WIP getch Fix warning (strict-prototype)
  
 --- a/terms.c
 +++ b/terms.c
-@@ -2274,6 +2274,7 @@ getch(void)
+@@ -2272,6 +2272,7 @@ getch(void)
   * E.g. SELECT_MENU will segfault if you remove it.
   * TODO(rkta): wgetch belongs to libcurses, something fishy is going on here.
   */
@@ -71,11 +59,11 @@ Subject: [PATCH 101/172] WIP getch Fix warning (strict-prototype)
  char
  wgetch(void *p)
  {
-@@ -2290,6 +2291,7 @@ wgetch(void *p)
+@@ -2288,6 +2289,7 @@ wgetch(void *p)
      return c;
  }
  
 +extern int do_getch(void); /* TODO(rkta): header, found in other file */
  int
- do_getch()
+ do_getch(void)
  {

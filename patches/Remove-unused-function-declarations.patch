@@ -1,0 +1,51 @@
+From 732013e80af2ea6c50b2d5fb617554011c4cdacf Mon Sep 17 00:00:00 2001
+From: Rene Kita <mail@rkta.de>
+Date: Wed, 29 Dec 2021 16:09:13 +0100
+Subject: [PATCH 033/172] Remove unused function declarations
+
+---
+ istream.h |    1 -
+ proto.h   |    5 -----
+ 2 files changed, 6 deletions(-)
+
+--- a/istream.h
++++ b/istream.h
+@@ -145,7 +145,6 @@ extern Str ssl_get_certificate(SSL * ssl
+ #define IST_UNCLOSE	0x10
+ 
+ #define IStype(stream) ((stream)->base.type)
+-#define is_eos(stream) ISeos(stream)
+ #define iseos(stream) ((stream)->base.iseos)
+ #define file_of(stream) ((stream)->file.handle->f)
+ #define set_close(stream,closep) ((IStype(stream)==IST_FILE)?((stream)->file.handle->close=(closep)):0)
+--- a/proto.h
++++ b/proto.h
+@@ -59,10 +59,8 @@ extern void linend(void);
+ extern void editBf(void);
+ extern void editScr(void);
+ extern void followA(void);
+-extern void bufferA(void);
+ extern void followI(void);
+ extern void submitForm(void);
+-extern void followForm(void);
+ extern void topA(void);
+ extern void lastA(void);
+ extern void nthA(void);
+@@ -605,9 +603,7 @@ extern Buffer *link_list_panel(Buffer *b
+ extern Str decodeB(char **ww);
+ extern void decodeB_to_growbuf(struct growbuf *gb, char **ww);
+ extern Str decodeQ(char **ww);
+-extern Str decodeQP(char **ww);
+ extern void decodeQP_to_growbuf(struct growbuf *gb, char **ww);
+-extern Str decodeU(char **ww);
+ extern void decodeU_to_growbuf(struct growbuf *gb, char **ww);
+ #ifdef USE_M17N
+ extern Str decodeWord(char **ow, wc_ces * charset);
+@@ -773,7 +769,6 @@ extern int addMenuList(MenuList **list,
+ extern int getMenuN(MenuList *list, char *id);
+ 
+ extern void popupMenu(int x, int y, Menu *menu);
+-extern void mainMenu(int x, int y);
+ extern void mainMn(void);
+ extern void selMn(void);
+ extern void tabMn(void);

@@ -18,7 +18,7 @@ make this behaviour permanent.
 
 --- a/file.c
 +++ b/file.c
-@@ -2622,7 +2622,7 @@ check_breakpoint(struct readbuffer *obuf
+@@ -2620,7 +2620,7 @@ check_breakpoint(struct readbuffer *obuf
      int tlen, len = obuf->line->length;
  
      append_tags(obuf);
@@ -58,7 +58,7 @@ make this behaviour permanent.
  #define DEFAULT_URL_CURRENT	1
 --- a/main.c
 +++ b/main.c
-@@ -4864,6 +4864,12 @@ DEFUN(vwSrc, SOURCE VIEW, "Toggle betwee
+@@ -4863,6 +4863,12 @@ DEFUN(vwSrc, SOURCE VIEW, "Toggle betwee
      displayBuffer(Currentbuf, B_NORMAL);
  }
  
@@ -71,7 +71,7 @@ make this behaviour permanent.
  /* reload */
  DEFUN(reload, RELOAD, "Load current document anew")
  {
-@@ -4987,6 +4993,7 @@ DEFUN(reload, RELOAD, "Load current docu
+@@ -4986,6 +4992,7 @@ DEFUN(reload, RELOAD, "Load current docu
  	restorePosition(Currentbuf, &sbuf);
      }
      displayBuffer(Currentbuf, B_FORCE_REDRAW);
@@ -81,7 +81,7 @@ make this behaviour permanent.
  /* reshape */
 --- a/proto.h
 +++ b/proto.h
-@@ -97,6 +97,7 @@ extern void peekURL(void);
+@@ -99,6 +99,7 @@ extern void peekURL(void);
  extern void peekIMG(void);
  extern void curURL(void);
  extern void vwSrc(void);
