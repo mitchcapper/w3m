@@ -82,7 +82,7 @@ Strnew_charp(const char *p)
 	exit(1);
     x->area_size = n;
     x->length = len;
-    bcopy(p, x->ptr, len);
+    memmove(x->ptr, p, len);
     x->ptr[x->length] = '\0';
     return x;
 }
@@ -123,7 +123,7 @@ Strnew_charp_n(const char *p, int n)
 	exit(1);
     x->area_size = n + 1;
     x->length = len;
-    bcopy(p, x->ptr, len);
+    memmove(x->ptr, p, len);
     x->ptr[x->length] = '\0';
     return x;
 }
@@ -159,7 +159,7 @@ Strcopy(Str x, Str y)
 	    exit(1);
 	x->area_size = y->length + 1;
     }
-    bcopy(y->ptr, x->ptr, y->length + 1);
+    memmove(x->ptr, y->ptr, y->length + 1);
     x->length = y->length;
 }
 
@@ -182,7 +182,7 @@ Strcopy_charp(Str x, const char *y)
 	    exit(1);
 	x->area_size = len + 1;
     }
-    bcopy(y, x->ptr, len);
+    memmove(x->ptr, y, len);
     x->ptr[len] = '\0';
     x->length = len;
 }
@@ -205,7 +205,7 @@ Strcopy_charp_n(Str x, const char *y, int n)
 	    exit(1);
 	x->area_size = len + 1;
     }
-    bcopy(y, x->ptr, len);
+    memmove(x->ptr, y, len);
     x->ptr[len] = '\0';
     x->length = len;
 }
@@ -235,7 +235,7 @@ Strcat_charp_n(Str x, const char *y, int n)
 	    exit(1);
 	x->area_size = newlen;
     }
-    bcopy(y, &x->ptr[x->length], n);
+    memmove(&x->ptr[x->length], y, n);
     x->length += n;
     x->ptr[x->length] = '\0';
 }

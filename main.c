@@ -4754,7 +4754,7 @@ _peekURL(int only_img)
 #ifdef USE_M17N
     s = checkType(s, &pp, NULL);
     p = NewAtom_N(Lineprop, s->length);
-    bcopy(pp, p, s->length * sizeof(Lineprop));
+    memmove(p, pp, s->length * sizeof(Lineprop));
 #endif
   disp:
     n = searchKeyNum();
@@ -4813,7 +4813,7 @@ DEFUN(curURL, PEEK, "Show current address")
 #ifdef USE_M17N
 	s = checkType(s, &pp, NULL);
 	p = NewAtom_N(Lineprop, s->length);
-	bcopy(pp, p, s->length * sizeof(Lineprop));
+	memmove(p, pp, s->length * sizeof(Lineprop));
 #endif
     }
     n = searchKeyNum();

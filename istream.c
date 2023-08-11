@@ -55,7 +55,7 @@ buffer_read(StreamBuffer sb, unsigned char *obuf, int count)
     if (len > 0) {
 	if (len > count)
 	    len = count;
-	bcopy((const void *)&sb->buf[sb->cur], obuf, len);
+	memmove(obuf, (const void *)&sb->buf[sb->cur], len);
 	sb->cur += len;
     }
     return len;
@@ -405,7 +405,7 @@ ssl_check_cert_ident(X509 * x, char *hostname)
 		    char *asn = GC_MALLOC(sl + 1);
 		    if (!asn)
 			exit(1);
-		    bcopy(sn, asn, sl);
+		    memmove(asn, sn, sl);
 		    asn[sl] = '\0';
 
 		    if (!seen_dnsname)

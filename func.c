@@ -689,12 +689,10 @@ initMouseAction(void)
 {
     FILE *mf;
 
-    bcopy(&default_mouse_action, &mouse_action,
-	  sizeof(default_mouse_action));
+    memmove(&mouse_action, &default_mouse_action, sizeof(default_mouse_action));
     mouse_action.lastline_map[0] = New_N(MouseActionMap, 6);
-    bcopy(&default_lastline_action,
-	  mouse_action.lastline_map[0],
-	  sizeof(default_lastline_action));
+    memmove(mouse_action.lastline_map[0], &default_lastline_action,
+	    sizeof(default_lastline_action));
     {
 #ifdef USE_M17N
 	int w = 0;

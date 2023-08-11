@@ -77,10 +77,6 @@
 #include "terms.h"
 #include "istream.h"
 
-#ifndef HAVE_BCOPY
-void bcopy(const void *, void *, int);
-void bzero(void *, int);
-#endif				/* HAVE_BCOPY */
 #ifdef __EMX__
 #include <strings.h>		/* for bzero() and bcopy() */
 #endif

@@ -169,7 +169,7 @@ copyFrame(struct frame_body *ob)
     struct frame_body *rb;
 
     rb = New(struct frame_body);
-    bcopy(ob, rb, sizeof(struct frame_body));
+    memmove(rb, ob, sizeof(struct frame_body));
     return rb;
 }
 
@@ -181,11 +181,11 @@ copyFrameSet(struct frameset *of)
 
     rf = New(struct frameset);
     n = of->col * of->row;
-    bcopy(of, rf, sizeof(struct frameset));
+    memmove(rf, of, sizeof(struct frameset));
     rf->width = New_N(char *, rf->col);
-    bcopy(of->width, rf->width, sizeof(char *) * rf->col);
+    memmove(rf->width, of->width, sizeof(char *) * rf->col);
     rf->height = New_N(char *, rf->row);
-    bcopy(of->height, rf->height, sizeof(char *) * rf->row);
+    memmove(rf->height, of->height, sizeof(char *) * rf->row);
     rf->frame = New_N(union frameset_element, n);
     while (n) {
 	n--;
