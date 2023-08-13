@@ -1,7 +1,37 @@
 From: Rene Kita <mail@rkta.de>
 Subject: Remove left-over FORMAT_NICE code
 
-The configure option was removed around 2003.
+The configure option was removed in
+commit 2ba7abd687a38b40b6d1d2c62c0e432a5b9775a5
+Author: Fumitoshi UKAI <ukai@debian.or.jp>
+Date:   2003-03-10T17:28:52+00:00
+
+    [w3m-dev 03804] fix autoconf
+    * acinclude.m4 (AC_W3M_MODEL): deleted
+            (AC_W3M_COLOR): default enable
+            (AC_W3M_ANSI_COLOR): default enable
+            (AC_W3M_BG_COLOR): default enable
+            (AC_W3M_SHOW_PARAMS): deleted
+            (AC_W3M_DICT): default enable
+            (AC_W3M_HISTORY): default enable
+            (AC_W3M_VIEW_UNSEENOBJECTS): deleted
+            (AC_W3M_FORMAT_NICE): deleted
+            (AC_W3M_ID_EXT): deleted
+            (AC_W3M_FTPPASS_HOSTNAMEGEN): deleted
+            (AC_W3M_NNTP): default enabled
+            (AC_W3M_LANG): autodetect whether japanese is enabled
+            (AC_W3M_KANJI_SYMBOLS): default enabled
+            (AC_W3M_EMACS_LIKE_LINEEDIT): deleted
+            (AC_W3M_VI_PREC_NUM): deleted
+            (AC_W3M_MARK): deleted
+            (AC_W3M_LABEL_TOPLINE): deleted
+            (AC_W3M_NEXTPAGE_TOPLINE): deleted
+            (AC_W3M_SSL): fix without ssl
+            (AC_W3M_IMAGE): default enabled
+            (AC_W3M_XFACE): check uncompface
+            (AC_W3M_IPv6): enable_ipv6 if inet6 lib found
+    * configure.in (AC_PROG_CPP): added
+    From: Fumitoshi UKAI  <ukai@debian.or.jp>
 ---
  config.h.dist |    1 -
  config.h.in   |    1 -

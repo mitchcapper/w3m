@@ -11,7 +11,7 @@
 +++ b/Makefile.in
 @@ -39,6 +39,7 @@ DEFAULTS = -Wall
  DEFAULTS += -D_FORTIFY_SOURCE=2
- DEFAULTS += -O3 -g3 -flto
+ DEFAULTS += -O3 -g3
  DEFAULTS += -Wcast-qual
 +DEFAULTS += -Wduplicated-branches
  DEFAULTS += -Wno-missing-field-initializers
@@ -21,7 +21,7 @@
 +++ b/libwc/Makefile.in
 @@ -10,6 +10,7 @@ DEFAULTS= -Wall
  DEFAULTS += -D_FORTIFY_SOURCE=2
- DEFAULTS += -O3 -g3 -flto
+ DEFAULTS += -O3 -g3
  DEFAULTS += -Wcast-qual
 +DEFAULTS += -Wduplicated-branches
  DEFAULTS += -Wno-missing-field-initializers
@@ -31,7 +31,7 @@
 +++ b/w3mimg/Makefile.in
 @@ -10,6 +10,7 @@ DEFAULTS= -Wall
  DEFAULTS += -D_FORTIFY_SOURCE=2
- DEFAULTS += -O3 -g3 -flto
+ DEFAULTS += -O3 -g3
  DEFAULTS += -Wcast-qual
 +DEFAULTS += -Wduplicated-branches
  DEFAULTS += -Wno-missing-field-initializers
@@ -41,7 +41,7 @@
 +++ b/w3mimg/fb/Makefile.in
 @@ -11,6 +11,7 @@ DEFAULTS= -Wall
  DEFAULTS += -D_FORTIFY_SOURCE=2
- DEFAULTS += -O3 -g3 -flto
+ DEFAULTS += -O3 -g3
  DEFAULTS += -Wcast-qual
 +DEFAULTS += -Wduplicated-branches
  DEFAULTS += -Wno-missing-field-initializers
@@ -51,7 +51,7 @@
 +++ b/w3mimg/win/Makefile.in
 @@ -11,6 +11,7 @@ DEFAULTS= -Wall
  DEFAULTS += -D_FORTIFY_SOURCE=2
- DEFAULTS += -O3 -g3 -flto
+ DEFAULTS += -O3 -g3
  DEFAULTS += -Wcast-qual
 +DEFAULTS += -Wduplicated-branches
  DEFAULTS += -Wno-missing-field-initializers
@@ -61,7 +61,7 @@
 +++ b/w3mimg/x11/Makefile.in
 @@ -11,6 +11,7 @@ DEFAULTS= -Wall
  DEFAULTS += -D_FORTIFY_SOURCE=2
- DEFAULTS += -O3 -g3 -flto
+ DEFAULTS += -O3 -g3
  DEFAULTS += -Wcast-qual
 +DEFAULTS += -Wduplicated-branches
  DEFAULTS += -Wno-missing-field-initializers

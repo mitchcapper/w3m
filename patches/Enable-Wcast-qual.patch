@@ -12,7 +12,7 @@
 @@ -38,6 +38,7 @@ CONF_DIR = $(sysconfdir)/$(PACKAGE)
  DEFAULTS = -Wall
  DEFAULTS += -D_FORTIFY_SOURCE=2
- DEFAULTS += -O3 -g3 -flto
+ DEFAULTS += -O3 -g3
 +DEFAULTS += -Wcast-qual
  DEFAULTS += -Wno-missing-field-initializers
  DEFAULTS += -Wno-unused-result
@@ -22,7 +22,7 @@
 @@ -9,6 +9,7 @@ CC=@CC@
  DEFAULTS= -Wall
  DEFAULTS += -D_FORTIFY_SOURCE=2
- DEFAULTS += -O3 -g3 -flto
+ DEFAULTS += -O3 -g3
 +DEFAULTS += -Wcast-qual
  DEFAULTS += -Wno-missing-field-initializers
  DEFAULTS += -Wno-unused-result
@@ -32,7 +32,7 @@
 @@ -10,6 +10,7 @@ VPATH = $(srcdir):.
  DEFAULTS= -Wall
  DEFAULTS += -D_FORTIFY_SOURCE=2
- DEFAULTS += -O3 -g3 -flto
+ DEFAULTS += -O3 -g3
 +DEFAULTS += -Wcast-qual
  DEFAULTS += -Wno-missing-field-initializers
  DEFAULTS += -Wno-unused-result
@@ -42,7 +42,7 @@
 @@ -10,6 +10,7 @@ VPATH = $(srcdir):.
  DEFAULTS= -Wall
  DEFAULTS += -D_FORTIFY_SOURCE=2
- DEFAULTS += -O3 -g3 -flto
+ DEFAULTS += -O3 -g3
 +DEFAULTS += -Wcast-qual
  DEFAULTS += -Wno-missing-field-initializers
  DEFAULTS += -Wno-unused-result
@@ -52,7 +52,7 @@
 @@ -10,6 +10,7 @@ VPATH = $(srcdir):.
  DEFAULTS= -Wall
  DEFAULTS += -D_FORTIFY_SOURCE=2
- DEFAULTS += -O3 -g3 -flto
+ DEFAULTS += -O3 -g3
 +DEFAULTS += -Wcast-qual
  DEFAULTS += -Wno-missing-field-initializers
  DEFAULTS += -Wno-unused-result
@@ -62,7 +62,7 @@
 @@ -9,6 +9,7 @@ VPATH = $(srcdir):.
  DEFAULTS= -Wall
  DEFAULTS += -D_FORTIFY_SOURCE=2
- DEFAULTS += -O3 -g3 -flto
+ DEFAULTS += -O3 -g3
 +DEFAULTS += -Wcast-qual
  DEFAULTS += -Wno-missing-field-initializers
  DEFAULTS += -Wno-unused-result

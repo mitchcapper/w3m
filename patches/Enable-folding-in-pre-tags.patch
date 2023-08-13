@@ -11,10 +11,10 @@ make this behaviour permanent.
 ---
  file.c  |    6 ++++--
  fm.h    |    2 ++
- main.c  |    7 +++++++
+ main.c  |    9 +++++++++
  proto.h |    1 +
  rc.c    |    3 +++
- 5 files changed, 17 insertions(+), 2 deletions(-)
+ 5 files changed, 19 insertions(+), 2 deletions(-)
 
 --- a/file.c
 +++ b/file.c
@@ -58,20 +58,22 @@ make this behaviour permanent.
  #define DEFAULT_URL_CURRENT	1
 --- a/main.c
 +++ b/main.c
-@@ -4863,6 +4863,12 @@ DEFUN(vwSrc, SOURCE VIEW, "Toggle betwee
+@@ -4863,6 +4863,14 @@ DEFUN(vwSrc, SOURCE VIEW, "Toggle betwee
      displayBuffer(Currentbuf, B_NORMAL);
  }
  
 +DEFUN(fold_pre, FOLD_PRE, "Fold long lines in <pre> elements")
 +{
-+	FoldPre = 1;
-+	reload();
++    FoldPre = 1;
++    Currentbuf->need_reshape = TRUE;
++    displayBuffer(Currentbuf, B_FORCE_REDRAW);
++    FoldPre = FoldPreOpt;
 +}
 +
  /* reload */
  DEFUN(reload, RELOAD, "Load current document anew")
  {
-@@ -4986,6 +4992,7 @@ DEFUN(reload, RELOAD, "Load current docu
+@@ -4986,6 +4994,7 @@ DEFUN(reload, RELOAD, "Load current docu
  	restorePosition(Currentbuf, &sbuf);
      }
      displayBuffer(Currentbuf, B_FORCE_REDRAW);

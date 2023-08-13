@@ -612,8 +612,8 @@ w3m-0.5.3+git20230121.
      if (Currentbuf->sourcefile == NULL) {
  	if (Currentbuf->pagerSource &&
  	    !strcasecmp(Currentbuf->type, "text/plain")) {
-@@ -4869,6 +4931,91 @@ DEFUN(fold_pre, FOLD_PRE, "Fold long lin
- 	reload();
+@@ -4871,6 +4933,91 @@ DEFUN(fold_pre, FOLD_PRE, "Fold long lin
+     FoldPre = FoldPreOpt;
  }
  
 +DEFUN(geminize, GEMINIZE, "Toggle between text/gemini shown or processed")
@@ -704,7 +704,7 @@ w3m-0.5.3+git20230121.
  /* reload */
  DEFUN(reload, RELOAD, "Load current document anew")
  {
-@@ -5094,6 +5241,7 @@ chkURLBuffer(Buffer *buf)
+@@ -5096,6 +5243,7 @@ chkURLBuffer(Buffer *buf)
  	"https?://[a-zA-Z0-9:%\\-\\./_@]*\\[[a-fA-F0-9:][a-fA-F0-9:\\.]*\\][a-zA-Z0-9:%\\-\\./?=~_\\&+@#,\\$;]*",
  	"ftp://[a-zA-Z0-9:%\\-\\./_@]*\\[[a-fA-F0-9:][a-fA-F0-9:\\.]*\\][a-zA-Z0-9:%\\-\\./=_+@#,\\$]*",
  #endif				/* INET6 */

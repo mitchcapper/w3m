@@ -759,7 +759,7 @@
  	disp_err_message(emsg, TRUE);
  	return;
      }
-@@ -5079,15 +5052,13 @@ DEFUN(reload, RELOAD, "Load current docu
+@@ -5081,15 +5054,13 @@ DEFUN(reload, RELOAD, "Load current docu
  	    ldDL();
  	    return;
  	}
@@ -777,7 +777,7 @@
  	return;
      }
      copyBuffer(&sbuf, Currentbuf);
-@@ -5139,8 +5110,7 @@ DEFUN(reload, RELOAD, "Load current docu
+@@ -5141,8 +5112,7 @@ DEFUN(reload, RELOAD, "Load current docu
  	request = NULL;
      }
      url = parsedURL2Str(&Currentbuf->currentURL);
@@ -787,7 +787,7 @@
      refresh();
  #ifdef USE_M17N
      old_charset = DocumentCharset;
-@@ -5159,8 +5129,7 @@ DEFUN(reload, RELOAD, "Load current docu
+@@ -5161,8 +5131,7 @@ DEFUN(reload, RELOAD, "Load current docu
      if (multipart)
  	unlink(request->body);
      if (buf == NULL) {
@@ -797,7 +797,7 @@
  	return;
      }
      else if (buf == NO_BUFFER) {
-@@ -5238,8 +5207,7 @@ DEFUN(docCSet, CHARSET, "Change the char
+@@ -5240,8 +5209,7 @@ DEFUN(docCSet, CHARSET, "Change the char
  
      cs = searchKeyData();
      if (cs == NULL || *cs == '\0')
@@ -807,7 +807,7 @@
  		      wc_ces_to_charset(Currentbuf->document_charset));
      charset = wc_guess_charset_short(cs, 0);
      if (charset == 0) {
-@@ -5256,8 +5224,7 @@ DEFUN(defCSet, DEFAULT_CHARSET, "Change
+@@ -5258,8 +5226,7 @@ DEFUN(defCSet, DEFAULT_CHARSET, "Change
  
      cs = searchKeyData();
      if (cs == NULL || *cs == '\0')
@@ -817,7 +817,7 @@
  		      wc_ces_to_charset(DocumentCharset));
      charset = wc_guess_charset_short(cs, 0);
      if (charset != 0)
-@@ -5445,15 +5412,13 @@ invoke_browser(const char *url)
+@@ -5447,15 +5414,13 @@ invoke_browser(const char *url)
  DEFUN(extbrz, EXTERN, "Display using an external browser")
  {
      if (Currentbuf->bufferprop & BP_INTERNAL) {
@@ -835,7 +835,7 @@
  	return;
      }
      invoke_browser(parsedURL2Str(&Currentbuf->currentURL)->ptr);
-@@ -5978,13 +5943,11 @@ DEFUN(wrapToggle, WRAP_TOGGLE, "Toggle w
+@@ -5980,13 +5945,11 @@ DEFUN(wrapToggle, WRAP_TOGGLE, "Toggle w
  {
      if (WrapSearch) {
  	WrapSearch = FALSE;

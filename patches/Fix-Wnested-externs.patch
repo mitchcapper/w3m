@@ -45,7 +45,7 @@
 -    extern Hash_si tagtable;
      char cmdstr[MAX_CMD_LEN];
      char *p = cmdstr;
-     char *save = *s;
+     char *save = s;
 @@ -1580,7 +1581,7 @@ char *
  expandName(char *name)
  {

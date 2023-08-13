@@ -1,8 +1,7 @@
-# PENDING							########
+# PENDING
 creat-hist-file.patch
 Move-buffer.patch
 Fix-slow-backward-search.patch
-# READY								########
 Replace-deprecated-md5.patch
 Fix-skip-blank-macros.patch
 Reduce-scope-of-dangerous-macro.patch
@@ -10,28 +9,49 @@ Simplify-reshapeBuffer.patch
 Fix-potential-null-dereference-to_str.patch
 Avoid-leaking-by-using-Str-function.patch
 Fix-potential-null-dereference.patch
-# 1
 Add-an-include-guard-for-proto.h.patch
 Remove-unnecessary-macro.patch
 Get-rid-of-DO_EXTERNAL-macro.patch
 Remove-code-duplication.patch
 Add-tilde-to-gopher-regex-for-chkURL.patch
 Do-not-reshape-all-new-buffers.patch
-# FEATURES							########
+Add-a-comment.patch
+Use-correct-format-specifier-for-sprintf.patch
+Check-return-value-of-freopen.patch
+Remove-left-over-FORMAT_NICE-code.patch
+Remove-redundant-initialization.patch
+Remove-assignment-of-unread-value.patch
+Handle-errors-in-mySystem.patch
+# FEATURES
 Display-error-for-unkown-command.patch
 Enable-folding-in-pre-tags.patch
 gemini.patch
 Zero-based-link-no.patch
 Use-https-with-USE_SSL-and-retry_http.patch
-# NEXT								########
-0120-Add-a-comment.patch
-0131-Use-correct-format-specifier-for-sprintf.patch
-0135-Check-return-value-of-freopen.patch
-Remove-left-over-FORMAT_NICE-code.patch
-0133-Remove-redundant-initialization.patch
-0134-Remove-assignment-of-unread-value.patch
-# WARNINGS							########
-Enable-more-optimization-and-lto.patch
+# READY
+# NEXT
+Remove-dead-code.patch
+Fix-Wstrict-prototypes-func-pointers.patch
+Fix-some-casts-that-discard-qualifiers.patch
+Remove-const-where-we-can-t-keep-the-promise.patch
+Remove-declarations-without-definition.patch
+Remove-unused-function-declarations.patch
+Remove-unused-prototyp.patch
+Remove-unused-function.patch
+Move-declarations-to-the-correct-header-file.patch
+Remove-redundant-declarations.patch
+Remove-if-condition-that-is-always-false.patch
+Fix-dead-store.patch
+Remove-unused-variable.patch
+Remove-unused-typedef-s.patch
+Remove-unused-parameters.patch
+Remove-unnecessary-casts.patch
+Remove-pointer-indirection-where-not-needed.patch
+Remove-redundant-assignment.patch
+Fix-old-style-definition.patch
+Fix-Wstrict-prototypes.patch
+# WARNINGS
+Enable-more-optimization.patch
 Enable-Wcast-qual.patch
 Enable-Wduplicated-branches.patch
 Enable-Wduplicated-cond.patch
@@ -47,29 +67,8 @@ Enable-Wlogical-op.patch
 Enable-Wold-style-definition.patch
 Enable-Wstrict-prototypes.patch
 0143-Add-cppcheck-target.patch
-# WIP								########
-Handle-errors-in-mySystem.patch
-Remove-dead-code.patch
-Fix-Wstrict-prototypes-func-pointers.patch
-Fix-some-casts-that-discard-qualifiers.patch
-Remove-const-where-we-can-t-keep-the-promise.patch
-Remove-declarations-without-definition.patch
-Remove-unused-function-declarations.patch
-Remove-unused-prototyp.patch
-Remove-unused-function.patch
-Move-declarations-to-the-correct-header-file.patch
-Remove-redundant-declarations.patch
-0119-Remove-if-condition-that-is-always-false.patch
-0053-Dead-store.patch
-0068-Remove-unused-variable.patch
-0071-Remove-unused-typedef-s.patch
-Remove-unused-parameters.patch
-Remove-unnecessary-casts.patch
-0126-Remove-pointer-indirection-where-not-needed.patch
-0132-Remove-if-that-is-always-false.patch
+# WIP
 remove-unused-macros.patch
-Fix-old-style-definition.patch
-Fix-Wstrict-prototypes.patch
 0078-Remove-all-usage-of-variable-length-arrays.patch
 0079-Make-usage-of-variable-length-arrays-an-error.patch
 Fix-Wnested-externs.patch
@@ -105,12 +104,14 @@ Suppress-Wstrict-prototypes
 0171-Add-more-const-correctness.patch
 0172-const.patch
 Remove-some-volatile.patch
-# ACTIVE							########
+# ACTIVE
 save-history.patch
 Store-session.patch
 shorten-not-assigned-in-help.patch
 Use-gettext-for-user-facing-strings.patch
 arg-loading-logic.patch
+Enable-lto.patch
+# BORKED
 0036-Move-chkurl-to-own-translation-unit.patch
 0037-Make-MARK_URL-work-with-display_link_numbers.patch
 0038-Do-not-double-check-urls-in-html-files.patch

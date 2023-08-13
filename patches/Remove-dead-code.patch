@@ -592,7 +592,7 @@ Subject: [PATCH 014/172] Remove dead code
  
      refresh();
      buf = loadGeneralFile(url, current, referer, 0, request);
-@@ -5466,10 +5421,6 @@ DEFUN(dispI, DISPLAY_IMAGE, "Restart loa
+@@ -5468,10 +5423,6 @@ DEFUN(dispI, DISPLAY_IMAGE, "Restart loa
      if (!activeImage)
  	return;
      displayImage = TRUE;
@@ -603,7 +603,7 @@ Subject: [PATCH 014/172] Remove dead code
      Currentbuf->image_flag = IMG_FLAG_AUTO;
      Currentbuf->need_reshape = TRUE;
      displayBuffer(Currentbuf, B_REDRAW_IMAGE);
-@@ -5479,10 +5430,6 @@ DEFUN(stopI, STOP_IMAGE, "Stop loading a
+@@ -5481,10 +5432,6 @@ DEFUN(stopI, STOP_IMAGE, "Stop loading a
  {
      if (!activeImage)
  	return;
@@ -614,7 +614,7 @@ Subject: [PATCH 014/172] Remove dead code
      Currentbuf->image_flag = IMG_FLAG_SKIP;
      displayBuffer(Currentbuf, B_REDRAW_IMAGE);
  }
-@@ -6482,11 +6429,7 @@ void
+@@ -6484,11 +6431,7 @@ void
  calcTabPos(void)
  {
      TabBuffer *tab;

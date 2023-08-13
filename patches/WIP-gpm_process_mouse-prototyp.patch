@@ -5,7 +5,7 @@
 
 --- a/main.c
 +++ b/main.c
-@@ -5740,6 +5740,8 @@ DEFUN(sgrmouse, SGRMOUSE, "SGR 1006 mous
+@@ -5742,6 +5742,8 @@ DEFUN(sgrmouse, SGRMOUSE, "SGR 1006 mous
  }
  
  #ifdef USE_GPM
