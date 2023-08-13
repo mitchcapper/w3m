@@ -356,7 +356,7 @@
      wc_uint8     gl;
 --- a/main.c
 +++ b/main.c
-@@ -964,7 +964,7 @@ main(int argc, char **argv)
+@@ -966,7 +966,7 @@ main(int argc, char **argv)
      if (load_argc == 0) {
  	/* no URL specified */
  	if (!isatty(0)) {
@@ -365,7 +365,7 @@
  	    newbuf = openGeneralPagerBuffer(redin);
  	    dup2(1, 0);
  	}
-@@ -1788,7 +1788,7 @@ clear_mark(Line *l)
+@@ -1790,7 +1790,7 @@ clear_mark(Line *l)
  static int
  srchcore(char *volatile str, int (*func) (Buffer *, char *))
  {
@@ -374,7 +374,7 @@
      volatile int i, result = SR_NOTFOUND;
  
      if (str != NULL && str != SearchString)
-@@ -2193,7 +2193,7 @@ DEFUN(pipesh, PIPE_SHELL, "Execute shell
+@@ -2195,7 +2195,7 @@ DEFUN(pipesh, PIPE_SHELL, "Execute shell
  DEFUN(readsh, READ_SHELL, "Execute shell command and display output")
  {
      Buffer *buf;

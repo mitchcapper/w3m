@@ -112,6 +112,8 @@ Use-gettext-for-user-facing-strings.patch
 arg-loading-logic.patch
 Enable-lto.patch
 # BORKED
+replace-deprecated-bcopy.patch
+Add-option-to-auto-accept-self-signed.patch
 0036-Move-chkurl-to-own-translation-unit.patch
 0037-Make-MARK_URL-work-with-display_link_numbers.patch
 0038-Do-not-double-check-urls-in-html-files.patch

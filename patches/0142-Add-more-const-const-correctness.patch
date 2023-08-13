@@ -107,7 +107,7 @@ Subject: [PATCH 142/172] Add more const const correctness
      int i;
 --- a/istream.c
 +++ b/istream.c
-@@ -776,7 +776,7 @@ static int
+@@ -775,7 +775,7 @@ static int
  ens_read(struct ens_handle *handle, char *buf, int len)
  {
      if (handle->pos == handle->gb.length) {

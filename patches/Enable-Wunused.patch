@@ -14,7 +14,7 @@
  DEFAULTS += -Wtype-limits
  DEFAULTS += -Wuninitialized
 +DEFAULTS += -Wunused
- CFLAGS = -I. -I$(top_srcdir) @CFLAGS@ $(DEFAULTS) $(CPPFLAGS) $(DEFS) $(OPTS)
+ CFLAGS = -I. -I$(top_srcdir) $(DEFAULTS) @CFLAGS@ $(CPPFLAGS) $(DEFS) $(OPTS)
  WCCFLAGS = @WCCFLAGS@
  CPPFLAGS = @CPPFLAGS@
 --- a/libwc/Makefile.in
@@ -24,7 +24,7 @@
  DEFAULTS += -Wtype-limits
  DEFAULTS += -Wuninitialized
 +DEFAULTS += -Wunused
- CFLAGS = $(OPTS) -I.. -I$(top_srcdir) -I$(srcdir) @CFLAGS@ $(DEFAULTS) @CPPFLAGS@ @WCCFLAGS@ @DEFS@
+ CFLAGS = $(OPTS) -I.. -I$(top_srcdir) -I$(srcdir) $(DEFAULTS) @CFLAGS@ @CPPFLAGS@ @WCCFLAGS@ @DEFS@
  AR=ar
  RANLIB=@RANLIB@
 --- a/w3mimg/Makefile.in
@@ -34,7 +34,7 @@
  DEFAULTS += -Wtype-limits
  DEFAULTS += -Wuninitialized
 +DEFAULTS += -Wunused
- CFLAGS=$(OPTS) -I.. -I$(top_srcdir) -I$(srcdir) @CFLAGS@ $(DEFAULTS) @CPPFLAGS@ @DEFS@ $(IMGCFLAGS)
+ CFLAGS=$(OPTS) -I.. -I$(top_srcdir) -I$(srcdir) $(DEFAULTS) @CFLAGS@ @CPPFLAGS@ @DEFS@ $(IMGCFLAGS)
  AR=ar
  RANLIB=@RANLIB@
 --- a/w3mimg/fb/Makefile.in
@@ -44,7 +44,7 @@
  DEFAULTS += -Wtype-limits
  DEFAULTS += -Wuninitialized
 +DEFAULTS += -Wunused
- CFLAGS=$(OPTS) -I../.. -I$(top_srcdir) -I$(srcdir) @CFLAGS@ $(DEFAULTS) @CPPFLAGS@ @DEFS@ $(IMGCFLAGS)
+ CFLAGS=$(OPTS) -I../.. -I$(top_srcdir) -I$(srcdir) $(DEFAULTS) @CFLAGS@ @CPPFLAGS@ @DEFS@ $(IMGCFLAGS)
  RM=rm
  
 --- a/w3mimg/win/Makefile.in
@@ -54,7 +54,7 @@
  DEFAULTS += -Wtype-limits
  DEFAULTS += -Wuninitialized
 +DEFAULTS += -Wunused
- CFLAGS=$(OPTS) -I../.. -I$(top_srcdir) -I$(srcdir) @CFLAGS@ $(DEFAULTS) @CPPFLAGS@ @DEFS@ $(IMGCFLAGS)
+ CFLAGS=$(OPTS) -I../.. -I$(top_srcdir) -I$(srcdir) $(DEFAULTS) @CFLAGS@ @CPPFLAGS@ @DEFS@ $(IMGCFLAGS)
  RM=rm
  CC=@CC@
 --- a/w3mimg/x11/Makefile.in
@@ -64,6 +64,6 @@
  DEFAULTS += -Wtype-limits
  DEFAULTS += -Wuninitialized
 +DEFAULTS += -Wunused
- CFLAGS=$(OPTS) -I../.. -I$(top_srcdir) -I$(srcdir) @CFLAGS@ $(DEFAULTS) @CPPFLAGS@ @DEFS@ $(IMGCFLAGS)
+ CFLAGS=$(OPTS) -I../.. -I$(top_srcdir) -I$(srcdir) $(DEFAULTS) @CFLAGS@ @CPPFLAGS@ @DEFS@ $(IMGCFLAGS)
  RM=rm
  

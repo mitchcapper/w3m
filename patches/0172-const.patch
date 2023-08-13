@@ -1064,7 +1064,7 @@ Subject: [PATCH 172/172] const
  {
      /* RFC2818 3.1.  Server Identity
       * Names may contain the wildcard
-@@ -555,7 +555,7 @@ ssl_get_certificate(SSL * ssl, char *hos
+@@ -554,7 +554,7 @@ ssl_get_certificate(SSL * ssl, char *hos
      char buf[2048];
      Str amsg = NULL;
      Str emsg;
@@ -1073,7 +1073,7 @@ Subject: [PATCH 172/172] const
  
      if (ssl == NULL)
  	return NULL;
-@@ -575,7 +575,7 @@ ssl_get_certificate(SSL * ssl, char *hos
+@@ -574,7 +574,7 @@ ssl_get_certificate(SSL * ssl, char *hos
  		("Accept SSL session without any peer certificate");
  	else {
  	    /* FIXME: gettextize? */
@@ -1082,7 +1082,7 @@ Subject: [PATCH 172/172] const
  		"to prevent security violation: no peer certificate";
  	    disp_err_message(e, FALSE);
  	    free_ssl_ctx();
-@@ -648,7 +648,7 @@ ssl_get_certificate(SSL * ssl, char *hos
+@@ -647,7 +647,7 @@ ssl_get_certificate(SSL * ssl, char *hos
  	}
  	else {
  	    /* FIXME: gettextize? */
@@ -1358,7 +1358,7 @@ Subject: [PATCH 172/172] const
  static void _newT(void);
  static void followTab(TabBuffer * tab);
  static void moveTab(TabBuffer * t, TabBuffer * t2, int right);
-@@ -1811,7 +1811,7 @@ srchcore(const char *str, int (*func) (B
+@@ -1813,7 +1813,7 @@ srchcore(const char *str, int (*func) (B
  }
  
  static void
@@ -1367,7 +1367,7 @@ Subject: [PATCH 172/172] const
  {
      if (str == NULL)
  	str = "";
-@@ -1896,7 +1896,7 @@ dispincsrch(int ch, Str buf, Lineprop *p
+@@ -1898,7 +1898,7 @@ dispincsrch(int ch, Str buf, Lineprop *p
  }
  
  static void
@@ -1376,7 +1376,7 @@ Subject: [PATCH 172/172] const
  {
      char *str;
      Buffer sbuf;
-@@ -1912,7 +1912,7 @@ isrch(int (*func) (Buffer *, const char
+@@ -1914,7 +1914,7 @@ isrch(int (*func) (Buffer *, const char
  }
  
  static void
@@ -1385,7 +1385,7 @@ Subject: [PATCH 172/172] const
  {
      const char *str;
      int result;
-@@ -2582,7 +2582,7 @@ save_known_hosts(void)
+@@ -2584,7 +2584,7 @@ save_known_hosts(void)
  static void
  _quitfm(int confirm)
  {
@@ -1394,7 +1394,7 @@ Subject: [PATCH 172/172] const
      int err = 0;
  
      if (checkDownloadList())
-@@ -2709,7 +2709,7 @@ DEFUN(susp, INTERRUPT SUSPEND, "Suspend
+@@ -2711,7 +2711,7 @@ DEFUN(susp, INTERRUPT SUSPEND, "Suspend
  
  /* Go to specified line */
  static void
@@ -1403,7 +1403,7 @@ Subject: [PATCH 172/172] const
  {
      if (l == NULL || *l == '\0' || Currentbuf->currentLine == NULL) {
  	displayBuffer(Currentbuf, B_FORCE_REDRAW);
-@@ -4219,7 +4219,7 @@ cmd_loadURL(char *url, ParsedURL *curren
+@@ -4221,7 +4221,7 @@ cmd_loadURL(char *url, ParsedURL *curren
  
  /* go to specified URL */
  static void
@@ -1412,7 +1412,7 @@ Subject: [PATCH 172/172] const
  {
      char *url, *referer;
      ParsedURL p_url, *current;
-@@ -5269,10 +5269,10 @@ DEFUN(rFrame, FRAME, "Toggle rendering H
+@@ -5271,10 +5271,10 @@ DEFUN(rFrame, FRAME, "Toggle rendering H
  
  /* spawn external browser */
  static void
@@ -1425,7 +1425,7 @@ Subject: [PATCH 172/172] const
      int bg = 0, len;
  
      CurrentKeyData = NULL;	/* not allowed in w3m-control: */
-@@ -5927,7 +5927,7 @@ GetWord(Buffer *buf)
+@@ -5929,7 +5929,7 @@ GetWord(Buffer *buf)
  
  #ifdef USE_DICT
  static void
@@ -1434,7 +1434,7 @@ Subject: [PATCH 172/172] const
  {
      char *w, *dictcmd;
      Buffer *buf;
-@@ -6597,7 +6597,7 @@ DEFUN(tabA, TAB_LINK, "Follow current hy
+@@ -6599,7 +6599,7 @@ DEFUN(tabA, TAB_LINK, "Follow current hy
  }
  
  static void

@@ -15,15 +15,15 @@ w3m-0.5.3+git20230121.
  doc/README.func        |    1 
  file.c                 |  292 ++++++++++++++++++++++++++++++++++++++++++++++++-
  html.h                 |    1 
- istream.c              |  141 ++++++++++++++++++-----
+ istream.c              |  140 ++++++++++++++++++-----
  istream.h              |    5 
- main.c                 |  150 +++++++++++++++++++++++++
+ main.c                 |  152 +++++++++++++++++++++++++
  proto.h                |    1 
  rc.c                   |    5 
  rc.h                   |    2 
  scripts/w3mhelp.cgi.in |    5 
  url.c                  |   35 +++++
- 14 files changed, 612 insertions(+), 39 deletions(-)
+ 14 files changed, 613 insertions(+), 39 deletions(-)
 
 --- a/file.c
 +++ b/file.c
@@ -238,7 +238,7 @@ w3m-0.5.3+git20230121.
  static void
  set_breakpoint(struct readbuffer *obuf, int tag_length)
  {
-@@ -7657,6 +7820,129 @@ loadGopherSearch0(URLFile *uf, ParsedURL
+@@ -7600,6 +7763,129 @@ loadGopherSearch0(URLFile *uf, ParsedURL
  }
  #endif				/* USE_GOPHER */
  
@@ -509,7 +509,7 @@ w3m-0.5.3+git20230121.
      UFclose(&f);
 --- a/main.c
 +++ b/main.c
-@@ -406,6 +406,30 @@ die_oom(size_t bytes)
+@@ -406,6 +406,32 @@ die_oom(size_t bytes)
      return NULL;
  }
  
@@ -526,10 +526,12 @@ w3m-0.5.3+git20230121.
 +    kh = newTextList();
 +
 +    if (!(f = fopen(known_hosts_file, "r")))
-+	return NULL;
++	return kh;
 +
 +    while (!feof(f)) {
 +	l = Strfgets(f);
++	if (!l->length)
++	    continue;
 +	Strchop(l);
 +	pushText(kh, l->ptr);
 +    }
@@ -540,7 +542,7 @@ w3m-0.5.3+git20230121.
  int
  main(int argc, char **argv)
  {
-@@ -908,6 +932,9 @@ main(int argc, char **argv)
+@@ -908,6 +934,9 @@ main(int argc, char **argv)
      if (UseHistory)
  	loadHistory(URLHist);
  #endif				/* not USE_HISTORY */
@@ -550,7 +552,7 @@ w3m-0.5.3+git20230121.
  
  #ifdef USE_M17N
      /*  if (w3m_dump)
-@@ -2557,10 +2584,36 @@ DEFUN(movRW, NEXT_WORD, "Move to the nex
+@@ -2557,10 +2586,36 @@ DEFUN(movRW, NEXT_WORD, "Move to the nex
      displayBuffer(Currentbuf, B_NORMAL);
  }
  
@@ -587,7 +589,7 @@ w3m-0.5.3+git20230121.
  
      if (checkDownloadList())
  	/* FIXME: gettextize? */
-@@ -2587,7 +2640,9 @@ _quitfm(int confirm)
+@@ -2587,7 +2642,9 @@ _quitfm(int confirm)
      if (UseHistory && SaveURLHist)
  	saveHistory(URLHist, URLHistSize);
  #endif				/* USE_HISTORY */
@@ -598,7 +600,7 @@ w3m-0.5.3+git20230121.
  }
  
  /* Quit */
-@@ -4786,6 +4841,13 @@ DEFUN(vwSrc, SOURCE VIEW, "Toggle betwee
+@@ -4786,6 +4843,13 @@ DEFUN(vwSrc, SOURCE VIEW, "Toggle betwee
  	displayBuffer(Currentbuf, B_NORMAL);
  	return;
      }
@@ -612,7 +614,7 @@ w3m-0.5.3+git20230121.
      if (Currentbuf->sourcefile == NULL) {
  	if (Currentbuf->pagerSource &&
  	    !strcasecmp(Currentbuf->type, "text/plain")) {
-@@ -4871,6 +4933,91 @@ DEFUN(fold_pre, FOLD_PRE, "Fold long lin
+@@ -4871,6 +4935,91 @@ DEFUN(fold_pre, FOLD_PRE, "Fold long lin
      FoldPre = FoldPreOpt;
  }
  
@@ -704,7 +706,7 @@ w3m-0.5.3+git20230121.
  /* reload */
  DEFUN(reload, RELOAD, "Load current document anew")
  {
-@@ -5096,6 +5243,7 @@ chkURLBuffer(Buffer *buf)
+@@ -5096,6 +5245,7 @@ chkURLBuffer(Buffer *buf)
  	"https?://[a-zA-Z0-9:%\\-\\./_@]*\\[[a-fA-F0-9:][a-fA-F0-9:\\.]*\\][a-zA-Z0-9:%\\-\\./?=~_\\&+@#,\\$;]*",
  	"ftp://[a-zA-Z0-9:%\\-\\./_@]*\\[[a-fA-F0-9:][a-fA-F0-9:\\.]*\\][a-zA-Z0-9:%\\-\\./=_+@#,\\$]*",
  #endif				/* INET6 */
@@ -766,23 +768,23 @@ w3m-0.5.3+git20230121.
 -	accept_this_site = Strnew_charp(hostname);
 -    else
 -	accept_this_site = NULL;
-+    const char *hh;
 +
-+    _accept_this_site = NULL;
 +    if (!hostname)
 +	return;
 +
-+    if (!ssl_known_hosts || !perm) {
++    if (!perm) {
 +	_accept_this_site = Strnew_charp(hostname);
-+	return;
 +    }
-+
-+    hh = Strnew_m_charp(hostname, " ", X509_fingerprint(x)->ptr, NULL)->ptr;
-+    pushText(known_hosts, hh);
++    else {
++	pushText(known_hosts, Strnew_m_charp(hostname,
++					     " ",
++					     X509_fingerprint(x)->ptr,
++					     NULL)->ptr);
++    }
  }
  
  static int
-@@ -497,6 +526,51 @@ ssl_check_cert_ident(X509 * x, char *hos
+@@ -497,6 +526,50 @@ ssl_check_cert_ident(X509 * x, char *hos
      return ret;
  }
  
@@ -798,19 +800,18 @@ w3m-0.5.3+git20230121.
 +    char *h;
 +    size_t n;
 +
-+    if (_accept_this_site) {
-+	n = _accept_this_site->length;
-+	if (!strncasecmp(_accept_this_site->ptr, hostname, n))
-+	    return 1;
-+    }
-+
-+    if (!ssl_known_hosts && !_accept_this_site)
++    if (!ssl_known_hosts) {
++	if (!_accept_this_site)
 +	    return 0;
++	return !strncasecmp(_accept_this_site->ptr,
++			    hostname,
++			    _accept_this_site->length);
++    }
 +
 +    if (!known_hosts && (!(known_hosts = load_known_hosts())))
 +	known_hosts = newTextList();
 +
-+    if (!(host = known_hosts->last))
++    if (!(host = known_hosts->last)) /* Empty list */
 +	return 0;
 +
 +    n = strlen(hostname);
@@ -834,7 +835,7 @@ w3m-0.5.3+git20230121.
  Str
  ssl_get_certificate(SSL * ssl, char *hostname)
  {
-@@ -504,7 +578,7 @@ ssl_get_certificate(SSL * ssl, char *hos
+@@ -504,7 +577,7 @@ ssl_get_certificate(SSL * ssl, char *hos
      X509 *x;
      X509_NAME *xn;
      char *p;
@@ -843,7 +844,7 @@ w3m-0.5.3+git20230121.
      Str s;
      char buf[2048];
      Str amsg = NULL;
-@@ -513,10 +587,10 @@ ssl_get_certificate(SSL * ssl, char *hos
+@@ -513,10 +586,10 @@ ssl_get_certificate(SSL * ssl, char *hos
  
      if (ssl == NULL)
  	return NULL;
@@ -856,7 +857,7 @@ w3m-0.5.3+git20230121.
  	    ans = "y";
  	else {
  	    /* FIXME: gettextize? */
-@@ -537,7 +611,7 @@ ssl_get_certificate(SSL * ssl, char *hos
+@@ -537,7 +610,7 @@ ssl_get_certificate(SSL * ssl, char *hos
  	}
  	if (amsg)
  	    disp_err_message(amsg->ptr, FALSE);
@@ -865,7 +866,7 @@ w3m-0.5.3+git20230121.
  	/* FIXME: gettextize? */
  	s = amsg ? amsg : Strnew_charp("valid certificate");
  	return s;
-@@ -547,39 +621,46 @@ ssl_get_certificate(SSL * ssl, char *hos
+@@ -547,39 +620,46 @@ ssl_get_certificate(SSL * ssl, char *hos
       * The chain length is automatically checked by OpenSSL when we
       * set the verify depth in the ctx.
       */
@@ -931,7 +932,7 @@ w3m-0.5.3+git20230121.
  	    ans = "y";
  	else {
  	    Str ep = Strdup(emsg);
-@@ -601,10 +682,10 @@ ssl_get_certificate(SSL * ssl, char *hos
+@@ -601,10 +681,10 @@ ssl_get_certificate(SSL * ssl, char *hos
  	    free_ssl_ctx();
  	    return NULL;
  	}

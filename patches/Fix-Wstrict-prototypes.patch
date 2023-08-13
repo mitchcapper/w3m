@@ -62,7 +62,7 @@
  #define getch()	do_getch()
  #endif				/* defined(USE_GPM) || defined(USE_SYSMOUSE) */
  #endif
-@@ -1534,7 +1534,7 @@ static Str currentURL(void);
+@@ -1536,7 +1536,7 @@ static Str currentURL(void);
  
  #ifdef USE_BUFINFO
  void

@@ -513,7 +513,7 @@ Subject: [PATCH 014/172] Remove dead code
      fprintf(f, "    -W               toggle search wrap mode\n");
      fprintf(f, "    -X               don't use termcap init/deinit\n");
      fprintf(f,
-@@ -610,14 +601,6 @@ main(int argc, char **argv)
+@@ -612,14 +603,6 @@ main(int argc, char **argv)
  		    PagerMax = atoi(argv[i]);
  	    }
  #ifdef USE_M17N
@@ -528,7 +528,7 @@ Subject: [PATCH 014/172] Remove dead code
  	    else if (!strncmp("-I", argv[i], 2)) {
  		if (argv[i][2] != '\0')
  		    p = argv[i] + 2;
-@@ -793,11 +776,7 @@ main(int argc, char **argv)
+@@ -795,11 +778,7 @@ main(int argc, char **argv)
  		accept_cookie = TRUE;
  	    }
  #endif				/* USE_COOKIE */
@@ -540,7 +540,7 @@ Subject: [PATCH 014/172] Remove dead code
  		squeezeBlankLine = TRUE;
  	    else if (!strcmp("-X", argv[i]))
  		Do_not_use_ti_te = TRUE;
-@@ -937,9 +916,6 @@ main(int argc, char **argv)
+@@ -939,9 +918,6 @@ main(int argc, char **argv)
  	known_hosts = load_known_hosts();
  
  #ifdef USE_M17N
@@ -550,7 +550,7 @@ Subject: [PATCH 014/172] Remove dead code
  #endif
  
      if (w3m_backend)
-@@ -1770,11 +1746,6 @@ DEFUN(ctrCsrV, CENTER_V, "Center on curs
+@@ -1772,11 +1748,6 @@ DEFUN(ctrCsrV, CENTER_V, "Center on curs
  	return;
      offsety = Currentbuf->LINES / 2 - Currentbuf->cursorY;
      if (offsety != 0) {
@@ -562,7 +562,7 @@ Subject: [PATCH 014/172] Remove dead code
  	Currentbuf->topLine =
  	    lineSkip(Currentbuf, Currentbuf->topLine, -offsety, FALSE);
  	arrangeLine(Currentbuf);
-@@ -3219,14 +3190,6 @@ DEFUN(followA, GOTO_LINK, "Follow curren
+@@ -3221,14 +3192,6 @@ DEFUN(followA, GOTO_LINK, "Follow curren
      }
      if (handleMailto(a->url))
  	return;
@@ -577,7 +577,7 @@ Subject: [PATCH 014/172] Remove dead code
      url = a->url;
  #ifdef USE_IMAGE
      if (map)
-@@ -4254,14 +4217,6 @@ cmd_loadURL(char *url, ParsedURL *curren
+@@ -4256,14 +4219,6 @@ cmd_loadURL(char *url, ParsedURL *curren
  
      if (handleMailto(url))
  	return;
@@ -592,7 +592,7 @@ Subject: [PATCH 014/172] Remove dead code
  
      refresh();
      buf = loadGeneralFile(url, current, referer, 0, request);
-@@ -5468,10 +5423,6 @@ DEFUN(dispI, DISPLAY_IMAGE, "Restart loa
+@@ -5470,10 +5425,6 @@ DEFUN(dispI, DISPLAY_IMAGE, "Restart loa
      if (!activeImage)
  	return;
      displayImage = TRUE;
@@ -603,7 +603,7 @@ Subject: [PATCH 014/172] Remove dead code
      Currentbuf->image_flag = IMG_FLAG_AUTO;
      Currentbuf->need_reshape = TRUE;
      displayBuffer(Currentbuf, B_REDRAW_IMAGE);
-@@ -5481,10 +5432,6 @@ DEFUN(stopI, STOP_IMAGE, "Stop loading a
+@@ -5483,10 +5434,6 @@ DEFUN(stopI, STOP_IMAGE, "Stop loading a
  {
      if (!activeImage)
  	return;
@@ -614,7 +614,7 @@ Subject: [PATCH 014/172] Remove dead code
      Currentbuf->image_flag = IMG_FLAG_SKIP;
      displayBuffer(Currentbuf, B_REDRAW_IMAGE);
  }
-@@ -6484,11 +6431,7 @@ void
+@@ -6486,11 +6433,7 @@ void
  calcTabPos(void)
  {
      TabBuffer *tab;

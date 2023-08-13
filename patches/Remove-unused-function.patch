@@ -241,7 +241,7 @@ Subject: [PATCH 018/172] Remove unused function
  char *known_hosts_file;
 --- a/main.c
 +++ b/main.c
-@@ -3214,15 +3214,6 @@ DEFUN(followA, GOTO_LINK, "Follow curren
+@@ -3216,15 +3216,6 @@ DEFUN(followA, GOTO_LINK, "Follow curren
      displayBuffer(Currentbuf, B_NORMAL);
  }
  
@@ -257,7 +257,7 @@ Subject: [PATCH 018/172] Remove unused function
  /* view inline image */
  DEFUN(followI, VIEW_IMAGE, "Display image in viewer")
  {
-@@ -3470,13 +3461,6 @@ DEFUN(submitForm, SUBMIT, "Submit form")
+@@ -3472,13 +3463,6 @@ DEFUN(submitForm, SUBMIT, "Submit form")
      _followForm(TRUE);
  }
  
