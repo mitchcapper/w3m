@@ -4,7 +4,7 @@
 
 --- a/main.c
 +++ b/main.c
-@@ -1057,81 +1057,79 @@ main(int argc, char **argv)
+@@ -1059,81 +1059,79 @@ main(int argc, char **argv)
  		fprintf(stderr, "%s", err_msg->ptr);
  	    w3m_exit(2);
  	}

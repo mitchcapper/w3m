@@ -18,7 +18,7 @@ make this behaviour permanent.
 
 --- a/file.c
 +++ b/file.c
-@@ -2620,7 +2620,7 @@ check_breakpoint(struct readbuffer *obuf
+@@ -2617,7 +2617,7 @@ check_breakpoint(struct readbuffer *obuf
      int tlen, len = obuf->line->length;
  
      append_tags(obuf);
@@ -27,7 +27,7 @@ make this behaviour permanent.
  	return;
      tlen = obuf->line->length - len;
      if (tlen > 0
-@@ -6711,7 +6711,8 @@ HTMLlineproc0(char *line, struct html_fe
+@@ -6667,7 +6667,8 @@ HTMLlineproc0(char *line, struct html_fe
  			proc_mchar(obuf, 1, delta, &str, mode);
  		}
  		if (obuf->flag & (RB_SPECIAL & ~RB_PRE_INT))
@@ -37,7 +37,7 @@ make this behaviour permanent.
  	    }
  	    else {
  		if (!IS_SPACE(*str))
-@@ -6939,6 +6940,7 @@ loadHTMLBuffer(URLFile *f, Buffer *newBu
+@@ -6882,6 +6883,7 @@ loadHTMLBuffer(URLFile *f, Buffer *newBu
  	if (src)
  	    newBuf->sourcefile = tmp->ptr;
      }
@@ -47,7 +47,7 @@ make this behaviour permanent.
  
 --- a/fm.h
 +++ b/fm.h
-@@ -1056,6 +1056,8 @@ global int ignore_null_img_alt init(TRUE
+@@ -1053,6 +1053,8 @@ global int ignore_null_img_alt init(TRUE
  #define DISPLAY_INS_DEL_FONTIFY	2
  global int displayInsDel init(DISPLAY_INS_DEL_NORMAL);
  global int FoldTextarea init(FALSE);

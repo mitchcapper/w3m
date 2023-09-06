@@ -1,0 +1,18 @@
+From 0e3057008d209c14611db0e95b76ce693699ccd6 Mon Sep 17 00:00:00 2001
+From: Rene Kita <mail@rkta.de>
+Date: Sun, 12 Dec 2021 19:44:34 +0100
+
+---
+ url.c |    1 -
+ 1 file changed, 1 deletion(-)
+
+--- a/url.c
++++ b/url.c
+@@ -606,7 +606,6 @@ openSocket(char *const hostname,
+ 	    /* try next ai family */
+ 	    continue;
+ 	}
+-	sock = -1;
+ 	for (res = res0; res; res = res->ai_next) {
+ 	    sock = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+ 	    if (sock < 0) {

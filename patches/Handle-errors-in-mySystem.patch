@@ -39,7 +39,7 @@ Check the return value of system() calls and display an error message.
  Str
 --- a/proto.h
 +++ b/proto.h
-@@ -665,7 +665,7 @@ extern Str romanNumeral(int n);
+@@ -663,7 +663,7 @@ extern Str romanNumeral(int n);
  extern Str romanAlphabet(int n);
  extern void setup_child(int child, int i, int f);
  extern void myExec(char *command);
@@ -50,7 +50,7 @@ Check the return value of system() calls and display an error message.
  extern int is_localhost(const char *host);
 --- a/file.c
 +++ b/file.c
-@@ -8501,7 +8501,7 @@ doExternal(URLFile uf, char *type, Buffe
+@@ -8213,7 +8213,7 @@ doExternal(URLFile uf, char *type, Buffe
  {
      Str tmpf, command;
      struct mailcap *mcap;
@@ -59,7 +59,7 @@ Check the return value of system() calls and display an error message.
      Buffer *buf = NULL;
      char *header, *src = NULL, *ext = uf.ext;
  
-@@ -8577,8 +8577,11 @@ doExternal(URLFile uf, char *type, Buffe
+@@ -8289,8 +8289,11 @@ doExternal(URLFile uf, char *type, Buffe
      else {
  	if (mcap->flags & MAILCAP_NEEDSTERMINAL || !BackgroundExtViewer) {
  	    fmTerm();

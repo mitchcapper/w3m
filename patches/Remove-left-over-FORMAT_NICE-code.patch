@@ -51,7 +51,7 @@ Date:   2003-03-10T17:28:52+00:00
  #undef INET6
 --- a/file.c
 +++ b/file.c
-@@ -2669,9 +2669,6 @@ set_breakpoint(struct readbuffer *obuf,
+@@ -2506,9 +2506,6 @@ set_breakpoint(struct readbuffer *obuf,
      obuf->bp.pos = obuf->pos;
      obuf->bp.tlen = tag_length;
      obuf->bp.flag = obuf->flag;
@@ -61,7 +61,7 @@ Date:   2003-03-10T17:28:52+00:00
      obuf->bp.top_margin = obuf->top_margin;
      obuf->bp.bottom_margin = obuf->bottom_margin;
  
-@@ -3076,47 +3073,6 @@ flushline(struct html_feed_environ *h_en
+@@ -2913,47 +2910,6 @@ flushline(struct html_feed_environ *h_en
  	else if (RB_GET_ALIGN(obuf) == RB_LEFT && obuf->flag & RB_INTABLE) {
  	    align(lbuf, width, ALIGN_LEFT);
  	}
@@ -109,7 +109,7 @@ Date:   2003-03-10T17:28:52+00:00
  #ifdef TABLE_DEBUG
  	if (w3m_debug) {
  	    FILE *f = fopen("zzzproc1", "a");
-@@ -6935,15 +6891,8 @@ HTMLlineproc0(char *line, struct html_fe
+@@ -6771,15 +6727,8 @@ HTMLlineproc0(char *line, struct html_fe
  		    bp = obuf->line->ptr + obuf->bp.len;
  		    line = Strnew_charp(bp);
  		    Strshrink(obuf->line, obuf->line->length - obuf->bp.len);
@@ -125,7 +125,7 @@ Date:   2003-03-10T17:28:52+00:00
  		    HTMLlineproc1(line->ptr, h_env);
  		}
  	    }
-@@ -6964,13 +6913,7 @@ HTMLlineproc0(char *line, struct html_fe
+@@ -6800,13 +6749,7 @@ HTMLlineproc0(char *line, struct html_fe
  	    i = 1;
  	indent = h_env->envs[h_env->envc].indent;
  	if (obuf->pos - i > h_env->limit) {

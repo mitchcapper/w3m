@@ -1,0 +1,20 @@
+From 69b5bb4d0bae5bf3d5cdda831ea16116b77cd7f9 Mon Sep 17 00:00:00 2001
+From: Rene Kita <mail@rkta.de>
+Date: Sun, 12 Dec 2021 19:43:54 +0100
+Subject: [PATCH 131/172] Use correct format specifier for sprintf
+
+---
+ map.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+--- a/map.c
++++ b/map.c
+@@ -560,7 +560,7 @@ page_info_panel(Buffer *buf)
+ 	Strcat_charp(tmp,
+ 		     "<tr><td nowrap>Document Charset<td><select name=charset>");
+ 	for (; list->name != NULL; list++) {
+-	    sprintf(charset, "%d", (unsigned int)list->id);
++	    sprintf(charset, "%u", (unsigned int)list->id);
+ 	    Strcat_m_charp(tmp, "<option value=", charset,
+ 			   (buf->document_charset == list->id) ? " selected>"
+ 			   : ">", list->desc, NULL);

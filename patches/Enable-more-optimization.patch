@@ -1,0 +1,112 @@
+---
+ Makefile.in            |    9 +++++++--
+ libwc/Makefile.in      |    8 +++++++-
+ w3mimg/Makefile.in     |    8 +++++++-
+ w3mimg/fb/Makefile.in  |    8 +++++++-
+ w3mimg/win/Makefile.in |    8 +++++++-
+ w3mimg/x11/Makefile.in |    8 +++++++-
+ 6 files changed, 42 insertions(+), 7 deletions(-)
+
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -35,8 +35,13 @@ RC_DIR = @RC_DIR@
+ ETC_DIR = $(sysconfdir)
+ CONF_DIR = $(sysconfdir)/$(PACKAGE)
+ 
+-WARNINGS= -Wall -Wnull-dereference
+-CFLAGS = $(WARNINGS) -I. -I$(top_srcdir) @CFLAGS@ $(CPPFLAGS) $(DEFS) $(OPTS)
++DEFAULTS = -Wall
++DEFAULTS += -D_FORTIFY_SOURCE=2
++DEFAULTS += -O3 -g3
++DEFAULTS += -Wno-missing-field-initializers
++DEFAULTS += -Wno-unused-result
++DEFAULTS += -Wnull-dereference
++CFLAGS = -I. -I$(top_srcdir) $(DEFAULTS) @CFLAGS@ $(CPPFLAGS) $(DEFS) $(OPTS)
+ WCCFLAGS = @WCCFLAGS@
+ CPPFLAGS = @CPPFLAGS@
+ DEFS = @DEFS@ -DAUXBIN_DIR=\"$(AUXBIN_DIR)\" \
+--- a/libwc/Makefile.in
++++ b/libwc/Makefile.in
+@@ -6,7 +6,13 @@ top_srcdir=@top_srcdir@
+ VPATH=$(srcdir):.
+ LIBRARY = libwc.a
+ CC=@CC@
+-CFLAGS = $(OPTS) -I.. -I$(top_srcdir) -I$(srcdir) @CFLAGS@ @CPPFLAGS@ @WCCFLAGS@ @DEFS@
++DEFAULTS= -Wall
++DEFAULTS += -D_FORTIFY_SOURCE=2
++DEFAULTS += -O3 -g3
++DEFAULTS += -Wno-missing-field-initializers
++DEFAULTS += -Wno-unused-result
++DEFAULTS += -Wnull-dereference
++CFLAGS = $(OPTS) -I.. -I$(top_srcdir) -I$(srcdir) $(DEFAULTS) @CFLAGS@ @CPPFLAGS@ @WCCFLAGS@ @DEFS@
+ AR=ar
+ RANLIB=@RANLIB@
+ RM=rm
+--- a/w3mimg/Makefile.in
++++ b/w3mimg/Makefile.in
+@@ -6,7 +6,13 @@ SHELL=@SHELL@
+ srcdir = @srcdir@
+ top_srcdir = @top_srcdir@
+ VPATH = $(srcdir):.
+-CFLAGS=$(OPTS) -I.. -I$(top_srcdir) -I$(srcdir) @CFLAGS@ @CPPFLAGS@ @DEFS@ $(IMGCFLAGS)
++DEFAULTS= -Wall
++DEFAULTS += -D_FORTIFY_SOURCE=2
++DEFAULTS += -O3 -g3
++DEFAULTS += -Wno-missing-field-initializers
++DEFAULTS += -Wno-unused-result
++DEFAULTS += -Wnull-dereference
++CFLAGS=$(OPTS) -I.. -I$(top_srcdir) -I$(srcdir) $(DEFAULTS) @CFLAGS@ @CPPFLAGS@ @DEFS@ $(IMGCFLAGS)
+ AR=ar
+ RANLIB=@RANLIB@
+ RM=rm
+--- a/w3mimg/fb/Makefile.in
++++ b/w3mimg/fb/Makefile.in
+@@ -7,7 +7,13 @@ SHELL=@SHELL@
+ srcdir = @srcdir@
+ top_srcdir = @top_srcdir@
+ VPATH = $(srcdir):.
+-CFLAGS=$(OPTS) -I../.. -I$(top_srcdir) -I$(srcdir) @CFLAGS@ @CPPFLAGS@ @DEFS@ $(IMGCFLAGS)
++DEFAULTS= -Wall
++DEFAULTS += -D_FORTIFY_SOURCE=2
++DEFAULTS += -O3 -g3
++DEFAULTS += -Wno-missing-field-initializers
++DEFAULTS += -Wno-unused-result
++DEFAULTS += -Wnull-dereference
++CFLAGS=$(OPTS) -I../.. -I$(top_srcdir) -I$(srcdir) $(DEFAULTS) @CFLAGS@ @CPPFLAGS@ @DEFS@ $(IMGCFLAGS)
+ RM=rm
+ 
+ IMGCFLAGS=@IMGFBCFLAGS@
+--- a/w3mimg/win/Makefile.in
++++ b/w3mimg/win/Makefile.in
+@@ -7,7 +7,13 @@ SHELL=@SHELL@
+ srcdir = @srcdir@
+ top_srcdir = @top_srcdir@
+ VPATH = $(srcdir):.
+-CFLAGS=$(OPTS) -I../.. -I$(top_srcdir) -I$(srcdir) @CFLAGS@ @CPPFLAGS@ @DEFS@ $(IMGCFLAGS)
++DEFAULTS= -Wall
++DEFAULTS += -D_FORTIFY_SOURCE=2
++DEFAULTS += -O3 -g3
++DEFAULTS += -Wno-missing-field-initializers
++DEFAULTS += -Wno-unused-result
++DEFAULTS += -Wnull-dereference
++CFLAGS=$(OPTS) -I../.. -I$(top_srcdir) -I$(srcdir) $(DEFAULTS) @CFLAGS@ @CPPFLAGS@ @DEFS@ $(IMGCFLAGS)
+ RM=rm
+ CC=@CC@
+ CXX=@CXX@
+--- a/w3mimg/x11/Makefile.in
++++ b/w3mimg/x11/Makefile.in
+@@ -7,7 +7,13 @@ SHELL=@SHELL@
+ srcdir = @srcdir@
+ top_srcdir = @top_srcdir@
+ VPATH = $(srcdir):.
+-CFLAGS=$(OPTS) -I../.. -I$(top_srcdir) -I$(srcdir) @CFLAGS@ @CPPFLAGS@ @DEFS@ $(IMGCFLAGS)
++DEFAULTS= -Wall
++DEFAULTS += -D_FORTIFY_SOURCE=2
++DEFAULTS += -O3 -g3
++DEFAULTS += -Wno-missing-field-initializers
++DEFAULTS += -Wno-unused-result
++DEFAULTS += -Wnull-dereference
++CFLAGS=$(OPTS) -I../.. -I$(top_srcdir) -I$(srcdir) $(DEFAULTS) @CFLAGS@ @CPPFLAGS@ @DEFS@ $(IMGCFLAGS)
+ RM=rm
+ 
+ IMGCFLAGS=@IMGX11CFLAGS@
