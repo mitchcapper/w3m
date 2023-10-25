@@ -1,20 +1,9 @@
 /* vi: set sw=4 ts=8 ai sm noet : */
 #include "fm.h"
 
+#include <errno.h>
+
 #ifdef USE_HISTORY
-/* Merge entries from their history into ours */
-static int
-mergeHistory(Hist *ours, Hist *theirs)
-{
-    HistItem *item;
-
-    for (item = theirs->list->first; item; item = item->next)
-	if (!getHashHist(ours, item->ptr))
-	    pushHist(ours, (char *)item->ptr);
-
-    return 0;
-}
-
 Buffer *
 historyBuffer(Hist *hist)
 {
@@ -46,14 +35,51 @@ historyBuffer(Hist *hist)
     return loadHTMLString(src);
 }
 
+/*
+ * If HISTORY_FILE was written to after we last read it, read it again and
+ * merge our URLHist into it.
+ */
+static int
+syncUrlHistory(void)
+{
+    Hist *hist;
+    HistItem *item;
+    struct stat st;
+
+    if (stat(rcFile(HISTORY_FILE), &st))
+	if (errno != ENOENT)
+	    goto err;
+
+    if (URLHist->mtime == (long long)st.st_mtime)
+	return 0;
+
+    hist = URLHist;
+    URLHist = newHist();
+    if (loadUrlHistory()) {
+	URLHist = hist;
+	goto err;
+    }
+
+    /* Merge */
+    for (item = hist->list->first; item; item = item->next)
+	if (!getHashHist(URLHist, item->ptr))
+	    pushHist(URLHist, (char *)item->ptr);
+
+    return 0;
+
+err:
+    disp_err_message("Can't sync URL history", FALSE);
+    return 1;
+}
+
 int
-loadHistory(Hist *hist)
+loadUrlHistory(void)
 {
     FILE *f;
     Str line;
     struct stat st;
 
-    if (hist == NULL)
+    if (URLHist == NULL)
 	return 1;
     if ((f = fopen(rcFile(HISTORY_FILE), "rt")) == NULL)
 	return 1;
@@ -62,7 +88,7 @@ loadHistory(Hist *hist)
 	fclose(f);
 	return 1;
     }
-    hist->mtime = (long long)st.st_mtime;
+    URLHist->mtime = (long long)st.st_mtime;
 
     while (!feof(f)) {
 	line = Strfgets(f);
@@ -71,47 +97,38 @@ loadHistory(Hist *hist)
 	Strremovetrailingspaces(line);
 	if (line->length == 0)
 	    continue;
-	pushHist(hist, url_quote(line->ptr));
+	pushHist(URLHist, url_quote(line->ptr));
     }
     fclose(f);
     return 0;
 }
 
 void
-saveHistory(Hist *hist, size_t size)
+saveUrlHistory(void)
 {
     FILE *f;
-    Hist *fhist;
     HistItem *item;
-    char *histf;
     char *tmpf;
-    int rename_ret;
-    struct stat st;
 
-    if (hist == NULL || hist->list == NULL)
+    if (URLHist == NULL || URLHist->list == NULL)
 	return;
 
-    histf = rcFile(HISTORY_FILE);
-    if (!stat(histf, &st) && hist->mtime != (long long)st.st_mtime) {
-	fhist = newHist();
-	if (loadHistory(fhist) || mergeHistory(fhist, hist))
-	    disp_err_message("Can't merge history", FALSE);
-	else
-	    hist = fhist;
-    }
+    syncUrlHistory();
 
     tmpf = tmpfname(TMPF_HIST, NULL)->ptr;
     if ((f = fopen(tmpf, "w")) == NULL)
 	goto fail;
-    for (item = hist->list->first; item && hist->list->nitem > size;
-	 item = item->next)
-	size++;
+
+    /* Respect URLHistSize before saving */
+    for (item = URLHist->list->first;
+	 item && URLHist->list->nitem > URLHistSize;
+	 item = item->next);
+
     for (; item; item = item->next)
 	fprintf(f, "%s\n", (char *)item->ptr);
     if (fclose(f) == EOF)
 	goto fail;
-    rename_ret = rename(tmpf, rcFile(HISTORY_FILE));
-    if (rename_ret != 0)
+    if (rename(tmpf, rcFile(HISTORY_FILE)))
 	goto fail;
 
     return;
@@ -123,8 +140,8 @@ fail:
 #endif				/* USE_HISTORY */
 
 /*
- * The following functions are used for internal stuff, we need them regardless
- * if history is used or not.
+ * The following functions are used for internal stuff, we need them
+ * regardless if history is used or not.
  */
 
 Hist *

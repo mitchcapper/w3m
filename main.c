@@ -876,7 +876,7 @@ main(int argc, char **argv)
 #endif				/* USE_COOKIE */
 #ifdef USE_HISTORY
     if (UseHistory)
-	loadHistory(URLHist);
+	loadUrlHistory();
 #endif				/* not USE_HISTORY */
 
 #ifdef USE_M17N
@@ -2544,7 +2544,7 @@ _quitfm(int confirm)
 #endif				/* USE_COOKIE */
 #ifdef USE_HISTORY
     if (UseHistory && SaveURLHist)
-	saveHistory(URLHist, URLHistSize);
+	saveUrlHistory();
 #endif				/* USE_HISTORY */
     if (deprecated)
 	fprintf(stderr, "%s\n%s\n%s\n",
