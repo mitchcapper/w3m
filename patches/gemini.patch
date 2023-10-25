@@ -45,7 +45,7 @@ w3m-0.5.3+git20230121.
      return buf;
  }
  
-@@ -1715,7 +1717,7 @@ loadGeneralFile(char *path, ParsedURL *v
+@@ -1687,7 +1689,7 @@ loadGeneralFile(char *path, ParsedURL *v
      URLFile f, *volatile of = NULL;
      ParsedURL pu;
      Buffer *b = NULL;
@@ -54,7 +54,7 @@ w3m-0.5.3+git20230121.
      char *volatile tpath;
      char *volatile t = "text/plain", *p, *volatile real_type = NULL;
      Buffer *volatile t_buf = NULL;
-@@ -2067,6 +2069,166 @@ loadGeneralFile(char *path, ParsedURL *v
+@@ -2039,6 +2041,166 @@ loadGeneralFile(char *path, ParsedURL *v
      else if (pu.scheme == SCM_DATA) {
  	t = f.guess_type;
      }
@@ -221,7 +221,7 @@ w3m-0.5.3+git20230121.
      else if (searchHeader) {
  	searchHeader = SearchHeader = FALSE;
  	if (t_buf == NULL)
-@@ -2244,6 +2406,8 @@ loadGeneralFile(char *path, ParsedURL *v
+@@ -2216,6 +2378,8 @@ loadGeneralFile(char *path, ParsedURL *v
  
      if (is_html_type(t))
  	proc = loadHTMLBuffer;
@@ -230,7 +230,7 @@ w3m-0.5.3+git20230121.
      else if (is_plain_text_type(t))
  	proc = loadBuffer;
  #ifdef USE_IMAGE
-@@ -2498,7 +2662,6 @@ is_boundary(unsigned char *ch1, unsigned
+@@ -2470,7 +2634,6 @@ is_boundary(unsigned char *ch1, unsigned
      return 1;
  }
  
@@ -238,7 +238,7 @@ w3m-0.5.3+git20230121.
  static void
  set_breakpoint(struct readbuffer *obuf, int tag_length)
  {
-@@ -7600,6 +7763,129 @@ loadGopherSearch0(URLFile *uf, ParsedURL
+@@ -7572,6 +7735,129 @@ loadGopherSearch0(URLFile *uf, ParsedURL
  }
  #endif				/* USE_GOPHER */
  

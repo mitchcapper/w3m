@@ -1,0 +1,35 @@
+From 0dc4fba95a6d991dbe9493b001acaf8464b88e84 Mon Sep 17 00:00:00 2001
+From: Rene Kita <mail@rkta.de>
+Date: Thu, 23 Dec 2021 21:39:45 +0100
+Subject: [PATCH 021/172] Remove unused function
+
+---
+ proto.h | 1 -
+ terms.c | 6 ------
+ 2 files changed, 7 deletions(-)
+
+--- a/proto.h
++++ b/proto.h
+@@ -495,7 +495,6 @@ extern void rscroll(int);
+ #endif
+ extern void clrtoeol(void);
+ extern void clrtoeolx(void);
+-extern void clrtobot(void);
+ extern void clrtobotx(void);
+ extern void addstr(char *s);
+ extern void addnstr(char *s, int n);
+--- a/terms.c
++++ b/terms.c
+@@ -2083,12 +2083,6 @@ clrtobot_eol(void (*clrtoeol) ())
+ }
+ 
+ void
+-clrtobot(void)
+-{
+-    clrtobot_eol(clrtoeol);
+-}
+-
+-void
+ clrtobotx(void)
+ {
+     clrtobot_eol(clrtoeolx);

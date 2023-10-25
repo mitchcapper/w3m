@@ -22,7 +22,7 @@ Subject: [PATCH 068/172] Remove unused variable
  #ifdef HAVE_LOCALE_H
 --- a/file.c
 +++ b/file.c
-@@ -8682,7 +8682,6 @@ doFileSave(URLFile uf, char *defstr)
+@@ -8654,7 +8654,6 @@ doFileSave(URLFile uf, char *defstr)
      char *p, *q;
      pid_t pid;
      char *lock;
@@ -30,7 +30,7 @@ Subject: [PATCH 068/172] Remove unused variable
  #if !(defined(HAVE_SYMLINK) && defined(HAVE_LSTAT))
      FILE *f;
  #endif
-@@ -8718,11 +8717,8 @@ doFileSave(URLFile uf, char *defstr)
+@@ -8690,11 +8689,8 @@ doFileSave(URLFile uf, char *defstr)
  	pid = fork();
  	if (!pid) {
  	    int err;
@@ -44,7 +44,7 @@ Subject: [PATCH 068/172] Remove unused variable
  	    setup_child(FALSE, 0, UFfileno(&uf));
  	    err = save2tmp(uf, p);
  	    if (err == 0 && PreserveTimestamp && uf.modtime != -1)
-@@ -8758,11 +8754,8 @@ doFileSave(URLFile uf, char *defstr)
+@@ -8730,11 +8726,8 @@ doFileSave(URLFile uf, char *defstr)
  	    printf("Can't save. Load file and %s are identical.", p);
  	    return -1;
  	}

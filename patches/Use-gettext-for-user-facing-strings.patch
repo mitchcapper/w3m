@@ -1,7 +1,7 @@
 ---
  buffer.c       |   18 +++------
  display.c      |    6 +--
- file.c         |   58 ++++++++++-------------------
+ file.c         |   55 +++++++++-------------------
  form.c         |    6 +--
  frame.c        |    9 +---
  func.c         |   12 ++----
@@ -11,7 +11,7 @@
  main.c         |  111 +++++++++++++++++++--------------------------------------
  po/POTFILES.in |   23 ++++++++++-
  url.c          |    6 +--
- 12 files changed, 110 insertions(+), 180 deletions(-)
+ 12 files changed, 109 insertions(+), 178 deletions(-)
 
 --- a/buffer.c
 +++ b/buffer.c
@@ -127,9 +127,9 @@
  	    /* FIXME: gettextize? */
  	    printf(proxy ? "Proxy Username for %s: " : "Username for %s: ",
  		   realm);
-@@ -1676,8 +1674,7 @@ checkRedirection(ParsedURL *pu)
- 	return TRUE;
+@@ -1664,8 +1662,7 @@ checkRedirection(ParsedURL *pu)
      }
+ 
      if (nredir >= FollowRedirection) {
 -	/* FIXME: gettextize? */
 -	tmp = Sprintf("Number of redirections exceeded %d at %s",
@@ -137,17 +137,7 @@
  		      FollowRedirection, parsedURL2Str(pu)->ptr);
  	disp_err_message(tmp->ptr, FALSE);
  	return FALSE;
-@@ -1686,8 +1683,7 @@ checkRedirection(ParsedURL *pu)
- 	     (same_url_p(pu, &puv[(nredir - 1) % nredir_size]) ||
- 	      (!(nredir % 2)
- 	       && same_url_p(pu, &puv[(nredir / 2) % nredir_size])))) {
--	/* FIXME: gettextize? */
--	tmp = Sprintf("Redirection loop detected (%s)",
-+	tmp = Sprintf(_("Redirection loop detected (%s)"),
- 		      parsedURL2Str(pu)->ptr);
- 	disp_err_message(tmp->ptr, FALSE);
- 	return FALSE;
-@@ -1822,8 +1818,7 @@ loadGeneralFile(char *path, ParsedURL *v
+@@ -1794,8 +1791,7 @@ loadGeneralFile(char *path, ParsedURL *v
  		return b;
  	    }
  #endif
@@ -157,7 +147,7 @@
  				     parsedURL2Str(&pu)->ptr)->ptr, FALSE);
  	    break;
  	}
-@@ -1870,8 +1865,7 @@ loadGeneralFile(char *path, ParsedURL *v
+@@ -1842,8 +1838,7 @@ loadGeneralFile(char *path, ParsedURL *v
  
  	if (fmInitialized) {
  	    term_cbreak();
@@ -167,7 +157,7 @@
  		    ptr, 0, 0);
  	    refresh();
  	}
-@@ -8561,8 +8555,7 @@ _doFileCopy(char *tmpf, char *defstr, in
+@@ -8533,8 +8528,7 @@ _doFileCopy(char *tmpf, char *defstr, in
      if (fmInitialized) {
  	p = searchKeyData();
  	if (p == NULL || *p == '\0') {
@@ -177,7 +167,7 @@
  			      defstr, IN_COMMAND, SaveHist);
  	    if (q == NULL || *q == '\0')
  		return FALSE;
-@@ -8580,16 +8573,14 @@ _doFileCopy(char *tmpf, char *defstr, in
+@@ -8552,16 +8546,14 @@ _doFileCopy(char *tmpf, char *defstr, in
  		return -1;
  	}
  	if (checkCopyFile(tmpf, p) < 0) {
@@ -196,7 +186,7 @@
  		disp_err_message(msg->ptr, FALSE);
  	    }
  	    return -1;
-@@ -8619,8 +8610,7 @@ _doFileCopy(char *tmpf, char *defstr, in
+@@ -8591,8 +8583,7 @@ _doFileCopy(char *tmpf, char *defstr, in
      else {
  	q = searchKeyData();
  	if (q == NULL || *q == '\0') {
@@ -206,7 +196,7 @@
  	    fflush(stdout);
  	    filen = Strfgets(stdin);
  	    if (filen->length == 0)
-@@ -8640,13 +8630,11 @@ _doFileCopy(char *tmpf, char *defstr, in
+@@ -8612,13 +8603,11 @@ _doFileCopy(char *tmpf, char *defstr, in
  		return -1;
  	}
  	if (checkCopyFile(tmpf, p) < 0) {
@@ -222,7 +212,7 @@
  	    return -1;
  	}
  	if (PreserveTimestamp && !is_pipe && !stat(tmpf, &st))
-@@ -8680,8 +8668,7 @@ doFileSave(URLFile uf, const char *defst
+@@ -8652,8 +8641,7 @@ doFileSave(URLFile uf, const char *defst
      if (fmInitialized) {
  	p = searchKeyData();
  	if (p == NULL || *p == '\0') {
@@ -232,7 +222,7 @@
  			      defstr, IN_FILENAME, SaveHist);
  	    if (p == NULL || *p == '\0')
  		return -1;
-@@ -8690,8 +8677,7 @@ doFileSave(URLFile uf, const char *defst
+@@ -8662,8 +8650,7 @@ doFileSave(URLFile uf, const char *defst
  	if (checkOverWrite(p) < 0)
  	    return -1;
  	if (checkSaveFile(uf.stream, p) < 0) {
@@ -242,7 +232,7 @@
  			  conv_from_system(p));
  	    disp_err_message(msg->ptr, FALSE);
  	    return -1;
-@@ -8725,8 +8711,7 @@ doFileSave(URLFile uf, const char *defst
+@@ -8697,8 +8684,7 @@ doFileSave(URLFile uf, const char *defst
      else {
  	q = searchKeyData();
  	if (q == NULL || *q == '\0') {
@@ -252,7 +242,7 @@
  	    fflush(stdout);
  	    filen = Strfgets(stdin);
  	    if (filen->length == 0)
-@@ -8741,15 +8726,13 @@ doFileSave(URLFile uf, const char *defst
+@@ -8713,15 +8699,13 @@ doFileSave(URLFile uf, const char *defst
  	if (checkOverWrite(p) < 0)
  	    return -1;
  	if (checkSaveFile(uf.stream, p) < 0) {
@@ -270,7 +260,7 @@
  	    return -1;
  	}
  	if (PreserveTimestamp && uf.modtime != -1)
-@@ -8796,8 +8779,7 @@ checkOverWrite(const char *path)
+@@ -8768,8 +8752,7 @@ checkOverWrite(const char *path)
  
      if (stat(path, &st) < 0)
  	return 0;
@@ -361,7 +351,7 @@
  	    disp_message_nsec(emsg, FALSE, 1, TRUE, FALSE);
 --- a/history.c
 +++ b/history.c
-@@ -22,9 +22,8 @@ historyBuffer(Hist *hist)
+@@ -11,9 +11,8 @@ historyBuffer(Hist *hist)
      HistItem *item;
      char *p, *q;
  

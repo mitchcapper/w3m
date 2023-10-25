@@ -1,0 +1,288 @@
+From 69ed67674fa26d3d4c353f6846a4a98989b3f7d3 Mon Sep 17 00:00:00 2001
+From: bptato <nincsnevem662@gmail.com>
+Date: Sat, 26 Mar 2022 13:57:30 +0100
+Subject: [PATCH 1/3] Add PIPE_LINK command
+
+Which pipes content directly to shell commands, without first loading it
+in w3m.
+---
+ doc-de/README.func     |   1 +
+ doc-jp/README.func     |   1 +
+ doc/README.func        |   1 +
+ file.c                 | 109 ++++++++++++++++++++++++++++++++++++++---
+ fm.h                   |   1 +
+ main.c                 |   8 +++
+ proto.h                |   2 +
+ scripts/w3mhelp.cgi.in |   2 +-
+ 8 files changed, 116 insertions(+), 9 deletions(-)
+
+diff --git a/doc-de/README.func b/doc-de/README.func
+index cb175db4..46a3c5ba 100644
+--- a/doc-de/README.func
++++ b/doc-de/README.func
+@@ -94,6 +94,7 @@ PEEK		Zeige aktuelle Adresse an
+ PEEK_IMG	Zeige Adresse des Bildes
+ PEEK_LINK	Zeige Zieladresse
+ PIPE_BUF	Leite aktuellen Pufferinhalt einem Shell-Befehl zu und zeige Ausgabe an
++PIPE_LINK	Leite den Inhalt des Links unter dem Cursor direkt an einem Shell-Befehl weiter
+ PIPE_SHELL	Führe Shell-Befehl aus und zeige Ausgabe an
+ PREV		Schalte zum vorherigen Puffer
+ PREV_HALF_PAGE	Scrolle eine halbe Seite aufwärts
+diff --git a/doc-jp/README.func b/doc-jp/README.func
+index 092656e4..571fdede 100644
+--- a/doc-jp/README.func
++++ b/doc-jp/README.func
+@@ -94,6 +94,7 @@ PEEK		現在の文書のURLを表示します
+ PEEK_IMG	現在カーソルがあるリンクを含む画像そのもののURLを表示します
+ PEEK_LINK      リンクが指す先のURLを表示します
+ PIPE_BUF       バッファの内容をパイプに渡します
++PIPE_LINK	リンクが指す先の内容をパイプに渡します
+ PIPE_SHELL	コマンドを実行し，結果を読みこみながら表示します
+ PREV		前のバッファを表示します
+ PREV_HALF_PAGE	半ページ上にスクロールします
+diff --git a/doc/README.func b/doc/README.func
+index 688b8ceb..de39892e 100644
+--- a/doc/README.func
++++ b/doc/README.func
+@@ -94,6 +94,7 @@ PEEK		Show current address
+ PEEK_IMG	Show image address
+ PEEK_LINK	Show target address
+ PIPE_BUF	Pipe current buffer through a shell command and display output
++PIPE_LINK	Pipe the contents of the current hyperlink directly to a shell command
+ PIPE_SHELL	Execute shell command and display output
+ PREV		Switch to the previous buffer
+ PREV_HALF_PAGE	Scroll up half a page
+diff --git a/file.c b/file.c
+index 9f8e97e3..45ee7637 100644
+--- a/file.c
++++ b/file.c
+@@ -2150,6 +2150,10 @@ loadGeneralFile(char *path, ParsedURL *volatile current, char *referer,
+ 	    doFileMove(tmp->ptr, file);
+ 	    return NO_BUFFER;
+ 	}
++	if (do_pipe) {
++	    return NO_BUFFER;
++	}
++
+ 	b = loadHTMLString(page);
+ 	if (b) {
+ 	    copyParsedURL(&b->currentURL, &pu);
+@@ -2196,6 +2200,19 @@ loadGeneralFile(char *path, ParsedURL *volatile current, char *referer,
+ 	return NO_BUFFER;
+     }
+ 
++    if (do_pipe) {
++	TRAP_OFF;
++	if (DecodeCTE && IStype(f.stream) != IST_ENCODED)
++	    f.stream = newEncodedStream(f.stream, f.encoding);
++	if (doFilePipe(f) == 0) {
++	    UFhalfclose(&f);
++	}
++	else {
++	    UFclose(&f);
++	}
++	return NO_BUFFER;
++    }
++
+     if ((f.content_encoding != CMP_NOCOMPRESS) && AutoUncompress
+ 	&& !(w3m_dump & DUMP_EXTRA)) {
+ 	uncompress_stream(&f, &pu.real_file);
+@@ -8186,20 +8203,16 @@ getNextPage(Buffer *buf, int plen)
+ }
+ 
+ int
+-save2tmp(URLFile uf, char *tmpf)
++save2file(URLFile uf, FILE *ff)
+ {
+     FILE *ff;
++    int check;
+     clen_t linelen = 0, trbyte = 0;
+     MySignalHandler(*volatile prevtrap) (SIGNAL_ARG) = NULL;
+     static JMP_BUF env_bak;
+     volatile int retval = 0;
+     char *volatile buf = NULL;
+ 
+-    ff = fopen(tmpf, "wb");
+-    if (ff == NULL) {
+-	/* fclose(f); */
+-	return -1;
+-    }
+     bcopy(AbortLoading, env_bak, sizeof(JMP_BUF));
+     if (SETJMP(AbortLoading) != 0) {
+ 	goto _end;
+@@ -8236,7 +8249,8 @@ save2tmp(URLFile uf, char *tmpf)
+ 
+ 	buf = NewWithoutGC_N(char, SAVE_BUF_SIZE);
+ 	while ((count = ISread_n(uf.stream, buf, SAVE_BUF_SIZE)) > 0) {
+-	    if (fwrite(buf, 1, count, ff) != count) {
++	    int c = fwrite(buf, 1, count, ff);
++	    if (c != count) {
+ 		retval = -2;
+ 		goto _end;
+ 	    }
+@@ -8248,11 +8262,26 @@ save2tmp(URLFile uf, char *tmpf)
+     bcopy(env_bak, AbortLoading, sizeof(JMP_BUF));
+     TRAP_OFF;
+     xfree(buf);
+-    fclose(ff);
+     current_content_length = 0;
+     return retval;
+ }
+ 
++int
++save2tmp(URLFile uf, char *tmpf)
++{
++    FILE *ff;
++    int r;
++
++    ff = fopen(tmpf, "wb");
++    if (ff == NULL) {
++	/* fclose(f); */
++	return -1;
++    }
++    r = save2file(uf, ff);
++    fclose(ff);
++    return r;
++}
++
+ Buffer *
+ doExternal(URLFile uf, char *type, Buffer *defaultbuf)
+ {
+@@ -8625,6 +8654,70 @@ doFileSave(URLFile uf, char *defstr)
+     return 0;
+ }
+ 
++int
++doFilePipe(URLFile uf)
++{
++#ifndef __MINGW32_VERSION
++    Str msg;
++    Str filen;
++    pid_t pid;
++    char *p, *q;
++
++    if (fmInitialized) {
++	p = searchKeyData();
++	if (p == NULL || *p == '\0') {
++	    /* FIXME: gettextize? */
++	    p = inputLineHist("(Download)Pipe into: ",
++			      "", IN_FILENAME, SaveHist);
++	    if (p == NULL || *p == '\0')
++		return -1;
++	    p = conv_to_system(p);
++	}
++	pid = fork();
++	if (!pid) {
++	    int err;
++	    if ((uf.content_encoding != CMP_NOCOMPRESS) && AutoUncompress) {
++		uncompress_stream(&uf, NULL);
++	    }
++	    setup_child(FALSE, 0, UFfileno(&uf));
++	    FILE *ff = popen(p, "w");
++	    err = save2file(uf, ff);
++
++	    pclose(ff);
++	    UFclose(&uf);
++	    if (err != 0)
++		exit(-err);
++	    exit(0);
++	}
++    } else {
++	q = searchKeyData();
++	if (q == NULL || *q == '\0') {
++	    /* FIXME: gettextize? */
++	    printf("(Download)Pipe into: ");
++	    fflush(stdout);
++	    filen = Strfgets(stdin);
++	    if (filen->length == 0)
++		return -1;
++	    q = filen->ptr;
++	}
++	for (p = q + strlen(q) - 1; IS_SPACE(*p); p--) ;
++	*(p + 1) = '\0';
++	if (*q == '\0')
++	    return -1;
++	p = expandPath(q);
++	if (uf.content_encoding != CMP_NOCOMPRESS && AutoUncompress) {
++	    uncompress_stream(&uf, NULL);
++	}
++	if (save2tmp(uf, p) < 0) {
++	    /* FIXME: gettextize? */
++	    printf("Couldn't pipe into %s\n", p);
++	    return -1;
++	}
++    }
++#endif /* __MINGW32_VERSION */
++    return 0;
++}
++
+ int
+ checkCopyFile(char *path1, char *path2)
+ {
+diff --git a/fm.h b/fm.h
+index e6c760ec..d8e1fc83 100644
+--- a/fm.h
++++ b/fm.h
+@@ -1030,6 +1030,7 @@ global char *siteconf_file init(SITECONF_FILE);
+ global char *ftppasswd init(NULL);
+ global int ftppass_hostnamegen init(TRUE);
+ global int do_download init(FALSE);
++global int do_pipe init(FALSE);
+ #ifdef USE_IMAGE
+ global char *image_source init(NULL);
+ #endif
+diff --git a/main.c b/main.c
+index 710db9c1..f74f757a 100644
+--- a/main.c
++++ b/main.c
+@@ -2160,6 +2160,14 @@ DEFUN(pipeBuf, PIPE_BUF, "Pipe current buffer through a shell command and displa
+     displayBuffer(Currentbuf, B_FORCE_REDRAW);
+ }
+ 
++DEFUN(pipeLink, PIPE_LINK, "Load and pipe a URL into a shell command")
++{
++    CurrentKeyData = NULL;	/* not allowed in w3m-control: */
++    do_pipe = TRUE;
++    followA();
++    do_pipe = FALSE;
++}
++
+ /* Execute shell command and read output ac pipe. */
+ DEFUN(pipesh, PIPE_SHELL, "Execute shell command and display output")
+ {
+diff --git a/proto.h b/proto.h
+index c833e9f9..3c7c5eee 100644
+--- a/proto.h
++++ b/proto.h
+@@ -30,6 +30,7 @@ extern void col1R(void);
+ extern void col1L(void);
+ extern void setEnv(void);
+ extern void pipeBuf(void);
++extern void pipeLink(void);
+ extern void pipesh(void);
+ extern void readsh(void);
+ extern void execsh(void);
+@@ -288,6 +289,7 @@ extern int _doFileCopy(char *tmpf, char *defstr, int download);
+ #define doFileCopy(tmpf, defstr) _doFileCopy(tmpf, defstr, FALSE);
+ extern int doFileMove(char *tmpf, char *defstr);
+ extern int doFileSave(URLFile uf, char *defstr);
++extern int doFilePipe(URLFile uf);
+ extern int checkCopyFile(char *path1, char *path2);
+ extern int checkSaveFile(InputStream stream, char *path);
+ extern int checkOverWrite(char *path);
+diff --git a/scripts/w3mhelp.cgi.in b/scripts/w3mhelp.cgi.in
+index 55358f8b..c3f7abbc 100644
+--- a/scripts/w3mhelp.cgi.in
++++ b/scripts/w3mhelp.cgi.in
+@@ -149,7 +149,7 @@ print "<P><A HREF=\"$keymap\">$head</A>\n";
+ 
+ &show_keymap('File/Stream Operations',
+ 	     split(" ", "goURL gorURL tabURL tabrURL ldfile readsh pipesh
+-		pipeBuf"));
++		pipeLink pipeBuf"));
+ 
+ &show_keymap('Buffer Operations',
+ 	     split(" ", "backBf nextBf prevBf goHome selMn selBuf vwSrc svSrc
+-- 
+2.39.2
+

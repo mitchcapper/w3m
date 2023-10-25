@@ -1,0 +1,88 @@
+Author: Rene Kita <mail@rkta.de>
+Date: Wed Sep 13 09:18:33 CEST 2023
+Subject: Fix redirection check
+
+When doing a search on http://en.wikipedia.org w3m falsely claims to
+detect a redirection loop. This happens because Wikipedia does a 302
+redirect where only the searchpart of the url (the part after the ?)
+differs.
+
+Here are the parameters passed to same_url_p() when searching for w3m:
+
+(gdb) p *pu1
+$8 = {scheme = 13, user = 0x0, pass = 0x0,
+  host = 0x7ffff762ec30 "en.wikipedia.org", port = 443,
+  file = 0x7ffff762ec00 "/w/index.php", real_file = 0x0,
+  query = 0x7ffff7530910 "search=w3m&title=Special%3ASearch&ns0=1",
+  label = 0x0, is_nocache = 0}
+(gdb) p *pu2
+$9 = {scheme = 13, user = 0x0, pass = 0x0,
+  host = 0x7ffff762ef60 "en.wikipedia.org", port = 443,
+  file = 0x7ffff762ef30 "/w/index.php", real_file = 0x0,
+  query = 0x7ffff762eed0 "search=w3m&title=Special%3ASearch", label = 0x0,
+  is_nocache = 0}
+
+The only difference is the '&ns0=1' in the query.
+
+Remove the whole logic to detect redirection loops and only rely on
+exceeding the maximum number of allowed redirections in such a case.
+
+---
+ file.c |   30 +-----------------------------
+ 1 file changed, 1 insertion(+), 29 deletions(-)
+
+--- a/file.c
++++ b/file.c
+@@ -1650,28 +1650,16 @@ getAuthCookie(struct http_auth *hauth, c
+ }
+ 
+ static int
+-same_url_p(ParsedURL *pu1, ParsedURL *pu2)
+-{
+-    return (pu1->scheme == pu2->scheme && pu1->port == pu2->port &&
+-	    (pu1->host ? pu2->host ? !strcasecmp(pu1->host, pu2->host) : 0 : 1)
+-	    && (pu1->file ? pu2->
+-		file ? !strcmp(pu1->file, pu2->file) : 0 : 1));
+-}
+-
+-static int
+ checkRedirection(ParsedURL *pu)
+ {
+-    static ParsedURL *puv = NULL;
+     static int nredir = 0;
+-    static int nredir_size = 0;
+     Str tmp;
+ 
+     if (pu == NULL) {
+ 	nredir = 0;
+-	nredir_size = 0;
+-	puv = NULL;
+ 	return TRUE;
+     }
++
+     if (nredir >= FollowRedirection) {
+ 	/* FIXME: gettextize? */
+ 	tmp = Sprintf("Number of redirections exceeded %d at %s",
+@@ -1679,22 +1667,6 @@ checkRedirection(ParsedURL *pu)
+ 	disp_err_message(tmp->ptr, FALSE);
+ 	return FALSE;
+     }
+-    else if (nredir_size > 0 &&
+-	     (same_url_p(pu, &puv[(nredir - 1) % nredir_size]) ||
+-	      (!(nredir % 2)
+-	       && same_url_p(pu, &puv[(nredir / 2) % nredir_size])))) {
+-	/* FIXME: gettextize? */
+-	tmp = Sprintf("Redirection loop detected (%s)",
+-		      parsedURL2Str(pu)->ptr);
+-	disp_err_message(tmp->ptr, FALSE);
+-	return FALSE;
+-    }
+-    if (!puv) {
+-	nredir_size = FollowRedirection / 2 + 1;
+-	puv = New_N(ParsedURL, nredir_size);
+-	memset(puv, 0, sizeof(ParsedURL) * nredir_size);
+-    }
+-    copyParsedURL(&puv[nredir % nredir_size], pu);
+     nredir++;
+     return TRUE;
+ }

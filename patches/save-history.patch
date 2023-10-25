@@ -9,8 +9,8 @@
 --- a/history.h
 +++ b/history.h
 @@ -33,6 +33,7 @@ extern char *prevHist(Hist *hist);
- extern int loadHistory(Hist *hist);
- extern void saveHistory(Hist *hist, size_t size);
+ extern int loadUrlHistory(void);
+ extern void saveUrlHistory(void);
  extern void ldHist(void);
 +extern void svHist(void);
  #else				/* not USE_HISTORY */
@@ -26,7 +26,7 @@
 +/* Save history */
 +DEFUN(svHist, SAVE_HISTORY, "Save browsing history")
 +{
-+    saveHistory(URLHist, URLHistSize);
++    saveUrlHistory();
 +    disp_message_nsec("History written", TRUE, 1, FALSE, TRUE);
 +}
  #endif				/* USE_HISTORY */

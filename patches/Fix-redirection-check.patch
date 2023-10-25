@@ -1,0 +1,56 @@
+Author: Rene Kita <mail@rkta.de>
+Date: Wed Sep 13 09:18:33 CEST 2023
+Subject: Fix redirection check
+
+When doing a search on http://en.wikipedia.org w3m falsely claims to
+detect a redirection loop. This happens because Wikipedia does a 302
+redirect where only the searchpart of the url (the part after the ?)
+differs.
+
+Here are the parameters passed to same_url_p() when searching for w3m:
+
+(gdb) p *pu1
+$8 = {scheme = 13, user = 0x0, pass = 0x0,
+  host = 0x7ffff762ec30 "en.wikipedia.org", port = 443,
+  file = 0x7ffff762ec00 "/w/index.php", real_file = 0x0,
+  query = 0x7ffff7530910 "search=w3m&title=Special%3ASearch&ns0=1",
+  label = 0x0, is_nocache = 0}
+(gdb) p *pu2
+$9 = {scheme = 13, user = 0x0, pass = 0x0,
+  host = 0x7ffff762ef60 "en.wikipedia.org", port = 443,
+  file = 0x7ffff762ef30 "/w/index.php", real_file = 0x0,
+  query = 0x7ffff762eed0 "search=w3m&title=Special%3ASearch", label = 0x0,
+  is_nocache = 0}
+
+The only difference is the '&ns0=1' in the query.
+
+Append same_url_p() to also check the query part.
+---
+ file.c |    9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+--- a/file.c
++++ b/file.c
+@@ -1655,8 +1655,9 @@ same_url_p(ParsedURL *pu1, ParsedURL *pu
+ {
+     return (pu1->scheme == pu2->scheme && pu1->port == pu2->port &&
+ 	    (pu1->host ? pu2->host ? !strcasecmp(pu1->host, pu2->host) : 0 : 1)
+-	    && (pu1->file ? pu2->
+-		file ? !strcmp(pu1->file, pu2->file) : 0 : 1));
++	    && (pu1->file ? pu2->file ? !strcmp(pu1->file, pu2->file) : 0 : 1)
++	    && (pu1->query ? pu2->query ?
++		!strcmp(pu1->query, pu2->query) : 0 : 1));
+ }
+ 
+ static int
+@@ -1681,8 +1682,8 @@ checkRedirection(ParsedURL *pu)
+     }
+     else if (nredir_size > 0 &&
+ 	     (same_url_p(pu, &puv[(nredir - 1) % nredir_size]) ||
+-	      (!(nredir % 2)
+-	       && same_url_p(pu, &puv[(nredir / 2) % nredir_size])))) {
++	      (!(nredir % 2) &&
++	       same_url_p(pu, &puv[(nredir / 2) % nredir_size])))) {
+ 	tmp = Sprintf(_("Redirection loop detected (%s)"),
+ 		      parsedURL2Str(pu)->ptr);
+ 	disp_err_message(tmp->ptr, FALSE);

@@ -1,0 +1,64 @@
+--- a/file.c
++++ b/file.c
+@@ -2771,7 +2771,7 @@ check_breakpoint(struct readbuffer *obuf
+     int tlen, len = obuf->line->length;
+ 
+     append_tags(obuf);
+-    if (pre_mode)
++    if (pre_mode && !FoldPre)
+ 	return;
+     tlen = obuf->line->length - len;
+     if (tlen > 0
+@@ -6862,7 +6862,8 @@ HTMLlineproc0(char *line, struct html_fe
+ 			proc_mchar(obuf, 1, delta, &str, mode);
+ 		}
+ 		if (obuf->flag & (RB_SPECIAL & ~RB_PRE_INT))
+-		    continue;
++		    if (!FoldPre)
++			continue;
+ 	    }
+ 	    else {
+ 		if (!IS_SPACE(*str))
+--- a/fm.h
++++ b/fm.h
+@@ -1057,6 +1057,7 @@ global int ignore_null_img_alt init(TRUE
+ global int displayInsDel init(DISPLAY_INS_DEL_NORMAL);
+ global int FoldTextarea init(FALSE);
+ global int FoldLine init(FALSE);
++global int FoldPre init(FALSE);
+ #define DEFAULT_URL_EMPTY	0
+ #define DEFAULT_URL_CURRENT	1
+ #define DEFAULT_URL_LINK	2
+--- a/main.c
++++ b/main.c
+@@ -5011,6 +5011,12 @@ DEFUN(geminize, GEMINIZE, "Toggle betwee
+     displayBuffer(Currentbuf, B_NORMAL);
+ }
+ 
++DEFUN(fold_pre, FOLD_PRE, "Fold long lines in <pre> elements")
++{
++	FoldPre = 1;
++	reload();
++}
++
+ /* reload */
+ DEFUN(reload, RELOAD, "Load current document anew")
+ {
+@@ -5134,6 +5140,7 @@ DEFUN(reload, RELOAD, "Load current docu
+ 	restorePosition(Currentbuf, &sbuf);
+     }
+     displayBuffer(Currentbuf, B_FORCE_REDRAW);
++    FoldPre = 0;
+ }
+ 
+ /* reshape */
+--- a/proto.h
++++ b/proto.h
+@@ -98,6 +98,7 @@ extern void peekIMG(void);
+ extern void curURL(void);
+ extern void vwSrc(void);
+ extern void geminize(void);
++extern void fold_pre(void);
+ extern void reload(void);
+ extern void reshape(void);
+ extern void chkURL(void);

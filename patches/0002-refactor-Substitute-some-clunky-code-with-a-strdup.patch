@@ -1,0 +1,33 @@
+From f812275fe600ee4c74006702f8e95fb487015f68 Mon Sep 17 00:00:00 2001
+From: Yash Lala <yashlala@gmail.com>
+Date: Thu, 2 Jun 2022 17:44:41 -0700
+Subject: [PATCH 2/3] refactor: Substitute some clunky code with a `strdup()`.
+
+---
+ rc.c | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
+
+diff --git a/rc.c b/rc.c
+index 4240dd3b..622bc370 100644
+--- a/rc.c
++++ b/rc.c
+@@ -1245,13 +1245,11 @@ do_recursive_mkdir(const char *dir)
+     size_t n;
+     struct stat st;
+ 
+-    n = strlen(dir);
+-    if (n == 0)
++    if (*dir == '\0')
+ 	 return -1;
+ 
+-    if ((dircpy = malloc(n + 1)) == NULL)
+-	 return -1;
+-    strcpy(dircpy, dir);
++    if ((dircpy = strdup(dir)) == NULL)
++	 return -1; 
+ 
+     ch = dircpy + 1;
+     do {
+-- 
+2.30.2
+

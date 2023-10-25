@@ -1,0 +1,24 @@
+From 8d660f0a1b02e3cd88acbe7581cada7129fd82ae Mon Sep 17 00:00:00 2001
+From: Rene Kita <mail@rkta.de>
+Date: Thu, 23 Dec 2021 21:43:55 +0100
+Subject: [PATCH 027/172] Remove unused function
+
+---
+ menu.c | 6 ------
+ 1 file changed, 6 deletions(-)
+
+--- a/menu.c
++++ b/menu.c
+@@ -1329,12 +1329,6 @@ popupMenu(int x, int y, Menu *menu)
+     popup_menu(NULL, menu);
+ }
+ 
+-void
+-mainMenu(int x, int y)
+-{
+-    popupMenu(x, y, &MainMenu);
+-}
+-
+ DEFUN(mainMn, MAIN_MENU MENU, "Pop up menu")
+ {
+     Menu *menu = &MainMenu;

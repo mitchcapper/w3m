@@ -22,6 +22,8 @@ Remove-left-over-FORMAT_NICE-code.patch
 Remove-redundant-initialization.patch
 Remove-assignment-of-unread-value.patch
 Handle-errors-in-mySystem.patch
+# PR
+Remove-redirection-loop-check.patch
 # FEATURES
 Display-error-for-unkown-command.patch
 Enable-folding-in-pre-tags.patch
@@ -105,14 +107,15 @@ Suppress-Wstrict-prototypes
 0172-const.patch
 Remove-some-volatile.patch
 # ACTIVE
+replace-deprecated-bcopy.patch
+Refactor-URL-history-handling.patch
 save-history.patch
 Store-session.patch
 shorten-not-assigned-in-help.patch
 Use-gettext-for-user-facing-strings.patch
-arg-loading-logic.patch
 Enable-lto.patch
 # BORKED
-replace-deprecated-bcopy.patch
+Fix-redirection-check.patch
 Add-option-to-auto-accept-self-signed.patch
 0036-Move-chkurl-to-own-translation-unit.patch
 0037-Make-MARK_URL-work-with-display_link_numbers.patch

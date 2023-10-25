@@ -18,7 +18,7 @@ cast away and there was no easy way to keep the const.
 
 --- a/file.c
 +++ b/file.c
-@@ -1749,7 +1749,7 @@ loadGeneralFile(char *path, ParsedURL *v
+@@ -1721,7 +1721,7 @@ loadGeneralFile(char *path, ParsedURL *v
  
    load_doc:
      {
@@ -27,7 +27,7 @@ cast away and there was no easy way to keep the const.
  	parseURL2(tpath, &pu, current);
  	sc_redirect = query_SCONF_SUBSTITUTE_URL(&pu);
  	if (sc_redirect && *sc_redirect && checkRedirection(&pu)) {
-@@ -7907,7 +7907,7 @@ loadImageBuffer(URLFile *uf, Buffer *new
+@@ -7879,7 +7879,7 @@ loadImageBuffer(URLFile *uf, Buffer *new
      URLFile f;
      MySignalHandler(*volatile prevtrap) (SIGNAL_ARG) = NULL;
      struct stat st;

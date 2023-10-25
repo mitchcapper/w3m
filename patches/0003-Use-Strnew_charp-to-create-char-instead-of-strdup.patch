@@ -1,0 +1,63 @@
+From 4c8f4f6cd9d35e895ab6dc71afc0248fb9854dfc Mon Sep 17 00:00:00 2001
+From: Yash Lala <yashlala@gmail.com>
+Date: Fri, 3 Jun 2022 17:04:07 -0700
+Subject: [PATCH 3/3] Use `Strnew_charp()` to create `char *` instead of
+ `strdup()`.
+
+---
+ rc.c | 16 +++++-----------
+ 1 file changed, 5 insertions(+), 11 deletions(-)
+
+diff --git a/rc.c b/rc.c
+index 622bc370..33c941a2 100644
+--- a/rc.c
++++ b/rc.c
+@@ -1248,9 +1248,7 @@ do_recursive_mkdir(const char *dir)
+     if (*dir == '\0')
+ 	 return -1;
+ 
+-    if ((dircpy = strdup(dir)) == NULL)
+-	 return -1; 
+-
++    dircpy = Strnew_charp(dir)->ptr; 
+     ch = dircpy + 1;
+     do {
+ 	while (!(*ch == '/' || *ch == '\0')) {
+@@ -1262,30 +1260,26 @@ do_recursive_mkdir(const char *dir)
+ 
+ 	if (stat(dircpy, &st) < 0) {
+ 	    if (errno != ENOENT) {	/* no directory */
+-		goto err;
++		return -1; 
+ 	    }
+ 	    if (do_mkdir(dircpy, 0700) < 0) {
+-		goto err;
++		return -1; 
+ 	    }
+ 	    stat(dircpy, &st);
+ 	}
+ 	if (!S_ISDIR(st.st_mode)) {
+ 	    /* not a directory */
+-	    goto err;
++	    return -1; 
+ 	}
+ 	if (!(st.st_mode & S_IWUSR)) {
+-	    goto err;
++	    return -1; 
+ 	}
+ 
+ 	*ch = tmp;
+ 
+     } while (*ch++ != '\0');
+ 
+-    free(dircpy);
+     return 0;
+-err:
+-    free(dircpy);
+-    return -1;
+ }
+ 
+ static void loadSiteconf(void);
+-- 
+2.30.2
+

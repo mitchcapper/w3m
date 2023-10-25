@@ -1,0 +1,83 @@
+--- a/file.c
++++ b/file.c
+@@ -7718,8 +7718,9 @@ Buffer *
+ loadGeminiBuffer(URLFile *uf, Buffer *volatile buf)
+ {
+     Anchor *a;
++    FILE *src = NULL;
+     wc_ces charset;
+-    Str l, line;
++    Str l, line, tmpf;
+     char *spacer, *p, *q;
+     int hseq, len, nlines, pre = 0;
+     clen_t linelen = 0, trbyte = 0;
+@@ -7736,7 +7737,21 @@ loadGeminiBuffer(URLFile *uf, Buffer *vo
+     if (IStype(uf->stream) != IST_ENCODED)
+ 	uf->stream = newEncodedStream(uf->stream, uf->encoding);
+ 
++    if (buf->sourcefile == NULL &&
++	(uf->scheme != SCM_LOCAL || buf->mailcap)) {
++	tmpf = tmpfname(TMPF_SRC, NULL);
++	if (!(src = fopen(tmpf->ptr, "w"))) {
++	    TRAP_OFF;
++	    disp_err_message(Sprintf("Cannot open %s, aborting!", tmpf->ptr)->ptr,
++			     FALSE);
++	    return NULL;
++	}
++	buf->sourcefile = tmpf->ptr;
++    }
++
+     while ((line = StrmyISgets(uf->stream)) && line->length) {
++	if (src)
++	    Strfputs(line, src);
+ 	linelen += line->length;
+ 	line = convertLine(uf, line, PAGER_MODE, &charset, charset);
+ 	Strchop(line);
+@@ -7810,6 +7825,8 @@ loadGeminiBuffer(URLFile *uf, Buffer *vo
+     }
+   _end:
+     TRAP_OFF;
++    if (src)
++	fclose(src);
+     buf->topLine = buf->firstLine;
+     buf->lastLine = buf->currentLine;
+     buf->currentLine = buf->firstLine;
+--- a/buffer.c
++++ b/buffer.c
+@@ -18,6 +18,10 @@ extern int do_getch(void); /* TODO(rkta)
+ const char *NullLine = "";
+ Lineprop NullProp[] = { 0 };
+ 
++
++/* TODO(rkta): header file */
++Buffer * loadGeminiBuffer(URLFile *uf, Buffer *volatile buf);
++
+ /* 
+  * Buffer creation
+  */
+@@ -483,6 +487,8 @@ reshapeBuffer(Buffer *buf)
+ {
+     URLFile f;
+     Buffer sbuf;
++    /* TODO(rkta): Shouldn't we do this for all schemes? */
++    int scheme;
+ #ifdef USE_M17N
+     wc_uint8 old_auto_detect = WcOption.auto_detect;
+ #endif
+@@ -493,6 +499,7 @@ reshapeBuffer(Buffer *buf)
+     buf->width = INIT_BUFFER_WIDTH;
+     if (buf->sourcefile == NULL)
+ 	return;
++    scheme = buf->currentURL.scheme;
+     init_stream(&f, SCM_LOCAL, NULL);
+     examineFile(buf->mailcap_source ? buf->mailcap_source : buf->sourcefile,
+ 		&f);
+@@ -538,6 +545,8 @@ reshapeBuffer(Buffer *buf)
+ #endif
+     if (is_html_type(buf->type))
+ 	loadHTMLBuffer(&f, buf);
++    else if (scheme == SCM_GEMINI)
++	loadGeminiBuffer(&f, buf);
+     else
+ 	loadBuffer(&f, buf);
+     UFclose(&f);

@@ -1,0 +1,28 @@
+From 01cb1b366e056f4bea056c5105ded1ecac3017b9 Mon Sep 17 00:00:00 2001
+From: Rene Kita <mail@rkta.de>
+Date: Sat, 4 Dec 2021 16:29:26 +0100
+Subject: [PATCH 001/172] Update README
+
+---
+ README | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/README b/README
+index 8dcef066..f418b2ac 100644
+--- a/README
++++ b/README
+@@ -4,8 +4,9 @@ w3m: WWW wo Miru Tool
+ w3m is a pager with WWW capability.  It IS a pager, but it can be used
+ as a text-mode WWW browser.
+ 
+-This package is maintained for Debian <https://www.debian.org>,
+-forked from the original version <https://sourceforge.net/projects/w3m/>.
++This package is maintained for me <https://rkta.de>, forked from the Debian
++version <https://github.com/tats/w3m>, which was forked from the original
++version <https://sourceforge.net/projects/w3m/>.
+ 
+ If you can read English, see doc/*.
+ If you can read Japanese, see doc-jp/*.
+-- 
+2.30.2
+
