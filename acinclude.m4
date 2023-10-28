@@ -877,20 +877,9 @@ if test x"$enable_ipv6" = xyes; then
 	int i = ss.ss_family;
       ],
       [AC_MSG_RESULT(yes)],
-      [AC_TRY_COMPILE([
-#include <sys/types.h>
-#include <sys/socket.h>
-	],
-	[
-	struct sockaddr_storage ss;
-	int i = ss.__ss_family;
-	],
-	[AC_MSG_RESULT(no, but __ss_family exists)
-	 AC_DEFINE(HAVE_OLD_SS_FAMILY)],
-	[AC_MSG_RESULT(no)
-	 AC_MSG_WARN(IPv6 support is disabled)
-	 enable_ipv6="no"])
-      ])
+      [AC_MSG_RESULT(no)
+      AC_MSG_WARN(IPv6 support is disabled)
+      enable_ipv6="no"])
  fi
  if test x"$enable_ipv6" = xyes; then
     AC_DEFINE(INET6)
