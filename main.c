@@ -8,7 +8,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <fcntl.h>
-#if defined(HAVE_WAITPID) || defined(HAVE_WAIT3)
+#if defined(HAVE_WAITPID)
 #include <sys/wait.h>
 #endif
 #include <time.h>
@@ -348,8 +348,6 @@ sig_chld(int signo)
 
 #ifdef HAVE_WAITPID
     while ((pid = waitpid(-1, &p_stat, WNOHANG)) > 0)
-#elif HAVE_WAIT3
-    while ((pid = wait3(&p_stat, WNOHANG, NULL)) > 0)
 #else
     if ((pid = wait(&p_stat)) > 0)
 #endif
