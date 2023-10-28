@@ -13,7 +13,7 @@ w3m-0.5.3+git20230121.
  display.c              |    3 
  doc-de/README.func     |    1 
  doc/README.func        |    1 
- file.c                 |  292 ++++++++++++++++++++++++++++++++++++++++++++++++-
+ file.c                 |  293 ++++++++++++++++++++++++++++++++++++++++++++++++-
  html.h                 |    1 
  istream.c              |  140 ++++++++++++++++++-----
  istream.h              |    5 
@@ -23,7 +23,7 @@ w3m-0.5.3+git20230121.
  rc.h                   |    2 
  scripts/w3mhelp.cgi.in |    5 
  url.c                  |   35 +++++
- 14 files changed, 613 insertions(+), 39 deletions(-)
+ 14 files changed, 614 insertions(+), 39 deletions(-)
 
 --- a/file.c
 +++ b/file.c
@@ -238,7 +238,7 @@ w3m-0.5.3+git20230121.
  static void
  set_breakpoint(struct readbuffer *obuf, int tag_length)
  {
-@@ -7572,6 +7735,129 @@ loadGopherSearch0(URLFile *uf, ParsedURL
+@@ -7572,6 +7735,130 @@ loadGopherSearch0(URLFile *uf, ParsedURL
  }
  #endif				/* USE_GOPHER */
  
@@ -361,6 +361,7 @@ w3m-0.5.3+git20230121.
 +    buf->lastLine = buf->currentLine;
 +    buf->currentLine = buf->firstLine;
 +    buf->trbyte = trbyte + linelen;
++    buf->type = "text/gemini";
 +
 +    return buf;
 +}
