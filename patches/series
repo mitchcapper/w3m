@@ -114,6 +114,13 @@ Store-session.patch
 shorten-not-assigned-in-help.patch
 Use-gettext-for-user-facing-strings.patch
 Enable-lto.patch
+Get-rid-of-MySignalHandler.patch
+Remove-config.h.hist.patch
+Drop-wait3-support.patch
+Drop-support-for-old-ss-family.patch
+Remove-obsolete-checks-in-configure.patch
+Replace-AC_TRY_CPP.patch
+run-autoupdate.patch
 # BORKED
 Fix-redirection-check.patch
 Add-option-to-auto-accept-self-signed.patch

@@ -1,0 +1,150 @@
+Author: Rene Kita <mail@rkta.de>
+Date: Sat Oct 28 11:56:36 CEST 2023
+Subject: Drop wait3 support
+---
+ config.h.in  |    1 
+ configure    |   67 -----------------------------------------------------------
+ configure.ac |    1 
+ etc.c        |    2 -
+ file.c       |    2 -
+ main.c       |    4 ---
+ 6 files changed, 3 insertions(+), 74 deletions(-)
+
+--- a/config.h.in
++++ b/config.h.in
+@@ -130,7 +130,6 @@ typedef long clen_t;
+ #undef HAVE_STRCHR
+ #undef HAVE_STRERROR
+ #undef HAVE_WAITPID
+-#undef HAVE_WAIT3
+ #undef HAVE_STRFTIME
+ #undef HAVE_GETCWD
+ #undef HAVE_GETWD
+--- a/configure.ac
++++ b/configure.ac
+@@ -153,7 +153,6 @@ dnl AC_FUNC_SETVBUF_REVERSED
+ dnl AC_FUNC_VPRINTF
+ AC_CHECK_FUNCS(strcasecmp strcasestr strchr memcpy strerror setpgrp chdir mkdtemp faccessat getcwd getwd readlink setenv putenv strtoll stroq atoll atoq symlink readlink lstat srand48 srandom getpassphrase waitpid setlocale)
+ AC_FUNC_STRFTIME
+-AC_FUNC_WAIT3
+ AC_FUNC_SETPGRP
+ case "$host_os" in
+   *cygwin*)
+--- a/etc.c
++++ b/etc.c
+@@ -11,7 +11,7 @@
+ #include <fcntl.h>
+ #include <sys/types.h>
+ #include <time.h>
+-#if defined(HAVE_WAITPID) || defined(HAVE_WAIT3)
++#if defined(HAVE_WAITPID)
+ #include <sys/wait.h>
+ #endif
+ #include <signal.h>
+--- a/file.c
++++ b/file.c
+@@ -6,7 +6,7 @@
+ #include "myctype.h"
+ #include <signal.h>
+ #include <setjmp.h>
+-#if defined(HAVE_WAITPID) || defined(HAVE_WAIT3)
++#if defined(HAVE_WAITPID)
+ #include <sys/wait.h>
+ #endif
+ #include <stdio.h>
+--- a/main.c
++++ b/main.c
+@@ -9,7 +9,7 @@
+ #include <sys/types.h>
+ #include <unistd.h>
+ #include <fcntl.h>
+-#if defined(HAVE_WAITPID) || defined(HAVE_WAIT3)
++#if defined(HAVE_WAITPID)
+ #include <sys/wait.h>
+ #endif
+ #include <time.h>
+@@ -342,8 +342,6 @@ sig_chld(int signo)
+ 
+ #ifdef HAVE_WAITPID
+     while ((pid = waitpid(-1, &p_stat, WNOHANG)) > 0)
+-#elif HAVE_WAIT3
+-    while ((pid = wait3(&p_stat, WNOHANG, NULL)) > 0)
+ #else
+     if ((pid = wait(&p_stat)) > 0)
+ #endif
+--- a/configure
++++ b/configure
+@@ -10677,73 +10677,6 @@ fi
+ fi
+ 
+ done
+-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for wait3 that fills in rusage" >&5
+-printf %s "checking for wait3 that fills in rusage... " >&6; }
+-if test ${ac_cv_func_wait3_rusage+y}
+-then :
+-  printf %s "(cached) " >&6
+-else $as_nop
+-  if test "$cross_compiling" = yes
+-then :
+-  ac_cv_func_wait3_rusage=no
+-else $as_nop
+-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+-/* end confdefs.h.  */
+-$ac_includes_default
+-#include <sys/time.h>
+-#include <sys/resource.h>
+-#include <sys/wait.h>
+-/* HP-UX has wait3 but does not fill in rusage at all.  */
+-int
+-main (void)
+-{
+-  struct rusage r;
+-  int i;
+-  /* Use a field that we can force nonzero --
+-     voluntary context switches.
+-     For systems like NeXT and OSF/1 that don't set it,
+-     also use the system CPU time.  And page faults (I/O) for Linux.  */
+-  r.ru_nvcsw = 0;
+-  r.ru_stime.tv_sec = 0;
+-  r.ru_stime.tv_usec = 0;
+-  r.ru_majflt = r.ru_minflt = 0;
+-  switch (fork ())
+-    {
+-    case 0: /* Child.  */
+-      sleep(1); /* Give up the CPU.  */
+-      _exit(0);
+-      break;
+-    case -1: /* What can we do?  */
+-      _exit(0);
+-      break;
+-    default: /* Parent.  */
+-      wait3(&i, 0, &r);
+-      /* Avoid "text file busy" from rm on fast HP-UX machines.  */
+-      sleep(2);
+-      return (r.ru_nvcsw == 0 && r.ru_majflt == 0 && r.ru_minflt == 0
+-	      && r.ru_stime.tv_sec == 0 && r.ru_stime.tv_usec == 0);
+-    }
+-}
+-_ACEOF
+-if ac_fn_c_try_run "$LINENO"
+-then :
+-  ac_cv_func_wait3_rusage=yes
+-else $as_nop
+-  ac_cv_func_wait3_rusage=no
+-fi
+-rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
+-  conftest.$ac_objext conftest.beam conftest.$ac_ext
+-fi
+-
+-fi
+-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_func_wait3_rusage" >&5
+-printf "%s\n" "$ac_cv_func_wait3_rusage" >&6; }
+-if test $ac_cv_func_wait3_rusage = yes; then
+-
+-printf "%s\n" "#define HAVE_WAIT3 1" >>confdefs.h
+-
+-fi
+-
+ { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether setpgrp requires zero arguments" >&5
+ printf %s "checking whether setpgrp requires zero arguments... " >&6; }
+ if test ${ac_cv_func_setpgrp_void+y}
