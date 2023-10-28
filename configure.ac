@@ -1,6 +1,6 @@
 dnl w3m autoconf
 dnl Process this file with autoconf to produce a configure script.
-AC_INIT(w3m, 0.5.3)
+AC_INIT([w3m],[0.5.3])
 PACKAGE=w3m
 VERSION=0.5.3
 AC_DEFINE_UNQUOTED(PACKAGE, "$PACKAGE")
@@ -15,7 +15,7 @@ AC_DEFINE(W3M, w3m)
 AC_SUBST(W3M_LANG)
 W3M_LANG=${LC_ALL:-$LANG}
 dnl AM_INIT_AUTOMAKE(w3m, 0.4)
-AC_CONFIG_HEADER(config.h)
+AC_CONFIG_HEADERS([config.h])
 dnl Checks for programs.
 AC_PROG_CXX
 AC_PROG_AWK
@@ -98,10 +98,10 @@ if test x"$enable_mouse" = xyes; then
  AC_CHECK_LIB(gpm, Gpm_Open, [AC_DEFINE(USE_GPM)
    		W3M_LIBS="$W3M_LIBS -lgpm"])
  AC_SUBST(USE_SYSMOUSE)
- AC_CHECK_HEADER([#include <sys/consio.h>
-   MOUSE_GETINFO], [AC_DEFINE(USE_SYSMOUSE)],
-   [AC_CHECK_HEADER([#include <machine/console.h>
-      MOUSE_GETINFO], [AC_DEFINE(USE_SYSMOUSE)])])
+ AC_COMPILE_IFELSE([AC_LANG_SOURCE([#include <sys/consio.h>
+   int test = MOUSE_GETINFO;])], [AC_DEFINE(USE_SYSMOUSE)],
+   [AC_COMPILE_IFELSE([AC_LANG_SOURCE([#include <machine/console.h>
+      MOUSE_GETINFO], [AC_DEFINE(USE_SYSMOUSE)])])])
 fi
 AC_SUBST(AUXBIN_TARGETS)
 AC_W3M_TERMLIB
@@ -160,7 +160,7 @@ DOCDIRS="doc:en_English doc-jp:ja_Japanese doc-de:de_German"
 AC_DEFINE_UNQUOTED(DOCDIRS, "$DOCDIRS")
 
 AC_W3M_VERSION
-AC_OUTPUT([Makefile posubst po/Makefile.in \
+AC_CONFIG_FILES([Makefile posubst po/Makefile.in \
 scripts/Makefile scripts/dirlist.cgi \
 scripts/w3mhelp.cgi \
 scripts/w3mmail.cgi scripts/xface2xpm \
@@ -172,5 +172,6 @@ libwc/Makefile \
 w3mimg/Makefile w3mimg/fb/Makefile w3mimg/x11/Makefile w3mimg/win/Makefile \
 w3mhelp-w3m_en.html w3mhelp-w3m_ja.html \
 w3mhelp-lynx_en.html w3mhelp-lynx_ja.html])
+AC_OUTPUT
 
 chmod +x posubst
