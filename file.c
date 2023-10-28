@@ -188,11 +188,10 @@ static struct compression_decoder {
 
 #define SAVE_BUF_SIZE 1536
 
-static MySignalHandler
+static void
 KeyAbort(SIGNAL_ARG)
 {
     LONGJMP(AbortLoading, 1);
-    SIGNAL_RETURN;
 }
 
 static void
@@ -1695,7 +1694,7 @@ loadGeneralFile(char *path, ParsedURL *volatile current, char *referer,
     Buffer *volatile t_buf = NULL;
     int volatile searchHeader = SearchHeader;
     int volatile searchHeader_through = TRUE;
-    MySignalHandler(*volatile prevtrap) (SIGNAL_ARG) = NULL;
+    void (*volatile prevtrap) (SIGNAL_ARG) = NULL;
     TextList *extra_header = newTextList();
     volatile Str uname = NULL;
     volatile Str pwd = NULL;
@@ -7214,7 +7213,7 @@ loadHTMLstream(URLFile *f, Buffer *newBuf, FILE * src, int internal)
 #ifdef USE_IMAGE
     int volatile image_flag;
 #endif
-    MySignalHandler(*volatile prevtrap) (SIGNAL_ARG) = NULL;
+    void (*volatile prevtrap) (SIGNAL_ARG) = NULL;
 
 #ifdef USE_M17N
     if (fmInitialized && graph_ok()) {
@@ -7390,7 +7389,7 @@ Buffer *
 loadHTMLString(Str page)
 {
     URLFile f;
-    MySignalHandler(*volatile prevtrap) (SIGNAL_ARG) = NULL;
+    void (*volatile prevtrap) (SIGNAL_ARG) = NULL;
     Buffer *newBuf;
 
     init_stream(&f, SCM_LOCAL, newStrStream(page));
@@ -7441,7 +7440,7 @@ loadGopherDir0(URLFile *uf, ParsedURL *pu)
     Str lbuf, name, file, host, port, type;
     char *volatile p, *volatile q;
     int link, pre;
-    MySignalHandler(*volatile prevtrap) (SIGNAL_ARG) = NULL;
+    void (*volatile prevtrap) (SIGNAL_ARG) = NULL;
 #ifdef USE_M17N
     wc_ces doc_charset = DocumentCharset;
 #endif
@@ -7605,7 +7604,7 @@ loadBuffer(URLFile *uf, Buffer *volatile newBuf)
 #ifdef USE_ANSI_COLOR
     Linecolor *colorBuffer = NULL;
 #endif
-    MySignalHandler(*volatile prevtrap) (SIGNAL_ARG) = NULL;
+    void (*volatile prevtrap) (SIGNAL_ARG) = NULL;
 
     if (newBuf == NULL)
 	newBuf = newBuffer(INIT_BUFFER_WIDTH);
@@ -7694,7 +7693,7 @@ loadImageBuffer(URLFile *uf, Buffer *newBuf)
     Str tmp, tmpf;
     FILE *src = NULL;
     URLFile f;
-    MySignalHandler(*volatile prevtrap) (SIGNAL_ARG) = NULL;
+    void (*volatile prevtrap) (SIGNAL_ARG) = NULL;
     struct stat st;
     const ParsedURL *pu = newBuf ? &newBuf->currentURL : NULL;
 
@@ -8023,7 +8022,7 @@ getNextPage(Buffer *buf, int plen)
 #ifdef USE_ANSI_COLOR
     Linecolor *colorBuffer = NULL;
 #endif
-    MySignalHandler(*volatile prevtrap) (SIGNAL_ARG) = NULL;
+    void (*volatile prevtrap) (SIGNAL_ARG) = NULL;
 
     if (buf->pagerSource == NULL)
 	return NULL;
@@ -8132,7 +8131,7 @@ save2tmp(URLFile uf, char *tmpf)
 {
     FILE *ff;
     clen_t linelen = 0, trbyte = 0;
-    MySignalHandler(*volatile prevtrap) (SIGNAL_ARG) = NULL;
+    void (*volatile prevtrap) (SIGNAL_ARG) = NULL;
     static JMP_BUF env_bak;
     volatile int retval = 0;
     unsigned char *volatile buf = NULL;

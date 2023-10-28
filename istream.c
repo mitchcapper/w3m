@@ -178,7 +178,7 @@ newEncodedStream(InputStream is, char encoding)
 int
 ISclose(InputStream stream)
 {
-    MySignalHandler(*prevtrap) (SIGNAL_ARG);
+    void (*prevtrap) (SIGNAL_ARG);
     if (stream == NULL)
         return -1;
     if (stream->base.close != NULL) {
