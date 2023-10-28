@@ -911,16 +911,3 @@ AC_TRY_COMPILE(
 [have_sigsetjmp="yes"; AC_DEFINE(HAVE_SIGSETJMP)],
 [have_sigsetjmp="no"])
 AC_MSG_RESULT($have_sigsetjmp)])
-#
-# ----------------------------------------------------------------
-# AC_W3M_SIGNAL_RETURN
-# ----------------------------------------------------------------
-AC_DEFUN([AC_W3M_SIGNAL],
-[AC_TYPE_SIGNAL
- AC_SUBST(RETSIGTYPE)
- AC_SUBST(SIGNAL_RETURN)
- if test x"$ac_cv_type_signal" = xvoid; then
-  AC_DEFINE(SIGNAL_RETURN,return)
- else
-  AC_DEFINE(SIGNAL_RETURN,return 0)
- fi])

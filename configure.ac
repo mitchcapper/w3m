@@ -163,7 +163,6 @@ case "$host_os" in
     ;;
 esac
 AC_W3M_SIGSETJMP
-AC_W3M_SIGNAL
 
 AC_SUBST(HELP_DIR)
 HELP_DIR="$datadir/$PACKAGE"
