@@ -72,6 +72,7 @@ static int
     119,			/* news group */
     0,				/* data - not defined */
     0,				/* mailto - not defined */
+    70,				/* gophers */
 #ifdef USE_SSL
     443,			/* https */
 #endif				/* USE_SSL */
@@ -80,6 +81,7 @@ static int
 struct cmdtable schemetable[] = {
     {"http", SCM_HTTP},
     {"gopher", SCM_GOPHER},
+    {"gophers", SCM_GOPHERS},
     {"ftp", SCM_FTP},
     {"local", SCM_LOCAL},
     {"file", SCM_LOCAL},
@@ -229,6 +231,7 @@ DefaultFile(int scheme)
 	return allocStr(HTTP_DEFAULT_FILE, -1);
 #ifdef USE_GOPHER
     case SCM_GOPHER:
+    case SCM_GOPHERS:
 	return allocStr("1", -1);
 #endif				/* USE_GOPHER */
     case SCM_LOCAL:
@@ -962,7 +965,8 @@ parseURL(char *url, ParsedURL *p_url, ParsedURL *current)
 
     q = p;
 #ifdef USE_GOPHER
-    if (p_url->scheme == SCM_GOPHER) {
+    if (p_url->scheme == SCM_GOPHER
+	|| p_url->scheme == SCM_GOPHERS) {
 	if (*q == '/')
 	    q++;
 	if (*q && q[0] != '/' && q[1] != '/' && q[2] == '/')
@@ -976,7 +980,8 @@ parseURL(char *url, ParsedURL *p_url, ParsedURL *current)
 	goto do_query;
     }
 #ifdef USE_GOPHER
-    if (p_url->scheme == SCM_GOPHER && *p == 'R') {
+    if ((p_url->scheme == SCM_GOPHER
+	 || p_url->scheme == SCM_GOPHERS)&& *p == 'R') {
 	if (!*++p) {
 	    p_url->file = "";
 	    goto do_query;
@@ -1145,7 +1150,8 @@ parseURL2(char *url, ParsedURL *pu, ParsedURL *current)
 #endif
 		if (
 #ifdef USE_GOPHER
-		       pu->scheme != SCM_GOPHER &&
+		       (pu->scheme != SCM_GOPHER
+			&& pu->scheme != SCM_GOPHERS) &&
 #endif				/* USE_GOPHER */
 		       pu->file[0] != '/'
 #ifdef SUPPORT_DOS_DRIVE_PREFIX
@@ -1168,7 +1174,8 @@ parseURL2(char *url, ParsedURL *pu, ParsedURL *current)
 		}
 	    }
 #ifdef USE_GOPHER
-	    else if (pu->scheme == SCM_GOPHER && pu->file[0] == '/') {
+	    else if ((pu->scheme == SCM_GOPHER
+		      || pu->scheme == SCM_GOPHERS) && pu->file[0] == '/') {
 		p = pu->file;
 		pu->file = allocStr(p + 1, -1);
 	    }
@@ -1224,7 +1231,8 @@ parseURL2(char *url, ParsedURL *pu, ParsedURL *current)
 	}
 	else if (
 #ifdef USE_GOPHER
-		    pu->scheme != SCM_GOPHER &&
+		    (pu->scheme != SCM_GOPHER
+		     && pu->scheme != SCM_GOPHERS) &&
 #endif				/* USE_GOPHER */
 		    pu->file[0] == '/') {
 	    /*
@@ -1254,9 +1262,11 @@ static Str
 _parsedURL2Str(ParsedURL *pu, int pass, int user, int label)
 {
     Str tmp;
+    /* See SCM_* defines in html.h for correct order of entries. */
     static char *scheme_str[] = {
 	"http", "gopher", "ftp", "ftp", "file", "file", "exec", "nntp", "nntp",
 	"news", "news", "data", "mailto",
+	"gophers",
 #ifdef USE_SSL
 	"https",
 #endif				/* USE_SSL */
@@ -1897,6 +1907,7 @@ openURL(char *url, ParsedURL *pu, ParsedURL *current,
 	return uf;
 #ifdef USE_GOPHER
     case SCM_GOPHER:
+    case SCM_GOPHERS:
 	p = pu->file;
 	n = 0;
 	while(*p == '/') {
@@ -1955,11 +1966,25 @@ openURL(char *url, ParsedURL *pu, ParsedURL *current,
 	    tmp = Strnew_charp(file_unquote(pu->file));
 	    Strcat_charp(tmp, "\r\n");
 	}
-	write(sock, tmp->ptr, tmp->length);
+#ifdef USE_SSL
+	if (pu->scheme == SCM_GOPHERS) {
+	    if (!(sslh = openSSLHandle(sock, pu->host,
+				       &uf.ssl_certificate))) {
+		*status = HTST_MISSING;
+		return uf;
+	    }
+	    uf.stream = newSSLStream(sslh, sock);
+	    SSL_write(sslh, tmp->ptr, tmp->length);
+	}
+	else
+#endif
+	{
+	    write(sock, tmp->ptr, tmp->length);
+	    uf.stream = newInputStream(sock);
+	}
 	if(type != '\0') {
 	  pu->file = gophertmp->ptr;
 	}
-	uf.stream = newInputStream(sock);
 	return uf;
 #endif				/* USE_GOPHER */
 #ifdef USE_NNTP
@@ -2414,6 +2439,7 @@ schemeToProxy(int scheme)
 	break;
 #ifdef USE_GOPHER
     case SCM_GOPHER:
+    case SCM_GOPHERS:
 	pu = &GOPHER_proxy_parsed;
 	break;
 #endif

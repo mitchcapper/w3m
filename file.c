@@ -1952,7 +1952,7 @@ loadGeneralFile(char *path, ParsedURL *volatile current, char *referer,
     }
 #endif				/* USE_NNTP */
 #ifdef USE_GOPHER
-    else if (pu.scheme == SCM_GOPHER) {
+    else if (pu.scheme == SCM_GOPHER || pu.scheme == SCM_GOPHERS) {
 	p = pu.file;
 	while(*p == '/')
 	    ++p;
@@ -2126,7 +2126,7 @@ loadGeneralFile(char *path, ParsedURL *volatile current, char *referer,
 		return NULL;
 	    file = guess_filename(pu.file);
 #ifdef USE_GOPHER
-	    if (f.scheme == SCM_GOPHER)
+	    if (f.scheme == SCM_GOPHER || f.scheme == SCM_GOPHERS)
 		file = Sprintf("%s.html", file)->ptr;
 #endif
 #ifdef USE_NNTP

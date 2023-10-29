@@ -401,6 +401,10 @@ struct environment {
 
 #define INDENT_INCR IndentIncr
 
+/*
+ * Those SCM_ define the indeces of DefaultPort in url.c and scheme_str[] in
+ * _parsedURL2Str in url.c
+ */
 #define SCM_UNKNOWN	255
 #define SCM_MISSING	254
 #define SCM_HTTP	0
@@ -416,8 +420,9 @@ struct environment {
 #define SCM_NEWS_GROUP	10
 #define SCM_DATA	11
 #define SCM_MAILTO      12
+#define SCM_GOPHERS	13
 #ifdef USE_SSL
-#define SCM_HTTPS       13
+#define SCM_HTTPS       14
 #endif				/* USE_SSL */
 
 #endif				/* _HTML_H */
