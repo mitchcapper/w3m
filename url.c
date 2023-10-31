@@ -1763,7 +1763,8 @@ openURL(char *url, ParsedURL *pu, ParsedURL *current,
 	    uf.scheme = pu->scheme;
 	    return uf;
 	}
-	break;
+	uf.stream = newInputStream(sock);
+	return uf;
     case SCM_HTTP:
 #ifdef USE_SSL
     case SCM_HTTPS:
@@ -1892,7 +1893,8 @@ openURL(char *url, ParsedURL *pu, ParsedURL *current,
 		request->enctype == FORM_ENCTYPE_MULTIPART)
 		write_from_file(sock, request->body);
 	}
-	break;
+	uf.stream = newInputStream(sock);
+	return uf;
 #ifdef USE_GOPHER
     case SCM_GOPHER:
 	p = pu->file;
@@ -1957,7 +1959,8 @@ openURL(char *url, ParsedURL *pu, ParsedURL *current,
 	if(type != '\0') {
 	  pu->file = gophertmp->ptr;
 	}
-	break;
+	uf.stream = newInputStream(sock);
+	return uf;
 #endif				/* USE_GOPHER */
 #ifdef USE_NNTP
     case SCM_NNTP:
@@ -1994,8 +1997,6 @@ openURL(char *url, ParsedURL *pu, ParsedURL *current,
     default:
 	return uf;
     }
-    uf.stream = newInputStream(sock);
-    return uf;
 }
 
 /* add index_file if exists */
