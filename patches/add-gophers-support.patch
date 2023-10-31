@@ -1,0 +1,146 @@
+Author: Rene Kita <mail@rkta.de>
+Date: Sun Oct 29 16:11:29 CET 2023
+Subject: add gophers support
+---
+ file.c |    4 ++--
+ html.h |    1 +
+ url.c  |   24 ++++++++++++++++++------
+ 3 files changed, 21 insertions(+), 8 deletions(-)
+
+--- a/file.c
++++ b/file.c
+@@ -1954,7 +1954,7 @@ loadGeneralFile(char *path, ParsedURL *v
+     }
+ #endif				/* USE_NNTP */
+ #ifdef USE_GOPHER
+-    else if (pu.scheme == SCM_GOPHER) {
++    else if (pu.scheme == SCM_GOPHER || pu.scheme == SCM_GOPHERS) {
+ 	p = pu.file;
+ 	while(*p == '/')
+ 	    ++p;
+@@ -2287,7 +2287,7 @@ fail:
+ 		return NULL;
+ 	    file = guess_filename(pu.file);
+ #ifdef USE_GOPHER
+-	    if (f.scheme == SCM_GOPHER)
++	    if (f.scheme == SCM_GOPHER || f.scheme == SCM_GOPHERS)
+ 		file = Sprintf("%s.html", file)->ptr;
+ #endif
+ #ifdef USE_NNTP
+--- a/url.c
++++ b/url.c
+@@ -75,12 +75,14 @@ static int
+ #ifdef USE_SSL
+     443,			/* https */
+ #endif				/* USE_SSL */
+-    1965			/* gemini */
++    1965,			/* gemini */
++    70				/* gophers */
+ };
+ 
+ struct cmdtable schemetable[] = {
+     {"http", SCM_HTTP},
+     {"gopher", SCM_GOPHER},
++    {"gophers", SCM_GOPHERS},
+     {"ftp", SCM_FTP},
+     {"local", SCM_LOCAL},
+     {"file", SCM_LOCAL},
+@@ -97,6 +99,7 @@ struct cmdtable schemetable[] = {
+     {"https", SCM_HTTPS},
+ #endif				/* USE_SSL */
+     {"gemini", SCM_GEMINI},
++    {"gophers", SCM_GOPHERS},
+     {NULL, SCM_UNKNOWN},
+ };
+ 
+@@ -231,6 +234,7 @@ DefaultFile(int scheme)
+ 	return allocStr(HTTP_DEFAULT_FILE, -1);
+ #ifdef USE_GOPHER
+     case SCM_GOPHER:
++    case SCM_GOPHERS:
+ 	return allocStr("1", -1);
+ #endif				/* USE_GOPHER */
+     case SCM_LOCAL:
+@@ -966,7 +970,8 @@ parseURL(char *url, ParsedURL *p_url, Pa
+ 
+     q = p;
+ #ifdef USE_GOPHER
+-    if (p_url->scheme == SCM_GOPHER) {
++    if (p_url->scheme == SCM_GOPHER
++	|| p_url->scheme == SCM_GOPHERS) {
+ 	if (*q == '/')
+ 	    q++;
+ 	if (*q && q[0] != '/' && q[1] != '/' && q[2] == '/')
+@@ -980,7 +985,8 @@ parseURL(char *url, ParsedURL *p_url, Pa
+ 	goto do_query;
+     }
+ #ifdef USE_GOPHER
+-    if (p_url->scheme == SCM_GOPHER && *p == 'R') {
++    if ((p_url->scheme == SCM_GOPHER
++	 || p_url->scheme == SCM_GOPHERS)&& *p == 'R') {
+ 	if (!*++p) {
+ 	    p_url->file = "";
+ 	    goto do_query;
+@@ -1149,7 +1155,8 @@ parseURL2(char *url, ParsedURL *pu, Pars
+ #endif
+ 		if (
+ #ifdef USE_GOPHER
+-		       pu->scheme != SCM_GOPHER &&
++		       (pu->scheme != SCM_GOPHER
++			&& pu->scheme != SCM_GOPHERS) &&
+ #endif				/* USE_GOPHER */
+ 		       pu->file[0] != '/'
+ #ifdef SUPPORT_DOS_DRIVE_PREFIX
+@@ -1172,7 +1179,8 @@ parseURL2(char *url, ParsedURL *pu, Pars
+ 		}
+ 	    }
+ #ifdef USE_GOPHER
+-	    else if (pu->scheme == SCM_GOPHER && pu->file[0] == '/') {
++	    else if ((pu->scheme == SCM_GOPHER
++		      || pu->scheme == SCM_GOPHERS) && pu->file[0] == '/') {
+ 		p = pu->file;
+ 		pu->file = allocStr(p + 1, -1);
+ 	    }
+@@ -1228,7 +1236,8 @@ parseURL2(char *url, ParsedURL *pu, Pars
+ 	}
+ 	else if (
+ #ifdef USE_GOPHER
+-		    pu->scheme != SCM_GOPHER &&
++		    (pu->scheme != SCM_GOPHER
++		     && pu->scheme != SCM_GOPHERS) &&
+ #endif				/* USE_GOPHER */
+ 		    pu->file[0] == '/') {
+ 	    /*
+@@ -1264,6 +1273,7 @@ _parsedURL2Str(ParsedURL *pu, int pass,
+ #ifdef USE_SSL
+ 	"https",
+ 	"gemini",
++	"gophers",
+ #endif				/* USE_SSL */
+     };
+ 
+@@ -1907,6 +1917,7 @@ openURL(char *url, ParsedURL *pu, Parsed
+ 	return uf;
+ #ifdef USE_GOPHER
+     case SCM_GOPHER:
++    case SCM_GOPHERS:
+ 	p = pu->file;
+ 	n = 0;
+ 	while(*p == '/') {
+@@ -2453,6 +2464,7 @@ schemeToProxy(int scheme)
+ 	break;
+ #ifdef USE_GOPHER
+     case SCM_GOPHER:
++    case SCM_GOPHERS:
+ 	pu = &GOPHER_proxy_parsed;
+ 	break;
+ #endif
+--- a/html.h
++++ b/html.h
+@@ -420,5 +420,6 @@ struct environment {
+ #define SCM_HTTPS       13
+ #endif				/* USE_SSL */
+ #define SCM_GEMINI	14
++#define SCM_GOPHERS	15
+ 
+ #endif				/* _HTML_H */

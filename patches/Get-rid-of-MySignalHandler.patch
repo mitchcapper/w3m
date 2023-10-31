@@ -77,7 +77,7 @@ Subject: Get rid of MySignalHandler
  
      if (SETJMP(AbortLoading) != 0) {
  	goto _end;
-@@ -7775,7 +7774,7 @@ loadBuffer(URLFile *uf, Buffer *volatile
+@@ -7776,7 +7775,7 @@ loadBuffer(URLFile *uf, Buffer *volatile
  #ifdef USE_ANSI_COLOR
      Linecolor *colorBuffer = NULL;
  #endif
@@ -86,7 +86,7 @@ Subject: Get rid of MySignalHandler
  
      if (newBuf == NULL)
  	newBuf = newBuffer(INIT_BUFFER_WIDTH);
-@@ -7864,7 +7863,7 @@ loadImageBuffer(URLFile *uf, Buffer *new
+@@ -7865,7 +7864,7 @@ loadImageBuffer(URLFile *uf, Buffer *new
      Str tmp, tmpf;
      FILE *src = NULL;
      URLFile f;
@@ -95,7 +95,7 @@ Subject: Get rid of MySignalHandler
      struct stat st;
      ParsedURL *pu = newBuf ? &newBuf->currentURL : NULL;
  
-@@ -8192,7 +8191,7 @@ getNextPage(Buffer *buf, int plen)
+@@ -8193,7 +8192,7 @@ getNextPage(Buffer *buf, int plen)
  #ifdef USE_ANSI_COLOR
      Linecolor *colorBuffer = NULL;
  #endif
@@ -104,7 +104,7 @@ Subject: Get rid of MySignalHandler
  
      if (buf->pagerSource == NULL)
  	return NULL;
-@@ -8301,7 +8300,7 @@ save2tmp(URLFile uf, const char *tmpf)
+@@ -8302,7 +8301,7 @@ save2tmp(URLFile uf, const char *tmpf)
  {
      FILE *ff;
      clen_t linelen = 0, trbyte = 0;
@@ -398,7 +398,7 @@ Subject: Get rid of MySignalHandler
      struct mouse_info mi;
 --- a/url.c
 +++ b/url.c
-@@ -243,11 +243,10 @@ DefaultFile(int scheme)
+@@ -247,11 +247,10 @@ DefaultFile(int scheme)
      return NULL;
  }
  
@@ -411,7 +411,7 @@ Subject: Get rid of MySignalHandler
  }
  
  #ifdef USE_SSL
-@@ -550,7 +549,7 @@ openSocket(char *const hostname,
+@@ -554,7 +553,7 @@ openSocket(char *const hostname,
      int a1, a2, a3, a4;
      unsigned long adr;
  #endif				/* not INET6 */
@@ -420,7 +420,7 @@ Subject: Get rid of MySignalHandler
  
      if (fmInitialized) {
  	message(Sprintf(_("Opening socket..."))->ptr, 0, 0);
-@@ -2150,7 +2149,7 @@ check_no_proxy(char *domain)
+@@ -2162,7 +2161,7 @@ check_no_proxy(char *domain)
  {
      TextListItem *tl;
      volatile int ret = 0;

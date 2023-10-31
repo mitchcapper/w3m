@@ -145,7 +145,7 @@ w3m-0.5.3+git20230121.
 +		    SKIP_BLANKS(m);
 +		}
 +		else {
-+		    err = Sprintf("Can't parser Gemini response header: %s", hdr->ptr);
++		    err = Sprintf("Can't parse Gemini response header: %s", hdr->ptr);
 +		    goto fail;
 +		}
 +	    }

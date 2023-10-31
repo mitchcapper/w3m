@@ -578,7 +578,7 @@ Subject: [PATCH 172/172] const
      float csize, factor = 1;
      int sizepos = 0;
  
-@@ -8020,7 +8020,7 @@ saveBufferBody(Buffer *buf, FILE * f, in
+@@ -8021,7 +8021,7 @@ saveBufferBody(Buffer *buf, FILE * f, in
  }
  
  static Buffer *
@@ -587,7 +587,7 @@ Subject: [PATCH 172/172] const
  	   Buffer *(*loadproc) (URLFile *, Buffer *), Buffer *defaultbuf)
  {
      FILE *f;
-@@ -8302,7 +8302,7 @@ getNextPage(Buffer *buf, int plen)
+@@ -8303,7 +8303,7 @@ getNextPage(Buffer *buf, int plen)
  }
  
  int
@@ -596,7 +596,7 @@ Subject: [PATCH 172/172] const
  {
      FILE *ff;
      clen_t linelen = 0, trbyte = 0;
-@@ -8370,7 +8370,7 @@ save2tmp(URLFile uf, char *tmpf)
+@@ -8371,7 +8371,7 @@ save2tmp(URLFile uf, char *tmpf)
  }
  
  Buffer *
@@ -605,7 +605,7 @@ Subject: [PATCH 172/172] const
  {
      Str tmpf, command;
      struct mailcap *mcap;
-@@ -8474,7 +8474,7 @@ doExternal(URLFile uf, char *type, Buffe
+@@ -8475,7 +8475,7 @@ doExternal(URLFile uf, char *type, Buffe
  }
  
  static int
@@ -614,7 +614,7 @@ Subject: [PATCH 172/172] const
  {
      InputStream f1;
      FILE *f2;
-@@ -8637,7 +8637,7 @@ doFileMove(char *tmpf, char *defstr)
+@@ -8638,7 +8638,7 @@ doFileMove(char *tmpf, char *defstr)
  }
  
  int
@@ -623,7 +623,7 @@ Subject: [PATCH 172/172] const
  {
  #ifndef __MINGW32_VERSION
      Str msg;
-@@ -8732,7 +8732,7 @@ doFileSave(URLFile uf, char *defstr)
+@@ -8733,7 +8733,7 @@ doFileSave(URLFile uf, char *defstr)
  }
  
  int
@@ -632,7 +632,7 @@ Subject: [PATCH 172/172] const
  {
      struct stat st1, st2;
  
-@@ -8745,7 +8745,7 @@ checkCopyFile(char *path1, char *path2)
+@@ -8746,7 +8746,7 @@ checkCopyFile(char *path1, char *path2)
  }
  
  int
@@ -641,7 +641,7 @@ Subject: [PATCH 172/172] const
  {
      struct stat st1, st2;
      int des = ISfileno(stream);
-@@ -8761,7 +8761,7 @@ checkSaveFile(InputStream stream, char *
+@@ -8762,7 +8762,7 @@ checkSaveFile(InputStream stream, char *
  }
  
  int
@@ -650,7 +650,7 @@ Subject: [PATCH 172/172] const
  {
      struct stat st;
      char *ans;
-@@ -8777,7 +8777,7 @@ checkOverWrite(char *path)
+@@ -8778,7 +8778,7 @@ checkOverWrite(char *path)
  }
  
  char *
@@ -659,7 +659,7 @@ Subject: [PATCH 172/172] const
  {
      char *ans;
  
-@@ -8894,7 +8894,7 @@ uncompress_stream(URLFile *uf, char **sr
+@@ -8895,7 +8895,7 @@ uncompress_stream(URLFile *uf, char **sr
  
  
  static FILE *
@@ -668,7 +668,7 @@ Subject: [PATCH 172/172] const
  {
      char *lessopen;
      FILE *fp;
-@@ -8943,7 +8943,7 @@ lessopen_stream(char *path)
+@@ -8944,7 +8944,7 @@ lessopen_stream(char *path)
  }
  
  static char *
@@ -1684,7 +1684,7 @@ Subject: [PATCH 172/172] const
          return;
 --- a/url.c
 +++ b/url.c
-@@ -2058,10 +2058,10 @@ add_index_file(ParsedURL *pu, URLFile *u
+@@ -2070,10 +2070,10 @@ add_index_file(ParsedURL *pu, URLFile *u
  }
  
  static char *
@@ -1697,7 +1697,7 @@ Subject: [PATCH 172/172] const
      if (table == NULL)
  	return NULL;
      p = &filename[strlen(filename) - 1];
-@@ -2082,7 +2082,7 @@ guessContentTypeFromTable(struct table2
+@@ -2094,7 +2094,7 @@ guessContentTypeFromTable(struct table2
  }
  
  char *

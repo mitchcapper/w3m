@@ -255,7 +255,7 @@ Subject: [PATCH 014/172] Remove dead code
  #ifdef USE_M17N
  	if (meta_charset) {	/* <META> */
  	    if (content_charset == 0 && UseContentCharset) {
-@@ -8768,12 +8678,6 @@ doFileSave(URLFile uf, char *defstr)
+@@ -8769,12 +8679,6 @@ doFileSave(URLFile uf, char *defstr)
  	    disp_err_message(msg->ptr, FALSE);
  	    return -1;
  	}
@@ -268,7 +268,7 @@ Subject: [PATCH 014/172] Remove dead code
  	lock = tmpfname(TMPF_DFL, ".lock")->ptr;
  #if defined(HAVE_SYMLINK) && defined(HAVE_LSTAT)
  	symlink(p, lock);
-@@ -9054,40 +8958,6 @@ lessopen_stream(char *path)
+@@ -9055,40 +8959,6 @@ lessopen_stream(char *path)
      return fp;
  }
  
@@ -809,7 +809,7 @@ Subject: [PATCH 014/172] Remove dead code
  {
 --- a/url.c
 +++ b/url.c
-@@ -419,13 +419,8 @@ openSSLHandle(int sock, char *hostname,
+@@ -423,13 +423,8 @@ openSSLHandle(int sock, char *hostname,
  
  #ifdef USE_SSL_VERIFY
  	/* derived from openssl-0.9.5/apps/s_{client,cb}.c */
@@ -824,7 +824,7 @@ Subject: [PATCH 014/172] Remove dead code
  	if (ssl_cert_file != NULL && *ssl_cert_file != '\0') {
  	    int ng = 1;
  	    if (SSL_CTX_use_certificate_file
-@@ -2491,17 +2486,6 @@ url_encode(const char *url, const Parsed
+@@ -2504,17 +2499,6 @@ url_encode(const char *url, const Parsed
  			  url_to_charset(url, base, doc_charset));
  }
  

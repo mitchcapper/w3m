@@ -196,7 +196,7 @@ WIP: Still needs changes in configure.ac, but can't run autoconf.
      }
      else {
  	c = NULL;
-@@ -8316,7 +8316,7 @@ save2tmp(URLFile uf, const char *tmpf)
+@@ -8317,7 +8317,7 @@ save2tmp(URLFile uf, const char *tmpf)
  	/* fclose(f); */
  	return -1;
      }
@@ -205,7 +205,7 @@ WIP: Still needs changes in configure.ac, but can't run autoconf.
      if (SETJMP(AbortLoading) != 0) {
  	goto _end;
      }
-@@ -8361,7 +8361,7 @@ save2tmp(URLFile uf, const char *tmpf)
+@@ -8362,7 +8362,7 @@ save2tmp(URLFile uf, const char *tmpf)
  	}
      }
    _end:
@@ -339,7 +339,7 @@ WIP: Still needs changes in configure.ac, but can't run autoconf.
  
 --- a/url.c
 +++ b/url.c
-@@ -647,7 +647,7 @@ openSocket(char *const hostname,
+@@ -651,7 +651,7 @@ openSocket(char *const hostname,
      if (regexMatch(hostname, -1, 1)) {
  	sscanf(hostname, "%d.%d.%d.%d", &a1, &a2, &a3, &a4);
  	adr = htonl((a1 << 24) | (a2 << 16) | (a3 << 8) | a4);
@@ -348,7 +348,7 @@ WIP: Still needs changes in configure.ac, but can't run autoconf.
  	hostaddr.sin_family = AF_INET;
  	hostaddr.sin_port = s_port;
  	if (fmInitialized) {
-@@ -681,7 +681,7 @@ openSocket(char *const hostname,
+@@ -685,7 +685,7 @@ openSocket(char *const hostname,
  	hostaddr.sin_family = AF_INET;
  	hostaddr.sin_port = s_port;
  	for (h_addr_list = entry->h_addr_list; *h_addr_list; h_addr_list++) {

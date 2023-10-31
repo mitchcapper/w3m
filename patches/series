@@ -30,6 +30,8 @@ Enable-folding-in-pre-tags.patch
 gemini.patch
 Zero-based-link-no.patch
 Use-https-with-USE_SSL-and-retry_http.patch
+refactor-openUrl-scheme-handling.patch
+add-gophers-support.patch
 # READY
 # NEXT
 Remove-dead-code.patch

@@ -1,0 +1,51 @@
+Author: Rene Kita <mail@rkta.de>
+Date: Tue Oct 31 10:43:55 CET 2023
+Subject: refactor openUrl scheme handling
+
+Instead of breaking in this really long switch statement, except a
+little more code duplication to make the control flow more obvious.
+---
+ url.c |   11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
+
+--- a/url.c
++++ b/url.c
+@@ -1773,7 +1773,8 @@ openURL(char *url, ParsedURL *pu, Parsed
+ 	    uf.scheme = pu->scheme;
+ 	    return uf;
+ 	}
+-	break;
++	uf.stream = newInputStream(sock);
++	return uf;
+     case SCM_HTTP:
+ #ifdef USE_SSL
+     case SCM_HTTPS:
+@@ -1902,7 +1903,8 @@ openURL(char *url, ParsedURL *pu, Parsed
+ 		request->enctype == FORM_ENCTYPE_MULTIPART)
+ 		write_from_file(sock, request->body);
+ 	}
+-	break;
++	uf.stream = newInputStream(sock);
++	return uf;
+ #ifdef USE_GOPHER
+     case SCM_GOPHER:
+ 	p = pu->file;
+@@ -1967,7 +1969,8 @@ openURL(char *url, ParsedURL *pu, Parsed
+ 	if(type != '\0') {
+ 	  pu->file = gophertmp->ptr;
+ 	}
+-	break;
++	uf.stream = newInputStream(sock);
++	return uf;
+ #endif				/* USE_GOPHER */
+     case SCM_GEMINI:
+ 	sock = openSocket(pu->host, schemeNumToName(pu->scheme), pu->port);
+@@ -2033,8 +2036,6 @@ openURL(char *url, ParsedURL *pu, Parsed
+     default:
+ 	return uf;
+     }
+-    uf.stream = newInputStream(sock);
+-    return uf;
+ }
+ 
+ /* add index_file if exists */

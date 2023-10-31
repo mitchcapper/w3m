@@ -34,7 +34,7 @@
  {
      static char *outc = NULL;
      static Lineprop *outp = NULL;
-@@ -8041,7 +8041,7 @@ loadcmdout(char *cmd,
+@@ -8042,7 +8042,7 @@ loadcmdout(char *cmd,
      f = popen(cmd, "r");
      if (f == NULL)
  	return NULL;
@@ -43,7 +43,7 @@
      buf = loadproc(&uf, defaultbuf);
      UFclose(&uf);
      return buf;
-@@ -8079,7 +8079,7 @@ getpipe(char *cmd)
+@@ -8080,7 +8080,7 @@ getpipe(char *cmd)
      if (f == NULL)
  	return NULL;
      buf = newBuffer(INIT_BUFFER_WIDTH);
@@ -52,7 +52,7 @@
      buf->filename = cmd;
      buf->buffername = Sprintf("%s %s", PIPEBUFFERNAME,
  			      conv_from_system(cmd))->ptr;
-@@ -8318,7 +8318,7 @@ save2tmp(URLFile uf, char *tmpf)
+@@ -8319,7 +8319,7 @@ save2tmp(URLFile uf, char *tmpf)
      MySignalHandler(*volatile prevtrap) (SIGNAL_ARG) = NULL;
      static JMP_BUF env_bak;
      volatile int retval = 0;
@@ -61,7 +61,7 @@
  
      ff = fopen(tmpf, "wb");
      if (ff == NULL) {
-@@ -8359,7 +8359,7 @@ save2tmp(URLFile uf, char *tmpf)
+@@ -8360,7 +8360,7 @@ save2tmp(URLFile uf, char *tmpf)
      {
  	int count;
  
@@ -70,7 +70,7 @@
  	while ((count = ISread_n(uf.stream, buf, SAVE_BUF_SIZE)) > 0) {
  	    if (fwrite(buf, 1, count, ff) != count) {
  		retval = -2;
-@@ -8489,7 +8489,7 @@ _MoveFile(char *path1, char *path2)
+@@ -8490,7 +8490,7 @@ _MoveFile(char *path1, char *path2)
      FILE *f2;
      int is_pipe;
      clen_t linelen = 0, trbyte = 0;
@@ -79,7 +79,7 @@
      int count;
  
      f1 = openIS(path1);
-@@ -8508,7 +8508,7 @@ _MoveFile(char *path1, char *path2)
+@@ -8509,7 +8509,7 @@ _MoveFile(char *path1, char *path2)
  	return -1;
      }
      current_content_length = 0;
@@ -88,7 +88,7 @@
      while ((count = ISread_n(f1, buf, SAVE_BUF_SIZE)) > 0) {
  	fwrite(buf, 1, count, f2);
  	linelen += count;
-@@ -8869,7 +8869,7 @@ uncompress_stream(URLFile *uf, char **sr
+@@ -8870,7 +8870,7 @@ uncompress_stream(URLFile *uf, char **sr
  	}
  	if (pid2 == 0) {
  	    /* child2 */
@@ -97,7 +97,7 @@
  	    int count;
  	    FILE *f = NULL;
  
-@@ -8904,7 +8904,7 @@ uncompress_stream(URLFile *uf, char **sr
+@@ -8905,7 +8905,7 @@ uncompress_stream(URLFile *uf, char **sr
  	    uf->scheme = SCM_LOCAL;
      }
      UFhalfclose(uf);
@@ -447,7 +447,7 @@
  
 --- a/url.c
 +++ b/url.c
-@@ -1691,12 +1691,12 @@ openURL(char *url, ParsedURL *pu, Parsed
+@@ -1701,12 +1701,12 @@ openURL(char *url, ParsedURL *pu, Parsed
  	    /* local CGI: POST */
  	    uf.stream = newFileStream(localcgi_post(pu->real_file, pu->query,
  						    request, option->referer),

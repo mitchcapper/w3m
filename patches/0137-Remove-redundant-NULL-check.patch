@@ -9,7 +9,7 @@ Subject: [PATCH 137/172] Remove redundant NULL check
 
 --- a/url.c
 +++ b/url.c
-@@ -578,7 +578,7 @@ openSocket(char *const hostname,
+@@ -582,7 +582,7 @@ openSocket(char *const hostname,
  #ifdef INET6
      /* rfc2732 compliance */
      hname = hostname;

@@ -27,7 +27,7 @@ cast away and there was no easy way to keep the const.
  	parseURL2(tpath, &pu, current);
  	sc_redirect = query_SCONF_SUBSTITUTE_URL(&pu);
  	if (sc_redirect && *sc_redirect && checkRedirection(&pu)) {
-@@ -7879,7 +7879,7 @@ loadImageBuffer(URLFile *uf, Buffer *new
+@@ -7880,7 +7880,7 @@ loadImageBuffer(URLFile *uf, Buffer *new
      URLFile f;
      MySignalHandler(*volatile prevtrap) (SIGNAL_ARG) = NULL;
      struct stat st;
@@ -144,7 +144,7 @@ cast away and there was no easy way to keep the const.
  
 --- a/url.c
 +++ b/url.c
-@@ -2460,14 +2460,14 @@ schemeToProxy(int scheme)
+@@ -2473,14 +2473,14 @@ schemeToProxy(int scheme)
  
  #ifdef USE_M17N
  wc_ces
@@ -162,7 +162,7 @@ cast away and there was no easy way to keep the const.
  	pu = &pu_buf;
      } else {
  	pu = base;
-@@ -2480,14 +2480,14 @@ url_to_charset(const char *url, const Pa
+@@ -2493,14 +2493,14 @@ url_to_charset(const char *url, const Pa
  }
  
  char *

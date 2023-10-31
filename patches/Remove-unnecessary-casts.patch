@@ -475,7 +475,7 @@
  #endif
 --- a/url.c
 +++ b/url.c
-@@ -682,8 +682,7 @@ openSocket(char *const hostname,
+@@ -686,8 +686,7 @@ openSocket(char *const hostname,
  	hostaddr.sin_family = AF_INET;
  	hostaddr.sin_port = s_port;
  	for (h_addr_list = entry->h_addr_list; *h_addr_list; h_addr_list++) {
