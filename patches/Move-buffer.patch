@@ -24,8 +24,8 @@ prev even if we don't need it, I decided to do the unnecessary computation
 because it's no big deal nowadays. Now I feel dirty like a whore.
 
 ---
- menu.c |   74 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 74 insertions(+)
+ menu.c |   75 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 75 insertions(+)
 --- a/menu.c
 +++ b/menu.c
 @@ -242,6 +242,8 @@ static int SelectV = 0;
@@ -46,7 +46,7 @@ because it's no big deal nowadays. Now I feel dirty like a whore.
      SelectMenu.item[nitem].type = MENU_NOP;
  }
  
-@@ -1506,6 +1510,76 @@ smDelBuf(char c)
+@@ -1506,6 +1510,77 @@ smDelBuf(char c)
      return (MENU_NOTHING);
  }
  
@@ -93,11 +93,12 @@ because it's no big deal nowadays. Now I feel dirty like a whore.
 +    for (i = 0, cur = Firstbuf; i < CurrentMenu->select;
 +	 i++, cur = cur->nextBuffer) ;
 +
-+    /* Nothing to do if now previous buffer */
-+    if (!(prev = prevBuffer(Firstbuf, cur)))
-+	return (MENU_NOTHING);
++    if (!cur->nextBuffer) /* Bottom of menu */
++	return MENU_NOTHING;
 +
++    prev = prevBuffer(Firstbuf, cur);
 +    next = cur->nextBuffer;
++
 +    if (cur == Firstbuf)
 +	Firstbuf = cur->nextBuffer;
 +    else

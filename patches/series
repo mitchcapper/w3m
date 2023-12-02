@@ -115,6 +115,8 @@ save-history.patch
 Store-session.patch
 shorten-not-assigned-in-help.patch
 Use-gettext-for-user-facing-strings.patch
+Check-for-underflow-in-checkType.patch
+Fix-checkType.patch
 Enable-lto.patch
 Get-rid-of-MySignalHandler.patch
 Remove-config.h.hist.patch
