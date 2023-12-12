@@ -7,6 +7,19 @@
 /* *INDENT-OFF* */
 #ifdef USE_COLOR
 
+static void effect_anchor_start(void);
+static void effect_anchor_end(void);
+static void effect_image_start(void);
+static void effect_image_end(void);
+static void effect_form_start(void);
+static void effect_form_end(void);
+static void effect_active_start(void);
+static void effect_active_end(void);
+static void effect_visited_start(void);
+static void effect_visited_end(void);
+static void effect_mark_start(void);
+static void effect_mark_end(void);
+
 #define EFFECT_ANCHOR_START       effect_anchor_start()
 #define EFFECT_ANCHOR_END         effect_anchor_end()
 #define EFFECT_IMAGE_START        effect_image_start()
@@ -72,18 +85,22 @@
 static void name_start { if (useColor) { color_start; } else { mono_start; }}\
 static void name_end { if (useColor) { color_end; } else { mono_end; }}
 
-define_effect(EFFECT_ANCHOR_START, EFFECT_ANCHOR_END, EFFECT_ANCHOR_START_C,
-	      EFFECT_ANCHOR_END_C, EFFECT_ANCHOR_START_M, EFFECT_ANCHOR_END_M)
-define_effect(EFFECT_IMAGE_START, EFFECT_IMAGE_END, EFFECT_IMAGE_START_C,
-	      EFFECT_IMAGE_END_C, EFFECT_IMAGE_START_M, EFFECT_IMAGE_END_M)
-define_effect(EFFECT_FORM_START, EFFECT_FORM_END, EFFECT_FORM_START_C,
-	      EFFECT_FORM_END_C, EFFECT_FORM_START_M, EFFECT_FORM_END_M)
-define_effect(EFFECT_MARK_START, EFFECT_MARK_END, EFFECT_MARK_START_C,
-	      EFFECT_MARK_END_C, EFFECT_MARK_START_M, EFFECT_MARK_END_M)
+define_effect(effect_anchor_start(void), effect_anchor_end(void),
+	      EFFECT_ANCHOR_START_C, EFFECT_ANCHOR_END_C,
+	      EFFECT_ANCHOR_START_M, EFFECT_ANCHOR_END_M)
+define_effect(effect_image_start(void), effect_image_end(void),
+	      EFFECT_IMAGE_START_C, EFFECT_IMAGE_END_C,
+	      EFFECT_IMAGE_START_M, EFFECT_IMAGE_END_M)
+define_effect(effect_form_start(void), effect_form_end(void),
+	      EFFECT_FORM_START_C, EFFECT_FORM_END_C,
+	      EFFECT_FORM_START_M, EFFECT_FORM_END_M)
+define_effect(effect_mark_start(void), effect_mark_end(void),
+	      EFFECT_MARK_START_C, EFFECT_MARK_END_C,
+	      EFFECT_MARK_START_M, EFFECT_MARK_END_M)
 
 /*****************/
 static void
-EFFECT_ACTIVE_START
+effect_active_start(void)
 {
     if (useColor) {
 	if (useActiveColor) {
@@ -104,7 +121,7 @@ EFFECT_ACTIVE_START
 }
 
 static void
-EFFECT_ACTIVE_END
+effect_active_end(void)
 {
     if (useColor) {
 	if (useActiveColor) {
@@ -118,7 +135,7 @@ EFFECT_ACTIVE_END
 }
 
 static void
-EFFECT_VISITED_START
+effect_visited_start(void)
 {
     if (useVisitedColor) {
 	if (useColor) {
@@ -130,7 +147,7 @@ EFFECT_VISITED_START
 }
 
 static void
-EFFECT_VISITED_END
+effect_visited_end(void)
 {
     if (useVisitedColor) {
 	if (useColor) {
