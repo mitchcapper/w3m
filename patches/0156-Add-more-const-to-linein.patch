@@ -10,7 +10,7 @@ Subject: [PATCH 156/172] Add more const to linein
 
 --- a/linein.c
 +++ b/linein.c
-@@ -83,7 +83,8 @@ static void ins_char(Str str);
+@@ -80,7 +80,8 @@ static void ins_char(Str str);
  #endif
  
  char *

@@ -36,7 +36,7 @@ w3m-0.5.3+git20230121.
  static int frame_source = 0;
  static int need_number = 0;
  
-@@ -248,7 +250,7 @@ loadSomething(URLFile *f,
+@@ -247,7 +249,7 @@ loadSomething(URLFile *f,
         )
  	buf->type = "text/html";
      else
@@ -45,7 +45,7 @@ w3m-0.5.3+git20230121.
      return buf;
  }
  
-@@ -1687,7 +1689,7 @@ loadGeneralFile(char *path, ParsedURL *v
+@@ -1686,7 +1688,7 @@ loadGeneralFile(char *path, ParsedURL *v
      URLFile f, *volatile of = NULL;
      ParsedURL pu;
      Buffer *b = NULL;
@@ -54,7 +54,7 @@ w3m-0.5.3+git20230121.
      char *volatile tpath;
      char *volatile t = "text/plain", *p, *volatile real_type = NULL;
      Buffer *volatile t_buf = NULL;
-@@ -2039,6 +2041,166 @@ loadGeneralFile(char *path, ParsedURL *v
+@@ -2008,6 +2010,166 @@ loadGeneralFile(char *path, ParsedURL *v
      else if (pu.scheme == SCM_DATA) {
  	t = f.guess_type;
      }
@@ -221,7 +221,7 @@ w3m-0.5.3+git20230121.
      else if (searchHeader) {
  	searchHeader = SearchHeader = FALSE;
  	if (t_buf == NULL)
-@@ -2216,6 +2378,8 @@ loadGeneralFile(char *path, ParsedURL *v
+@@ -2185,6 +2347,8 @@ loadGeneralFile(char *path, ParsedURL *v
  
      if (is_html_type(t))
  	proc = loadHTMLBuffer;
@@ -230,7 +230,7 @@ w3m-0.5.3+git20230121.
      else if (is_plain_text_type(t))
  	proc = loadBuffer;
  #ifdef USE_IMAGE
-@@ -2470,7 +2634,6 @@ is_boundary(unsigned char *ch1, unsigned
+@@ -2439,7 +2603,6 @@ is_boundary(unsigned char *ch1, unsigned
      return 1;
  }
  
@@ -238,7 +238,7 @@ w3m-0.5.3+git20230121.
  static void
  set_breakpoint(struct readbuffer *obuf, int tag_length)
  {
-@@ -7572,6 +7735,130 @@ loadGopherSearch0(URLFile *uf, ParsedURL
+@@ -7472,6 +7635,130 @@ loadGopherSearch0(ParsedURL *pu)
  }
  #endif				/* USE_GOPHER */
  
@@ -413,7 +413,7 @@ w3m-0.5.3+git20230121.
  }
  
  #if SSLEAY_VERSION_NUMBER >= 0x00905100
-@@ -1260,6 +1263,7 @@ _parsedURL2Str(ParsedURL *pu, int pass,
+@@ -1253,6 +1256,7 @@ _parsedURL2Str(ParsedURL *pu, int pass,
  	"news", "news", "data", "mailto",
  #ifdef USE_SSL
  	"https",
@@ -421,7 +421,7 @@ w3m-0.5.3+git20230121.
  #endif				/* USE_SSL */
      };
  
-@@ -1960,6 +1964,35 @@ openURL(char *url, ParsedURL *pu, Parsed
+@@ -1951,6 +1955,35 @@ openURL(char *url, ParsedURL *pu, Parsed
  	}
  	break;
  #endif				/* USE_GOPHER */
@@ -459,7 +459,7 @@ w3m-0.5.3+git20230121.
      case SCM_NNTP_GROUP:
 --- a/display.c
 +++ b/display.c
-@@ -382,7 +382,8 @@ displayBuffer(Buffer *buf, int mode)
+@@ -395,7 +395,8 @@ displayBuffer(Buffer *buf, int mode)
      if (buf->height == 0)
  	buf->height = LASTLINE + 1;
      if ((buf->width != INIT_BUFFER_WIDTH &&
@@ -471,7 +471,7 @@ w3m-0.5.3+git20230121.
      }
 --- a/buffer.c
 +++ b/buffer.c
-@@ -18,6 +18,10 @@ extern int do_getch();
+@@ -18,6 +18,10 @@ extern int do_getch(void);
  char *NullLine = "";
  Lineprop NullProp[] = { 0 };
  
@@ -482,7 +482,7 @@ w3m-0.5.3+git20230121.
  /* 
   * Buffer creation
   */
-@@ -507,6 +511,8 @@ reshapeBuffer(Buffer *buf)
+@@ -483,6 +487,8 @@ reshapeBuffer(Buffer *buf)
  {
      URLFile f;
      Buffer sbuf;
@@ -491,7 +491,7 @@ w3m-0.5.3+git20230121.
  #ifdef USE_M17N
      wc_uint8 old_auto_detect = WcOption.auto_detect;
  #endif
-@@ -515,6 +521,7 @@ reshapeBuffer(Buffer *buf)
+@@ -491,6 +497,7 @@ reshapeBuffer(Buffer *buf)
      buf->width = INIT_BUFFER_WIDTH;
      if (buf->sourcefile == NULL)
  	return;
@@ -499,7 +499,7 @@ w3m-0.5.3+git20230121.
      init_stream(&f, SCM_LOCAL, NULL);
      examineFile(buf->mailcap_source ? buf->mailcap_source : buf->sourcefile,
  		&f);
-@@ -560,6 +567,8 @@ reshapeBuffer(Buffer *buf)
+@@ -536,6 +543,8 @@ reshapeBuffer(Buffer *buf)
  #endif
      if (is_html_type(buf->type))
  	loadHTMLBuffer(&f, buf);
@@ -510,7 +510,7 @@ w3m-0.5.3+git20230121.
      UFclose(&f);
 --- a/main.c
 +++ b/main.c
-@@ -406,6 +406,32 @@ die_oom(size_t bytes)
+@@ -396,6 +396,32 @@ die_oom(size_t bytes)
      return NULL;
  }
  
@@ -543,7 +543,7 @@ w3m-0.5.3+git20230121.
  int
  main(int argc, char **argv)
  {
-@@ -908,6 +934,9 @@ main(int argc, char **argv)
+@@ -886,6 +912,9 @@ main(int argc, char **argv)
      if (UseHistory)
  	loadHistory(URLHist);
  #endif				/* not USE_HISTORY */
@@ -552,8 +552,8 @@ w3m-0.5.3+git20230121.
 +	known_hosts = load_known_hosts();
  
  #ifdef USE_M17N
-     /*  if (w3m_dump)
-@@ -2557,10 +2586,36 @@ DEFUN(movRW, NEXT_WORD, "Move to the nex
+ #endif
+@@ -2527,10 +2556,36 @@ DEFUN(movRW, NEXT_WORD, "Move to the nex
      displayBuffer(Currentbuf, B_NORMAL);
  }
  
@@ -590,7 +590,7 @@ w3m-0.5.3+git20230121.
  
      if (checkDownloadList())
  	/* FIXME: gettextize? */
-@@ -2587,7 +2642,9 @@ _quitfm(int confirm)
+@@ -2557,7 +2612,9 @@ _quitfm(int confirm)
      if (UseHistory && SaveURLHist)
  	saveHistory(URLHist, URLHistSize);
  #endif				/* USE_HISTORY */
@@ -601,7 +601,7 @@ w3m-0.5.3+git20230121.
  }
  
  /* Quit */
-@@ -4786,6 +4843,13 @@ DEFUN(vwSrc, SOURCE VIEW, "Toggle betwee
+@@ -4724,6 +4781,13 @@ DEFUN(vwSrc, SOURCE VIEW, "Toggle betwee
  	displayBuffer(Currentbuf, B_NORMAL);
  	return;
      }
@@ -615,7 +615,7 @@ w3m-0.5.3+git20230121.
      if (Currentbuf->sourcefile == NULL) {
  	if (Currentbuf->pagerSource &&
  	    !strcasecmp(Currentbuf->type, "text/plain")) {
-@@ -4871,6 +4935,91 @@ DEFUN(fold_pre, FOLD_PRE, "Fold long lin
+@@ -4809,6 +4873,91 @@ DEFUN(fold_pre, FOLD_PRE, "Fold long lin
      FoldPre = FoldPreOpt;
  }
  
@@ -707,7 +707,7 @@ w3m-0.5.3+git20230121.
  /* reload */
  DEFUN(reload, RELOAD, "Load current document anew")
  {
-@@ -5096,6 +5245,7 @@ chkURLBuffer(Buffer *buf)
+@@ -5034,6 +5183,7 @@ chkURLBuffer(Buffer *buf)
  	"https?://[a-zA-Z0-9:%\\-\\./_@]*\\[[a-fA-F0-9:][a-fA-F0-9:\\.]*\\][a-zA-Z0-9:%\\-\\./?=~_\\&+@#,\\$;]*",
  	"ftp://[a-zA-Z0-9:%\\-\\./_@]*\\[[a-fA-F0-9:][a-fA-F0-9:\\.]*\\][a-zA-Z0-9:%\\-\\./=_+@#,\\$]*",
  #endif				/* INET6 */
@@ -717,7 +717,7 @@ w3m-0.5.3+git20230121.
      int i;
 --- a/proto.h
 +++ b/proto.h
-@@ -99,6 +99,7 @@ extern void peekURL(void);
+@@ -96,6 +96,7 @@ extern void peekURL(void);
  extern void peekIMG(void);
  extern void curURL(void);
  extern void vwSrc(void);
@@ -735,7 +735,7 @@ w3m-0.5.3+git20230121.
  #include "istream.h"
  #include <signal.h>
  #ifdef USE_SSL
-@@ -350,15 +351,43 @@ ISeos(InputStream stream)
+@@ -316,15 +317,43 @@ ISfileno(InputStream stream)
  }
  
  #ifdef USE_SSL
@@ -785,7 +785,7 @@ w3m-0.5.3+git20230121.
  }
  
  static int
-@@ -497,6 +526,50 @@ ssl_check_cert_ident(X509 * x, char *hos
+@@ -463,6 +492,50 @@ ssl_check_cert_ident(X509 * x, char *hos
      return ret;
  }
  
@@ -836,7 +836,7 @@ w3m-0.5.3+git20230121.
  Str
  ssl_get_certificate(SSL * ssl, char *hostname)
  {
-@@ -504,7 +577,7 @@ ssl_get_certificate(SSL * ssl, char *hos
+@@ -470,7 +543,7 @@ ssl_get_certificate(SSL * ssl, char *hos
      X509 *x;
      X509_NAME *xn;
      char *p;
@@ -845,7 +845,7 @@ w3m-0.5.3+git20230121.
      Str s;
      char buf[2048];
      Str amsg = NULL;
-@@ -513,10 +586,10 @@ ssl_get_certificate(SSL * ssl, char *hos
+@@ -479,10 +552,10 @@ ssl_get_certificate(SSL * ssl, char *hos
  
      if (ssl == NULL)
  	return NULL;
@@ -858,7 +858,7 @@ w3m-0.5.3+git20230121.
  	    ans = "y";
  	else {
  	    /* FIXME: gettextize? */
-@@ -537,7 +610,7 @@ ssl_get_certificate(SSL * ssl, char *hos
+@@ -503,7 +576,7 @@ ssl_get_certificate(SSL * ssl, char *hos
  	}
  	if (amsg)
  	    disp_err_message(amsg->ptr, FALSE);
@@ -867,7 +867,7 @@ w3m-0.5.3+git20230121.
  	/* FIXME: gettextize? */
  	s = amsg ? amsg : Strnew_charp("valid certificate");
  	return s;
-@@ -547,39 +620,46 @@ ssl_get_certificate(SSL * ssl, char *hos
+@@ -513,39 +586,46 @@ ssl_get_certificate(SSL * ssl, char *hos
       * The chain length is automatically checked by OpenSSL when we
       * set the verify depth in the ctx.
       */
@@ -933,7 +933,7 @@ w3m-0.5.3+git20230121.
  	    ans = "y";
  	else {
  	    Str ep = Strdup(emsg);
-@@ -601,10 +681,10 @@ ssl_get_certificate(SSL * ssl, char *hos
+@@ -567,10 +647,10 @@ ssl_get_certificate(SSL * ssl, char *hos
  	    free_ssl_ctx();
  	    return NULL;
  	}
@@ -947,7 +947,7 @@ w3m-0.5.3+git20230121.
      Strcat_charp(s, "\n");
 --- a/istream.h
 +++ b/istream.h
-@@ -109,6 +109,9 @@ typedef struct encoded_stream *EncodedSt
+@@ -103,6 +103,9 @@ typedef struct base_stream *BaseStream;
  
  typedef union input_stream *InputStream;
  
@@ -955,9 +955,9 @@ w3m-0.5.3+git20230121.
 +extern char *known_hosts_file;
 +
  extern InputStream newInputStream(int des);
- extern InputStream newFileStream(FILE * f, void (*closep) ());
+ extern InputStream newFileStream(FILE * f);
  extern InputStream newStrStream(Str s);
-@@ -130,7 +133,7 @@ int ISread_n(InputStream stream, char *d
+@@ -124,7 +127,7 @@ int ISread_n(InputStream stream, unsigne
  extern int ISfileno(InputStream stream);
  extern int ISeos(InputStream stream);
  #ifdef USE_SSL
@@ -985,7 +985,7 @@ w3m-0.5.3+git20230121.
  #endif				/* USE_SSL_VERIFY */
  #define CMT_SSL_FORBID_METHOD N_("List of forbidden SSL methods (2: SSLv2, 3: SSLv3, t: TLSv1.0, 5: TLSv1.1, 6: TLSv1.2, 7: TLSv1.3)")
  #ifdef SSL_CTX_set_min_proto_version
-@@ -650,6 +653,8 @@ struct param_ptr params7[] = {
+@@ -638,6 +641,8 @@ struct param_ptr params7[] = {
       NULL},
      {"ssl_ca_default", P_INT, PI_ONOFF, (void *)&ssl_ca_default,
       CMT_SSL_CA_DEFAULT, NULL},

@@ -17,7 +17,7 @@ Found with -Wcast-qual.
 
 --- a/etc.c
 +++ b/etc.c
-@@ -1020,7 +1020,7 @@ find_auth_pass_entry(char *host, int por
+@@ -1040,7 +1040,7 @@ find_auth_pass_entry(char *host, int por
  
  int
  find_auth_user_passwd(ParsedURL *pu, char *realm,
@@ -26,7 +26,7 @@ Found with -Wcast-qual.
  {
      struct auth_pass *ent;
  
-@@ -2092,7 +2092,7 @@ base64_encode(const char *src, size_t le
+@@ -2112,7 +2112,7 @@ base64_encode(const char *src, size_t le
      unsigned long j;
      size_t k;
  
@@ -104,7 +104,7 @@ Found with -Wcast-qual.
  wc_map *
 --- a/main.c
 +++ b/main.c
-@@ -1390,7 +1390,7 @@ dump_extra(Buffer *buf)
+@@ -1361,7 +1361,7 @@ dump_extra(Buffer *buf)
  static int
  cmp_anchor_hseq(const void *a, const void *b)
  {
@@ -162,7 +162,7 @@ Found with -Wcast-qual.
  }
 --- a/file.c
 +++ b/file.c
-@@ -1572,7 +1572,7 @@ getAuthCookie(struct http_auth *hauth, c
+@@ -1570,7 +1570,7 @@ getAuthCookie(struct http_auth *hauth, c
      *uname = NULL;
      *pwd = NULL;
  
@@ -173,7 +173,7 @@ Found with -Wcast-qual.
      }
 --- a/proto.h
 +++ b/proto.h
-@@ -644,7 +644,7 @@ extern FILE *openSecretFile(char *fname)
+@@ -642,7 +642,7 @@ extern FILE *openSecretFile(char *fname)
  extern void loadPasswd(void);
  extern void loadPreForm(void);
  extern int find_auth_user_passwd(ParsedURL *pu, char *realm,

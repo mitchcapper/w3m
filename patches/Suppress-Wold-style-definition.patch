@@ -13,8 +13,8 @@
 +
  #ifdef USE_COLOR
  
- #define EFFECT_ANCHOR_START       effect_anchor_start()
-@@ -156,6 +159,7 @@ EFFECT_VISITED_END
+ static void effect_anchor_start(void);
+@@ -169,6 +172,7 @@ effect_visited_end(void)
  #define EFFECT_MARK_START         standout()
  #define EFFECT_MARK_END           standend()
  #endif				/* not USE_COLOR */

@@ -24,7 +24,7 @@
  #endif				/* USE_GPM */
  #ifdef USE_SYSMOUSE
  #include <osreldate.h>
-@@ -2419,7 +2420,6 @@ void
+@@ -2423,7 +2424,6 @@ void
  mouse_init(void)
  {
      Gpm_Connect conn;

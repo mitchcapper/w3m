@@ -1,0 +1,32 @@
+From 7b7fb6a73b12658bb61ee5d915c5487c09984f9b Mon Sep 17 00:00:00 2001
+From: Rene Kita <mail@rkta.de>
+Date: Tue, 19 Dec 2023 16:11:15 +0100
+Subject: [PATCH 3/6] Add missing voids
+
+---
+ w3mimg/fb/fb_img.h |    2 +-
+ w3mimg/w3mimg.h    |    2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+--- a/w3mimg/fb/fb_img.h
++++ b/w3mimg/fb/fb_img.h
+@@ -3,7 +3,7 @@
+ #define fb_img_header
+ #include "fb.h"
+ 
+-void fb_image_init();
++void fb_image_init(void);
+ FB_IMAGE **fb_image_load(char *filename, int w, int h, int n);
+ void fb_image_set_bg(int r, int g, int b);
+ int fb_image_clear(int x, int y, int w, int h);
+--- a/w3mimg/w3mimg.h
++++ b/w3mimg/w3mimg.h
+@@ -47,7 +47,7 @@ typedef struct _w3mimg_op {
+ extern w3mimg_op *w3mimg_x11open(void);
+ #endif
+ #ifdef USE_W3MIMG_FB
+-extern w3mimg_op *w3mimg_fbopen();
++extern w3mimg_op *w3mimg_fbopen(void);
+ #endif
+ #ifdef USE_W3MIMG_WIN
+ extern w3mimg_op *w3mimg_winopen();

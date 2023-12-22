@@ -159,7 +159,7 @@ Subject: Get rid of MySignalHandler
  
 --- a/istream.c
 +++ b/istream.c
-@@ -186,7 +186,7 @@ newEncodedStream(InputStream is, char en
+@@ -180,7 +180,7 @@ newEncodedStream(InputStream is, char en
  int
  ISclose(InputStream stream)
  {
@@ -387,7 +387,7 @@ Subject: Get rid of MySignalHandler
  }
  
  void
-@@ -2331,7 +2329,7 @@ do_getch(void)
+@@ -2335,7 +2333,7 @@ do_getch(void)
  	return sysm_getch();
  }
  
@@ -420,7 +420,7 @@ Subject: Get rid of MySignalHandler
  
      if (fmInitialized) {
  	message(Sprintf(_("Opening socket..."))->ptr, 0, 0);
-@@ -2162,7 +2161,7 @@ check_no_proxy(char *domain)
+@@ -2160,7 +2159,7 @@ check_no_proxy(char *domain)
  {
      TextListItem *tl;
      volatile int ret = 0;

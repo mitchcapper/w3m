@@ -10,7 +10,7 @@ little more code duplication to make the control flow more obvious.
 
 --- a/url.c
 +++ b/url.c
-@@ -1773,7 +1773,8 @@ openURL(char *url, ParsedURL *pu, Parsed
+@@ -1764,7 +1764,8 @@ openURL(char *url, ParsedURL *pu, Parsed
  	    uf.scheme = pu->scheme;
  	    return uf;
  	}
@@ -20,7 +20,7 @@ little more code duplication to make the control flow more obvious.
      case SCM_HTTP:
  #ifdef USE_SSL
      case SCM_HTTPS:
-@@ -1902,7 +1903,8 @@ openURL(char *url, ParsedURL *pu, Parsed
+@@ -1893,7 +1894,8 @@ openURL(char *url, ParsedURL *pu, Parsed
  		request->enctype == FORM_ENCTYPE_MULTIPART)
  		write_from_file(sock, request->body);
  	}
@@ -30,7 +30,7 @@ little more code duplication to make the control flow more obvious.
  #ifdef USE_GOPHER
      case SCM_GOPHER:
  	p = pu->file;
-@@ -1967,7 +1969,8 @@ openURL(char *url, ParsedURL *pu, Parsed
+@@ -1958,7 +1960,8 @@ openURL(char *url, ParsedURL *pu, Parsed
  	if(type != '\0') {
  	  pu->file = gophertmp->ptr;
  	}
@@ -40,7 +40,7 @@ little more code duplication to make the control flow more obvious.
  #endif				/* USE_GOPHER */
      case SCM_GEMINI:
  	sock = openSocket(pu->host, schemeNumToName(pu->scheme), pu->port);
-@@ -2033,8 +2036,6 @@ openURL(char *url, ParsedURL *pu, Parsed
+@@ -2024,8 +2027,6 @@ openURL(char *url, ParsedURL *pu, Parsed
      default:
  	return uf;
      }

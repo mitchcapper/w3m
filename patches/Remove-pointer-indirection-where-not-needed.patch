@@ -73,7 +73,7 @@ This functions do not need to use a pointer to a pointer.
  
 --- a/file.c
 +++ b/file.c
-@@ -2822,7 +2822,7 @@ passthrough(struct readbuffer *obuf, cha
+@@ -2659,7 +2659,7 @@ passthrough(struct readbuffer *obuf, cha
  	str_bak = str;
  	if (sloppy_parse_line(&str)) {
  	    char *q = str_bak;
@@ -84,7 +84,7 @@ This functions do not need to use a pointer to a pointer.
  		for (p = link_stack; p; p = p->next) {
 --- a/istream.c
 +++ b/istream.c
-@@ -792,11 +792,11 @@ ens_read(struct ens_handle *handle, char
+@@ -699,11 +699,11 @@ ens_read(struct ens_handle *handle, char
  	growbuf_init_without_GC(&gbtmp);
  	p = handle->gb.ptr;
  	if (handle->encoding == ENC_QUOTE)
@@ -232,7 +232,7 @@ This functions do not need to use a pointer to a pointer.
  		return cnv;
 --- a/proto.h
 +++ b/proto.h
-@@ -345,7 +345,7 @@ extern int columnPos(Line *line, int col
+@@ -343,7 +343,7 @@ extern int columnPos(Line *line, int col
  extern int columnLen(Line *line, int column);
  extern Line *lineSkip(Buffer *buf, Line *line, int offset, int last);
  extern Line *currentLineSkip(Buffer *buf, Line *line, int offset, int last);
@@ -241,7 +241,7 @@ This functions do not need to use a pointer to a pointer.
  extern Str checkType(Str s, Lineprop **oprop, Linecolor **ocolor);
  extern int calcPosition(char *l, Lineprop *pr, int len, int pos, int bpos,
  			int mode);
-@@ -582,16 +582,16 @@ extern void shiftAnchorPosition(AnchorLi
+@@ -580,16 +580,16 @@ extern void shiftAnchorPosition(AnchorLi
  extern char *getAnchorText(Buffer *buf, AnchorList *al, Anchor *a);
  extern Buffer *link_list_panel(Buffer *buf);
  

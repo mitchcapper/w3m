@@ -24,7 +24,7 @@ Subject: [PATCH 149/172] Use https with USE_SSL and retry_http
  #define CMT_PRESERVE_TIMESTAMP N_("Preserve timestamp when saving")
 --- a/url.c
 +++ b/url.c
-@@ -1740,8 +1740,13 @@ openURL(char *url, ParsedURL *pu, Parsed
+@@ -1731,8 +1731,13 @@ openURL(char *url, ParsedURL *pu, Parsed
  	}
  	if (uf.stream == NULL && retryAsHttp && url[0] != '/') {
  	    if (scheme == SCM_MISSING || scheme == SCM_UNKNOWN) {

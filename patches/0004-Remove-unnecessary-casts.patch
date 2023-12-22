@@ -1,0 +1,66 @@
+From 2acf0b5f58dbbb05bf6e51b7dae2ac61707e0182 Mon Sep 17 00:00:00 2001
+From: Rene Kita <mail@rkta.de>
+Date: Tue, 19 Dec 2023 16:15:22 +0100
+Subject: [PATCH 4/6] Remove unnecessary casts
+
+---
+ istream.c |   20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
+
+--- a/istream.c
++++ b/istream.c
+@@ -102,8 +102,8 @@ newInputStream(int des)
+     stream->base.type = IST_BASIC;
+     stream->base.handle = NewWithoutGC(int);
+     *(int *)stream->base.handle = des;
+-    stream->base.read = (int (*)(void *, unsigned char *, int))basic_read;
+-    stream->base.close = (void (*)(void *))basic_close;
++    stream->base.read = basic_read;
++    stream->base.close = basic_close;
+     return stream;
+ }
+ 
+@@ -121,9 +121,9 @@ newFileStream(FILE * f, void (*closep) (
+     if (closep)
+ 	stream->file.handle->close = closep;
+     else
+-	stream->file.handle->close = (void (*)(FILE *))fclose;
+-    stream->file.read = (int (*)(FILE *))file_read;
+-    stream->file.close = (void (*)(FILE *))file_close;
++	stream->file.handle->close = fclose;
++    stream->file.read = file_read;
++    stream->file.close = file_close;
+     return stream;
+ }
+ 
+@@ -137,7 +137,7 @@ newStrStream(Str s)
+     init_str_stream(&stream->base, s);
+     stream->str.type = IST_STR;
+     stream->str.handle = NULL;
+-    stream->str.read = (int (*)(void *, unsigned char *, int))str_read;
++    stream->str.read = str_read;
+     stream->str.close = NULL;
+     return stream;
+ }
+@@ -155,8 +155,8 @@ newSSLStream(SSL * ssl, int sock)
+     stream->ssl.handle = NewWithoutGC(struct ssl_handle);
+     stream->ssl.handle->ssl = ssl;
+     stream->ssl.handle->sock = sock;
+-    stream->ssl.read = (int (*)(void *, unsigned char *, int))ssl_read;
+-    stream->ssl.close = (void (*)(void *, int, int *))ssl_close;
++    stream->ssl.read = ssl_read;
++    stream->ssl.close = ssl_close;
+     return stream;
+ }
+ #endif
+@@ -176,8 +176,8 @@ newEncodedStream(InputStream is, char en
+     stream->ens.handle->pos = 0;
+     stream->ens.handle->encoding = encoding;
+     growbuf_init_without_GC(&stream->ens.handle->gb);
+-    stream->ens.read = (int (*)(void *, unsigned char *, int))ens_read;
+-    stream->ens.close = (void (*)(void *, int, int *))ens_close;
++    stream->ens.read = ens_read;
++    stream->ens.close = ens_close;
+     return stream;
+ }
+ 

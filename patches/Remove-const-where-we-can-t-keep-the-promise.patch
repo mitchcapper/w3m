@@ -18,7 +18,7 @@ cast away and there was no easy way to keep the const.
 
 --- a/file.c
 +++ b/file.c
-@@ -1721,7 +1721,7 @@ loadGeneralFile(char *path, ParsedURL *v
+@@ -1719,7 +1719,7 @@ loadGeneralFile(char *path, ParsedURL *v
  
    load_doc:
      {
@@ -27,7 +27,7 @@ cast away and there was no easy way to keep the const.
  	parseURL2(tpath, &pu, current);
  	sc_redirect = query_SCONF_SUBSTITUTE_URL(&pu);
  	if (sc_redirect && *sc_redirect && checkRedirection(&pu)) {
-@@ -7880,7 +7880,7 @@ loadImageBuffer(URLFile *uf, Buffer *new
+@@ -7591,7 +7591,7 @@ loadImageBuffer(URLFile *uf, Buffer *new
      URLFile f;
      MySignalHandler(*volatile prevtrap) (SIGNAL_ARG) = NULL;
      struct stat st;
@@ -84,7 +84,7 @@ cast away and there was no easy way to keep the const.
  
 --- a/proto.h
 +++ b/proto.h
-@@ -174,11 +174,11 @@ extern void chkExternalURIBuffer(Buffer
+@@ -172,11 +172,11 @@ extern void chkExternalURIBuffer(Buffer
  #endif
  extern ParsedURL *schemeToProxy(int scheme);
  #ifdef USE_M17N
@@ -99,7 +99,7 @@ cast away and there was no easy way to keep the const.
  #else /* !defined(USE_M17N) */
  #define url_encode(url, base, cs) url_quote(url)
  extern char *url_decode0(const char *url);
-@@ -634,7 +634,7 @@ extern char *etcFile(char *base);
+@@ -632,7 +632,7 @@ extern char *etcFile(char *base);
  extern char *confFile(char *base);
  extern char *auxbinFile(char *base);
  extern char *helpFile(char *base);
@@ -108,7 +108,7 @@ cast away and there was no easy way to keep the const.
  extern Str localCookie(void);
  extern Str loadLocalDir(char *dirname);
  extern void set_environ(char *var, char *value);
-@@ -751,7 +751,7 @@ extern char *getKeyData(int key);
+@@ -749,7 +749,7 @@ extern char *getKeyData(int key);
  extern char *getWord(char **str);
  extern char *getQWord(char **str);
  struct regex;
@@ -119,7 +119,7 @@ cast away and there was no easy way to keep the const.
  #endif
 --- a/rc.c
 +++ b/rc.c
-@@ -1801,7 +1801,7 @@ loadSiteconf(void)
+@@ -1786,7 +1786,7 @@ loadSiteconf(void)
  
  	    /* Second, create a new record. */
  	    newent = newSiteconfRec();
@@ -128,7 +128,7 @@ cast away and there was no easy way to keep the const.
  	    opt = getWord(&p);
  	    SKIP_BLANKS(p);
  	    if (!newent->re_url) {
-@@ -1862,10 +1862,10 @@ loadSiteconf(void)
+@@ -1847,10 +1847,10 @@ loadSiteconf(void)
      fclose(fp);
  }
  
@@ -144,7 +144,7 @@ cast away and there was no easy way to keep the const.
  
 --- a/url.c
 +++ b/url.c
-@@ -2473,14 +2473,14 @@ schemeToProxy(int scheme)
+@@ -2420,14 +2420,14 @@ schemeToProxy(int scheme)
  
  #ifdef USE_M17N
  wc_ces
@@ -162,7 +162,7 @@ cast away and there was no easy way to keep the const.
  	pu = &pu_buf;
      } else {
  	pu = base;
-@@ -2493,14 +2493,14 @@ url_to_charset(const char *url, const Pa
+@@ -2440,14 +2440,14 @@ url_to_charset(const char *url, const Pa
  }
  
  char *

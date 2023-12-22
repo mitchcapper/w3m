@@ -1,14 +1,30 @@
 # PENDING
+#276
 creat-hist-file.patch
+# modernC
+0001-Enable-building-with-modern-C-build-options.patch
+0002-Fix-build-error-with-disable-color.patch
+0003-Add-missing-voids.patch
+0004-Remove-unnecessary-casts.patch
+0005-Fix-types-of-read-close-functions.patch
+0006-Remove-declaration-of-libc-functions.patch
+0007-Add-missing-void-to-function-definitions.patch
+#285 checkType underruns
+Label-endif-else-that-is-far-away-from-ifdef.patch
+Check-for-buffer-underruns-in-checkType.patch
+#266 reorder
+Replace-reserved-chars-with-HTML-entities.patch
 Move-buffer.patch
+# ?
 Fix-slow-backward-search.patch
-Replace-deprecated-md5.patch
+#278 md5
 Fix-skip-blank-macros.patch
 Reduce-scope-of-dangerous-macro.patch
-Simplify-reshapeBuffer.patch
+Fix-potential-null-dereference.patch
 Fix-potential-null-dereference-to_str.patch
 Avoid-leaking-by-using-Str-function.patch
-Fix-potential-null-dereference.patch
+Simplify-reshapeBuffer.patch
+Replace-deprecated-md5.patch
 Add-an-include-guard-for-proto.h.patch
 Remove-unnecessary-macro.patch
 Get-rid-of-DO_EXTERNAL-macro.patch
@@ -22,20 +38,10 @@ Remove-left-over-FORMAT_NICE-code.patch
 Remove-redundant-initialization.patch
 Remove-assignment-of-unread-value.patch
 Handle-errors-in-mySystem.patch
-# PR
+# 288
 Remove-redirection-loop-check.patch
-# FEATURES
-Display-error-for-unkown-command.patch
-Enable-folding-in-pre-tags.patch
-gemini.patch
-Zero-based-link-no.patch
-Use-https-with-USE_SSL-and-retry_http.patch
-refactor-openUrl-scheme-handling.patch
-add-gophers-support.patch
-# READY
-# NEXT
+# 279 deadcode
 Remove-dead-code.patch
-Fix-Wstrict-prototypes-func-pointers.patch
 Fix-some-casts-that-discard-qualifiers.patch
 Remove-const-where-we-can-t-keep-the-promise.patch
 Remove-declarations-without-definition.patch
@@ -52,8 +58,18 @@ Remove-unused-parameters.patch
 Remove-unnecessary-casts.patch
 Remove-pointer-indirection-where-not-needed.patch
 Remove-redundant-assignment.patch
-Fix-old-style-definition.patch
 Fix-Wstrict-prototypes.patch
+# NEXT
+Replace-deprecated-bcopy.patch
+# FEATURES
+Display-error-for-unkown-command.patch
+Enable-folding-in-pre-tags.patch
+gemini.patch
+Zero-based-link-no.patch
+Use-https-with-USE_SSL-and-retry_http.patch
+# gophers
+refactor-openUrl-scheme-handling.patch
+add-gophers-support.patch
 # WARNINGS
 Enable-more-optimization.patch
 Enable-Wcast-qual.patch
@@ -83,7 +99,7 @@ Add-comment-for-wgetch.patch
 0101-WIP-getch-Fix-warning-strict-prototype.patch
 Suppress-Wlogical-op.patch
 Suppress-Wold-style-definition.patch
-Suppress-Wstrict-prototypes
+Suppress-Wstrict-prototypes.patch
 0080-Fix-malloc-calls.patch
 0081-Only-use-malloc-if-the-default-buffer-is-to-small.patch
 # NULL check
@@ -109,14 +125,11 @@ Suppress-Wstrict-prototypes
 0172-const.patch
 Remove-some-volatile.patch
 # ACTIVE
-replace-deprecated-bcopy.patch
 Refactor-URL-history-handling.patch
 save-history.patch
 Store-session.patch
 shorten-not-assigned-in-help.patch
 Use-gettext-for-user-facing-strings.patch
-Check-for-underflow-in-checkType.patch
-Fix-checkType.patch
 Enable-lto.patch
 Get-rid-of-MySignalHandler.patch
 Remove-config.h.hist.patch

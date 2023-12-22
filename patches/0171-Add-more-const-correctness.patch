@@ -11,7 +11,7 @@ Subject: [PATCH 171/172] Add more const correctness
 
 --- a/etc.c
 +++ b/etc.c
-@@ -1687,10 +1687,10 @@ file_to_url(char *file)
+@@ -1707,10 +1707,10 @@ file_to_url(char *file)
  
  #ifdef USE_M17N
  char *

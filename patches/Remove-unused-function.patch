@@ -20,7 +20,7 @@ Subject: [PATCH 018/172] Remove unused function
 
 --- a/display.c
 +++ b/display.c
-@@ -1440,14 +1440,6 @@ cursorLeft(Buffer *buf, int n)
+@@ -1452,14 +1452,6 @@ cursorLeft(Buffer *buf, int n)
      buf->cursorX = buf->visualpos - l->bwidth;
  }
  
@@ -37,7 +37,7 @@ Subject: [PATCH 018/172] Remove unused function
   * current position.
 --- a/proto.h
 +++ b/proto.h
-@@ -301,7 +301,6 @@ extern Buffer *newBuffer(int width);
+@@ -299,7 +299,6 @@ extern Buffer *newBuffer(int width);
  extern Buffer *nullBuffer(void);
  extern void clearBuffer(Buffer *buf);
  extern void discardBuffer(Buffer *buf);
@@ -45,7 +45,7 @@ Subject: [PATCH 018/172] Remove unused function
  extern Buffer *deleteBuffer(Buffer *first, Buffer *delbuf);
  extern Buffer *replaceBuffer(Buffer *first, Buffer *delbuf, Buffer *newbuf);
  extern Buffer *nthBuffer(Buffer *firstbuf, int n);
-@@ -339,7 +338,6 @@ extern void cursorDown(Buffer *buf, int
+@@ -337,7 +336,6 @@ extern void cursorDown(Buffer *buf, int
  extern void cursorUpDown(Buffer *buf, int n);
  extern void cursorRight(Buffer *buf, int n);
  extern void cursorLeft(Buffer *buf, int n);
@@ -53,7 +53,7 @@ Subject: [PATCH 018/172] Remove unused function
  extern void arrangeCursor(Buffer *buf);
  extern void arrangeLine(Buffer *buf);
  extern void cursorXY(Buffer *buf, int x, int y);
-@@ -492,14 +490,11 @@ extern void rscroll(int);
+@@ -490,14 +488,11 @@ extern void rscroll(int);
  #endif
  extern void clrtoeol(void);
  extern void clrtoeolx(void);
@@ -70,7 +70,7 @@ Subject: [PATCH 018/172] Remove unused function
  extern void term_cooked(void);
 --- a/buffer.c
 +++ b/buffer.c
-@@ -121,25 +121,6 @@ discardBuffer(Buffer *buf)
+@@ -117,25 +117,6 @@ discardBuffer(Buffer *buf)
  }
  
  /* 
@@ -151,7 +151,7 @@ Subject: [PATCH 018/172] Remove unused function
  extern int non_null(char *s);
 --- a/terms.c
 +++ b/terms.c
-@@ -2082,12 +2082,6 @@ clrtobot_eol(void (*clrtoeol) (void))
+@@ -2086,12 +2086,6 @@ clrtobot_eol(void (*clrtoeol) (void))
  }
  
  void
@@ -164,7 +164,7 @@ Subject: [PATCH 018/172] Remove unused function
  clrtobotx(void)
  {
      clrtobot_eol(clrtoeolx);
-@@ -2175,29 +2169,6 @@ crmode(void)
+@@ -2179,29 +2173,6 @@ crmode(void)
  #endif				/* HAVE_SGTTY_H */
  
  void
@@ -196,7 +196,7 @@ Subject: [PATCH 018/172] Remove unused function
      ttymode_reset(ECHO, 0);
 --- a/istream.c
 +++ b/istream.c
-@@ -277,26 +277,6 @@ ISgets_to_growbuf(InputStream stream, st
+@@ -270,26 +270,6 @@ ISgets_to_growbuf(InputStream stream, st
      return;
  }
  
@@ -223,7 +223,7 @@ Subject: [PATCH 018/172] Remove unused function
  int
  ISread_n(InputStream stream, unsigned char *dst, int count)
  {
-@@ -341,15 +321,6 @@ ISfileno(InputStream stream)
+@@ -334,15 +314,6 @@ ISfileno(InputStream stream)
      }
  }
  
@@ -237,11 +237,11 @@ Subject: [PATCH 018/172] Remove unused function
 -}
 -
  #ifdef USE_SSL
- TextList *known_hosts;
- char *known_hosts_file;
+ static Str accept_this_site;
+ 
 --- a/main.c
 +++ b/main.c
-@@ -3216,15 +3216,6 @@ DEFUN(followA, GOTO_LINK, "Follow curren
+@@ -3159,15 +3159,6 @@ DEFUN(followA, GOTO_LINK, "Follow curren
      displayBuffer(Currentbuf, B_NORMAL);
  }
  
@@ -257,7 +257,7 @@ Subject: [PATCH 018/172] Remove unused function
  /* view inline image */
  DEFUN(followI, VIEW_IMAGE, "Display image in viewer")
  {
-@@ -3472,13 +3463,6 @@ DEFUN(submitForm, SUBMIT, "Submit form")
+@@ -3415,13 +3406,6 @@ DEFUN(submitForm, SUBMIT, "Submit form")
      _followForm(TRUE);
  }
  

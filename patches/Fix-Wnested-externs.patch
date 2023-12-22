@@ -1,11 +1,8 @@
 ---
- etc.c            |    5 +++--
- file.c           |    4 ++--
- func.c           |    1 +
- indep.c          |    2 +-
- w3mbookmark.c    |    1 -
- w3mhelperpanel.c |    1 -
- 6 files changed, 7 insertions(+), 7 deletions(-)
+ etc.c   |    5 +++--
+ file.c  |    4 ++--
+ indep.c |    2 +-
+ 3 files changed, 6 insertions(+), 5 deletions(-)
 
 --- a/file.c
 +++ b/file.c
@@ -46,7 +43,7 @@
      char cmdstr[MAX_CMD_LEN];
      char *p = cmdstr;
      char *save = s;
-@@ -1580,7 +1581,7 @@ char *
+@@ -1600,7 +1601,7 @@ char *
  expandName(char *name)
  {
      char *p;
@@ -55,19 +52,9 @@
      Str extpath = NULL;
  
      if (name == NULL)
---- a/func.c
-+++ b/func.c
-@@ -19,6 +19,7 @@ static Hash_iv *keyData = NULL;
- static char keymap_initialized = FALSE;
- static struct stat sys_current_keymap_file;
- static struct stat current_keymap_file;
-+extern int str_to_bool(char *value, int old);
- 
- void
- setKeymap(char *p, int lineno, int verbose)
 --- a/indep.c
 +++ b/indep.c
-@@ -210,7 +210,7 @@ char *
+@@ -183,7 +183,7 @@ char *
  expandPath(char *name)
  {
      char *p;
@@ -76,23 +63,3 @@
      Str extpath = NULL;
  
      if (name == NULL)
---- a/w3mbookmark.c
-+++ b/w3mbookmark.c
-@@ -183,7 +183,6 @@ insert_bookmark(char *bmark, struct pars
- int
- main(void)
- {
--    extern char *getenv();
-     char *p;
-     int length;
-     Str qs = NULL;
---- a/w3mhelperpanel.c
-+++ b/w3mhelperpanel.c
-@@ -167,7 +167,6 @@ int
- main(void)
- {
-     Str mailcapfile;
--    extern char *getenv();
-     char *p;
-     int length;
-     Str qs = NULL;

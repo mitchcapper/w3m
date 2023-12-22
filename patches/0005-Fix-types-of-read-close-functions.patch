@@ -1,0 +1,237 @@
+From 591144439ee64e6c3e019060253680cb9f01dfc0 Mon Sep 17 00:00:00 2001
+From: Rene Kita <mail@rkta.de>
+Date: Tue, 19 Dec 2023 17:06:44 +0100
+Subject: [PATCH 5/6] Fix types of read/close functions
+
+This gets rid of io_file_handle. We can just use fclose and a FILE *.
+---
+ file.c    |    8 ++++----
+ ftp.c     |    2 +-
+ istream.c |   31 +++++++++----------------------
+ istream.h |   22 +++++++++++-----------
+ main.c    |    2 +-
+ url.c     |    6 ++----
+ 6 files changed, 28 insertions(+), 43 deletions(-)
+
+--- a/file.c
++++ b/file.c
+@@ -401,7 +401,7 @@ examineFile(char *path, URLFile *uf)
+ 		return;
+ 	    if ((fp = lessopen_stream(path))) {
+ 		UFclose(uf);
+-		uf->stream = newFileStream(fp, (void (*)(FILE *))pclose);
++		uf->stream = newFileStream(fp);
+ 		uf->guess_type = "text/plain";
+ 		return;
+ 	    }
+@@ -7916,7 +7916,7 @@ loadcmdout(char *cmd,
+     f = popen(cmd, "r");
+     if (f == NULL)
+ 	return NULL;
+-    init_stream(&uf, SCM_UNKNOWN, newFileStream(f, (void (*)(FILE *))pclose));
++    init_stream(&uf, SCM_UNKNOWN, newFileStream(f));
+     buf = loadproc(&uf, defaultbuf);
+     UFclose(&uf);
+     return buf;
+@@ -7954,7 +7954,7 @@ getpipe(char *cmd)
+     if (f == NULL)
+ 	return NULL;
+     buf = newBuffer(INIT_BUFFER_WIDTH);
+-    buf->pagerSource = newFileStream(f, (void (*)(FILE *))pclose);
++    buf->pagerSource = newFileStream(f);
+     buf->filename = cmd;
+     buf->buffername = Sprintf("%s %s", PIPEBUFFERNAME,
+ 			      conv_from_system(cmd))->ptr;
+@@ -8782,7 +8782,7 @@ uncompress_stream(URLFile *uf, char **sr
+ 	    uf->scheme = SCM_LOCAL;
+     }
+     UFhalfclose(uf);
+-    uf->stream = newFileStream(f1, (void (*)(FILE *))fclose);
++    uf->stream = newFileStream(f1);
+ #endif /* __MINGW32_VERSION */
+ }
+ 
+--- a/ftp.c
++++ b/ftp.c
+@@ -460,7 +460,7 @@ openFTPStream(ParsedURL *pu, URLFile *uf
+     uf->modtime = ftp_modtime(&current_ftp, realpathname);
+     ftp_command(&current_ftp, "RETR", realpathname, &status);
+     if (status == 125 || status == 150)
+-	return newFileStream(current_ftp.data, (void (*)(FILE *))closeFTPdata);
++	return newFileStream(current_ftp.data);
+ 
+   ftp_dir:
+     pu->scheme = SCM_FTPDIR;
+--- a/istream.c
++++ b/istream.c
+@@ -20,10 +20,9 @@
+ #define POP_CHAR(bs) ((bs)->iseos?'\0':(bs)->stream.buf[(bs)->stream.cur++])
+ 
+ static void basic_close(int *handle);
+-static int basic_read(int *handle, char *buf, int len);
++static int basic_read(int *handle, unsigned char *buf, int len);
+ 
+-static void file_close(struct io_file_handle *handle);
+-static int file_read(struct io_file_handle *handle, char *buf, int len);
++static int file_read(FILE *handle, char *buf, int len);
+ 
+ static int str_read(Str handle, char *buf, int len);
+ 
+@@ -108,7 +107,7 @@ newInputStream(int des)
+ }
+ 
+ InputStream
+-newFileStream(FILE * f, void (*closep) (FILE *))
++newFileStream(FILE * f)
+ {
+     InputStream stream;
+     if (f == NULL)
+@@ -116,14 +115,9 @@ newFileStream(FILE * f, void (*closep) (
+     stream = NewWithoutGC(union input_stream);
+     init_base_stream(&stream->base, STREAM_BUF_SIZE);
+     stream->file.type = IST_FILE;
+-    stream->file.handle = NewWithoutGC(struct io_file_handle);
+-    stream->file.handle->f = f;
+-    if (closep)
+-	stream->file.handle->close = closep;
+-    else
+-	stream->file.handle->close = fclose;
++    stream->file.handle = f;
+     stream->file.read = file_read;
+-    stream->file.close = file_close;
++    stream->file.close = fclose;
+     return stream;
+ }
+ 
+@@ -328,7 +322,7 @@ ISfileno(InputStream stream)
+     case IST_BASIC:
+ 	return *(int *)stream->base.handle;
+     case IST_FILE:
+-	return fileno(stream->file.handle->f);
++	return fileno(stream->file.handle);
+ #ifdef USE_SSL
+     case IST_SSL:
+ 	return stream->ssl.handle->sock;
+@@ -644,7 +638,7 @@ basic_close(int *handle)
+ }
+ 
+ static int
+-basic_read(int *handle, char *buf, int len)
++basic_read(int *handle, unsigned char *buf, int len)
+ {
+ #ifdef __MINGW32_VERSION
+     return recv(*(int *)handle, buf, len, 0);
+@@ -653,17 +647,10 @@ basic_read(int *handle, char *buf, int l
+ #endif
+ }
+ 
+-static void
+-file_close(struct io_file_handle *handle)
+-{
+-    handle->close(handle->f);
+-    xfree(handle);
+-}
+-
+ static int
+-file_read(struct io_file_handle *handle, char *buf, int len)
++file_read(FILE *handle, char *buf, int len)
+ {
+-    return fread(buf, 1, len, handle->f);
++    return fread(buf, 1, len, handle);
+ }
+ 
+ static int
+--- a/istream.h
++++ b/istream.h
+@@ -47,17 +47,17 @@ struct base_stream {
+     void *handle;
+     char type;
+     char iseos;
+-    int (*read) (void *, unsigned char *, int);
+-    void (*close) (void *);
++    int (*read) (int *, unsigned char *, int);
++    void (*close) (int *);
+ };
+ 
+ struct file_stream {
+     struct stream_buffer stream;
+-    struct io_file_handle *handle;
++    FILE *handle;
+     char type;
+     char iseos;
+-    int (*read) (FILE *);
+-    void (*close) (FILE *);
++    int (*read) (FILE *, char *, int);
++    int (*close) (FILE *);
+ };
+ 
+ struct str_stream {
+@@ -65,7 +65,7 @@ struct str_stream {
+     Str handle;
+     char type;
+     char iseos;
+-    int (*read) (void *, unsigned char *, int);
++    int (*read) (Str, char *, int);
+     void (*close) (void *, int, int *);
+ };
+ 
+@@ -75,8 +75,8 @@ struct ssl_stream {
+     struct ssl_handle *handle;
+     char type;
+     char iseos;
+-    int (*read) (void *, unsigned char *, int);
+-    void (*close) (void *, int, int *);
++    int (*read) (struct ssl_handle *, char *, int);
++    void (*close) (struct ssl_handle *);
+ };
+ #endif				/* USE_SSL */
+ 
+@@ -85,8 +85,8 @@ struct encoded_stream {
+     struct ens_handle *handle;
+     char type;
+     char iseos;
+-    int (*read) (void *, unsigned char *, int);
+-    void (*close) (void *, int, int *);
++    int (*read) (struct ens_handle *, char *, int);
++    void (*close) (struct ens_handle *);
+ };
+ 
+ union input_stream {
+@@ -110,7 +110,7 @@ typedef struct encoded_stream *EncodedSt
+ typedef union input_stream *InputStream;
+ 
+ extern InputStream newInputStream(int des);
+-extern InputStream newFileStream(FILE * f, void (*closep) (FILE *));
++extern InputStream newFileStream(FILE * f);
+ extern InputStream newStrStream(Str s);
+ #ifdef USE_SSL
+ extern InputStream newSSLStream(SSL * ssl, int sock);
+--- a/main.c
++++ b/main.c
+@@ -961,7 +961,7 @@ main(int argc, char **argv)
+     if (load_argc == 0) {
+ 	/* no URL specified */
+ 	if (!isatty(0)) {
+-	    redin = newFileStream(fdopen(dup(0), "rb"), (void (*)(FILE *))pclose);
++	    redin = newFileStream(fdopen(dup(0), "rb"));
+ 	    newbuf = openGeneralPagerBuffer(redin);
+ 	    dup2(1, 0);
+ 	}
+--- a/url.c
++++ b/url.c
+@@ -1693,13 +1693,11 @@ openURL(char *url, ParsedURL *pu, Parsed
+ 	if (request && request->body)
+ 	    /* local CGI: POST */
+ 	    uf.stream = newFileStream(localcgi_post(pu->real_file, pu->query,
+-						    request, option->referer),
+-				      (void (*)(FILE *))fclose);
++						    request, option->referer));
+ 	else
+ 	    /* lodal CGI: GET */
+ 	    uf.stream = newFileStream(localcgi_get(pu->real_file, pu->query,
+-						   option->referer),
+-				      (void (*)(FILE *))fclose);
++						   option->referer));
+ 	if (uf.stream) {
+ 	    uf.is_cgi = TRUE;
+ 	    uf.scheme = pu->scheme = SCM_LOCAL_CGI;

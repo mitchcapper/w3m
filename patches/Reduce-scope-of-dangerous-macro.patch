@@ -31,7 +31,7 @@ this function.
  #define Strncmp(x,y,n)               strncmp((x)->ptr,(y)->ptr,(n))
 --- a/etc.c
 +++ b/etc.c
-@@ -2094,6 +2094,8 @@ static char Base64Table[] =
+@@ -2114,6 +2114,8 @@ static char Base64Table[] =
  Str
  base64_encode(const char *src, size_t len)
  {
@@ -40,7 +40,7 @@ this function.
      Str dest;
      const unsigned char *in, *endw, *s;
      unsigned long j;
-@@ -2150,4 +2152,6 @@ base64_encode(const char *src, size_t le
+@@ -2170,4 +2172,6 @@ base64_encode(const char *src, size_t le
      }
      Strnulterm(dest);
      return dest;

@@ -11,7 +11,7 @@ which uses garbage collection in the background.
 
 --- a/etc.c
 +++ b/etc.c
-@@ -2048,7 +2048,7 @@ FQDN(char *host)
+@@ -2068,7 +2068,7 @@ FQDN(char *host)
  	for (res = res0; res != NULL; res = res->ai_next) {
  	    if (res->ai_canonname) {
  		/* found */

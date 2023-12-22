@@ -75,7 +75,7 @@
      move(c, 0);
 --- a/display.c
 +++ b/display.c
-@@ -338,8 +338,7 @@ make_lastline_message(Buffer *buf)
+@@ -351,8 +351,7 @@ make_lastline_message(Buffer *buf)
  	Strcat(msg, Sprintf("%d/%d (%d%%)", cl, ll, r));
      }
      else
@@ -85,7 +85,7 @@
  #ifdef USE_SSL
      if (buf->ssl_certificate)
  	Strcat_charp(msg, "[SSL]");
-@@ -475,8 +474,7 @@ displayBuffer(Buffer *buf, int mode)
+@@ -488,8 +487,7 @@ displayBuffer(Buffer *buf, int mode)
  
      msg = make_lastline_message(buf);
      if (buf->firstLine == NULL) {
@@ -365,7 +365,7 @@
  	for (item = hist->list->last; item; item = item->prev) {
 --- a/istream.c
 +++ b/istream.c
-@@ -464,8 +464,7 @@ ssl_check_cert_ident(X509 * x, char *hos
+@@ -458,8 +458,7 @@ ssl_check_cert_ident(X509 * x, char *hos
  	    if (i < n)		/* Found a match */
  		match_ident = TRUE;
  	    else if (seen_dnsname)
@@ -375,7 +375,7 @@
  			      seen_dnsname->ptr);
  	}
      }
-@@ -479,8 +478,7 @@ ssl_check_cert_ident(X509 * x, char *hos
+@@ -473,8 +472,7 @@ ssl_check_cert_ident(X509 * x, char *hos
  
  	slen = X509_NAME_get_text_by_NID(xn, NID_commonName, buf, sizeof(buf));
  	if ( slen == -1)
@@ -385,7 +385,7 @@
  	else if (slen != strlen(buf)
  		|| !ssl_match_cert_ident(buf, strlen(buf), hostname)) {
  	    /* replace \0 to make full string visible to user */
-@@ -491,8 +489,7 @@ ssl_check_cert_ident(X509 * x, char *hos
+@@ -485,8 +483,7 @@ ssl_check_cert_ident(X509 * x, char *hos
  			buf[i] = '!';
  		}
  	    }
@@ -395,7 +395,7 @@
  	}
      }
      return ret;
-@@ -564,14 +561,12 @@ ssl_get_certificate(SSL * ssl, char *hos
+@@ -558,14 +555,12 @@ ssl_get_certificate(SSL * ssl, char *hos
  	if (accept_this_site(hostname, x))
  	    ans = "y";
  	else {
@@ -412,7 +412,7 @@
  	else {
  	    /* FIXME: gettextize? */
  	    const char *e = "This SSL session was rejected "
-@@ -583,8 +578,7 @@ ssl_get_certificate(SSL * ssl, char *hos
+@@ -577,8 +572,7 @@ ssl_get_certificate(SSL * ssl, char *hos
  	if (amsg)
  	    disp_err_message(amsg->ptr, FALSE);
  	ssl_accept_this_site(hostname, x, 0);
@@ -422,7 +422,7 @@
  	return s;
      }
  #ifdef USE_SSL_VERIFY
-@@ -617,9 +611,8 @@ ssl_get_certificate(SSL * ssl, char *hos
+@@ -611,9 +605,8 @@ ssl_get_certificate(SSL * ssl, char *hos
  		    perm = 1;
  		}
  		else {
@@ -433,7 +433,7 @@
  		    disp_err_message(e, FALSE);
  		    free_ssl_ctx();
  		    return NULL;
-@@ -641,8 +634,7 @@ ssl_get_certificate(SSL * ssl, char *hos
+@@ -635,8 +628,7 @@ ssl_get_certificate(SSL * ssl, char *hos
  	    ans = inputAnswer(ep->ptr);
  	}
  	if (ans && TOLOWER(*ans) == 'y') {
@@ -443,7 +443,7 @@
  	    Strcat(amsg, emsg);
  	}
  	else {
-@@ -657,8 +649,7 @@ ssl_get_certificate(SSL * ssl, char *hos
+@@ -651,8 +643,7 @@ ssl_get_certificate(SSL * ssl, char *hos
      }
      if (amsg)
  	disp_err_message(amsg->ptr, FALSE);
@@ -455,7 +455,7 @@
      if (X509_NAME_get_text_by_NID(xn, NID_commonName, buf, sizeof(buf)) == -1)
 --- a/linein.c
 +++ b/linein.c
-@@ -814,8 +814,7 @@ next_dcompl(int next)
+@@ -811,8 +811,7 @@ next_dcompl(int next)
  	move(y, 0);
  	clrtoeolx();
  	bold();
@@ -465,7 +465,7 @@
  	boldend();
  	y++;
      }
-@@ -839,11 +838,9 @@ next_dcompl(int next)
+@@ -836,11 +835,9 @@ next_dcompl(int next)
  	clrtoeolx();
  	bold();
  	if (emacs_like_lineedit)

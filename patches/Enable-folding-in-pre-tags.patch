@@ -18,7 +18,7 @@ make this behaviour permanent.
 
 --- a/file.c
 +++ b/file.c
-@@ -2589,7 +2589,7 @@ check_breakpoint(struct readbuffer *obuf
+@@ -2558,7 +2558,7 @@ check_breakpoint(struct readbuffer *obuf
      int tlen, len = obuf->line->length;
  
      append_tags(obuf);
@@ -27,7 +27,7 @@ make this behaviour permanent.
  	return;
      tlen = obuf->line->length - len;
      if (tlen > 0
-@@ -6639,7 +6639,8 @@ HTMLlineproc0(char *line, struct html_fe
+@@ -6577,7 +6577,8 @@ HTMLlineproc0(char *line, struct html_fe
  			proc_mchar(obuf, 1, delta, &str, mode);
  		}
  		if (obuf->flag & (RB_SPECIAL & ~RB_PRE_INT))
@@ -37,7 +37,7 @@ make this behaviour permanent.
  	    }
  	    else {
  		if (!IS_SPACE(*str))
-@@ -6854,6 +6855,7 @@ loadHTMLBuffer(URLFile *f, Buffer *newBu
+@@ -6792,6 +6793,7 @@ loadHTMLBuffer(URLFile *f, Buffer *newBu
  	if (src)
  	    newBuf->sourcefile = tmp->ptr;
      }
@@ -47,7 +47,7 @@ make this behaviour permanent.
  
 --- a/fm.h
 +++ b/fm.h
-@@ -1053,6 +1053,8 @@ global int ignore_null_img_alt init(TRUE
+@@ -1042,6 +1042,8 @@ global int ignore_null_img_alt init(TRUE
  #define DISPLAY_INS_DEL_FONTIFY	2
  global int displayInsDel init(DISPLAY_INS_DEL_NORMAL);
  global int FoldTextarea init(FALSE);
@@ -58,7 +58,7 @@ make this behaviour permanent.
  #define DEFAULT_URL_CURRENT	1
 --- a/main.c
 +++ b/main.c
-@@ -4863,6 +4863,14 @@ DEFUN(vwSrc, SOURCE VIEW, "Toggle betwee
+@@ -4801,6 +4801,14 @@ DEFUN(vwSrc, SOURCE VIEW, "Toggle betwee
      displayBuffer(Currentbuf, B_NORMAL);
  }
  
@@ -73,7 +73,7 @@ make this behaviour permanent.
  /* reload */
  DEFUN(reload, RELOAD, "Load current document anew")
  {
-@@ -4986,6 +4994,7 @@ DEFUN(reload, RELOAD, "Load current docu
+@@ -4924,6 +4932,7 @@ DEFUN(reload, RELOAD, "Load current docu
  	restorePosition(Currentbuf, &sbuf);
      }
      displayBuffer(Currentbuf, B_FORCE_REDRAW);
@@ -83,7 +83,7 @@ make this behaviour permanent.
  /* reshape */
 --- a/proto.h
 +++ b/proto.h
-@@ -99,6 +99,7 @@ extern void peekURL(void);
+@@ -96,6 +96,7 @@ extern void peekURL(void);
  extern void peekIMG(void);
  extern void curURL(void);
  extern void vwSrc(void);
@@ -101,7 +101,7 @@ make this behaviour permanent.
  #define CMT_DISP_INS_DEL N_("Display INS, DEL, S and STRIKE element")
  #define CMT_COLOR        N_("Display with color")
  #define CMT_HINTENSITY_COLOR N_("Use high-intensity colors")
-@@ -430,6 +431,8 @@ struct param_ptr params1[] = {
+@@ -418,6 +419,8 @@ struct param_ptr params1[] = {
       CMT_DISABLE_CENTER, NULL},
      {"fold_textarea", P_CHARINT, PI_ONOFF, (void *)&FoldTextarea,
       CMT_FOLD_TEXTAREA, NULL},

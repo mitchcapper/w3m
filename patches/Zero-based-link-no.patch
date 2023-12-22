@@ -15,7 +15,7 @@
  #define CMT_DECODE_URL   N_("Display decoded URL")
  #define CMT_DISPLINEINFO N_("Display current line number")
  #define CMT_DISP_IMAGE   N_("Display inline images")
-@@ -410,6 +411,8 @@ struct param_ptr params1[] = {
+@@ -398,6 +399,8 @@ struct param_ptr params1[] = {
       NULL},
      {"display_link_number", P_INT, PI_ONOFF, (void *)&displayLinkNumber,
       CMT_DISPLINKNUMBER, NULL},
@@ -26,7 +26,7 @@
       CMT_DISPLINEINFO, NULL},
 --- a/file.c
 +++ b/file.c
-@@ -1676,7 +1676,7 @@ checkRedirection(ParsedURL *pu)
+@@ -1675,7 +1675,7 @@ checkRedirection(ParsedURL *pu)
  Str
  getLinkNumberStr(int correction)
  {
@@ -35,7 +35,7 @@
  }
  
  /* 
-@@ -7806,7 +7806,7 @@ loadGeminiBuffer(URLFile *uf, Buffer *vo
+@@ -7706,7 +7706,7 @@ loadGeminiBuffer(URLFile *uf, Buffer *vo
  	    buf->hmarklist = putHmarker(buf->hmarklist, currentLn(buf),
  					0, hseq);
  	    if (displayLinkNumber)
@@ -46,7 +46,7 @@
  	    line = checkType(line, &propBuf, NULL);
 --- a/fm.h
 +++ b/fm.h
-@@ -981,6 +981,7 @@ global int nextpage_topline init(FALSE);
+@@ -970,6 +970,7 @@ global int nextpage_topline init(FALSE);
  global char *displayTitleTerm init(NULL);
  global int displayLink init(FALSE);
  global int displayLinkNumber init(FALSE);
@@ -56,7 +56,7 @@
  global int retryAsHttp init(TRUE);
 --- a/main.c
 +++ b/main.c
-@@ -3723,7 +3723,7 @@ DEFUN(topA, LINK_BEGIN, "Move to the fir
+@@ -3669,7 +3669,7 @@ DEFUN(topA, LINK_BEGIN, "Move to the fir
      if (prec_num > hl->nmark)
  	hseq = hl->nmark - 1;
      else if (prec_num > 0)

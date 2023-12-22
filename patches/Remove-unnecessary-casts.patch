@@ -75,7 +75,7 @@
  }
 --- a/buffer.c
 +++ b/buffer.c
-@@ -33,7 +33,7 @@ newBuffer(int width)
+@@ -29,7 +29,7 @@ newBuffer(int width)
      n = New(Buffer);
      if (n == NULL)
  	exit(3);
@@ -84,7 +84,7 @@
      n->width = width;
      n->COLS = COLS;
      n->LINES = LASTLINE;
-@@ -597,7 +597,7 @@ void
+@@ -588,7 +588,7 @@ void
  copyBuffer(Buffer *a, Buffer *b)
  {
      readBufferCache(b);
@@ -95,7 +95,7 @@
  Buffer *
 --- a/file.c
 +++ b/file.c
-@@ -6889,7 +6889,7 @@ addnewline(Buffer *buf, char *line, Line
+@@ -6725,7 +6725,7 @@ addnewline(Buffer *buf, char *line, Line
      if (pos > 0) {
  	s = allocStr(line, pos);
  	p = NewAtom_N(Lineprop, pos);
@@ -104,7 +104,7 @@
      }
      else {
  	s = NullLine;
-@@ -6898,7 +6898,7 @@ addnewline(Buffer *buf, char *line, Line
+@@ -6734,7 +6734,7 @@ addnewline(Buffer *buf, char *line, Line
  #ifdef USE_ANSI_COLOR
      if (pos > 0 && color) {
  	c = NewAtom_N(Linecolor, pos);
@@ -309,15 +309,15 @@
  #endif
 --- a/istream.c
 +++ b/istream.c
-@@ -102,6 +102,7 @@ newInputStream(int des)
+@@ -100,6 +100,7 @@ newInputStream(int des)
      init_base_stream(&stream->base, STREAM_BUF_SIZE);
      stream->base.type = IST_BASIC;
      stream->base.handle = NewWithoutGC(int);
 +    /* TODO(rkta): Check cast from int to void ptr */
      *(int *)stream->base.handle = des;
-     stream->base.read = (int (*)(void *, unsigned char *, int))basic_read;
-     stream->base.close = (void (*)(void *))basic_close;
-@@ -687,9 +688,9 @@ static void
+     stream->base.read = basic_read;
+     stream->base.close = basic_close;
+@@ -601,9 +602,9 @@ static void
  basic_close(int *handle)
  {
  #ifdef __MINGW32_VERSION
@@ -329,8 +329,8 @@
  #endif
      xfree(handle);
  }
-@@ -698,9 +699,9 @@ static int
- basic_read(int *handle, char *buf, int len)
+@@ -612,9 +613,9 @@ static int
+ basic_read(int *handle, unsigned char *buf, int len)
  {
  #ifdef __MINGW32_VERSION
 -    return recv(*(int *)handle, buf, len, 0);
@@ -363,7 +363,7 @@
  #else				/* not HAVE_PUTENV */
 --- a/main.c
 +++ b/main.c
-@@ -473,7 +473,7 @@ main(int argc, char **argv)
+@@ -447,7 +447,7 @@ main(int argc, char **argv)
      load_argc = 0;
  
      CurrentDir = currentdir();
@@ -372,7 +372,7 @@
  #if defined(DONT_CALL_GC_AFTER_FORK) && defined(USE_IMAGE)
      if (argv[0] && *argv[0])
  	MyProgramName = argv[0];
-@@ -489,7 +489,7 @@ main(int argc, char **argv)
+@@ -463,7 +463,7 @@ main(int argc, char **argv)
  	    hostname[HOST_NAME_MAX + 1] = '\0';
  	    hostname_len = strlen(hostname);
  	    if (hostname_len <= HOST_NAME_MAX && hostname_len < STR_SIZE_MAX)
@@ -381,7 +381,7 @@
  	}
      }
  
-@@ -1202,7 +1202,7 @@ main(int argc, char **argv)
+@@ -1173,7 +1173,7 @@ main(int argc, char **argv)
  	if (CurrentEvent) {
  	    CurrentKey = -1;
  	    CurrentKeyData = NULL;
@@ -390,7 +390,7 @@
  	    w3mFuncList[CurrentEvent->cmd].func();
  	    CurrentCmdData = NULL;
  	    CurrentEvent = CurrentEvent->next;
-@@ -1217,7 +1217,7 @@ main(int argc, char **argv)
+@@ -1188,7 +1188,7 @@ main(int argc, char **argv)
  		    Currentbuf->event = NULL;
  		    CurrentKey = -1;
  		    CurrentKeyData = NULL;
@@ -399,7 +399,7 @@
  		    w3mFuncList[CurrentAlarm->cmd].func();
  		    CurrentCmdData = NULL;
  		    continue;
-@@ -1286,7 +1286,7 @@ main(int argc, char **argv)
+@@ -1257,7 +1257,7 @@ main(int argc, char **argv)
  	    else {
  		set_buffer_environ(Currentbuf);
  		save_buffer_position(Currentbuf);
@@ -408,7 +408,7 @@
  		prec_num = 0;
  	    }
  	}
-@@ -1482,7 +1482,7 @@ DEFUN(escmap, ESCMAP, "ESC map")
+@@ -1453,7 +1453,7 @@ DEFUN(escmap, ESCMAP, "ESC map")
      char c;
      c = getch();
      if (IS_ASCII(c))
@@ -417,7 +417,7 @@
  }
  
  DEFUN(escbmap, ESCBMAP, "ESC [ map")
-@@ -1494,7 +1494,7 @@ DEFUN(escbmap, ESCBMAP, "ESC [ map")
+@@ -1465,7 +1465,7 @@ DEFUN(escbmap, ESCBMAP, "ESC [ map")
  	return;
      }
      if (IS_ASCII(c))
@@ -426,7 +426,7 @@
  }
  
  void
-@@ -1508,7 +1508,7 @@ escdmap(char c)
+@@ -1479,7 +1479,7 @@ escdmap(char c)
  	c = getch();
      }
      if (c == '~')
@@ -435,7 +435,7 @@
  }
  
  DEFUN(multimap, MULTIMAP, "multimap")
-@@ -1517,7 +1517,7 @@ DEFUN(multimap, MULTIMAP, "multimap")
+@@ -1488,7 +1488,7 @@ DEFUN(multimap, MULTIMAP, "multimap")
      c = getch();
      if (IS_ASCII(c)) {
  	CurrentKey = K_MULTI | (CurrentKey << 16) | c;
@@ -444,7 +444,7 @@
      }
  }
  
-@@ -4696,7 +4696,7 @@ _peekURL(int only_img)
+@@ -4639,7 +4639,7 @@ _peekURL(int only_img)
  #ifdef USE_M17N
      s = checkType(s, &pp, NULL);
      p = NewAtom_N(Lineprop, s->length);
@@ -453,7 +453,7 @@
  #endif
    disp:
      n = searchKeyNum();
-@@ -4755,7 +4755,7 @@ DEFUN(curURL, PEEK, "Show current addres
+@@ -4698,7 +4698,7 @@ DEFUN(curURL, PEEK, "Show current addres
  #ifdef USE_M17N
  	s = checkType(s, &pp, NULL);
  	p = NewAtom_N(Lineprop, s->length);
@@ -475,7 +475,7 @@
  #endif
 --- a/url.c
 +++ b/url.c
-@@ -686,8 +686,7 @@ openSocket(char *const hostname,
+@@ -679,8 +679,7 @@ openSocket(char *const hostname,
  	hostaddr.sin_family = AF_INET;
  	hostaddr.sin_port = s_port;
  	for (h_addr_list = entry->h_addr_list; *h_addr_list; h_addr_list++) {

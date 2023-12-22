@@ -9,7 +9,7 @@ Check the return value of system() calls and display an error message.
 
 --- a/etc.c
 +++ b/etc.c
-@@ -1490,7 +1490,7 @@ myExec(char *command)
+@@ -1510,7 +1510,7 @@ myExec(char *command)
      exit(127);
  }
  
@@ -18,7 +18,7 @@ Check the return value of system() calls and display an error message.
  mySystem(char *command, int background)
  {
  #ifndef __MINGW32_VERSION
-@@ -1501,15 +1501,16 @@ mySystem(char *command, int background)
+@@ -1521,15 +1521,16 @@ mySystem(char *command, int background)
  	    setup_child(FALSE, 0, -1);
  	    myExec(command);
  	}

@@ -4,54 +4,12 @@ Date: Sun, 5 Sep 2021 21:18:16 +0200
 Subject: [PATCH 101/172] WIP getch Fix warning (strict-prototype)
 
 ---
- buffer.c |    4 ++--
- linein.c |    4 ++--
- menu.c   |    4 ++--
- terms.c  |    2 ++
- 4 files changed, 8 insertions(+), 6 deletions(-)
+ terms.c |    2 ++
+ 1 file changed, 2 insertions(+)
 
---- a/buffer.c
-+++ b/buffer.c
-@@ -6,8 +6,8 @@
- #include <gpm.h>
- #endif
- #if defined(USE_GPM) || defined(USE_SYSMOUSE)
--extern int do_getch();
--#define getch()	do_getch()
-+extern int do_getch(void); /* TODO(rkta): header, found in other file */
-+#define getch(void)	do_getch(void)
- #endif				/* USE_GPM */
- #endif				/* USE_MOUSE */
- 
---- a/linein.c
-+++ b/linein.c
-@@ -8,8 +8,8 @@
- #include <gpm.h>
- #endif
- #if defined(USE_GPM) || defined(USE_SYSMOUSE)
--extern int do_getch();
--#define getch()	do_getch()
-+extern int do_getch(void); /* TODO(rkta): move extern to header, is found in other file too */
-+#define getch(void)	do_getch(void)
- #endif				/* USE_GPM */
- #endif				/* USE_MOUSE */
- 
---- a/menu.c
-+++ b/menu.c
-@@ -24,8 +24,8 @@ extern int sysm_process_mouse(int, int,
- #if defined(USE_GPM) || defined(USE_SYSMOUSE)
- #define X_MOUSE_SELECTED (char)0xff
- static int X_Mouse_Selection;
--extern int do_getch();
--#define getch()	do_getch()
-+extern int do_getch(void);
-+#define getch(void)	do_getch(void)
- #endif				/* defined(USE_GPM) || defined(USE_SYSMOUSE) */
- #endif				/* USE_MOUSE */
- 
 --- a/terms.c
 +++ b/terms.c
-@@ -2272,6 +2272,7 @@ getch(void)
+@@ -2276,6 +2276,7 @@ getch(void)
   * E.g. SELECT_MENU will segfault if you remove it.
   * TODO(rkta): wgetch belongs to libcurses, something fishy is going on here.
   */
@@ -59,7 +17,7 @@ Subject: [PATCH 101/172] WIP getch Fix warning (strict-prototype)
  char
  wgetch(void *p)
  {
-@@ -2288,6 +2289,7 @@ wgetch(void *p)
+@@ -2292,6 +2293,7 @@ wgetch(void *p)
      return c;
  }
  

@@ -1,0 +1,791 @@
+From 0d2b6c38f0cb682a0c209b2df17e7d08b18642e1 Mon Sep 17 00:00:00 2001
+From: Rene Kita <mail@rkta.de>
+Date: Tue, 12 Dec 2023 13:17:24 +0100
+Subject: [PATCH 1/6] Enable building with "modern C" build options
+
+make OPTS="-Werror=implicit-function-declaration -Werror=implicit-int
+-Werror=strict-prototypes"
+---
+ buffer.c         |    2 +-
+ display.c        |   21 +++++++++++++++++----
+ file.c           |   20 ++++++++++----------
+ fm.h             |    2 +-
+ ftp.c            |    2 +-
+ func.h           |    2 +-
+ istream.c        |   28 ++++++++++++++--------------
+ istream.h        |   26 +++++++++++++-------------
+ libwc/wc_types.h |   12 +++++++-----
+ linein.c         |    8 ++++----
+ local.c          |    2 +-
+ main.c           |    8 ++++----
+ menu.c           |    6 +++---
+ menu.h           |    2 +-
+ parsetagx.c      |   48 ++++++++++++++++++++++++------------------------
+ proto.h          |    4 ++--
+ rc.c             |    2 +-
+ terms.c          |    4 ++--
+ url.c            |    4 ++--
+ w3mbookmark.c    |    2 +-
+ w3mhelperpanel.c |    2 +-
+ w3mimg/w3mimg.h  |    4 ++--
+ 22 files changed, 113 insertions(+), 98 deletions(-)
+
+--- a/buffer.c
++++ b/buffer.c
+@@ -6,7 +6,7 @@
+ #include <gpm.h>
+ #endif
+ #if defined(USE_GPM) || defined(USE_SYSMOUSE)
+-extern int do_getch();
++extern int do_getch(void);
+ #define getch()	do_getch()
+ #endif				/* USE_GPM */
+ #endif				/* USE_MOUSE */
+--- a/display.c
++++ b/display.c
+@@ -7,6 +7,19 @@
+ /* *INDENT-OFF* */
+ #ifdef USE_COLOR
+ 
++static void effect_anchor_start(void);
++static void effect_anchor_end(void);
++static void effect_image_start(void);
++static void effect_image_end(void);
++static void effect_form_start(void);
++static void effect_form_end(void);
++static void effect_active_start(void);
++static void effect_active_end(void);
++static void effect_visited_start(void);
++static void effect_visited_end(void);
++static void effect_mark_start(void);
++static void effect_mark_end(void);
++
+ #define EFFECT_ANCHOR_START       effect_anchor_start()
+ #define EFFECT_ANCHOR_END         effect_anchor_end()
+ #define EFFECT_IMAGE_START        effect_image_start()
+@@ -83,7 +96,7 @@ define_effect(EFFECT_MARK_START, EFFECT_
+ 
+ /*****************/
+ static void
+-EFFECT_ACTIVE_START
++effect_active_start(void)
+ {
+     if (useColor) {
+ 	if (useActiveColor) {
+@@ -104,7 +117,7 @@ EFFECT_ACTIVE_START
+ }
+ 
+ static void
+-EFFECT_ACTIVE_END
++effect_active_end(void)
+ {
+     if (useColor) {
+ 	if (useActiveColor) {
+@@ -118,7 +131,7 @@ EFFECT_ACTIVE_END
+ }
+ 
+ static void
+-EFFECT_VISITED_START
++effect_visited_start(void)
+ {
+     if (useVisitedColor) {
+ 	if (useColor) {
+@@ -130,7 +143,7 @@ EFFECT_VISITED_START
+ }
+ 
+ static void
+-EFFECT_VISITED_END
++effect_visited_end(void)
+ {
+     if (useVisitedColor) {
+ 	if (useColor) {
+--- a/file.c
++++ b/file.c
+@@ -401,7 +401,7 @@ examineFile(char *path, URLFile *uf)
+ 		return;
+ 	    if ((fp = lessopen_stream(path))) {
+ 		UFclose(uf);
+-		uf->stream = newFileStream(fp, (void (*)())pclose);
++		uf->stream = newFileStream(fp, (void (*)(FILE *))pclose);
+ 		uf->guess_type = "text/plain";
+ 		return;
+ 	    }
+@@ -5588,7 +5588,7 @@ ex_efct(int ex)
+ }
+ 
+ static void
+-HTMLlineproc2body(Buffer *buf, Str (*feed) (), int llimit)
++HTMLlineproc2body(Buffer *buf, Str (*feed) (void), int llimit)
+ {
+     static char *outc = NULL;
+     static Lineprop *outp = NULL;
+@@ -7916,7 +7916,7 @@ loadcmdout(char *cmd,
+     f = popen(cmd, "r");
+     if (f == NULL)
+ 	return NULL;
+-    init_stream(&uf, SCM_UNKNOWN, newFileStream(f, (void (*)())pclose));
++    init_stream(&uf, SCM_UNKNOWN, newFileStream(f, (void (*)(FILE *))pclose));
+     buf = loadproc(&uf, defaultbuf);
+     UFclose(&uf);
+     return buf;
+@@ -7954,7 +7954,7 @@ getpipe(char *cmd)
+     if (f == NULL)
+ 	return NULL;
+     buf = newBuffer(INIT_BUFFER_WIDTH);
+-    buf->pagerSource = newFileStream(f, (void (*)())pclose);
++    buf->pagerSource = newFileStream(f, (void (*)(FILE *))pclose);
+     buf->filename = cmd;
+     buf->buffername = Sprintf("%s %s", PIPEBUFFERNAME,
+ 			      conv_from_system(cmd))->ptr;
+@@ -8193,7 +8193,7 @@ save2tmp(URLFile uf, char *tmpf)
+     MySignalHandler(*volatile prevtrap) (SIGNAL_ARG) = NULL;
+     static JMP_BUF env_bak;
+     volatile int retval = 0;
+-    char *volatile buf = NULL;
++    unsigned char *volatile buf = NULL;
+ 
+     ff = fopen(tmpf, "wb");
+     if (ff == NULL) {
+@@ -8234,7 +8234,7 @@ save2tmp(URLFile uf, char *tmpf)
+     {
+ 	int count;
+ 
+-	buf = NewWithoutGC_N(char, SAVE_BUF_SIZE);
++	buf = NewWithoutGC_N(unsigned char, SAVE_BUF_SIZE);
+ 	while ((count = ISread_n(uf.stream, buf, SAVE_BUF_SIZE)) > 0) {
+ 	    if (fwrite(buf, 1, count, ff) != count) {
+ 		retval = -2;
+@@ -8361,7 +8361,7 @@ _MoveFile(char *path1, char *path2)
+     FILE *f2;
+     int is_pipe;
+     clen_t linelen = 0, trbyte = 0;
+-    char *buf = NULL;
++    unsigned char *buf = NULL;
+     int count;
+ 
+     f1 = openIS(path1);
+@@ -8380,7 +8380,7 @@ _MoveFile(char *path1, char *path2)
+ 	return -1;
+     }
+     current_content_length = 0;
+-    buf = NewWithoutGC_N(char, SAVE_BUF_SIZE);
++    buf = NewWithoutGC_N(unsigned char, SAVE_BUF_SIZE);
+     while ((count = ISread_n(f1, buf, SAVE_BUF_SIZE)) > 0) {
+ 	fwrite(buf, 1, count, f2);
+ 	linelen += count;
+@@ -8747,7 +8747,7 @@ uncompress_stream(URLFile *uf, char **sr
+ 	}
+ 	if (pid2 == 0) {
+ 	    /* child2 */
+-	    char *buf = NewWithoutGC_N(char, SAVE_BUF_SIZE);
++	    unsigned char *buf = NewWithoutGC_N(unsigned char, SAVE_BUF_SIZE);
+ 	    int count;
+ 	    FILE *f = NULL;
+ 
+@@ -8782,7 +8782,7 @@ uncompress_stream(URLFile *uf, char **sr
+ 	    uf->scheme = SCM_LOCAL;
+     }
+     UFhalfclose(uf);
+-    uf->stream = newFileStream(f1, (void (*)())fclose);
++    uf->stream = newFileStream(f1, (void (*)(FILE *))fclose);
+ #endif /* __MINGW32_VERSION */
+ }
+ 
+--- a/fm.h
++++ b/fm.h
+@@ -1152,7 +1152,7 @@ global int relative_wheel_scroll init(FA
+ global int fixed_wheel_scroll_count init(5);
+ global int relative_wheel_scroll_ratio init(30);
+ typedef struct _MouseActionMap {
+-    void (*func) ();
++    void (*func) (void);
+     char *data;
+ } MouseActionMap;
+ typedef struct _MouseAction {
+--- a/ftp.c
++++ b/ftp.c
+@@ -460,7 +460,7 @@ openFTPStream(ParsedURL *pu, URLFile *uf
+     uf->modtime = ftp_modtime(&current_ftp, realpathname);
+     ftp_command(&current_ftp, "RETR", realpathname, &status);
+     if (status == 125 || status == 150)
+-	return newFileStream(current_ftp.data, (void (*)())closeFTPdata);
++	return newFileStream(current_ftp.data, (void (*)(FILE *))closeFTPdata);
+ 
+   ftp_dir:
+     pu->scheme = SCM_FTPDIR;
+--- a/func.h
++++ b/func.h
+@@ -19,7 +19,7 @@
+ 
+ typedef struct _FuncList {
+     char *id;
+-    void (*func) ();
++    void (*func) (void);
+ } FuncList;
+ 
+ #endif				/* not FUNC_H */
+--- a/istream.c
++++ b/istream.c
+@@ -50,7 +50,7 @@ do_update(BaseStream base)
+ }
+ 
+ static int
+-buffer_read(StreamBuffer sb, char *obuf, int count)
++buffer_read(StreamBuffer sb, unsigned char *obuf, int count)
+ {
+     int len = sb->next - sb->cur;
+     if (len > 0) {
+@@ -102,13 +102,13 @@ newInputStream(int des)
+     stream->base.type = IST_BASIC;
+     stream->base.handle = NewWithoutGC(int);
+     *(int *)stream->base.handle = des;
+-    stream->base.read = (int (*)())basic_read;
+-    stream->base.close = (void (*)())basic_close;
++    stream->base.read = (int (*)(void *, unsigned char *, int))basic_read;
++    stream->base.close = (void (*)(void *))basic_close;
+     return stream;
+ }
+ 
+ InputStream
+-newFileStream(FILE * f, void (*closep) ())
++newFileStream(FILE * f, void (*closep) (FILE *))
+ {
+     InputStream stream;
+     if (f == NULL)
+@@ -121,9 +121,9 @@ newFileStream(FILE * f, void (*closep) (
+     if (closep)
+ 	stream->file.handle->close = closep;
+     else
+-	stream->file.handle->close = (void (*)())fclose;
+-    stream->file.read = (int (*)())file_read;
+-    stream->file.close = (void (*)())file_close;
++	stream->file.handle->close = (void (*)(FILE *))fclose;
++    stream->file.read = (int (*)(FILE *))file_read;
++    stream->file.close = (void (*)(FILE *))file_close;
+     return stream;
+ }
+ 
+@@ -137,7 +137,7 @@ newStrStream(Str s)
+     init_str_stream(&stream->base, s);
+     stream->str.type = IST_STR;
+     stream->str.handle = NULL;
+-    stream->str.read = (int (*)())str_read;
++    stream->str.read = (int (*)(void *, unsigned char *, int))str_read;
+     stream->str.close = NULL;
+     return stream;
+ }
+@@ -155,8 +155,8 @@ newSSLStream(SSL * ssl, int sock)
+     stream->ssl.handle = NewWithoutGC(struct ssl_handle);
+     stream->ssl.handle->ssl = ssl;
+     stream->ssl.handle->sock = sock;
+-    stream->ssl.read = (int (*)())ssl_read;
+-    stream->ssl.close = (void (*)())ssl_close;
++    stream->ssl.read = (int (*)(void *, unsigned char *, int))ssl_read;
++    stream->ssl.close = (void (*)(void *, int, int *))ssl_close;
+     return stream;
+ }
+ #endif
+@@ -176,15 +176,15 @@ newEncodedStream(InputStream is, char en
+     stream->ens.handle->pos = 0;
+     stream->ens.handle->encoding = encoding;
+     growbuf_init_without_GC(&stream->ens.handle->gb);
+-    stream->ens.read = (int (*)())ens_read;
+-    stream->ens.close = (void (*)())ens_close;
++    stream->ens.read = (int (*)(void *, unsigned char *, int))ens_read;
++    stream->ens.close = (void (*)(void *, int, int *))ens_close;
+     return stream;
+ }
+ 
+ int
+ ISclose(InputStream stream)
+ {
+-    MySignalHandler(*prevtrap) ();
++    MySignalHandler(*prevtrap) (SIGNAL_ARG);
+     if (stream == NULL)
+         return -1;
+     if (stream->base.close != NULL) {
+@@ -297,7 +297,7 @@ ISread(InputStream stream, Str buf, int
+ #endif
+ 
+ int
+-ISread_n(InputStream stream, char *dst, int count)
++ISread_n(InputStream stream, unsigned char *dst, int count)
+ {
+     int len, l;
+     BaseStream base;
+--- a/istream.h
++++ b/istream.h
+@@ -22,7 +22,7 @@ typedef struct stream_buffer *StreamBuff
+ 
+ struct io_file_handle {
+     FILE *f;
+-    void (*close) ();
++    void (*close) (FILE *);
+ };
+ 
+ #ifdef USE_SSL
+@@ -47,8 +47,8 @@ struct base_stream {
+     void *handle;
+     char type;
+     char iseos;
+-    int (*read) ();
+-    void (*close) ();
++    int (*read) (void *, unsigned char *, int);
++    void (*close) (void *);
+ };
+ 
+ struct file_stream {
+@@ -56,8 +56,8 @@ struct file_stream {
+     struct io_file_handle *handle;
+     char type;
+     char iseos;
+-    int (*read) ();
+-    void (*close) ();
++    int (*read) (FILE *);
++    void (*close) (FILE *);
+ };
+ 
+ struct str_stream {
+@@ -65,8 +65,8 @@ struct str_stream {
+     Str handle;
+     char type;
+     char iseos;
+-    int (*read) ();
+-    void (*close) ();
++    int (*read) (void *, unsigned char *, int);
++    void (*close) (void *, int, int *);
+ };
+ 
+ #ifdef USE_SSL
+@@ -75,8 +75,8 @@ struct ssl_stream {
+     struct ssl_handle *handle;
+     char type;
+     char iseos;
+-    int (*read) ();
+-    void (*close) ();
++    int (*read) (void *, unsigned char *, int);
++    void (*close) (void *, int, int *);
+ };
+ #endif				/* USE_SSL */
+ 
+@@ -85,8 +85,8 @@ struct encoded_stream {
+     struct ens_handle *handle;
+     char type;
+     char iseos;
+-    int (*read) ();
+-    void (*close) ();
++    int (*read) (void *, unsigned char *, int);
++    void (*close) (void *, int, int *);
+ };
+ 
+ union input_stream {
+@@ -110,7 +110,7 @@ typedef struct encoded_stream *EncodedSt
+ typedef union input_stream *InputStream;
+ 
+ extern InputStream newInputStream(int des);
+-extern InputStream newFileStream(FILE * f, void (*closep) ());
++extern InputStream newFileStream(FILE * f, void (*closep) (FILE *));
+ extern InputStream newStrStream(Str s);
+ #ifdef USE_SSL
+ extern InputStream newSSLStream(SSL * ssl, int sock);
+@@ -126,7 +126,7 @@ void ISgets_to_growbuf(InputStream strea
+ #ifdef unused
+ extern int ISread(InputStream stream, Str buf, int count);
+ #endif
+-int ISread_n(InputStream stream, char *dst, int bufsize);
++int ISread_n(InputStream stream, unsigned char *dst, int bufsize);
+ extern int ISfileno(InputStream stream);
+ extern int ISeos(InputStream stream);
+ #ifdef USE_SSL
+--- a/libwc/wc_types.h
++++ b/libwc/wc_types.h
+@@ -26,6 +26,8 @@ typedef wc_uint32 wc_ces;
+ typedef wc_uint32 wc_locale;
+ typedef wc_uchar  wc_bool;
+ 
++typedef struct wc_status wc_status;
++
+ typedef struct {
+     wc_ccs ccs;
+     wc_uint32 code;
+@@ -46,7 +48,7 @@ typedef struct {
+     wc_ccs       ccs;
+     size_t       n;
+     wc_map      *map;
+-    wc_wchar_t (*conv)();
++    wc_wchar_t (*conv)(wc_ccs, wc_uint16);
+ } wc_table;
+ 
+ typedef struct {
+@@ -61,9 +63,9 @@ typedef struct {
+     char     *desc;
+     wc_gset  *gset;
+     wc_uchar *gset_ext;
+-    Str     (*conv_from)();
+-    void    (*push_to)();
+-    Str     (*char_conv)();
++    Str     (*conv_from)(Str, wc_ces);
++    void    (*push_to)(Str, wc_wchar_t, wc_status *);
++    Str     (*char_conv)(wc_uchar, wc_status *);
+ } wc_ces_info;
+ 
+ typedef struct {
+@@ -94,7 +96,7 @@ typedef struct {
+     wc_bool east_asian_width;	/* East Asian Ambiguous characters are wide */
+ } wc_option;
+ 
+-typedef struct {
++typedef struct wc_status {
+     wc_ces_info *ces_info;
+     wc_uint8     gr;
+     wc_uint8     gl;
+--- a/linein.c
++++ b/linein.c
+@@ -8,7 +8,7 @@
+ #include <gpm.h>
+ #endif
+ #if defined(USE_GPM) || defined(USE_SYSMOUSE)
+-extern int do_getch();
++extern int do_getch(void);
+ #define getch()	do_getch()
+ #endif				/* USE_GPM */
+ #endif				/* USE_MOUSE */
+@@ -43,14 +43,14 @@ static int getcntrl(void);
+ #endif
+ 
+ static int terminated(unsigned char c);
+-#define iself ((void(*)())insertself)
++#define iself ((void(*)(void))insertself)
+ 
+ static void next_compl(int next);
+ static void next_dcompl(int next);
+ static Str doComplete(Str ifn, int *status, int next);
+ 
+ /* *INDENT-OFF* */
+-void (*InputKeymap[32]) () = {
++void (*InputKeymap[32]) (void) = {
+ /*  C-@     C-a     C-b     C-c     C-d     C-e     C-f     C-g     */
+     _compl, _mvB,   _mvL,   _inbrk, delC,   _mvE,   _mvR,   _inbrk,
+ /*  C-h     C-i     C-j     C-k     C-l     C-m     C-n     C-o     */
+@@ -208,7 +208,7 @@ inputLineHistSearch(char *prompt, char *
+ 	else if (!i_quote && c < 0x20) {	/* Control code */
+ 	    if (incrfunc == NULL
+ 		|| (c = incrfunc((int)c, strBuf, strProp)) < 0x20)
+-		(*InputKeymap[(int)c]) (c);
++		(*InputKeymap[(int)c]) ();
+ 	    if (incrfunc && c != (unsigned char)-1 && c != CTRL_J)
+ 		incrfunc(-1, strBuf, strProp);
+ 	    if (cm_clear)
+--- a/local.c
++++ b/local.c
+@@ -28,7 +28,7 @@ static Str Local_cookie = NULL;
+ static char *Local_cookie_file = NULL;
+ 
+ static void
+-writeLocalCookie()
++writeLocalCookie(void)
+ {
+     FILE *f;
+ 
+--- a/main.c
++++ b/main.c
+@@ -32,7 +32,7 @@
+ #include <gpm.h>
+ #endif				/* USE_GPM */
+ #if defined(USE_GPM) || defined(USE_SYSMOUSE)
+-extern int do_getch();
++extern int do_getch(void);
+ #define getch()	do_getch()
+ #endif				/* defined(USE_GPM) || defined(USE_SYSMOUSE) */
+ #endif
+@@ -961,7 +961,7 @@ main(int argc, char **argv)
+     if (load_argc == 0) {
+ 	/* no URL specified */
+ 	if (!isatty(0)) {
+-	    redin = newFileStream(fdopen(dup(0), "rb"), (void (*)())pclose);
++	    redin = newFileStream(fdopen(dup(0), "rb"), (void (*)(FILE *))pclose);
+ 	    newbuf = openGeneralPagerBuffer(redin);
+ 	    dup2(1, 0);
+ 	}
+@@ -1790,7 +1790,7 @@ clear_mark(Line *l)
+ static int
+ srchcore(char *volatile str, int (*func) (Buffer *, char *))
+ {
+-    MySignalHandler(*prevtrap) ();
++    MySignalHandler(*prevtrap) (SIGNAL_ARG);
+     volatile int i, result = SR_NOTFOUND;
+ 
+     if (str != NULL && str != SearchString)
+@@ -2195,7 +2195,7 @@ DEFUN(pipesh, PIPE_SHELL, "Execute shell
+ DEFUN(readsh, READ_SHELL, "Execute shell command and display output")
+ {
+     Buffer *buf;
+-    MySignalHandler(*prevtrap) ();
++    MySignalHandler(*prevtrap) (SIGNAL_ARG);
+     char *cmd;
+ 
+     CurrentKeyData = NULL;	/* not allowed in w3m-control: */
+--- a/menu.c
++++ b/menu.c
+@@ -24,7 +24,7 @@ extern int sysm_process_mouse(int, int,
+ #if defined(USE_GPM) || defined(USE_SYSMOUSE)
+ #define X_MOUSE_SELECTED (char)0xff
+ static int X_Mouse_Selection;
+-extern int do_getch();
++extern int do_getch(void);
+ #define getch()	do_getch()
+ #endif				/* defined(USE_GPM) || defined(USE_SYSMOUSE) */
+ #endif				/* USE_MOUSE */
+@@ -666,7 +666,7 @@ guess_menu_xy(Menu *parent, int width, i
+ }
+ 
+ void
+-new_option_menu(Menu *menu, char **label, int *variable, void (*func) ())
++new_option_menu(Menu *menu, char **label, int *variable, void (*func) (void))
+ {
+     int i, nitem;
+     char **p;
+@@ -1653,7 +1653,7 @@ smDelTab(char c)
+ 
+ void
+ optionMenu(int x, int y, char **label, int *variable, int initial,
+-	   void (*func) ())
++	   void (*func) (void))
+ {
+     Menu menu;
+ 
+--- a/menu.h
++++ b/menu.h
+@@ -21,7 +21,7 @@ typedef struct _MenuItem {
+     char *label;
+     int *variable;
+     int value;
+-    void (*func) ();
++    void (*func) (void);
+     struct _Menu *popup;
+     char *keys;
+     char *data;
+--- a/parsetagx.c
++++ b/parsetagx.c
+@@ -10,14 +10,14 @@
+ 
+ /* parse HTML tag */
+ 
+-static int noConv(char *, char **);
+-static int toNumber(char *, int *);
+-static int toLength(char *, int *);
+-static int toAlign(char *, int *);
+-static int toVAlign(char *, int *);
++static int noConv(char *, void *);
++static int toNumber(char *, void *);
++static int toLength(char *, void *);
++static int toAlign(char *, void *);
++static int toVAlign(char *, void *);
+ 
+ /* *INDENT-OFF* */
+-static int (*toValFunc[]) () = {
++static int (*toValFunc[]) (char *, void *) = {
+     noConv,		/* VTYPE_NONE    */
+     noConv,		/* VTYPE_STR     */
+     toNumber,		/* VTYPE_NUMBER  */
+@@ -33,14 +33,14 @@ static int (*toValFunc[]) () = {
+ /* *INDENT-ON* */
+ 
+ static int
+-noConv(char *oval, char **str)
++noConv(char *oval, void *str)
+ {
+-    *str = oval;
++    *(char **)str = oval;
+     return 1;
+ }
+ 
+ static int
+-toNumber(char *oval, int *num)
++toNumber(char *oval, void *num)
+ {
+     char *ep;
+     int x;
+@@ -48,7 +48,7 @@ toNumber(char *oval, int *num)
+     x = strtol(oval, &ep, 10);
+ 
+     if (ep > oval) {
+-	*num = x;
++	*(int *)num = x;
+ 	return 1;
+     }
+     else
+@@ -56,7 +56,7 @@ toNumber(char *oval, int *num)
+ }
+ 
+ static int
+-toLength(char *oval, int *len)
++toLength(char *oval, void *len)
+ {
+     int w;
+     if (!IS_DIGIT(oval[0]))
+@@ -67,41 +67,41 @@ toLength(char *oval, int *len)
+     if (w == 0)
+ 	w = 1;
+     if (oval[strlen(oval) - 1] == '%')
+-	*len = -w;
++	*(int *)len = -w;
+     else
+-	*len = w;
++	*(int *)len = w;
+     return 1;
+ }
+ 
+ static int
+-toAlign(char *oval, int *align)
++toAlign(char *oval, void *align)
+ {
+     if (strcasecmp(oval, "left") == 0)
+-	*align = ALIGN_LEFT;
++	*(int *)align = ALIGN_LEFT;
+     else if (strcasecmp(oval, "right") == 0)
+-	*align = ALIGN_RIGHT;
++	*(int *)align = ALIGN_RIGHT;
+     else if (strcasecmp(oval, "center") == 0)
+-	*align = ALIGN_CENTER;
++	*(int *)align = ALIGN_CENTER;
+     else if (strcasecmp(oval, "top") == 0)
+-	*align = ALIGN_TOP;
++	*(int *)align = ALIGN_TOP;
+     else if (strcasecmp(oval, "bottom") == 0)
+-	*align = ALIGN_BOTTOM;
++	*(int *)align = ALIGN_BOTTOM;
+     else if (strcasecmp(oval, "middle") == 0)
+-	*align = ALIGN_MIDDLE;
++	*(int *)align = ALIGN_MIDDLE;
+     else
+ 	return 0;
+     return 1;
+ }
+ 
+ static int
+-toVAlign(char *oval, int *valign)
++toVAlign(char *oval, void *valign)
+ {
+     if (strcasecmp(oval, "top") == 0 || strcasecmp(oval, "baseline") == 0)
+-	*valign = VALIGN_TOP;
++	*(int *)valign = VALIGN_TOP;
+     else if (strcasecmp(oval, "bottom") == 0)
+-	*valign = VALIGN_BOTTOM;
++	*(int *)valign = VALIGN_BOTTOM;
+     else if (strcasecmp(oval, "middle") == 0)
+-	*valign = VALIGN_MIDDLE;
++	*(int *)valign = VALIGN_MIDDLE;
+     else
+ 	return 0;
+     return 1;
+--- a/proto.h
++++ b/proto.h
+@@ -777,7 +777,7 @@ extern int action_menu(Menu *menu);
+ extern void popup_menu(Menu *parent, Menu *menu);
+ extern void guess_menu_xy(Menu *menu, int width, int *x, int *y);
+ extern void new_option_menu(Menu *menu, char **label, int *variable,
+-			    void (*func) ());
++			    void (*func) (void));
+ 
+ extern int setMenuItem(MenuItem *item, char *type, char *line);
+ extern int addMenuList(MenuList **list, char *id);
+@@ -789,7 +789,7 @@ extern void mainMn(void);
+ extern void selMn(void);
+ extern void tabMn(void);
+ extern void optionMenu(int x, int y, char **label, int *variable, int initial,
+-		       void (*func) ());
++		       void (*func) (void));
+ extern void initMenu(void);
+ #else				/* not USE_MENU */
+ #define mainMn nulcmd
+--- a/rc.c
++++ b/rc.c
+@@ -811,7 +811,7 @@ compare_table(struct rc_search_table *a,
+ }
+ 
+ static void
+-create_option_search_table()
++create_option_search_table(void)
+ {
+     int i, j, k;
+     int diff1, diff2;
+--- a/terms.c
++++ b/terms.c
+@@ -2093,7 +2093,7 @@ clrtoeolx(void)
+ #endif				/* not USE_BG_COLOR */
+ 
+ static void
+-clrtobot_eol(void (*clrtoeol) ())
++clrtobot_eol(void (*clrtoeol) (void))
+ {
+     int l, c;
+ 
+@@ -2355,7 +2355,7 @@ wgetch(void *p)
+ }
+ 
+ int
+-do_getch()
++do_getch(void)
+ {
+     if (is_xterm || !gpm_handler)
+ 	return getch();
+--- a/url.c
++++ b/url.c
+@@ -1694,12 +1694,12 @@ openURL(char *url, ParsedURL *pu, Parsed
+ 	    /* local CGI: POST */
+ 	    uf.stream = newFileStream(localcgi_post(pu->real_file, pu->query,
+ 						    request, option->referer),
+-				      (void (*)())fclose);
++				      (void (*)(FILE *))fclose);
+ 	else
+ 	    /* lodal CGI: GET */
+ 	    uf.stream = newFileStream(localcgi_get(pu->real_file, pu->query,
+ 						   option->referer),
+-				      (void (*)())fclose);
++				      (void (*)(FILE *))fclose);
+ 	if (uf.stream) {
+ 	    uf.is_cgi = TRUE;
+ 	    uf.scheme = pu->scheme = SCM_LOCAL_CGI;
+--- a/w3mbookmark.c
++++ b/w3mbookmark.c
+@@ -183,7 +183,7 @@ insert_bookmark(char *bmark, struct pars
+ int
+ main(void)
+ {
+-    extern char *getenv();
++    extern char *getenv(const char *);
+     char *p;
+     int length;
+     Str qs = NULL;
+--- a/w3mhelperpanel.c
++++ b/w3mhelperpanel.c
+@@ -167,7 +167,7 @@ int
+ main(void)
+ {
+     Str mailcapfile;
+-    extern char *getenv();
++    extern char *getenv(const char *);
+     char *p;
+     int length;
+     Str qs = NULL;
+--- a/w3mimg/w3mimg.h
++++ b/w3mimg/w3mimg.h
+@@ -44,7 +44,7 @@ typedef struct _w3mimg_op {
+ } w3mimg_op;
+ 
+ #ifdef USE_W3MIMG_X11
+-extern w3mimg_op *w3mimg_x11open();
++extern w3mimg_op *w3mimg_x11open(void);
+ #endif
+ #ifdef USE_W3MIMG_FB
+ extern w3mimg_op *w3mimg_fbopen();
+@@ -53,7 +53,7 @@ extern w3mimg_op *w3mimg_fbopen();
+ extern w3mimg_op *w3mimg_winopen();
+ #endif
+ 
+-extern w3mimg_op *w3mimg_open();
++extern w3mimg_op *w3mimg_open(void);
+ 
+ #ifdef __cplusplus
+ }
