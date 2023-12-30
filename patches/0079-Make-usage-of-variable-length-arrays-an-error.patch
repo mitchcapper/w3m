@@ -18,14 +18,14 @@ error.
 
 --- a/Makefile.in
 +++ b/Makefile.in
-@@ -39,6 +39,7 @@ DEFAULTS = -Wall
- DEFAULTS += -D_FORTIFY_SOURCE=2
- DEFAULTS += -O3 -g3
- DEFAULTS += -Wcast-qual
-+DEFAULTS += -Werror=vla
- DEFAULTS += -Wduplicated-branches
- DEFAULTS += -Wduplicated-cond
- DEFAULTS += -Wlogical-op
+@@ -37,6 +37,7 @@ CONF_DIR = $(sysconfdir)/$(PACKAGE)
+ 
+ WARNINGS  = -Wall
+ WARNINGS += -Wcast-qual
++WARNINGS += -Werror=vla
+ WARNINGS += -Wduplicated-branches
+ WARNINGS += -Wduplicated-cond
+ WARNINGS += -Wimplicit-function-declaration
 --- a/libwc/Makefile.in
 +++ b/libwc/Makefile.in
 @@ -10,6 +10,7 @@ DEFAULTS= -Wall

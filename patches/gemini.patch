@@ -22,8 +22,8 @@ w3m-0.5.3+git20230121.
  rc.c                   |    5 
  rc.h                   |    2 
  scripts/w3mhelp.cgi.in |    5 
- url.c                  |   35 +++++
- 14 files changed, 614 insertions(+), 39 deletions(-)
+ url.c                  |   37 +++++-
+ 14 files changed, 615 insertions(+), 40 deletions(-)
 
 --- a/file.c
 +++ b/file.c
@@ -371,24 +371,26 @@ w3m-0.5.3+git20230121.
   */
 --- a/html.h
 +++ b/html.h
-@@ -419,5 +419,6 @@ struct environment {
- #ifdef USE_SSL
+@@ -420,5 +420,6 @@ struct environment {
  #define SCM_HTTPS       13
  #endif				/* USE_SSL */
-+#define SCM_GEMINI	14
+ #define SCM_GOPHERS	14
++#define SCM_GEMINI	15
  
  #endif				/* _HTML_H */
 --- a/url.c
 +++ b/url.c
-@@ -75,6 +75,7 @@ static int
+@@ -75,7 +75,8 @@ static int
  #ifdef USE_SSL
      443,			/* https */
  #endif				/* USE_SSL */
+-    70				/* gophers */
++    70,				/* gophers */
 +    1965			/* gemini */
  };
  
  struct cmdtable schemetable[] = {
-@@ -95,6 +96,7 @@ struct cmdtable schemetable[] = {
+@@ -97,6 +98,7 @@ struct cmdtable schemetable[] = {
  #ifdef USE_SSL
      {"https", SCM_HTTPS},
  #endif				/* USE_SSL */
@@ -396,7 +398,7 @@ w3m-0.5.3+git20230121.
      {NULL, SCM_UNKNOWN},
  };
  
-@@ -235,6 +237,7 @@ DefaultFile(int scheme)
+@@ -238,6 +240,7 @@ DefaultFile(int scheme)
      case SCM_LOCAL_CGI:
      case SCM_FTP:
      case SCM_FTPDIR:
@@ -404,7 +406,7 @@ w3m-0.5.3+git20230121.
  	return allocStr("/", -1);
      }
      return NULL;
-@@ -256,7 +259,7 @@ free_ssl_ctx(void)
+@@ -259,7 +262,7 @@ free_ssl_ctx(void)
      if (ssl_ctx != NULL)
  	SSL_CTX_free(ssl_ctx);
      ssl_ctx = NULL;
@@ -413,17 +415,17 @@ w3m-0.5.3+git20230121.
  }
  
  #if SSLEAY_VERSION_NUMBER >= 0x00905100
-@@ -1253,6 +1256,7 @@ _parsedURL2Str(ParsedURL *pu, int pass,
+@@ -1261,6 +1264,7 @@ _parsedURL2Str(ParsedURL *pu, int pass,
  	"news", "news", "data", "mailto",
  #ifdef USE_SSL
  	"https",
 +	"gemini",
  #endif				/* USE_SSL */
+ 	"gophers",
      };
- 
-@@ -1951,6 +1955,35 @@ openURL(char *url, ParsedURL *pu, Parsed
+@@ -1980,6 +1984,35 @@ openURL(char *url, ParsedURL *pu, Parsed
  	}
- 	break;
+ 	return uf;
  #endif				/* USE_GOPHER */
 +    case SCM_GEMINI:
 +	sock = openSocket(pu->host, schemeNumToName(pu->scheme), pu->port);
@@ -947,7 +949,7 @@ w3m-0.5.3+git20230121.
      Strcat_charp(s, "\n");
 --- a/istream.h
 +++ b/istream.h
-@@ -103,6 +103,9 @@ typedef struct base_stream *BaseStream;
+@@ -98,6 +98,9 @@ typedef struct base_stream *BaseStream;
  
  typedef union input_stream *InputStream;
  
@@ -955,9 +957,9 @@ w3m-0.5.3+git20230121.
 +extern char *known_hosts_file;
 +
  extern InputStream newInputStream(int des);
- extern InputStream newFileStream(FILE * f);
+ extern InputStream newFileStream(FILE * f, int (*closep) (FILE *));
  extern InputStream newStrStream(Str s);
-@@ -124,7 +127,7 @@ int ISread_n(InputStream stream, unsigne
+@@ -119,7 +122,7 @@ int ISread_n(InputStream stream, unsigne
  extern int ISfileno(InputStream stream);
  extern int ISeos(InputStream stream);
  #ifdef USE_SSL

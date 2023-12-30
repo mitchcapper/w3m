@@ -7,7 +7,7 @@
  func.c                  |   10 +++++-----
  history.c               |   14 +++++++-------
  image.c                 |    8 ++++----
- istream.c               |    9 +++++----
+ istream.c               |    1 +
  local.c                 |    4 ++--
  main.c                  |   22 +++++++++++-----------
  terms.c                 |    2 +-
@@ -15,7 +15,7 @@
  w3mimg/fb/fb.c          |    2 +-
  w3mimg/x11/x11_w3mimg.c |    4 ++--
  w3mimgdisplay.c         |    3 +--
- 16 files changed, 59 insertions(+), 62 deletions(-)
+ 16 files changed, 55 insertions(+), 58 deletions(-)
 
 --- a/Str.c
 +++ b/Str.c
@@ -317,30 +317,6 @@
      *(int *)stream->base.handle = des;
      stream->base.read = basic_read;
      stream->base.close = basic_close;
-@@ -601,9 +602,9 @@ static void
- basic_close(int *handle)
- {
- #ifdef __MINGW32_VERSION
--    closesocket(*(int *)handle);
-+    closesocket(*handle);
- #else
--    close(*(int *)handle);
-+    close(*handle);
- #endif
-     xfree(handle);
- }
-@@ -612,9 +613,9 @@ static int
- basic_read(int *handle, unsigned char *buf, int len)
- {
- #ifdef __MINGW32_VERSION
--    return recv(*(int *)handle, buf, len, 0);
-+    return recv(*handle, buf, len, 0);
- #else
--    return read(*(int *)handle, buf, len);
-+    return read(*handle, buf, len);
- #endif
- }
- 
 --- a/local.c
 +++ b/local.c
 @@ -114,7 +114,7 @@ loadLocalDir(char *dname)
@@ -475,7 +451,7 @@
  #endif
 --- a/url.c
 +++ b/url.c
-@@ -679,8 +679,7 @@ openSocket(char *const hostname,
+@@ -682,8 +682,7 @@ openSocket(char *const hostname,
  	hostaddr.sin_family = AF_INET;
  	hostaddr.sin_port = s_port;
  	for (h_addr_list = entry->h_addr_list; *h_addr_list; h_addr_list++) {

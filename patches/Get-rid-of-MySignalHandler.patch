@@ -1,4 +1,4 @@
-Author: Rene Kita <mail@rkta.de>
+From: Rene Kita <mail@rkta.de>
 Date: Sat Oct 28 11:31:40 CEST 2023
 Subject: Get rid of MySignalHandler
 ---
@@ -148,7 +148,7 @@ Subject: Get rid of MySignalHandler
  }
  
  static Str
-@@ -482,7 +481,7 @@ loadFTPDir0(ParsedURL *pu)
+@@ -483,7 +482,7 @@ loadFTPDir0(ParsedURL *pu)
      char *realpathname, *fn, *q;
      char **flist;
      int i, nfile, nfile_max;
@@ -398,7 +398,7 @@ Subject: Get rid of MySignalHandler
      struct mouse_info mi;
 --- a/url.c
 +++ b/url.c
-@@ -247,11 +247,10 @@ DefaultFile(int scheme)
+@@ -246,11 +246,10 @@ DefaultFile(int scheme)
      return NULL;
  }
  
@@ -411,7 +411,7 @@ Subject: Get rid of MySignalHandler
  }
  
  #ifdef USE_SSL
-@@ -554,7 +553,7 @@ openSocket(char *const hostname,
+@@ -553,7 +552,7 @@ openSocket(char *const hostname,
      int a1, a2, a3, a4;
      unsigned long adr;
  #endif				/* not INET6 */
@@ -420,7 +420,7 @@ Subject: Get rid of MySignalHandler
  
      if (fmInitialized) {
  	message(Sprintf(_("Opening socket..."))->ptr, 0, 0);
-@@ -2160,7 +2159,7 @@ check_no_proxy(char *domain)
+@@ -2175,7 +2174,7 @@ check_no_proxy(char *domain)
  {
      TextListItem *tl;
      volatile int ret = 0;

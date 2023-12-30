@@ -5,12 +5,12 @@ Subject: add gophers support
  file.c |    4 ++--
  html.h |    1 +
  main.c |    2 +-
- url.c  |   41 +++++++++++++++++++++++++++++++++--------
- 4 files changed, 37 insertions(+), 11 deletions(-)
+ url.c  |   39 ++++++++++++++++++++++++++++++++-------
+ 4 files changed, 36 insertions(+), 10 deletions(-)
 
 --- a/file.c
 +++ b/file.c
-@@ -1944,7 +1944,7 @@ loadGeneralFile(char *path, ParsedURL *v
+@@ -1952,7 +1952,7 @@ loadGeneralFile(char *path, ParsedURL *v
      }
  #endif				/* USE_NNTP */
  #ifdef USE_GOPHER
@@ -19,7 +19,7 @@ Subject: add gophers support
  	p = pu.file;
  	while(*p == '/')
  	    ++p;
-@@ -2256,7 +2256,7 @@ fail:
+@@ -2125,7 +2125,7 @@ loadGeneralFile(char *path, ParsedURL *v
  		return NULL;
  	    file = guess_filename(pu.file);
  #ifdef USE_GOPHER
@@ -30,12 +30,10 @@ Subject: add gophers support
  #ifdef USE_NNTP
 --- a/url.c
 +++ b/url.c
-@@ -75,12 +75,14 @@ static int
+@@ -75,11 +75,13 @@ static int
  #ifdef USE_SSL
      443,			/* https */
  #endif				/* USE_SSL */
--    1965			/* gemini */
-+    1965,			/* gemini */
 +    70				/* gophers */
  };
  
@@ -46,7 +44,7 @@ Subject: add gophers support
      {"ftp", SCM_FTP},
      {"local", SCM_LOCAL},
      {"file", SCM_LOCAL},
-@@ -231,6 +233,7 @@ DefaultFile(int scheme)
+@@ -229,6 +231,7 @@ DefaultFile(int scheme)
  	return allocStr(HTTP_DEFAULT_FILE, -1);
  #ifdef USE_GOPHER
      case SCM_GOPHER:
@@ -54,7 +52,7 @@ Subject: add gophers support
  	return allocStr("1", -1);
  #endif				/* USE_GOPHER */
      case SCM_LOCAL:
-@@ -959,7 +962,8 @@ parseURL(char *url, ParsedURL *p_url, Pa
+@@ -963,7 +966,8 @@ parseURL(char *url, ParsedURL *p_url, Pa
  
      q = p;
  #ifdef USE_GOPHER
@@ -64,7 +62,7 @@ Subject: add gophers support
  	if (*q == '/')
  	    q++;
  	if (*q && q[0] != '/' && q[1] != '/' && q[2] == '/')
-@@ -973,7 +977,8 @@ parseURL(char *url, ParsedURL *p_url, Pa
+@@ -977,7 +981,8 @@ parseURL(char *url, ParsedURL *p_url, Pa
  	goto do_query;
      }
  #ifdef USE_GOPHER
@@ -74,7 +72,7 @@ Subject: add gophers support
  	if (!*++p) {
  	    p_url->file = "";
  	    goto do_query;
-@@ -1142,7 +1147,8 @@ parseURL2(char *url, ParsedURL *pu, Pars
+@@ -1146,7 +1151,8 @@ parseURL2(char *url, ParsedURL *pu, Pars
  #endif
  		if (
  #ifdef USE_GOPHER
@@ -84,7 +82,7 @@ Subject: add gophers support
  #endif				/* USE_GOPHER */
  		       pu->file[0] != '/'
  #ifdef SUPPORT_DOS_DRIVE_PREFIX
-@@ -1165,7 +1171,8 @@ parseURL2(char *url, ParsedURL *pu, Pars
+@@ -1169,7 +1175,8 @@ parseURL2(char *url, ParsedURL *pu, Pars
  		}
  	    }
  #ifdef USE_GOPHER
@@ -94,7 +92,7 @@ Subject: add gophers support
  		p = pu->file;
  		pu->file = allocStr(p + 1, -1);
  	    }
-@@ -1221,7 +1228,8 @@ parseURL2(char *url, ParsedURL *pu, Pars
+@@ -1225,7 +1232,8 @@ parseURL2(char *url, ParsedURL *pu, Pars
  	}
  	else if (
  #ifdef USE_GOPHER
@@ -104,15 +102,15 @@ Subject: add gophers support
  #endif				/* USE_GOPHER */
  		    pu->file[0] == '/') {
  	    /*
-@@ -1258,6 +1266,7 @@ _parsedURL2Str(ParsedURL *pu, int pass,
+@@ -1261,6 +1269,7 @@ _parsedURL2Str(ParsedURL *pu, int pass,
+ #ifdef USE_SSL
  	"https",
- 	"gemini",
  #endif				/* USE_SSL */
 +	"gophers",
      };
  
      if (pu->scheme == SCM_MISSING) {
-@@ -1900,6 +1909,7 @@ openURL(char *url, ParsedURL *pu, Parsed
+@@ -1898,6 +1907,7 @@ openURL(char *url, ParsedURL *pu, Parsed
  	return uf;
  #ifdef USE_GOPHER
      case SCM_GOPHER:
@@ -120,7 +118,7 @@ Subject: add gophers support
  	p = pu->file;
  	n = 0;
  	while(*p == '/') {
-@@ -1958,11 +1968,25 @@ openURL(char *url, ParsedURL *pu, Parsed
+@@ -1956,11 +1966,25 @@ openURL(char *url, ParsedURL *pu, Parsed
  	    tmp = Strnew_charp(file_unquote(pu->file));
  	    Strcat_char(tmp, '\n');
  	}
@@ -147,8 +145,8 @@ Subject: add gophers support
 -	uf.stream = newInputStream(sock);
  	return uf;
  #endif				/* USE_GOPHER */
-     case SCM_GEMINI:
-@@ -2446,6 +2470,7 @@ schemeToProxy(int scheme)
+ #ifdef USE_NNTP
+@@ -2415,6 +2439,7 @@ schemeToProxy(int scheme)
  	break;
  #ifdef USE_GOPHER
      case SCM_GOPHER:
@@ -158,16 +156,16 @@ Subject: add gophers support
  #endif
 --- a/html.h
 +++ b/html.h
-@@ -420,5 +420,6 @@ struct environment {
+@@ -419,5 +419,6 @@ struct environment {
+ #ifdef USE_SSL
  #define SCM_HTTPS       13
  #endif				/* USE_SSL */
- #define SCM_GEMINI	14
-+#define SCM_GOPHERS	15
++#define SCM_GOPHERS	14
  
  #endif				/* _HTML_H */
 --- a/main.c
 +++ b/main.c
-@@ -5169,7 +5169,7 @@ chkURLBuffer(Buffer *buf)
+@@ -5073,7 +5073,7 @@ chkURLBuffer(Buffer *buf)
  	"https?://[a-zA-Z0-9][a-zA-Z0-9:%\\-\\./?=~_\\&+@#,\\$;]*[a-zA-Z0-9_/=\\-]",
  	"file:/[a-zA-Z0-9:%\\-\\./=_\\+@#,\\$;]*",
  #ifdef USE_GOPHER

@@ -14,7 +14,7 @@ Subject: [PATCH 6/6] Remove declaration of libc functions
  int
  main(void)
  {
--    extern char *getenv(const char *);
+-    extern char *getenv();
      char *p;
      int length;
      Str qs = NULL;
@@ -24,7 +24,7 @@ Subject: [PATCH 6/6] Remove declaration of libc functions
  main(void)
  {
      Str mailcapfile;
--    extern char *getenv(const char *);
+-    extern char *getenv();
      char *p;
      int length;
      Str qs = NULL;

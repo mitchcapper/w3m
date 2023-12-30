@@ -10,14 +10,14 @@ Subject: [PATCH 033/172] Remove unused function declarations
 
 --- a/istream.h
 +++ b/istream.h
-@@ -142,7 +142,6 @@ extern Str ssl_get_certificate(SSL * ssl
+@@ -137,7 +137,6 @@ extern Str ssl_get_certificate(SSL * ssl
  #define IST_UNCLOSE	0x10
  
  #define IStype(stream) ((stream)->base.type)
 -#define is_eos(stream) ISeos(stream)
  #define iseos(stream) ((stream)->base.iseos)
- #define file_of(stream) ((stream)->file.handle->f)
- #define set_close(stream,closep) ((IStype(stream)==IST_FILE)?((stream)->file.handle->close=(closep)):0)
+ #define str_of(stream) ((stream)->str.handle)
+ #ifdef USE_SSL
 --- a/proto.h
 +++ b/proto.h
 @@ -59,10 +59,8 @@ extern void linend(void);

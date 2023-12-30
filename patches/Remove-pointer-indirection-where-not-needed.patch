@@ -84,7 +84,7 @@ This functions do not need to use a pointer to a pointer.
  		for (p = link_stack; p; p = p->next) {
 --- a/istream.c
 +++ b/istream.c
-@@ -699,11 +699,11 @@ ens_read(struct ens_handle *handle, char
+@@ -702,11 +702,11 @@ ens_read(struct ens_handle *handle, char
  	growbuf_init_without_GC(&gbtmp);
  	p = handle->gb.ptr;
  	if (handle->encoding == ENC_QUOTE)

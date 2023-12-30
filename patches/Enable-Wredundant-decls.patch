@@ -1,22 +1,28 @@
 ---
- Makefile.in            |    1 +
+ Makefile.in            |    5 +++--
  libwc/Makefile.in      |    1 +
  w3mimg/Makefile.in     |    1 +
  w3mimg/fb/Makefile.in  |    1 +
  w3mimg/win/Makefile.in |    1 +
  w3mimg/x11/Makefile.in |    1 +
- 6 files changed, 6 insertions(+)
+ 6 files changed, 8 insertions(+), 2 deletions(-)
 
 --- a/Makefile.in
 +++ b/Makefile.in
-@@ -45,6 +45,7 @@ DEFAULTS += -Wnested-externs
- DEFAULTS += -Wno-missing-field-initializers
- DEFAULTS += -Wno-unused-result
- DEFAULTS += -Wnull-dereference
-+DEFAULTS += -Wredundant-decls
- CFLAGS = -I. -I$(top_srcdir) $(DEFAULTS) @CFLAGS@ $(CPPFLAGS) $(DEFS) $(OPTS)
- WCCFLAGS = @WCCFLAGS@
- CPPFLAGS = @CPPFLAGS@
+@@ -39,10 +39,11 @@ WARNINGS  = -Wall
+ WARNINGS += -Wcast-qual
+ WARNINGS += -Wduplicated-branches
+ WARNINGS += -Wduplicated-cond
+-WARNINGS += -Wnested-externs
+-WARNINGS += -Wnull-dereference
+ WARNINGS += -Wimplicit-function-declaration
+ WARNINGS += -Wimplicit-int
++WARNINGS += -Wnested-externs
++WARNINGS += -Wnull-dereference
++WARNINGS += -Wredundant-decls
+ WARNINGS += -Wstrict-prototypes
+ WARNINGS += -D_FORTIFY_SOURCE=2
+ WARNINGS += -O3 -g3
 --- a/libwc/Makefile.in
 +++ b/libwc/Makefile.in
 @@ -16,6 +16,7 @@ DEFAULTS += -Wnested-externs

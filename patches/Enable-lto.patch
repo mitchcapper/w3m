@@ -9,14 +9,14 @@
 
 --- a/Makefile.in
 +++ b/Makefile.in
-@@ -38,6 +38,7 @@ CONF_DIR = $(sysconfdir)/$(PACKAGE)
- DEFAULTS = -Wall
- DEFAULTS += -D_FORTIFY_SOURCE=2
- DEFAULTS += -O3 -g3
-+DEFAULTS += -flto
- DEFAULTS += -Wcast-qual
- DEFAULTS += -Werror=vla
- DEFAULTS += -Wduplicated-branches
+@@ -56,6 +56,7 @@ WARNINGS += -Wuninitialized
+ WARNINGS += -Wunused
+ WARNINGS += -D_FORTIFY_SOURCE=2
+ WARNINGS += -O3 -g3
++WARNINGS += -flto
+ WARNINGS += -Wno-missing-field-initializers
+ WARNINGS += -Wno-unused-result
+ 
 --- a/libwc/Makefile.in
 +++ b/libwc/Makefile.in
 @@ -9,6 +9,7 @@ CC=@CC@

@@ -1,4 +1,4 @@
-Author: Rene Kita <mail@rkta.de>
+From: Rene Kita <mail@rkta.de>
 Date: Tue Oct 31 10:43:55 CET 2023
 Subject: refactor openUrl scheme handling
 
@@ -38,9 +38,9 @@ little more code duplication to make the control flow more obvious.
 +	uf.stream = newInputStream(sock);
 +	return uf;
  #endif				/* USE_GOPHER */
-     case SCM_GEMINI:
- 	sock = openSocket(pu->host, schemeNumToName(pu->scheme), pu->port);
-@@ -2024,8 +2027,6 @@ openURL(char *url, ParsedURL *pu, Parsed
+ #ifdef USE_NNTP
+     case SCM_NNTP:
+@@ -1995,8 +1998,6 @@ openURL(char *url, ParsedURL *pu, Parsed
      default:
  	return uf;
      }

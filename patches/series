@@ -1,14 +1,15 @@
 # PENDING
-#276
-creat-hist-file.patch
 # modernC
-0001-Enable-building-with-modern-C-build-options.patch
 0002-Fix-build-error-with-disable-color.patch
-0003-Add-missing-voids.patch
-0004-Remove-unnecessary-casts.patch
-0005-Fix-types-of-read-close-functions.patch
 0006-Remove-declaration-of-libc-functions.patch
-0007-Add-missing-void-to-function-definitions.patch
+Get-rid-of-io_file_handle.patch
+Remove-unused-argument-check.patch
+Remove-unnecessary-casts-from-istream.patch
+Align-function-signature-with-standard-functions.patch
+0001-Enable-building-with-modern-C-build-options.patch
+#276
+Enable-warnings-for-modern-C.patch
+creat-hist-file.patch
 #285 checkType underruns
 Label-endif-else-that-is-far-away-from-ifdef.patch
 Check-for-buffer-underruns-in-checkType.patch
@@ -40,6 +41,9 @@ Remove-assignment-of-unread-value.patch
 Handle-errors-in-mySystem.patch
 # 288
 Remove-redirection-loop-check.patch
+# gophers
+refactor-openUrl-scheme-handling.patch
+Add-gophers-support.patch
 # 279 deadcode
 Remove-dead-code.patch
 Fix-some-casts-that-discard-qualifiers.patch
@@ -67,9 +71,6 @@ Enable-folding-in-pre-tags.patch
 gemini.patch
 Zero-based-link-no.patch
 Use-https-with-USE_SSL-and-retry_http.patch
-# gophers
-refactor-openUrl-scheme-handling.patch
-add-gophers-support.patch
 # WARNINGS
 Enable-more-optimization.patch
 Enable-Wcast-qual.patch
@@ -85,7 +86,6 @@ Enable-Wmissing-declarations.patch
 Enable-Wold-style-declaration.patch
 Enable-Wlogical-op.patch
 Enable-Wold-style-definition.patch
-Enable-Wstrict-prototypes.patch
 0143-Add-cppcheck-target.patch
 # WIP
 remove-unused-macros.patch

@@ -9,14 +9,14 @@
 
 --- a/Makefile.in
 +++ b/Makefile.in
-@@ -38,6 +38,7 @@ CONF_DIR = $(sysconfdir)/$(PACKAGE)
- DEFAULTS = -Wall
- DEFAULTS += -D_FORTIFY_SOURCE=2
- DEFAULTS += -O3 -g3
-+DEFAULTS += -Wcast-qual
- DEFAULTS += -Wno-missing-field-initializers
- DEFAULTS += -Wno-unused-result
- DEFAULTS += -Wnull-dereference
+@@ -36,6 +36,7 @@ ETC_DIR = $(sysconfdir)
+ CONF_DIR = $(sysconfdir)/$(PACKAGE)
+ 
+ WARNINGS  = -Wall
++WARNINGS += -Wcast-qual
+ WARNINGS += -Wnull-dereference
+ WARNINGS += -Wimplicit-function-declaration
+ WARNINGS += -Wimplicit-int
 --- a/libwc/Makefile.in
 +++ b/libwc/Makefile.in
 @@ -9,6 +9,7 @@ CC=@CC@

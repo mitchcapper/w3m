@@ -809,7 +809,7 @@ Subject: [PATCH 014/172] Remove dead code
  {
 --- a/url.c
 +++ b/url.c
-@@ -416,13 +416,8 @@ openSSLHandle(int sock, char *hostname,
+@@ -419,13 +419,8 @@ openSSLHandle(int sock, char *hostname,
  
  #ifdef USE_SSL_VERIFY
  	/* derived from openssl-0.9.5/apps/s_{client,cb}.c */
@@ -824,7 +824,7 @@ Subject: [PATCH 014/172] Remove dead code
  	if (ssl_cert_file != NULL && *ssl_cert_file != '\0') {
  	    int ng = 1;
  	    if (SSL_CTX_use_certificate_file
-@@ -2451,17 +2446,6 @@ url_encode(const char *url, const Parsed
+@@ -2479,17 +2474,6 @@ url_encode(const char *url, const Parsed
  			  url_to_charset(url, base, doc_charset));
  }
  

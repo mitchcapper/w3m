@@ -9,7 +9,7 @@ Subject: [PATCH 071/172] Remove unused typedef's
 
 --- a/istream.h
 +++ b/istream.h
-@@ -100,12 +100,6 @@ union input_stream {
+@@ -95,12 +95,6 @@ union input_stream {
  };
  
  typedef struct base_stream *BaseStream;

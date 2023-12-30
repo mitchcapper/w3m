@@ -9,14 +9,14 @@
 
 --- a/Makefile.in
 +++ b/Makefile.in
-@@ -46,6 +46,7 @@ DEFAULTS += -Wno-missing-field-initializ
- DEFAULTS += -Wno-unused-result
- DEFAULTS += -Wnull-dereference
- DEFAULTS += -Wredundant-decls
-+DEFAULTS += -Wstring-compare
- CFLAGS = -I. -I$(top_srcdir) $(DEFAULTS) @CFLAGS@ $(CPPFLAGS) $(DEFS) $(OPTS)
- WCCFLAGS = @WCCFLAGS@
- CPPFLAGS = @CPPFLAGS@
+@@ -45,6 +45,7 @@ WARNINGS += -Wnested-externs
+ WARNINGS += -Wnull-dereference
+ WARNINGS += -Wredundant-decls
+ WARNINGS += -Wstrict-prototypes
++WARNINGS += -Wstring-compare
+ WARNINGS += -D_FORTIFY_SOURCE=2
+ WARNINGS += -O3 -g3
+ WARNINGS += -Wno-missing-field-initializers
 --- a/libwc/Makefile.in
 +++ b/libwc/Makefile.in
 @@ -17,6 +17,7 @@ DEFAULTS += -Wno-missing-field-initializ

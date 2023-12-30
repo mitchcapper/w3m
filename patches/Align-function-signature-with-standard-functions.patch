@@ -1,0 +1,248 @@
+From: Rene Kita <mail@rkta.de>
+Date: Sat Dec 30 13:41:39 CET 2023
+Subject: Align function signature with standard functions
+
+Using the same signature as fclose and pclose let's us use all functions
+without casting.
+---
+ file.c    |    8 ++++----
+ ftp.c     |    5 +++--
+ istream.c |   17 ++++++++++-------
+ istream.h |   12 ++++++------
+ main.c    |    2 +-
+ url.c     |    4 ++--
+ 6 files changed, 26 insertions(+), 22 deletions(-)
+
+--- a/istream.c
++++ b/istream.c
+@@ -19,7 +19,7 @@
+ 
+ #define POP_CHAR(bs) ((bs)->iseos?'\0':(bs)->stream.buf[(bs)->stream.cur++])
+ 
+-static void basic_close(int *handle);
++static int basic_close(int *handle);
+ static int basic_read(int *handle, char *buf, int len);
+ 
+ static int file_read(FILE *handle, char *buf, int len);
+@@ -27,12 +27,12 @@ static int file_read(FILE *handle, char
+ static int str_read(Str handle, char *buf, int len);
+ 
+ #ifdef USE_SSL
+-static void ssl_close(struct ssl_handle *handle);
++static int ssl_close(struct ssl_handle *handle);
+ static int ssl_read(struct ssl_handle *handle, char *buf, int len);
+ #endif
+ 
+ static int ens_read(struct ens_handle *handle, char *buf, int len);
+-static void ens_close(struct ens_handle *handle);
++static int ens_close(struct ens_handle *handle);
+ 
+ static void memchop(char *p, int *len);
+ 
+@@ -107,7 +107,7 @@ newInputStream(int des)
+ }
+ 
+ InputStream
+-newFileStream(FILE * f, void (*closep) ())
++newFileStream(FILE * f, int (*closep) ())
+ {
+     InputStream stream;
+     if (f == NULL)
+@@ -626,7 +626,7 @@ ssl_get_certificate(SSL * ssl, char *hos
+ 
+ /* Raw level input stream functions */
+ 
+-static void
++static int
+ basic_close(int *handle)
+ {
+ #ifdef __MINGW32_VERSION
+@@ -635,6 +635,7 @@ basic_close(int *handle)
+     close(*handle);
+ #endif
+     xfree(handle);
++    return 0;
+ }
+ 
+ static int
+@@ -660,13 +661,14 @@ str_read(Str handle, char *buf, int len)
+ }
+ 
+ #ifdef USE_SSL
+-static void
++static int
+ ssl_close(struct ssl_handle *handle)
+ {
+     close(handle->sock);
+     if (handle->ssl)
+ 	SSL_free(handle->ssl);
+     xfree(handle);
++    return 0;
+ }
+ 
+ static int
+@@ -698,12 +700,13 @@ ssl_read(struct ssl_handle *handle, char
+ }
+ #endif				/* USE_SSL */
+ 
+-static void
++static int
+ ens_close(struct ens_handle *handle)
+ {
+     ISclose(handle->is);
+     growbuf_clear(&handle->gb);
+     xfree(handle);
++    return 0;
+ }
+ 
+ static int
+--- a/istream.h
++++ b/istream.h
+@@ -43,7 +43,7 @@ struct base_stream {
+     char type;
+     char iseos;
+     int (*read) ();
+-    void (*close) ();
++    int (*close) ();
+ };
+ 
+ struct file_stream {
+@@ -52,7 +52,7 @@ struct file_stream {
+     char type;
+     char iseos;
+     int (*read) ();
+-    void (*close) ();
++    int (*close) ();
+ };
+ 
+ struct str_stream {
+@@ -61,7 +61,7 @@ struct str_stream {
+     char type;
+     char iseos;
+     int (*read) ();
+-    void (*close) ();
++    int (*close) ();
+ };
+ 
+ #ifdef USE_SSL
+@@ -71,7 +71,7 @@ struct ssl_stream {
+     char type;
+     char iseos;
+     int (*read) ();
+-    void (*close) ();
++    int (*close) ();
+ };
+ #endif				/* USE_SSL */
+ 
+@@ -81,7 +81,7 @@ struct encoded_stream {
+     char type;
+     char iseos;
+     int (*read) ();
+-    void (*close) ();
++    int (*close) ();
+ };
+ 
+ union input_stream {
+@@ -105,7 +105,7 @@ typedef struct encoded_stream *EncodedSt
+ typedef union input_stream *InputStream;
+ 
+ extern InputStream newInputStream(int des);
+-extern InputStream newFileStream(FILE * f, void (*closep) ());
++extern InputStream newFileStream(FILE * f, int (*closep) ());
+ extern InputStream newStrStream(Str s);
+ #ifdef USE_SSL
+ extern InputStream newSSLStream(SSL * ssl, int sock);
+--- a/ftp.c
++++ b/ftp.c
+@@ -329,7 +329,7 @@ static int ex_ftpdir_name_size_date(char
+ #define	FTPDIR_LINK	2
+ #define	FTPDIR_FILE	3
+ 
+-static void
++static int
+ closeFTPdata(FILE * f)
+ {
+     int status;
+@@ -340,6 +340,7 @@ closeFTPdata(FILE * f)
+     }
+     ftp_command(&current_ftp, NULL, NULL, &status);
+     /* status == 226 */
++    return 0;
+ }
+ 
+ void
+@@ -460,7 +461,7 @@ openFTPStream(ParsedURL *pu, URLFile *uf
+     uf->modtime = ftp_modtime(&current_ftp, realpathname);
+     ftp_command(&current_ftp, "RETR", realpathname, &status);
+     if (status == 125 || status == 150)
+-	return newFileStream(current_ftp.data, (void (*)())closeFTPdata);
++	return newFileStream(current_ftp.data, closeFTPdata);
+ 
+   ftp_dir:
+     pu->scheme = SCM_FTPDIR;
+--- a/file.c
++++ b/file.c
+@@ -401,7 +401,7 @@ examineFile(char *path, URLFile *uf)
+ 		return;
+ 	    if ((fp = lessopen_stream(path))) {
+ 		UFclose(uf);
+-		uf->stream = newFileStream(fp, (void (*)())pclose);
++		uf->stream = newFileStream(fp, pclose);
+ 		uf->guess_type = "text/plain";
+ 		return;
+ 	    }
+@@ -7916,7 +7916,7 @@ loadcmdout(char *cmd,
+     f = popen(cmd, "r");
+     if (f == NULL)
+ 	return NULL;
+-    init_stream(&uf, SCM_UNKNOWN, newFileStream(f, (void (*)())pclose));
++    init_stream(&uf, SCM_UNKNOWN, newFileStream(f, pclose));
+     buf = loadproc(&uf, defaultbuf);
+     UFclose(&uf);
+     return buf;
+@@ -7954,7 +7954,7 @@ getpipe(char *cmd)
+     if (f == NULL)
+ 	return NULL;
+     buf = newBuffer(INIT_BUFFER_WIDTH);
+-    buf->pagerSource = newFileStream(f, (void (*)())pclose);
++    buf->pagerSource = newFileStream(f, pclose);
+     buf->filename = cmd;
+     buf->buffername = Sprintf("%s %s", PIPEBUFFERNAME,
+ 			      conv_from_system(cmd))->ptr;
+@@ -8782,7 +8782,7 @@ uncompress_stream(URLFile *uf, char **sr
+ 	    uf->scheme = SCM_LOCAL;
+     }
+     UFhalfclose(uf);
+-    uf->stream = newFileStream(f1, (void (*)())fclose);
++    uf->stream = newFileStream(f1, fclose);
+ #endif /* __MINGW32_VERSION */
+ }
+ 
+--- a/main.c
++++ b/main.c
+@@ -961,7 +961,7 @@ main(int argc, char **argv)
+     if (load_argc == 0) {
+ 	/* no URL specified */
+ 	if (!isatty(0)) {
+-	    redin = newFileStream(fdopen(dup(0), "rb"), (void (*)())pclose);
++	    redin = newFileStream(fdopen(dup(0), "rb"), pclose);
+ 	    newbuf = openGeneralPagerBuffer(redin);
+ 	    dup2(1, 0);
+ 	}
+--- a/url.c
++++ b/url.c
+@@ -1694,12 +1694,12 @@ openURL(char *url, ParsedURL *pu, Parsed
+ 	    /* local CGI: POST */
+ 	    uf.stream = newFileStream(localcgi_post(pu->real_file, pu->query,
+ 						    request, option->referer),
+-				      (void (*)())fclose);
++				      fclose);
+ 	else
+ 	    /* lodal CGI: GET */
+ 	    uf.stream = newFileStream(localcgi_get(pu->real_file, pu->query,
+ 						   option->referer),
+-				      (void (*)())fclose);
++				      fclose);
+ 	if (uf.stream) {
+ 	    uf.is_cgi = TRUE;
+ 	    uf.scheme = pu->scheme = SCM_LOCAL_CGI;

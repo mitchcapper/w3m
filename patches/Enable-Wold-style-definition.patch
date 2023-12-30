@@ -9,14 +9,14 @@
 
 --- a/Makefile.in
 +++ b/Makefile.in
-@@ -48,6 +48,7 @@ DEFAULTS += -Wno-missing-field-initializ
- DEFAULTS += -Wno-unused-result
- DEFAULTS += -Wnull-dereference
- DEFAULTS += -Wold-style-declaration
-+DEFAULTS += -Wold-style-definition
- DEFAULTS += -Wredundant-decls
- DEFAULTS += -Wstring-compare
- DEFAULTS += -Wtype-limits
+@@ -46,6 +46,7 @@ WARNINGS += -Wmissing-declarations
+ WARNINGS += -Wnested-externs
+ WARNINGS += -Wnull-dereference
+ WARNINGS += -Wold-style-declaration
++WARNINGS += -Wold-style-definition
+ WARNINGS += -Wredundant-decls
+ WARNINGS += -Wstrict-prototypes
+ WARNINGS += -Wstring-compare
 --- a/libwc/Makefile.in
 +++ b/libwc/Makefile.in
 @@ -16,6 +16,7 @@ DEFAULTS += -Wlogical-op

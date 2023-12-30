@@ -9,14 +9,14 @@
 
 --- a/Makefile.in
 +++ b/Makefile.in
-@@ -41,6 +41,7 @@ DEFAULTS += -O3 -g3
- DEFAULTS += -Wcast-qual
- DEFAULTS += -Wduplicated-branches
- DEFAULTS += -Wduplicated-cond
-+DEFAULTS += -Wmissing-declarations
- DEFAULTS += -Wnested-externs
- DEFAULTS += -Wno-missing-field-initializers
- DEFAULTS += -Wno-unused-result
+@@ -41,6 +41,7 @@ WARNINGS += -Wduplicated-branches
+ WARNINGS += -Wduplicated-cond
+ WARNINGS += -Wimplicit-function-declaration
+ WARNINGS += -Wimplicit-int
++WARNINGS += -Wmissing-declarations
+ WARNINGS += -Wnested-externs
+ WARNINGS += -Wnull-dereference
+ WARNINGS += -Wredundant-decls
 --- a/libwc/Makefile.in
 +++ b/libwc/Makefile.in
 @@ -12,6 +12,7 @@ DEFAULTS += -O3 -g3

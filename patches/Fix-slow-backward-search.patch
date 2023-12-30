@@ -1,4 +1,4 @@
-Author: Rene Kita <mail@rkta.de>
+From: Rene Kita <mail@rkta.de>
 Subject: Fix slow backward search in long lines
 
 We need to search the whole line up to the position we are at to find

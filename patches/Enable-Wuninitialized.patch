@@ -9,14 +9,14 @@
 
 --- a/Makefile.in
 +++ b/Makefile.in
-@@ -48,6 +48,7 @@ DEFAULTS += -Wnull-dereference
- DEFAULTS += -Wredundant-decls
- DEFAULTS += -Wstring-compare
- DEFAULTS += -Wtype-limits
-+DEFAULTS += -Wuninitialized
- CFLAGS = -I. -I$(top_srcdir) $(DEFAULTS) @CFLAGS@ $(CPPFLAGS) $(DEFS) $(OPTS)
- WCCFLAGS = @WCCFLAGS@
- CPPFLAGS = @CPPFLAGS@
+@@ -47,6 +47,7 @@ WARNINGS += -Wredundant-decls
+ WARNINGS += -Wstrict-prototypes
+ WARNINGS += -Wstring-compare
+ WARNINGS += -Wtype-limits
++WARNINGS += -Wuninitialized
+ WARNINGS += -D_FORTIFY_SOURCE=2
+ WARNINGS += -O3 -g3
+ WARNINGS += -Wno-missing-field-initializers
 --- a/libwc/Makefile.in
 +++ b/libwc/Makefile.in
 @@ -19,6 +19,7 @@ DEFAULTS += -Wnull-dereference

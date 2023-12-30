@@ -843,7 +843,7 @@
  
 --- a/url.c
 +++ b/url.c
-@@ -479,9 +479,8 @@ openSSLHandle(int sock, char *hostname,
+@@ -478,9 +478,8 @@ openSSLHandle(int sock, char *hostname,
      close(sock);
      if (handle)
  	SSL_free(handle);
@@ -854,7 +854,7 @@
  		      ERR_error_string(ERR_get_error(), NULL))->ptr, FALSE);
      return NULL;
  }
-@@ -558,8 +557,7 @@ openSocket(char *const hostname,
+@@ -557,8 +556,7 @@ openSocket(char *const hostname,
      MySignalHandler(*volatile prevtrap) (SIGNAL_ARG) = NULL;
  
      if (fmInitialized) {
