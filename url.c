@@ -1954,7 +1954,7 @@ openURL(char *url, ParsedURL *pu, ParsedURL *current,
 	    if (pu->file == NULL)
 		pu->file = "1";
 	    tmp = Strnew_charp(file_unquote(pu->file));
-	    Strcat_char(tmp, '\n');
+	    Strcat_charp(tmp, "\r\n");
 	}
 	write(sock, tmp->ptr, tmp->length);
 	if(type != '\0') {
