@@ -1,0 +1,30 @@
+From: Rene Kita <mail@rkta.de>
+Date: Mon Feb 12 16:08:00 CET 2024
+Subject: Fix gopher selector string
+Patch: patches/Fix-gopher-selector-string.patch
+
+As can be seen in the gopher RFC[0] in the examples on pages 4 and 5 the
+client is supposed to terminate the selection string with CR LF.
+
+I only could track this bug back to the initial revision in the CVS
+history, I would guess that it was present since the beginning of gopher
+support. So, it seems it's not such a big deal, but I heard people
+complain about it - just let's stick to the standard.
+
+[0]: https://www.rfc-editor.org/rfc/rfc1436.html#section-2
+
+---
+ url.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+--- a/url.c
++++ b/url.c
+@@ -1964,7 +1964,7 @@ openURL(char *url, ParsedURL *pu, Parsed
+ 	    if (pu->file == NULL)
+ 		pu->file = "1";
+ 	    tmp = Strnew_charp(file_unquote(pu->file));
+-	    Strcat_char(tmp, '\n');
++	    Strcat_charp(tmp, "\r\n");
+ 	}
+ #ifdef USE_SSL
+ 	if (pu->scheme == SCM_GOPHERS) {

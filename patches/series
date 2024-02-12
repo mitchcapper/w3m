@@ -138,6 +138,7 @@ Drop-support-for-old-ss-family.patch
 Remove-obsolete-checks-in-configure.patch
 Replace-AC_TRY_CPP.patch
 run-autoupdate.patch
+Fix-gopher-selector-string.patch
 # BORKED
 Enable-command-completion.patch
 Fix-redirection-check.patch

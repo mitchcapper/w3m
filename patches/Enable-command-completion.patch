@@ -1,0 +1,137 @@
+From: Rene Kita <mail@rkta.de>
+Date: Sun Jan 21 11:01:10 CET 2024
+Subject: Enable command completion
+Patch: patches/Enable-command-completion.patch
+
+This patch enables completion of commands and adds a separate history
+for commands only.
+---
+ fm.h     |    3 +++
+ linein.c |   34 +++++++++++++++++++++++++++++++++-
+ main.c   |    4 +++-
+ 3 files changed, 39 insertions(+), 2 deletions(-)
+
+--- a/fm.h
++++ b/fm.h
+@@ -243,6 +243,7 @@ extern int REV_LB[];
+ #define CPL_ON		0x2
+ #define CPL_ALWAYS	0x4
+ #define CPL_URL		0x8
++#define CPL_CMD		0x10	/* Completion for commands in w3mFuncList */
+ 
+ /* Flags for inputLine() */
+ #define IN_STRING	0x10
+@@ -251,6 +252,7 @@ extern int REV_LB[];
+ #define IN_COMMAND	0x80
+ #define IN_URL		0x100
+ #define IN_CHAR		0x200
++#define IN_EXECCMD	0x400	/* Coming from execCmd, COMMAND */
+ 
+ #define IMG_FLAG_SKIP	1
+ #define IMG_FLAG_AUTO	2
+@@ -284,6 +286,7 @@ extern int REV_LB[];
+ 
+ #define inputLineHist(p,d,f,h)	inputLineHistSearch(p,d,f,h,NULL)
+ #define inputLine(p,d,f)	inputLineHist(p,d,f,NULL)
++#define inputCmdHist(p,d,h)	inputLineHist(p,d,IN_EXECCMD,h)
+ #define inputStr(p,d)		inputLine(p,d,IN_STRING)
+ #define inputStrHist(p,d,h)	inputLineHist(p,d,IN_STRING,h)
+ #define inputFilename(p,d)	inputLine(p,d,IN_FILENAME)
+--- a/linein.c
++++ b/linein.c
+@@ -45,6 +45,7 @@ static int getcntrl(void);
+ static int terminated(unsigned char c);
+ #define iself ((void(*)(void))insertself)
+ 
++static void cmd_compl(void);
+ static void next_compl(int next);
+ static void next_dcompl(int next);
+ static Str doComplete(Str ifn, int *status, int next);
+@@ -54,7 +55,7 @@ void (*InputKeymap[32]) (void) = {
+ /*  C-@     C-a     C-b     C-c     C-d     C-e     C-f     C-g     */
+     _compl, _mvB,   _mvL,   _inbrk, delC,   _mvE,   _mvR,   _inbrk,
+ /*  C-h     C-i     C-j     C-k     C-l     C-m     C-n     C-o     */
+-    _bs,    iself,  _enter, killn,  iself,  _enter, _next,  _editor,
++    _bs,    _compl, _enter, killn,  iself,  _enter, _next,  _editor,
+ /*  C-p     C-q     C-r     C-s     C-t     C-u     C-v     C-w     */
+     _prev,  _quo,   _bsw,   iself,  _mvLw,  killb,  _quo,   _bsw,
+ /*  C-x     C-y     C-z     C-[     C-\     C-]     C-^     C-_     */
+@@ -113,6 +114,8 @@ inputLineHistSearch(const char *prompt,
+ 	is_passwd = TRUE;
+ 	move_word = FALSE;
+     }
++    else if (flag & IN_EXECCMD)
++	cm_mode = CPL_CMD;
+     else if (flag & IN_COMMAND)
+ 	cm_mode = CPL_ON;
+     else
+@@ -633,6 +636,8 @@ _inbrk(void)
+ static void
+ _compl(void)
+ {
++    if (cm_mode & CPL_CMD)
++	cmd_compl();
+     next_compl(1);
+ }
+ 
+@@ -652,6 +657,33 @@ _tcompl(void)
+ }
+ 
+ static void
++cmd_compl(void)
++{
++    FuncList *fl;
++    char *p;
++    int n;
++
++    for (p = strBuf->ptr + strBuf->length; p != strBuf->ptr; p--) {
++	if (*p == ';' || IS_SPACE(*p)) {
++	    p++;
++	    break;
++	}
++    }
++
++    n = strlen(p);
++
++    for (fl = w3mFuncList; fl->id; fl++)
++	if (!strncmp(fl->id, p, n))
++	    break;
++
++    if (!fl->id)
++	return;
++
++    CBeforeBuf = Strsubstr(strBuf, 0, p - strBuf->ptr);
++    strBuf = Strnew_m_charp(CBeforeBuf->ptr, fl->id, NULL);
++}
++
++static void
+ next_compl(int next)
+ {
+     int status;
+--- a/main.c
++++ b/main.c
+@@ -48,6 +48,7 @@ WSADATA WSAData;
+ 
+ #define DSTR_LEN	256
+ 
++Hist *CmdHist;
+ Hist *LoadHist;
+ Hist *SaveHist;
+ Hist *URLHist;
+@@ -535,6 +536,7 @@ main(int argc, char **argv)
+     /* initializations */
+     init_rc();
+ 
++    CmdHist = newHist();
+     LoadHist = newHist();
+     SaveHist = newHist();
+     ShellHist = newHist();
+@@ -6206,7 +6208,7 @@ DEFUN(execCmd, COMMAND, "Invoke w3m func
+     CurrentKeyData = NULL;	/* not allowed in w3m-control: */
+     data = searchKeyData();
+     if (data == NULL || *data == '\0') {
+-	data = inputStrHist("command [; ...]: ", "", TextHist);
++	data = inputCmdHist("command [; ...]: ", "", CmdHist);
+ 	if (data == NULL) {
+ 	    displayBuffer(Currentbuf, B_NORMAL);
+ 	    return;
