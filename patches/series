@@ -139,6 +139,7 @@ Remove-obsolete-checks-in-configure.patch
 Replace-AC_TRY_CPP.patch
 run-autoupdate.patch
 # BORKED
+Enable-command-completion.patch
 Fix-redirection-check.patch
 Add-option-to-auto-accept-self-signed.patch
 0036-Move-chkurl-to-own-translation-unit.patch

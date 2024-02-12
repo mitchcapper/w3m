@@ -3,10 +3,10 @@ Date: Sun Oct 29 16:11:29 CET 2023
 Subject: add gophers support
 ---
  file.c |    4 ++--
- html.h |    1 +
+ html.h |    7 ++++++-
  main.c |    2 +-
- url.c  |   39 ++++++++++++++++++++++++++++++++-------
- 4 files changed, 36 insertions(+), 10 deletions(-)
+ url.c  |   40 +++++++++++++++++++++++++++++++++-------
+ 4 files changed, 42 insertions(+), 11 deletions(-)
 
 --- a/file.c
 +++ b/file.c
@@ -30,13 +30,15 @@ Subject: add gophers support
  #ifdef USE_NNTP
 --- a/url.c
 +++ b/url.c
-@@ -75,11 +75,13 @@ static int
+@@ -72,6 +72,7 @@ static int
+     119,			/* news group */
+     0,				/* data - not defined */
+     0,				/* mailto - not defined */
++    70,				/* gophers */
  #ifdef USE_SSL
      443,			/* https */
  #endif				/* USE_SSL */
-+    70				/* gophers */
- };
- 
+@@ -80,6 +81,7 @@ static int
  struct cmdtable schemetable[] = {
      {"http", SCM_HTTP},
      {"gopher", SCM_GOPHER},
@@ -102,15 +104,19 @@ Subject: add gophers support
  #endif				/* USE_GOPHER */
  		    pu->file[0] == '/') {
  	    /*
-@@ -1261,6 +1269,7 @@ _parsedURL2Str(ParsedURL *pu, int pass,
+@@ -1255,9 +1263,11 @@ static Str
+ _parsedURL2Str(ParsedURL *pu, int pass, int user, int label)
+ {
+     Str tmp;
++    /* See SCM_* defines in html.h for correct order of entries. */
+     static char *scheme_str[] = {
+ 	"http", "gopher", "ftp", "ftp", "file", "file", "exec", "nntp", "nntp",
+ 	"news", "news", "data", "mailto",
++	"gophers",
  #ifdef USE_SSL
  	"https",
  #endif				/* USE_SSL */
-+	"gophers",
-     };
- 
-     if (pu->scheme == SCM_MISSING) {
-@@ -1898,6 +1907,7 @@ openURL(char *url, ParsedURL *pu, Parsed
+@@ -1898,6 +1908,7 @@ openURL(char *url, ParsedURL *pu, Parsed
  	return uf;
  #ifdef USE_GOPHER
      case SCM_GOPHER:
@@ -118,7 +124,7 @@ Subject: add gophers support
  	p = pu->file;
  	n = 0;
  	while(*p == '/') {
-@@ -1956,11 +1966,25 @@ openURL(char *url, ParsedURL *pu, Parsed
+@@ -1956,11 +1967,25 @@ openURL(char *url, ParsedURL *pu, Parsed
  	    tmp = Strnew_charp(file_unquote(pu->file));
  	    Strcat_char(tmp, '\n');
  	}
@@ -146,7 +152,7 @@ Subject: add gophers support
  	return uf;
  #endif				/* USE_GOPHER */
  #ifdef USE_NNTP
-@@ -2415,6 +2439,7 @@ schemeToProxy(int scheme)
+@@ -2415,6 +2440,7 @@ schemeToProxy(int scheme)
  	break;
  #ifdef USE_GOPHER
      case SCM_GOPHER:
@@ -156,11 +162,26 @@ Subject: add gophers support
  #endif
 --- a/html.h
 +++ b/html.h
-@@ -419,5 +419,6 @@ struct environment {
+@@ -401,6 +401,10 @@ struct environment {
+ 
+ #define INDENT_INCR IndentIncr
+ 
++/*
++ * Those SCM_ define the indeces of DefaultPort in url.c and scheme_str[] in
++ * _parsedURL2Str in url.c
++ */
+ #define SCM_UNKNOWN	255
+ #define SCM_MISSING	254
+ #define SCM_HTTP	0
+@@ -416,8 +420,9 @@ struct environment {
+ #define SCM_NEWS_GROUP	10
+ #define SCM_DATA	11
+ #define SCM_MAILTO      12
++#define SCM_GOPHERS	13
  #ifdef USE_SSL
- #define SCM_HTTPS       13
+-#define SCM_HTTPS       13
++#define SCM_HTTPS       14
  #endif				/* USE_SSL */
-+#define SCM_GOPHERS	14
  
  #endif				/* _HTML_H */
 --- a/main.c

@@ -824,7 +824,7 @@ Subject: [PATCH 014/172] Remove dead code
  	if (ssl_cert_file != NULL && *ssl_cert_file != '\0') {
  	    int ng = 1;
  	    if (SSL_CTX_use_certificate_file
-@@ -2479,17 +2474,6 @@ url_encode(const char *url, const Parsed
+@@ -2480,17 +2475,6 @@ url_encode(const char *url, const Parsed
  			  url_to_charset(url, base, doc_charset));
  }
  

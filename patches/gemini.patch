@@ -22,8 +22,8 @@ w3m-0.5.3+git20230121.
  rc.c                   |    5 
  rc.h                   |    2 
  scripts/w3mhelp.cgi.in |    5 
- url.c                  |   37 +++++-
- 14 files changed, 615 insertions(+), 40 deletions(-)
+ url.c                  |   35 +++++
+ 14 files changed, 614 insertions(+), 39 deletions(-)
 
 --- a/file.c
 +++ b/file.c
@@ -371,25 +371,24 @@ w3m-0.5.3+git20230121.
   */
 --- a/html.h
 +++ b/html.h
-@@ -420,5 +420,6 @@ struct environment {
- #define SCM_HTTPS       13
- #endif				/* USE_SSL */
- #define SCM_GOPHERS	14
+@@ -423,6 +423,7 @@ struct environment {
+ #define SCM_GOPHERS	13
+ #ifdef USE_SSL
+ #define SCM_HTTPS       14
 +#define SCM_GEMINI	15
+ #endif				/* USE_SSL */
  
  #endif				/* _HTML_H */
 --- a/url.c
 +++ b/url.c
-@@ -75,7 +75,8 @@ static int
+@@ -75,6 +75,7 @@ static int
+     70,				/* gophers */
  #ifdef USE_SSL
      443,			/* https */
- #endif				/* USE_SSL */
--    70				/* gophers */
-+    70,				/* gophers */
 +    1965			/* gemini */
+ #endif				/* USE_SSL */
  };
  
- struct cmdtable schemetable[] = {
 @@ -97,6 +98,7 @@ struct cmdtable schemetable[] = {
  #ifdef USE_SSL
      {"https", SCM_HTTPS},
@@ -415,15 +414,15 @@ w3m-0.5.3+git20230121.
  }
  
  #if SSLEAY_VERSION_NUMBER >= 0x00905100
-@@ -1261,6 +1264,7 @@ _parsedURL2Str(ParsedURL *pu, int pass,
- 	"news", "news", "data", "mailto",
+@@ -1263,6 +1266,7 @@ _parsedURL2Str(ParsedURL *pu, int pass,
+ 	"gophers",
  #ifdef USE_SSL
  	"https",
 +	"gemini",
  #endif				/* USE_SSL */
- 	"gophers",
      };
-@@ -1980,6 +1984,35 @@ openURL(char *url, ParsedURL *pu, Parsed
+ 
+@@ -1981,6 +1985,35 @@ openURL(char *url, ParsedURL *pu, Parsed
  	}
  	return uf;
  #endif				/* USE_GOPHER */

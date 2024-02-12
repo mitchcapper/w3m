@@ -1,4 +1,3 @@
-From 306a9832b9c80fb96bdad34b9d6d732bcfccdcc8 Mon Sep 17 00:00:00 2001
 From: Rene Kita <mail@rkta.de>
 Date: Sun, 30 Jan 2022 13:43:29 +0100
 Subject: [PATCH 035/172] Add tilde('~') to gopher regex for chkURL

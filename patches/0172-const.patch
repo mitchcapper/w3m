@@ -1676,7 +1676,7 @@ Subject: [PATCH 172/172] const
          return;
 --- a/url.c
 +++ b/url.c
-@@ -2083,10 +2083,10 @@ add_index_file(ParsedURL *pu, URLFile *u
+@@ -2084,10 +2084,10 @@ add_index_file(ParsedURL *pu, URLFile *u
  }
  
  static char *
@@ -1689,7 +1689,7 @@ Subject: [PATCH 172/172] const
      if (table == NULL)
  	return NULL;
      p = &filename[strlen(filename) - 1];
-@@ -2107,7 +2107,7 @@ guessContentTypeFromTable(struct table2
+@@ -2108,7 +2108,7 @@ guessContentTypeFromTable(struct table2
  }
  
  char *

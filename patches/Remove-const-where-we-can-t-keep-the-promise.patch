@@ -144,7 +144,7 @@ cast away and there was no easy way to keep the const.
  
 --- a/url.c
 +++ b/url.c
-@@ -2448,14 +2448,14 @@ schemeToProxy(int scheme)
+@@ -2449,14 +2449,14 @@ schemeToProxy(int scheme)
  
  #ifdef USE_M17N
  wc_ces
@@ -162,7 +162,7 @@ cast away and there was no easy way to keep the const.
  	pu = &pu_buf;
      } else {
  	pu = base;
-@@ -2468,14 +2468,14 @@ url_to_charset(const char *url, const Pa
+@@ -2469,14 +2469,14 @@ url_to_charset(const char *url, const Pa
  }
  
  char *
