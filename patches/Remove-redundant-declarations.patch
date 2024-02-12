@@ -82,7 +82,7 @@ Subject: [PATCH 085/172] Remove redundant declarations
  static int is_xterm = 0;
  
 -void mouse_init(void), mouse_end(void);
-+void mouse_init();
++static void mouse_init(void);
  int mouseActive = 0;
  #endif				/* USE_MOUSE */
  
