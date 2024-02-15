@@ -1,5 +1,8 @@
 Unreleased
 
+* new features
+  - Add command to change directory (CD)
+
 * bug fixes
   - Ignore C-i, C-l, C-s, C-z, C-\, C-], C-^ and C-_ key presses when
     inserting text
