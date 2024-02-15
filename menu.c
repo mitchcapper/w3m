@@ -577,7 +577,6 @@ action_menu(Menu *menu)
 	    *item.variable = item.value;
 	if (item.type & MENU_FUNC) {
 	    CurrentKey = -1;
-	    CurrentKeyData = NULL;
 	    CurrentCmdData = item.data;
 	    (*item.func) ();
 	    CurrentCmdData = NULL;
