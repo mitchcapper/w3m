@@ -130,7 +130,6 @@ save-history.patch
 Store-session.patch
 shorten-not-assigned-in-help.patch
 Use-gettext-for-user-facing-strings.patch
-Enable-lto.patch
 Get-rid-of-MySignalHandler.patch
 Remove-config.h.hist.patch
 Drop-wait3-support.patch
@@ -139,6 +138,9 @@ Remove-obsolete-checks-in-configure.patch
 Replace-AC_TRY_CPP.patch
 run-autoupdate.patch
 Fix-gopher-selector-string.patch
+Remove-unused-CurrentKeyData.patch
+Add-cd-command.patch
+Enable-lto.patch
 # BORKED
 Enable-command-completion.patch
 Fix-redirection-check.patch

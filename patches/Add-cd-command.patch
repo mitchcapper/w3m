@@ -1,0 +1,38 @@
+From: Rene Kita <mail@rkta.de>
+Date: Thu Feb 15 08:23:33 CET 2024
+Subject: Add cd command
+Patch: patches/Add-cd-command.patch
+
+---
+ main.c  |    9 +++++++++
+ proto.h |    1 +
+ 2 files changed, 10 insertions(+)
+
+--- a/main.c
++++ b/main.c
+@@ -2125,6 +2125,15 @@ DEFUN(col1L, LEFT, "Shift screen one col
+     displayBuffer(Currentbuf, B_NORMAL);
+ }
+ 
++DEFUN(cd, CD, "Change working directory")
++{
++    char *dir;
++
++    dir = inputFilename(_("cd to? "), NULL);
++    if (chdir(dir) == -1)
++	disp_err_message(strerror(errno), FALSE);
++}
++
+ DEFUN(setEnv, SETENV, "Set environment variable")
+ {
+     char *env;
+--- a/proto.h
++++ b/proto.h
+@@ -29,6 +29,7 @@ extern void shiftl(void);
+ extern void shiftr(void);
+ extern void col1R(void);
+ extern void col1L(void);
++extern void cd(void);
+ extern void setEnv(void);
+ extern void pipeBuf(void);
+ extern void pipesh(void);
