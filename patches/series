@@ -140,6 +140,7 @@ run-autoupdate.patch
 Fix-gopher-selector-string.patch
 Remove-unused-CurrentKeyData.patch
 Add-cd-command.patch
+Fix-potential-null-dereference-with-gopher-I.patch
 Enable-lto.patch
 # BORKED
 Enable-command-completion.patch

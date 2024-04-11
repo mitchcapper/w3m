@@ -1,0 +1,30 @@
+From: Rene Kita <mail@rkta.de>
+Date: Thu Apr 11 07:38:12 CEST 2024
+Subject: Fix potential null dereference with gopher
+Patch: patches/Fix-potential-null-dereference-with-gopher.patch
+
+guessContentType will return NULL if it can determine a ContentType.
+This might happen e.g. if you insert a partial URL where the file
+extension is missing.
+
+Segfaulting is the worst of all options, so fall back to the default
+ContentType of "image/png" in that case. Still leads to bad UX as the
+process will continue without an obvious error besides not image being
+displayed.
+
+---
+ file.c |    3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+--- a/file.c
++++ b/file.c
+@@ -1975,7 +1975,8 @@ loadGeneralFile(char *path, ParsedURL *v
+ 	    break;
+ 	case 'I':
+ 	    t = guessContentType(pu.file);
+-	    if(strncasecmp(t, "image/", 6) != 0) {
++	    /* TODO(rkta): Defaulting to png in any case is not a good UX */
++	    if(!t || strncasecmp(t, "image/", 6) != 0) {
+ 		t = "image/png";
+ 	    }
+ 	    break;
