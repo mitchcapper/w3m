@@ -9,8 +9,8 @@ extension is missing.
 
 Segfaulting is the worst of all options, so fall back to the default
 ContentType of "image/png" in that case. Still leads to bad UX as the
-process will continue without an obvious error besides not image being
-displayed.
+process will continue without an obvious error besides the image not
+being displayed.
 
 ---
  file.c |    3 ++-

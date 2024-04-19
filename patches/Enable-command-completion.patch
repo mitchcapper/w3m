@@ -100,8 +100,8 @@ for commands only.
 +    if (!fl->id)
 +	return;
 +
-+    CBeforeBuf = Strsubstr(strBuf, 0, p - strBuf->ptr);
-+    strBuf = Strnew_m_charp(CBeforeBuf->ptr, fl->id, NULL);
++    CBeforeBuf = Strsubstr(strBuf, 0, p - strBuf->ptr + 1);
++    strBuf = Strnew_m_charp(p, fl->id, NULL);
 +}
 +
 +static void
@@ -126,8 +126,8 @@ for commands only.
      LoadHist = newHist();
      SaveHist = newHist();
      ShellHist = newHist();
-@@ -6206,7 +6208,7 @@ DEFUN(execCmd, COMMAND, "Invoke w3m func
-     CurrentKeyData = NULL;	/* not allowed in w3m-control: */
+@@ -6202,7 +6204,7 @@ DEFUN(execCmd, COMMAND, "Invoke w3m func
+ 
      data = searchKeyData();
      if (data == NULL || *data == '\0') {
 -	data = inputStrHist("command [; ...]: ", "", TextHist);

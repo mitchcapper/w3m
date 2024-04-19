@@ -1,5 +1,96 @@
 From: Rene Kita <mail@rkta.de>
-Date: Tue Apr 16 20:11:13 CEST 2024
+Date: Fri Apr 19 13:51:41 CEST 2024
 Subject: gophertmp
 Patch: patches/gophertmp.patch
 
+---
+ url.c |   48 +++++++-----------------------------------------
+ 1 file changed, 7 insertions(+), 41 deletions(-)
+
+--- a/url.c
++++ b/url.c
+@@ -1631,8 +1631,6 @@ openURL(char *url, ParsedURL *pu, Parsed
+     char *p, *q, *u;
+ #ifdef USE_GOPHER
+     Str gophertmp;
+-    char type;
+-    int n;
+ #endif
+     URLFile uf;
+     HRequest hr0;
+@@ -1908,42 +1906,12 @@ openURL(char *url, ParsedURL *pu, Parsed
+ #ifdef USE_GOPHER
+     case SCM_GOPHER:
+     case SCM_GOPHERS:
+-	p = pu->file;
+-	n = 0;
+-	while(*p == '/') {
+-	  ++p;
+-	  ++n;
+-	}
+-	if(*p != '\0') {
+-	  type = pu->file[n];
+-	  switch(type) {
+-	    case '0':
+-	    case '1':
+-	    case 'm':
+-	    case 's':
+-	    case 'g':
+-	    case 'h':
+-	    case 'I':
+-	    case '5':
+-	    case '7':
+-	    case '9':
+-	      tmp = Strnew_charp(pu->file);
+-	      gophertmp = Strdup(tmp);
+-	      Strdelete(tmp, n, 1);
+-	      pu->file = tmp->ptr;
+-	      break;
+-	    default:
+-	      type = '\0';
+-	      break;
+-	  }
+-	} else {
+-	  type = '\0';
+-	}
++	if (pu->file == NULL)
++	    pu->file = "1";
++	tmp = Strnew_charp(pu->file + 1);
+ 	if(pu->query != NULL) {
+-	  tmp = Strnew_charp(pu->file);
+ 	  Strcat_char(tmp, '\t');
+ 	  Strcat_charp(tmp, pu->query);
+-	  pu->file = tmp->ptr;
+ 	}
+ 	if (non_null(GOPHER_proxy) &&
+ 	    !Do_not_use_proxy &&
+@@ -1955,15 +1923,16 @@ openURL(char *url, ParsedURL *pu, Parsed
+ 	    if (sock < 0)
+ 		return uf;
+ 	    uf.scheme = SCM_HTTP;
++	    gophertmp = Strnew_charp(pu->file);
++	    pu->file = tmp->ptr;
+ 	    tmp = HTTPrequest(pu, current, hr, extra_header);
++	    pu->file = gophertmp->ptr;
+ 	}
+ 	else {
+ 	    sock = openSocket(pu->host, schemeNumToName(pu->scheme), pu->port);
+ 	    if (sock < 0)
+ 		return uf;
+-	    if (pu->file == NULL)
+-		pu->file = "1";
+-	    tmp = Strnew_charp(file_unquote(pu->file));
++	    tmp = Strnew_charp(file_unquote(tmp->ptr));
+ 	    Strcat_charp(tmp, "\r\n");
+ 	}
+ #ifdef USE_SSL
+@@ -1982,9 +1951,6 @@ openURL(char *url, ParsedURL *pu, Parsed
+ 	    write(sock, tmp->ptr, tmp->length);
+ 	    uf.stream = newInputStream(sock);
+ 	}
+-	if(type != '\0') {
+-	  pu->file = gophertmp->ptr;
+-	}
+ 	return uf;
+ #endif				/* USE_GOPHER */
+     case SCM_GEMINI:

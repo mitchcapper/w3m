@@ -1,0 +1,333 @@
+From: Rene Kita <mail@rkta.de>
+Date: Tue Apr 16 20:11:13 CEST 2024
+Subject: do_download
+Patch: patches/do_download.patch
+
+Make do_download a parameter for loadGeneralFile. Add an assert that it
+matches the global variable.
+
+Extra parameter ensures we changed all usages of loadGeneralFile. The
+assert asserts.
+
+Next step: use 'flags' parameter for all options, include do_download.
+
+---
+ backend.c |    4 ---
+ file.c    |   79 +++++++++++++++++++++++++++-----------------------------------
+ frame.c   |    5 ++-
+ image.c   |    2 -
+ main.c    |   27 ++++++++++++---------
+ 5 files changed, 56 insertions(+), 61 deletions(-)
+
+--- a/file.c
++++ b/file.c
+@@ -21,6 +21,8 @@
+ #include "local.h"
+ #include "regex.h"
+ 
++#include <assert.h>
++
+ #ifndef max
+ #define max(a,b)        ((a) > (b) ? (a) : (b))
+ #endif				/* not max */
+@@ -393,31 +395,32 @@ examineFile(char *path, URLFile *uf)
+ 	return;
+     }
+     uf->stream = openIS(path);
+-    if (!do_download) {
+-	if (use_lessopen && getenv("LESSOPEN") != NULL) {
+-	    FILE *fp;
+-	    uf->guess_type = guessContentType(path);
+-	    if (uf->guess_type == NULL)
+-		uf->guess_type = "text/plain";
+-	    if (is_html_type(uf->guess_type))
+-		return;
+-	    if ((fp = lessopen_stream(path))) {
+-		UFclose(uf);
+-		uf->stream = newFileStream(fp, pclose);
+-		uf->guess_type = "text/plain";
+-		return;
+-	    }
+-	}
+-	check_compression(path, uf);
+-	if (uf->compression != CMP_NOCOMPRESS) {
+-	    char *ext = uf->ext;
+-	    char *t0 = uncompressed_file_type(path, &ext);
+-	    uf->guess_type = t0;
+-	    uf->ext = ext;
+-	    uncompress_stream(uf, NULL);
++    if (do_download) return;
++
++    if (use_lessopen && getenv("LESSOPEN") != NULL) {
++	FILE *fp;
++	uf->guess_type = guessContentType(path);
++	if (uf->guess_type == NULL)
++	    uf->guess_type = "text/plain";
++	if (is_html_type(uf->guess_type))
++	    return;
++	if ((fp = lessopen_stream(path))) {
++	    UFclose(uf);
++	    uf->stream = newFileStream(fp, pclose);
++	    uf->guess_type = "text/plain";
+ 	    return;
+ 	}
+     }
++
++    check_compression(path, uf);
++    if (uf->compression != CMP_NOCOMPRESS) {
++	char *ext = uf->ext;
++	char *t0 = uncompressed_file_type(path, &ext);
++	uf->guess_type = t0;
++	uf->ext = ext;
++	uncompress_stream(uf, NULL);
++	return;
++    }
+ }
+ 
+ #define S_IXANY	(S_IXUSR|S_IXGRP|S_IXOTH)
+@@ -1681,7 +1684,7 @@ getLinkNumberStr(int correction)
+  */
+ Buffer *
+ loadGeneralFile(char *path, ParsedURL *volatile current, char *referer,
+-		int flag, FormList *volatile request)
++		int flag, FormList *volatile request, int dl_only)
+ {
+     URLFile f, *volatile of = NULL;
+     ParsedURL pu;
+@@ -1702,9 +1705,6 @@ loadGeneralFile(char *path, ParsedURL *v
+     URLOption url_option;
+     Str tmp;
+     Str volatile page = NULL;
+-#ifdef USE_GOPHER
+-    int gopher_download = FALSE;
+-#endif
+ #ifdef USE_M17N
+     wc_ces charset = WC_CES_US_ASCII;
+ #endif
+@@ -1715,6 +1715,8 @@ loadGeneralFile(char *path, ParsedURL *v
+     prevtrap = NULL;
+     add_auth_cookie_flag = 0;
+ 
++    assert(dl_only == do_download);
++
+     checkRedirection(NULL);
+ 
+   load_doc:
+@@ -1753,7 +1755,7 @@ loadGeneralFile(char *path, ParsedURL *v
+ 			Str cmd = Sprintf("%s?dir=%s#current",
+ 					  DirBufferCommand, pu.file);
+ 			b = loadGeneralFile(cmd->ptr, NULL, NO_REFERER, 0,
+-					    NULL);
++					    NULL, FALSE);
+ 			if (b != NULL && b != NO_BUFFER) {
+ 			    copyParsedURL(&b->currentURL, &pu);
+ 			    b->filename = b->currentURL.real_file;
+@@ -1784,7 +1786,8 @@ loadGeneralFile(char *path, ParsedURL *v
+ #ifdef USE_EXTERNAL_URI_LOADER
+ 	    tmp = searchURIMethods(&pu);
+ 	    if (tmp != NULL) {
+-		b = loadGeneralFile(tmp->ptr, current, referer, flag, request);
++		b = loadGeneralFile(tmp->ptr, current, referer, flag, request,
++				    FALSE);
+ 		if (b != NULL && b != NO_BUFFER)
+ 		    copyParsedURL(&b->currentURL, &pu);
+ 		return b;
+@@ -1982,7 +1985,7 @@ loadGeneralFile(char *path, ParsedURL *v
+ 	    break;
+ 	case '5':
+ 	case '9':
+-	    gopher_download = TRUE;
++	    dl_only = TRUE;
+ 	    break;
+ 	}
+     }
+@@ -2243,11 +2246,7 @@ fail:
+ 	    Strfputs(s, src);
+ 	    fclose(src);
+ 	}
+-#ifdef USE_GOPHER
+-	if (do_download || gopher_download) {
+-#else
+-	if (do_download) {
+-#endif
++	if (dl_only) {
+ 	    char *file;
+ 	    if (!src)
+ 		return NULL;
+@@ -2283,11 +2282,7 @@ fail:
+     current_content_length = 0;
+     if ((p = checkHeader(t_buf, "Content-Length:")) != NULL)
+ 	current_content_length = strtoclen(p);
+-#ifdef USE_GOPHER
+-    if (do_download || gopher_download) {
+-#else
+-    if (do_download) {
+-#endif
++    if (dl_only) {
+ 	/* download only */
+ 	char *file;
+ 	TRAP_OFF;
+@@ -2355,11 +2350,7 @@ fail:
+ #endif
+     else if (w3m_backend) ;
+     else if (!(w3m_dump & ~DUMP_FRAME) || is_dump_text_type(t)) {
+-	if (!do_download && 
+-#ifdef USE_GOPHER
+-		!gopher_download &&
+-#endif
+-		searchExtViewer(t) != NULL) {
++	if (!dl_only && searchExtViewer(t) != NULL) {
+ 	    proc = NULL;
+ 	}
+ 	else {
+--- a/backend.c
++++ b/backend.c
+@@ -91,9 +91,7 @@ internal_get(char *url, int flag, FormLi
+     Buffer *buf;
+ 
+     backend_halfdump_buf = NULL;
+-    do_download = flag;
+-    buf = loadGeneralFile(url, NULL, NO_REFERER, 0, request);
+-    do_download = FALSE;
++    buf = loadGeneralFile(url, NULL, NO_REFERER, 0, request, flag);
+     if (buf != NULL && buf != NO_BUFFER) {
+ 	if (is_html_type(buf->type) && backend_halfdump_buf) {
+ 	    TextLineListItem *p;
+--- a/frame.c
++++ b/frame.c
+@@ -341,7 +341,8 @@ frame_download_source(struct frame_body
+ 	w3m_dump |= DUMP_FRAME;
+ 	buf = loadGeneralFile(b->url,
+ 			      baseURL ? baseURL : currentURL,
+-			      b->referer, flag | RG_FRAME_SRC, b->request);
++			      b->referer, flag | RG_FRAME_SRC, b->request,
++			      FALSE);
+ #ifdef USE_SSL
+ 	/* XXX certificate? */
+ 	if (buf && buf != NO_BUFFER)
+@@ -898,7 +899,7 @@ renderFrame(Buffer *Cbuf, int force_relo
+ #ifdef USE_M17N
+     DocumentCharset = InnerCharset;
+ #endif
+-    buf = loadGeneralFile(tmp->ptr, NULL, NULL, flag, NULL);
++    buf = loadGeneralFile(tmp->ptr, NULL, NULL, flag, NULL, FALSE);
+ #ifdef USE_M17N
+     DocumentCharset = doc_charset;
+ #endif
+--- a/image.c
++++ b/image.c
+@@ -522,7 +522,7 @@ loadImage(Buffer *buf, int flag)
+ 	if ((cache->pid = fork()) == 0) {
+ 	    setup_child(FALSE, 0, -1);
+ 	    image_source = cache->file;
+-	    loadGeneralFile(cache->url, cache->current, NULL, 0, NULL);
++	    loadGeneralFile(cache->url, cache->current, NULL, 0, NULL, FALSE);
+ #if defined(HAVE_SYMLINK) && defined(HAVE_LSTAT)
+ 	    symlink(cache->file, cache->touch);
+ #else
+--- a/main.c
++++ b/main.c
+@@ -974,7 +974,7 @@ main(int argc, char **argv)
+ 
+ 	parseURL2(base_url, &base_pu, NULL);
+ 	image_source = getimage_args[2];
+-	newbuf = loadGeneralFile(image_url, &base_pu, NULL, 0, NULL);
++	newbuf = loadGeneralFile(image_url, &base_pu, NULL, 0, NULL, FALSE);
+ 	if (!newbuf || !newbuf->real_type ||
+ 	    strncasecmp(newbuf->real_type, "image/", 6))
+ 	    unlink(getimage_args[2]);
+@@ -1015,7 +1015,8 @@ main(int argc, char **argv)
+ 	    dup2(1, 0);
+ 	}
+ 	else if (load_bookmark) {
+-	    newbuf = loadGeneralFile(BookmarkFile, NULL, NO_REFERER, 0, NULL);
++	    newbuf = loadGeneralFile(BookmarkFile, NULL, NO_REFERER, 0, NULL,
++				     FALSE);
+ 	    if (newbuf == NULL)
+ 		Strcat_charp(err_msg, "w3m: Can't load bookmark.\n");
+ 	}
+@@ -1039,7 +1040,7 @@ main(int argc, char **argv)
+ 	}
+ 	else if ((p = getenv("HTTP_HOME")) != NULL ||
+ 		 (p = getenv("WWW_HOME")) != NULL) {
+-	    newbuf = loadGeneralFile(p, NULL, NO_REFERER, 0, NULL);
++	    newbuf = loadGeneralFile(p, NULL, NO_REFERER, 0, NULL, FALSE);
+ 	    if (newbuf == NULL)
+ 		Strcat(err_msg, Sprintf("w3m: Can't load %s.\n", p));
+ 	    else if (newbuf != NO_BUFFER)
+@@ -1078,7 +1079,8 @@ main(int argc, char **argv)
+ 	    if (w3m_dump == DUMP_HEAD) {
+ 		request = New(FormList);
+ 		request->method = FORM_METHOD_HEAD;
+-		newbuf = loadGeneralFile(url, NULL, NO_REFERER, 0, request);
++		newbuf = loadGeneralFile(url, NULL, NO_REFERER, 0, request,
++					 FALSE);
+ 	    }
+ 	    else {
+ 		if (post_file && i == 0) {
+@@ -1106,7 +1108,8 @@ main(int argc, char **argv)
+ 		else {
+ 		    request = NULL;
+ 		}
+-		newbuf = loadGeneralFile(url, NULL, NO_REFERER, 0, request);
++		newbuf = loadGeneralFile(url, NULL, NO_REFERER, 0, request,
++					 FALSE);
+ 	    }
+ 	    if (newbuf == NULL) {
+ 		if (ArgvIsURL && !retry) {
+@@ -2330,7 +2333,7 @@ cmd_loadfile(char *fn)
+ {
+     Buffer *buf;
+ 
+-    buf = loadGeneralFile(file_to_url(fn), NULL, NO_REFERER, 0, NULL);
++    buf = loadGeneralFile(file_to_url(fn), NULL, NO_REFERER, 0, NULL, FALSE);
+     if (buf == NULL) {
+ 	char *emsg = Sprintf(_("%s not found"), conv_from_system(fn))->ptr;
+ 	disp_err_message(emsg, FALSE);
+@@ -3033,7 +3036,8 @@ loadLink(char *url, char *target, char *
+ 	referer = NO_REFERER;
+     if (referer == NULL)
+ 	referer = parsedURL2RefererStr(&Currentbuf->currentURL)->ptr;
+-    buf = loadGeneralFile(url, baseURL(Currentbuf), referer, flag, request);
++    buf = loadGeneralFile(url, baseURL(Currentbuf), referer, flag, request,
++			  do_download);
+     if (buf == NULL) {
+ 	char *emsg = Sprintf("Can't load %s", url)->ptr;
+ 	disp_err_message(emsg, FALSE);
+@@ -3260,7 +3264,7 @@ DEFUN(followI, VIEW_IMAGE, "Display imag
+ 	return;
+     message(Sprintf(_("loading %s"), a->url)->ptr, 0, 0);
+     refresh();
+-    buf = loadGeneralFile(a->url, baseURL(Currentbuf), NULL, 0, NULL);
++    buf = loadGeneralFile(a->url, baseURL(Currentbuf), NULL, 0, NULL, do_download);
+     if (buf == NULL) {
+ 	char *emsg = Sprintf(_("Can't load %s"), a->url)->ptr;
+ 	disp_err_message(emsg, FALSE);
+@@ -4229,7 +4233,7 @@ cmd_loadURL(char *url, ParsedURL *curren
+ 	return;
+ 
+     refresh();
+-    buf = loadGeneralFile(url, current, referer, 0, request);
++    buf = loadGeneralFile(url, current, referer, 0, request, FALSE);
+     if (buf == NULL) {
+ 	char *emsg = Sprintf(_("Can't load %s"), conv_from_system(url))->ptr;
+ 	disp_err_message(emsg, FALSE);
+@@ -5115,7 +5119,8 @@ DEFUN(reload, RELOAD, "Load current docu
+ #endif
+     SearchHeader = Currentbuf->search_header;
+     DefaultType = Currentbuf->real_type;
+-    buf = loadGeneralFile(url->ptr, NULL, NO_REFERER, RG_NOCACHE, request);
++    buf = loadGeneralFile(url->ptr, NULL, NO_REFERER, RG_NOCACHE, request,
++			  FALSE);
+ #ifdef USE_M17N
+     DocumentCharset = old_charset;
+ #endif
+@@ -6007,7 +6012,7 @@ execdict(const char *word)
+     }
+     dictcmd = Sprintf("%s?%s", DictCommand,
+ 		      Str_form_quote(Strnew_charp(w))->ptr)->ptr;
+-    buf = loadGeneralFile(dictcmd, NULL, NO_REFERER, 0, NULL);
++    buf = loadGeneralFile(dictcmd, NULL, NO_REFERER, 0, NULL, FALSE);
+     if (buf == NULL) {
+ 	disp_message("Execution failed", TRUE);
+ 	return;
