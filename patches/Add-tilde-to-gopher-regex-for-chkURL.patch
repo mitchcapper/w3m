@@ -2,8 +2,8 @@ From: Rene Kita <mail@rkta.de>
 Date: Sun, 30 Jan 2022 13:43:29 +0100
 Subject: [PATCH 035/172] Add tilde('~') to gopher regex for chkURL
 
-The tilde ('~') is valid character in gopher URLs and is often used to denote a
-user's home directory.
+The tilde ('~') is a valid character in gopher URLs and is often used to
+denote a user's home directory.
 
 ---
  main.c |    2 +-
