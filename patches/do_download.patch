@@ -17,7 +17,8 @@ Next step: use 'flags' parameter for all options, include do_download.
  frame.c   |    5 ++-
  image.c   |    2 -
  main.c    |   27 ++++++++++++---------
- 5 files changed, 56 insertions(+), 61 deletions(-)
+ proto.h   |    2 -
+ 6 files changed, 57 insertions(+), 62 deletions(-)
 
 --- a/file.c
 +++ b/file.c
@@ -331,3 +332,14 @@ Next step: use 'flags' parameter for all options, include do_download.
      if (buf == NULL) {
  	disp_message("Execution failed", TRUE);
  	return;
+--- a/proto.h
++++ b/proto.h
+@@ -202,7 +202,7 @@ extern void push_symbol(Str str, char sy
+ extern void update_utf8_symbol(void);
+ #endif
+ extern Buffer *loadGeneralFile(char *path, ParsedURL *current, char *referer,
+-			       int flag, FormList *request);
++			       int flag, FormList *request, int dl_only);
+ extern int is_boundary(const unsigned char *, const unsigned char *);
+ extern void push_render_image(Str str, int width, int limit,
+ 			      struct html_feed_environ *h_env);
