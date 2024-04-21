@@ -6137,11 +6137,9 @@ DEFUN(execCmd, COMMAND, "Invoke w3m function(s)")
 static void
 SigAlarm(SIGNAL_ARG)
 {
-    char *data;
-
     if (CurrentAlarm->sec > 0) {
 	CurrentKey = -1;
-	CurrentCmdData = data = (char *)CurrentAlarm->data;
+	CurrentCmdData = (char *)CurrentAlarm->data;
 #ifdef USE_MOUSE
 	if (use_mouse)
 	    mouse_inactive();

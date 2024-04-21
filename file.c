@@ -1138,9 +1138,8 @@ extract_auth_param(char *q, struct auth_param *auth)
 	}
 	if (ap->name == NULL) {
 	    /* skip unknown param */
-	    int token_type;
 	    p = q;
-	    if ((token_type = skip_auth_token(&q)) == AUTHCHR_TOKEN &&
+	    if (skip_auth_token(&q) == AUTHCHR_TOKEN &&
 		(IS_SPACE(*q) || *q == '=')) {
 		SKIP_BLANKS(q);
 		if (*q != '=')
@@ -1511,8 +1510,7 @@ findAuthentication(struct http_auth *hauth, Buffer *buf, char *auth_field)
 		}
 		if (p0 == p) {
 		    /* all unknown auth failed */
-		    int token_type;
-		    if ((token_type = skip_auth_token(&p)) == AUTHCHR_TOKEN && IS_SPACE(*p)) {
+		    if (skip_auth_token(&p) == AUTHCHR_TOKEN && IS_SPACE(*p)) {
 			SKIP_BLANKS(p);
 			p = extract_auth_param(p, none_auth_param);
 		    }
@@ -6427,7 +6425,6 @@ HTMLlineproc0(char *line, struct html_feed_environ *h_env, int internal)
 		    str = Strnew_charp_n(str, p - str)->ptr;
 		    line = Strnew_m_charp(p, line, NULL)->ptr;
 		}
-		is_tag = FALSE;
 		continue;
 	    }
 	    if (obuf->table_level >= 0)
@@ -7112,7 +7109,7 @@ loadHTMLstream(URLFile *f, Buffer *newBuf, FILE * src, int internal)
     struct environment envs[MAX_ENV_LEVEL];
     clen_t linelen = 0;
     clen_t trbyte = 0;
-    Str lineBuf2 = Strnew();
+    Str lineBuf2;
 #ifdef USE_M17N
     wc_ces charset = WC_CES_US_ASCII;
     wc_ces volatile doc_charset = DocumentCharset;
@@ -7353,11 +7350,11 @@ loadGopherDir0(URLFile *uf, ParsedURL *pu)
 			 "</title>\n</head>\n<body>\n<h1>Index of ", q,
 			 "</h1>\n<table>\n", NULL);
 
+    pre = 0;
     if (SETJMP(AbortLoading) != 0)
 	goto gopher_end;
     TRAP_ON;
 
-    pre = 0;
     while (1) {
 	if (!(lbuf = StrUFgets(uf)) || lbuf->length == 0)
 	    break;

@@ -145,7 +145,6 @@ gethtmlcmd(char *s)
     }
     if (p - cmdstr == MAX_CMD_LEN) {
 	/* buffer overflow: perhaps caused by bad HTML source */
-	s = save + 1;
 	return HTML_UNKNOWN;
     }
     *p = '\0';
