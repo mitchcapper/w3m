@@ -142,6 +142,8 @@ Remove-unused-CurrentKeyData.patch
 Add-cd-command.patch
 Fix-potential-null-dereference-with-gopher-I.patch
 do_download.patch
+Remove-unused-variable-amp_len.patch
+Fix-scan-build-issues.patch
 gophertmp.patch
 Reset-optimization.patch
 hist-numbering.patch

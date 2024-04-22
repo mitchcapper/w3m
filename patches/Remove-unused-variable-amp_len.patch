@@ -1,0 +1,31 @@
+From: Rene Kita <mail@rkta.de>
+Date: Sun Apr 21 10:34:55 CEST 2024
+Subject: Remove unused variable amp_len
+Patch: patches/Remove-unused-variable-amp_len.patch
+
+---
+ table.c |    3 ---
+ 1 file changed, 3 deletions(-)
+
+--- a/table.c
++++ b/table.c
+@@ -427,7 +427,6 @@ visible_length(const char *str)
+     int prev_status = status;
+     Str tagbuf = Strnew();
+     char *t, *r2;
+-    int amp_len = 0;
+ 
+     while (*str) {
+ 	prev_status = status;
+@@ -456,11 +455,9 @@ visible_length(const char *str)
+ 	    if (prev_status == R_ST_NORMAL) {
+ 		Strclear(tagbuf);
+ 		len--;
+-		amp_len = 0;
+ 	    }
+ 	    else {
+ 		PUSH_TAG(str, n);
+-		amp_len++;
+ 	    }
+ 	}
+ 	else if (status == R_ST_NORMAL && prev_status == R_ST_AMP) {

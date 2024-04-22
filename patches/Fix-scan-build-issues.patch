@@ -1,0 +1,123 @@
+From: Rene Kita <mail@rkta.de>
+Date: Sun Apr 21 11:20:03 CEST 2024
+Subject: Fix scan build issues
+Patch: patches/Fix-scan-build-issues.patch
+
+---
+ etc.c     |    1 -
+ file.c    |   11 ++++-------
+ istream.c |    8 ++------
+ main.c    |    6 ++----
+ 4 files changed, 8 insertions(+), 18 deletions(-)
+
+--- a/etc.c
++++ b/etc.c
+@@ -145,7 +145,6 @@ gethtmlcmd(const char *s)
+     }
+     if (p - cmdstr == MAX_CMD_LEN) {
+ 	/* buffer overflow: perhaps caused by bad HTML source */
+-	s = save + 1;
+ 	return HTML_UNKNOWN;
+     }
+     *p = '\0';
+--- a/file.c
++++ b/file.c
+@@ -1145,9 +1145,8 @@ extract_auth_param(char *q, struct auth_
+ 	}
+ 	if (ap->name == NULL) {
+ 	    /* skip unknown param */
+-	    int token_type;
+ 	    p = q;
+-	    if ((token_type = skip_auth_token(&q)) == AUTHCHR_TOKEN &&
++	    if (skip_auth_token(&q) == AUTHCHR_TOKEN &&
+ 		(IS_SPACE(*q) || *q == '=')) {
+ 		SKIP_BLANKS(q);
+ 		if (*q != '=')
+@@ -1515,8 +1514,7 @@ findAuthentication(struct http_auth *hau
+ 		}
+ 		if (p0 == p) {
+ 		    /* all unknown auth failed */
+-		    int token_type;
+-		    if ((token_type = skip_auth_token(&p)) == AUTHCHR_TOKEN && IS_SPACE(*p)) {
++		    if (skip_auth_token(&p) == AUTHCHR_TOKEN && IS_SPACE(*p)) {
+ 			SKIP_BLANKS(p);
+ 			p = extract_auth_param(p, none_auth_param);
+ 		    }
+@@ -6568,7 +6566,6 @@ HTMLlineproc0(char *line, struct html_fe
+ 		    str = Strnew_charp_n(str, p - str)->ptr;
+ 		    line = Strnew_m_charp(p, line, NULL)->ptr;
+ 		}
+-		is_tag = FALSE;
+ 		continue;
+ 	    }
+ 	    if (obuf->table_level >= 0)
+@@ -7253,7 +7250,7 @@ loadHTMLstream(URLFile *f, Buffer *newBu
+     struct environment envs[MAX_ENV_LEVEL];
+     clen_t linelen = 0;
+     clen_t trbyte = 0;
+-    Str lineBuf2 = Strnew();
++    Str lineBuf2;
+ #ifdef USE_M17N
+     wc_ces charset = WC_CES_US_ASCII;
+     wc_ces volatile doc_charset = DocumentCharset;
+@@ -7494,11 +7491,11 @@ loadGopherDir0(URLFile *uf, ParsedURL *p
+ 			 "</title>\n</head>\n<body>\n<h1>Index of ", q,
+ 			 "</h1>\n<table>\n", NULL);
+ 
++    pre = 0;
+     if (SETJMP(AbortLoading) != 0)
+ 	goto gopher_end;
+     TRAP_ON;
+ 
+-    pre = 0;
+     while (1) {
+ 	if (!(lbuf = StrUFgets(uf)) || lbuf->length == 0)
+ 	    break;
+--- a/istream.c
++++ b/istream.c
+@@ -586,9 +586,7 @@ ssl_get_certificate(SSL * ssl, char *hos
+ 	if ((verr = SSL_get_verify_result(ssl))
+ 	    != X509_V_OK) {
+ 	    const char *em = X509_verify_cert_error_string(verr);
+-	    if (accept_this_site(hostname, x))
+-		ans = "y";
+-	    else {
++	    if (!accept_this_site(hostname, x)) {
+ 		if (ssl_known_hosts)
+ 		    emsg = Sprintf("%s: accept? (y)es/(n)o/(a)lways)", em);
+ 		else
+@@ -618,9 +616,7 @@ ssl_get_certificate(SSL * ssl, char *hos
+ #endif
+     emsg = ssl_check_cert_ident(x, hostname);
+     if (emsg != NULL) {
+-	if (accept_this_site(hostname, x))
+-	    ans = "y";
+-	else {
++	if (!accept_this_site(hostname, x)) {
+ 	    Str ep = Strdup(emsg);
+ 	    if (ep->length > COLS - 16)
+ 		Strshrink(ep, ep->length - (COLS - 16));
+--- a/main.c
++++ b/main.c
+@@ -4424,7 +4424,7 @@ _strSession(char *sf)
+ 	sep = "\n";
+     }
+ 
+-    int r;
++    int r; /* TODO(rkta): Remove from store session patch */
+     if ((r = fclose(f)) == EOF) goto fail;
+     return;
+ 
+@@ -6243,11 +6243,9 @@ DEFUN(execCmd, COMMAND, "Invoke w3m func
+ static void
+ SigAlarm(SIGNAL_ARG)
+ {
+-    char *data;
+-
+     if (CurrentAlarm->sec > 0) {
+ 	CurrentKey = -1;
+-	CurrentCmdData = data = (char *)CurrentAlarm->data;
++	CurrentCmdData = (char *)CurrentAlarm->data;
+ #ifdef USE_MOUSE
+ 	if (use_mouse)
+ 	    mouse_inactive();
