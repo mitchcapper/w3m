@@ -142,10 +142,13 @@ Remove-unused-CurrentKeyData.patch
 Add-cd-command.patch
 Fix-potential-null-dereference-with-gopher-I.patch
 do_download.patch
+Fix-segfault-with-dump_source-on-compressed-data.patch
 Remove-unused-variable-amp_len.patch
 Fix-scan-build-issues.patch
 gophertmp.patch
 Reset-optimization.patch
+Remove-unused-variable-2.patch
+Remove-redundant-cast.patch
 hist-numbering.patch
 Enable-lto.patch
 # BORKED

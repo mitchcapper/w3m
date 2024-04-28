@@ -1,0 +1,20 @@
+From: Rene Kita <mail@rkta.de>
+Date: Sun Apr 28 10:52:54 CEST 2024
+Subject: Remove redundant cast
+Patch: patches/Remove-redundant-cast.patch
+
+---
+ rc.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+--- a/rc.c
++++ b/rc.c
+@@ -1877,7 +1877,7 @@ querySiteconf(ParsedURL *query_pu, int f
+ 	return NULL;
+     if (!query_pu || IS_EMPTY_PARSED_URL(query_pu))
+ 	return NULL;
+-    u = parsedURL2Str((ParsedURL *)query_pu);
++    u = parsedURL2Str(query_pu);
+     if (u->length == 0)
+ 	return NULL;
+ 
