@@ -126,7 +126,6 @@ gethtmlcmd(char *s)
 {
     char cmdstr[MAX_CMD_LEN];
     char *p = cmdstr;
-    char *save = s;
     int cmd;
 
     s++;
