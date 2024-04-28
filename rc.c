@@ -1881,7 +1881,7 @@ querySiteconf(ParsedURL *query_pu, int field)
 	return NULL;
     if (!query_pu || IS_EMPTY_PARSED_URL(query_pu))
 	return NULL;
-    u = parsedURL2Str((ParsedURL *)query_pu);
+    u = parsedURL2Str(query_pu);
     if (u->length == 0)
 	return NULL;
 
