@@ -2201,6 +2201,13 @@ loadGeneralFile(char *path, ParsedURL *volatile current, char *referer,
 	&& !(w3m_dump & DUMP_EXTRA)) {
 	uncompress_stream(&f, &pu.real_file);
     }
+    /*
+     * TODO(rkta): Something wrong here with DUMP_SOURCE and compressed streams
+     * If DUMP_SOURCE is set and the data is compressed, t will be set to the
+     * type of the compressed data which is not handled in the later if-else
+     * block to determine the function to assign to loadproc. loadproc will be
+     * NULL leading to an error when loading the page.
+    */
     else if (f.compression != CMP_NOCOMPRESS) {
 	if (!(w3m_dump & DUMP_SOURCE) &&
 	    (w3m_dump & ~DUMP_FRAME || is_text_type(t)
@@ -2270,6 +2277,8 @@ loadGeneralFile(char *path, ParsedURL *volatile current, char *referer,
     }
     else if (w3m_dump & DUMP_FRAME)
 	return NULL;
+    else
+	proc = NULL;
 
     if (t_buf == NULL)
 	t_buf = newBuffer(INIT_BUFFER_WIDTH);
