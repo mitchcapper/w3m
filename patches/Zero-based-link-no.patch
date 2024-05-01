@@ -1,9 +1,10 @@
 ---
- file.c |    4 ++--
- fm.h   |    1 +
- main.c |    2 +-
- rc.c   |    3 +++
- 4 files changed, 7 insertions(+), 3 deletions(-)
+ file.c    |    4 ++--
+ fm.h      |    1 +
+ history.c |    4 +++-
+ main.c    |    2 +-
+ rc.c      |    3 +++
+ 5 files changed, 10 insertions(+), 4 deletions(-)
 
 --- a/rc.c
 +++ b/rc.c
@@ -65,3 +66,21 @@
      do {
  	if (hseq >= hl->nmark)
  	    return;
+--- a/history.c
++++ b/history.c
+@@ -20,12 +20,14 @@ historyBuffer(Hist *hist)
+ {
+     Str src = Strnew();
+     HistItem *item;
++    char n[sizeof("0")];
+     char *p, *q;
+ 
++    sprintf(n, "%d", !zeroBasedLinkNo);
+     /* FIXME: gettextize? */
+     Strcat_charp(src, "<html>\n<head><title>History Page</title></head>\n");
+     Strcat_charp(src, "<body>\n<h1>History Page</h1>\n<hr>\n");
+-    Strcat_charp(src, "<ol>\n");
++    Strcat_m_charp(src, "<ol start=", n, ">\n", NULL);
+     if (hist && hist->list) {
+ 	for (item = hist->list->last; item; item = item->prev) {
+ 	    q = html_quote(item->ptr);

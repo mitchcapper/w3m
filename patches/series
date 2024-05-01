@@ -149,7 +149,6 @@ gophertmp.patch
 Reset-optimization.patch
 Remove-unused-variable-2.patch
 Remove-redundant-cast.patch
-hist-numbering.patch
 Enable-lto.patch
 # BORKED
 Enable-command-completion.patch

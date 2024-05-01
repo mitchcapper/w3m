@@ -351,16 +351,16 @@
  	    disp_message_nsec(emsg, FALSE, 1, TRUE, FALSE);
 --- a/history.c
 +++ b/history.c
-@@ -11,9 +11,8 @@ historyBuffer(Hist *hist)
-     HistItem *item;
+@@ -13,9 +13,8 @@ historyBuffer(Hist *hist)
      char *p, *q;
  
+     sprintf(n, "%d", !zeroBasedLinkNo);
 -    /* FIXME: gettextize? */
 -    Strcat_charp(src, "<html>\n<head><title>History Page</title></head>\n");
 -    Strcat_charp(src, "<body>\n<h1>History Page</h1>\n<hr>\n");
 +    Strcat_charp(src, _("<html>\n<head><title>History Page</title></head>\n"));
 +    Strcat_charp(src, _("<body>\n<h1>History Page</h1>\n<hr>\n"));
-     Strcat_charp(src, "<ol>\n");
+     Strcat_m_charp(src, "<ol start=", n, ">\n", NULL);
      if (hist && hist->list) {
  	for (item = hist->list->last; item; item = item->prev) {
 --- a/istream.c

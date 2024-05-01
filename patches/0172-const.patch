@@ -801,7 +801,7 @@ Subject: [PATCH 172/172] const
  Hash_##sym * \
 --- a/history.c
 +++ b/history.c
-@@ -152,7 +152,7 @@ copyHist(Hist *hist)
+@@ -154,7 +154,7 @@ copyHist(Hist *hist)
  }
  
  HistItem *
@@ -810,7 +810,7 @@ Subject: [PATCH 172/172] const
  {
      HistItem *item;
  
-@@ -171,7 +171,7 @@ unshiftHist(Hist *hist, char *ptr)
+@@ -173,7 +173,7 @@ unshiftHist(Hist *hist, char *ptr)
  }
  
  HistItem *
@@ -819,7 +819,7 @@ Subject: [PATCH 172/172] const
  {
      HistItem *item;
  
-@@ -192,7 +192,7 @@ pushHist(Hist *hist, char *ptr)
+@@ -194,7 +194,7 @@ pushHist(Hist *hist, char *ptr)
  /* Don't mix pushHashHist() and pushHist()/unshiftHist(). */
  
  HistItem *
@@ -828,7 +828,7 @@ Subject: [PATCH 172/172] const
  {
      HistItem *item;
  
-@@ -217,7 +217,7 @@ pushHashHist(Hist *hist, char *ptr)
+@@ -219,7 +219,7 @@ pushHashHist(Hist *hist, char *ptr)
  }
  
  HistItem *
