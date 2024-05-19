@@ -13,6 +13,7 @@
 #include <stdlib.h>
 #include <stddef.h>
 #include "rc.h"
+#include "cookie.h"
 
 struct param_ptr {
     char *name;

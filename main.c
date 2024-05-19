@@ -38,6 +38,7 @@ extern int do_getch(void);
 #endif				/* defined(USE_GPM) || defined(USE_SYSMOUSE) */
 #endif
 
+#include "cookie.h"
 #include "util.h"
 
 #ifdef __MINGW32_VERSION

@@ -657,7 +657,6 @@ extern int add_cookie(ParsedURL *pu, Str name, Str value, time_t expires,
 		      Str domain, Str path, int flag, Str comment, int version,
 		      Str port, Str commentURL);
 extern void save_cookies(void);
-extern void load_cookies(void);
 extern void initCookie(void);
 extern void cooLst(void);
 extern Buffer *cookie_list_panel(void);

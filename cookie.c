@@ -9,6 +9,7 @@
  */
 
 #include "fm.h"
+#include "cookie.h"
 #include "html.h"
 
 #ifdef USE_COOKIE
@@ -474,7 +475,7 @@ readcol(char **p)
     return tmp;
 }
 
-void
+static void
 load_cookies(void)
 {
     struct cookie *cookie, *p;

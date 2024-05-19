@@ -20,6 +20,7 @@
 #include <io.h>			/* ?? */
 #endif				/* __EMX__ */
 
+#include "cookie.h"
 #include "html.h"
 #include "Str.h"
 #include "myctype.h"
