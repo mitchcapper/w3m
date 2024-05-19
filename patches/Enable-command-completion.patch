@@ -110,7 +110,7 @@ for commands only.
      int status;
 --- a/main.c
 +++ b/main.c
-@@ -48,6 +48,7 @@ WSADATA WSAData;
+@@ -49,6 +49,7 @@ WSADATA WSAData;
  
  #define DSTR_LEN	256
  
@@ -118,7 +118,7 @@ for commands only.
  Hist *LoadHist;
  Hist *SaveHist;
  Hist *URLHist;
-@@ -535,6 +536,7 @@ main(int argc, char **argv)
+@@ -536,6 +537,7 @@ main(int argc, char **argv)
      /* initializations */
      init_rc();
  
@@ -126,7 +126,7 @@ for commands only.
      LoadHist = newHist();
      SaveHist = newHist();
      ShellHist = newHist();
-@@ -6202,7 +6204,7 @@ DEFUN(execCmd, COMMAND, "Invoke w3m func
+@@ -6203,7 +6205,7 @@ DEFUN(execCmd, COMMAND, "Invoke w3m func
  
      data = searchKeyData();
      if (data == NULL || *data == '\0') {

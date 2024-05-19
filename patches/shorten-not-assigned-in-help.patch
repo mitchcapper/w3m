@@ -4,7 +4,7 @@
 
 --- a/scripts/w3mhelp.cgi.in
 +++ b/scripts/w3mhelp.cgi.in
-@@ -269,7 +269,7 @@ PAGE
+@@ -268,7 +268,7 @@ PAGE
      foreach $fid (@list) {
  	local ($name, $desc, $keys) = split("\n", $funckeydesc{$fid}, 3);
  	$keys =~ s/,$//;

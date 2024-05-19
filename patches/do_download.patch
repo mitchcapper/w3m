@@ -22,7 +22,7 @@ Next step: use 'flags' parameter for all options, include do_download.
 
 --- a/file.c
 +++ b/file.c
-@@ -21,6 +21,8 @@
+@@ -20,6 +20,8 @@
  #include "local.h"
  #include "regex.h"
  
@@ -31,7 +31,7 @@ Next step: use 'flags' parameter for all options, include do_download.
  #ifndef max
  #define max(a,b)        ((a) > (b) ? (a) : (b))
  #endif				/* not max */
-@@ -393,31 +395,32 @@ examineFile(char *path, URLFile *uf)
+@@ -392,31 +394,32 @@ examineFile(char *path, URLFile *uf)
  	return;
      }
      uf->stream = openIS(path);
@@ -86,7 +86,7 @@ Next step: use 'flags' parameter for all options, include do_download.
  }
  
  #define S_IXANY	(S_IXUSR|S_IXGRP|S_IXOTH)
-@@ -1681,7 +1684,7 @@ getLinkNumberStr(int correction)
+@@ -1680,7 +1683,7 @@ getLinkNumberStr(int correction)
   */
  Buffer *
  loadGeneralFile(char *path, ParsedURL *volatile current, char *referer,
@@ -95,7 +95,7 @@ Next step: use 'flags' parameter for all options, include do_download.
  {
      URLFile f, *volatile of = NULL;
      ParsedURL pu;
-@@ -1702,9 +1705,6 @@ loadGeneralFile(char *path, ParsedURL *v
+@@ -1701,9 +1704,6 @@ loadGeneralFile(char *path, ParsedURL *v
      URLOption url_option;
      Str tmp;
      Str volatile page = NULL;
@@ -105,7 +105,7 @@ Next step: use 'flags' parameter for all options, include do_download.
  #ifdef USE_M17N
      wc_ces charset = WC_CES_US_ASCII;
  #endif
-@@ -1715,6 +1715,8 @@ loadGeneralFile(char *path, ParsedURL *v
+@@ -1714,6 +1714,8 @@ loadGeneralFile(char *path, ParsedURL *v
      prevtrap = NULL;
      add_auth_cookie_flag = 0;
  
@@ -114,7 +114,7 @@ Next step: use 'flags' parameter for all options, include do_download.
      checkRedirection(NULL);
  
    load_doc:
-@@ -1753,7 +1755,7 @@ loadGeneralFile(char *path, ParsedURL *v
+@@ -1752,7 +1754,7 @@ loadGeneralFile(char *path, ParsedURL *v
  			Str cmd = Sprintf("%s?dir=%s#current",
  					  DirBufferCommand, pu.file);
  			b = loadGeneralFile(cmd->ptr, NULL, NO_REFERER, 0,
@@ -123,7 +123,7 @@ Next step: use 'flags' parameter for all options, include do_download.
  			if (b != NULL && b != NO_BUFFER) {
  			    copyParsedURL(&b->currentURL, &pu);
  			    b->filename = b->currentURL.real_file;
-@@ -1784,7 +1786,8 @@ loadGeneralFile(char *path, ParsedURL *v
+@@ -1783,7 +1785,8 @@ loadGeneralFile(char *path, ParsedURL *v
  #ifdef USE_EXTERNAL_URI_LOADER
  	    tmp = searchURIMethods(&pu);
  	    if (tmp != NULL) {
@@ -133,7 +133,7 @@ Next step: use 'flags' parameter for all options, include do_download.
  		if (b != NULL && b != NO_BUFFER)
  		    copyParsedURL(&b->currentURL, &pu);
  		return b;
-@@ -1982,7 +1985,7 @@ loadGeneralFile(char *path, ParsedURL *v
+@@ -1981,7 +1984,7 @@ loadGeneralFile(char *path, ParsedURL *v
  	    break;
  	case '5':
  	case '9':
@@ -142,7 +142,7 @@ Next step: use 'flags' parameter for all options, include do_download.
  	    break;
  	}
      }
-@@ -2243,11 +2246,7 @@ fail:
+@@ -2242,11 +2245,7 @@ fail:
  	    Strfputs(s, src);
  	    fclose(src);
  	}
@@ -155,7 +155,7 @@ Next step: use 'flags' parameter for all options, include do_download.
  	    char *file;
  	    if (!src)
  		return NULL;
-@@ -2283,11 +2282,7 @@ fail:
+@@ -2282,11 +2281,7 @@ fail:
      current_content_length = 0;
      if ((p = checkHeader(t_buf, "Content-Length:")) != NULL)
  	current_content_length = strtoclen(p);
@@ -168,7 +168,7 @@ Next step: use 'flags' parameter for all options, include do_download.
  	/* download only */
  	char *file;
  	TRAP_OFF;
-@@ -2355,11 +2350,7 @@ fail:
+@@ -2354,11 +2349,7 @@ fail:
  #endif
      else if (w3m_backend) ;
      else if (!(w3m_dump & ~DUMP_FRAME) || is_dump_text_type(t)) {

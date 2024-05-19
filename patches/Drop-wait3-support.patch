@@ -43,7 +43,7 @@ Subject: Drop wait3 support
  #include <signal.h>
 --- a/file.c
 +++ b/file.c
-@@ -6,7 +6,7 @@
+@@ -5,7 +5,7 @@
  #include "myctype.h"
  #include <signal.h>
  #include <setjmp.h>

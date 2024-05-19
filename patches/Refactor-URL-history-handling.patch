@@ -17,7 +17,7 @@ This is in preparation for the next patch.
 --- a/history.c
 +++ b/history.c
 @@ -1,20 +1,9 @@
- /* $Id: history.c,v 1.11 2003/09/26 17:59:51 ukai Exp $ */
+ /* vi: set sw=4 ts=8 ai sm noet : */
  #include "fm.h"
  
 -#ifdef USE_HISTORY

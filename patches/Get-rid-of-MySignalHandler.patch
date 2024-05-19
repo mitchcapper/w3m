@@ -19,7 +19,7 @@ Subject: Get rid of MySignalHandler
 
 --- a/file.c
 +++ b/file.c
-@@ -191,11 +191,10 @@ static struct compression_decoder {
+@@ -190,11 +190,10 @@ static struct compression_decoder {
  
  #define SAVE_BUF_SIZE 1536
  
@@ -32,7 +32,7 @@ Subject: Get rid of MySignalHandler
  }
  
  static void
-@@ -1693,7 +1692,7 @@ loadGeneralFile(char *path, ParsedURL *v
+@@ -1692,7 +1691,7 @@ loadGeneralFile(char *path, ParsedURL *v
      Buffer *volatile t_buf = NULL;
      int volatile searchHeader = SearchHeader;
      int volatile searchHeader_through = TRUE;
@@ -41,7 +41,7 @@ Subject: Get rid of MySignalHandler
      TextList *extra_header = newTextList();
      volatile Str uname = NULL;
      volatile Str pwd = NULL;
-@@ -7272,7 +7271,7 @@ loadHTMLstream(URLFile *f, Buffer *newBu
+@@ -7271,7 +7270,7 @@ loadHTMLstream(URLFile *f, Buffer *newBu
  #ifdef USE_IMAGE
      int volatile image_flag;
  #endif
@@ -50,7 +50,7 @@ Subject: Get rid of MySignalHandler
  
  #ifdef USE_M17N
      if (fmInitialized && graph_ok()) {
-@@ -7437,7 +7436,7 @@ Buffer *
+@@ -7436,7 +7435,7 @@ Buffer *
  loadHTMLString(Str page)
  {
      URLFile f;
@@ -59,7 +59,7 @@ Subject: Get rid of MySignalHandler
      Buffer *newBuf;
  
      init_stream(&f, SCM_LOCAL, newStrStream(page));
-@@ -7488,7 +7487,7 @@ loadGopherDir0(URLFile *uf, ParsedURL *p
+@@ -7487,7 +7486,7 @@ loadGopherDir0(URLFile *uf, ParsedURL *p
      Str lbuf, name, file, host, port, type;
      char *volatile p, *volatile q;
      int link, pre;
@@ -68,7 +68,7 @@ Subject: Get rid of MySignalHandler
  #ifdef USE_M17N
      wc_ces doc_charset = DocumentCharset;
  #endif
-@@ -7643,7 +7642,7 @@ loadGeminiBuffer(URLFile *uf, Buffer *vo
+@@ -7642,7 +7641,7 @@ loadGeminiBuffer(URLFile *uf, Buffer *vo
      int hseq, len, nlines, pre = 0;
      clen_t linelen = 0, trbyte = 0;
      Lineprop *propBuf = NULL;
@@ -77,7 +77,7 @@ Subject: Get rid of MySignalHandler
  
      if (SETJMP(AbortLoading) != 0) {
  	goto _end;
-@@ -7776,7 +7775,7 @@ loadBuffer(URLFile *uf, Buffer *volatile
+@@ -7775,7 +7774,7 @@ loadBuffer(URLFile *uf, Buffer *volatile
  #ifdef USE_ANSI_COLOR
      Linecolor *colorBuffer = NULL;
  #endif
@@ -86,7 +86,7 @@ Subject: Get rid of MySignalHandler
  
      if (newBuf == NULL)
  	newBuf = newBuffer(INIT_BUFFER_WIDTH);
-@@ -7865,7 +7864,7 @@ loadImageBuffer(URLFile *uf, Buffer *new
+@@ -7864,7 +7863,7 @@ loadImageBuffer(URLFile *uf, Buffer *new
      Str tmp, tmpf;
      FILE *src = NULL;
      URLFile f;
@@ -95,7 +95,7 @@ Subject: Get rid of MySignalHandler
      struct stat st;
      ParsedURL *pu = newBuf ? &newBuf->currentURL : NULL;
  
-@@ -8193,7 +8192,7 @@ getNextPage(Buffer *buf, int plen)
+@@ -8192,7 +8191,7 @@ getNextPage(Buffer *buf, int plen)
  #ifdef USE_ANSI_COLOR
      Linecolor *colorBuffer = NULL;
  #endif
@@ -104,7 +104,7 @@ Subject: Get rid of MySignalHandler
  
      if (buf->pagerSource == NULL)
  	return NULL;
-@@ -8302,7 +8301,7 @@ save2tmp(URLFile uf, const char *tmpf)
+@@ -8301,7 +8300,7 @@ save2tmp(URLFile uf, const char *tmpf)
  {
      FILE *ff;
      clen_t linelen = 0, trbyte = 0;

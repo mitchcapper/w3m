@@ -1,0 +1,243 @@
+From: Rene Kita <mail@rkta.de>
+Date: Sun May 19 10:48:44 CEST 2024
+Subject: Move declarations to appropriate header
+Patch: patches/Move-declarations-to-appropriate-header.patch
+
+Move declarations, delete unused auth_cookie.
+---
+ cookie.c |    3 +-
+ cookie.h |   66 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ file.c   |    1 
+ fm.h     |   65 --------------------------------------------------------------
+ main.c   |    1 
+ proto.h  |    1 
+ rc.c     |    1 
+ url.c    |    1 
+ 8 files changed, 72 insertions(+), 67 deletions(-)
+
+--- /dev/null
++++ b/cookie.h
+@@ -0,0 +1,66 @@
++#ifndef W3M_COOKIE_H_
++#define W3M_COOKIE_H_
++
++#ifdef USE_COOKIE
++
++#define COO_USE		1
++#define COO_SECURE	2
++#define COO_DOMAIN	4
++#define COO_PATH	8
++#define COO_DISCARD	16
++#define COO_OVERRIDE	32	/* user chose to override security checks */
++#define COO_OVERRIDE_OK	32	/* flag to specify that an error is overridable */
++				/* version 0 refers to the original cookie_spec.html */
++				/* version 1 refers to RFC 2109 */
++				/* version 1' refers to the Internet draft to obsolete RFC 2109 */
++#define COO_EINTERNAL	(1)	/* unknown error; probably forgot to convert "return 1" in cookie.c */
++#define COO_ETAIL	(2 | COO_OVERRIDE_OK)	/* tail match failed (version 0) */
++#define COO_ESPECIAL	(3)	/* special domain check failed (version 0) */
++#define COO_EPATH	(4)	/* Path attribute mismatch (version 1 case 1) */
++#define COO_ENODOT	(5 | COO_OVERRIDE_OK)	/* no embedded dots in Domain (version 1 case 2.1) */
++#define COO_ENOTV1DOM	(6 | COO_OVERRIDE_OK)	/* Domain does not start with a dot (version 1 case 2.2) */
++#define COO_EDOM	(7 | COO_OVERRIDE_OK)	/* domain-match failed (version 1 case 3) */
++#define COO_EBADHOST	(8 | COO_OVERRIDE_OK)	/* dot in matched host name in FQDN (version 1 case 4) */
++#define COO_EPORT	(9)	/* Port match failed (version 1' case 5) */
++#define COO_EMAX	COO_EPORT
++
++#define ACCEPT_BAD_COOKIE_DISCARD	0
++#define ACCEPT_BAD_COOKIE_ACCEPT	1
++#define ACCEPT_BAD_COOKIE_ASK		2
++
++struct portlist {
++    unsigned short port;
++    struct portlist *next;
++};
++
++struct cookie {
++    ParsedURL url;
++    Str name;
++    Str value;
++    time_t expires;
++    Str path;
++    Str domain;
++    Str comment;
++    Str commentURL;
++    struct portlist *portl;
++    char version;
++    char flag;
++    struct cookie *next;
++};
++global struct cookie *First_cookie init(NULL);
++
++global int default_use_cookie init(TRUE);
++global int use_cookie init(TRUE);
++global int show_cookie init(FALSE);
++global int accept_cookie init(TRUE);
++global int accept_bad_cookie init(ACCEPT_BAD_COOKIE_DISCARD);
++global char *cookie_reject_domains init(NULL);
++global char *cookie_accept_domains init(NULL);
++global char *cookie_avoid_wrong_number_of_dots init(NULL);
++global TextList *Cookie_reject_domains;
++global TextList *Cookie_accept_domains;
++global TextList *Cookie_avoid_wrong_number_of_dots_domains;
++
++#endif				/* USE_COOKIE */
++
++#endif
+--- a/fm.h
++++ b/fm.h
+@@ -722,49 +722,6 @@ struct html_feed_environ {
+     int blank_lines;
+ };
+ 
+-#ifdef USE_COOKIE
+-struct portlist {
+-    unsigned short port;
+-    struct portlist *next;
+-};
+-
+-struct cookie {
+-    ParsedURL url;
+-    Str name;
+-    Str value;
+-    time_t expires;
+-    Str path;
+-    Str domain;
+-    Str comment;
+-    Str commentURL;
+-    struct portlist *portl;
+-    char version;
+-    char flag;
+-    struct cookie *next;
+-};
+-#define COO_USE		1
+-#define COO_SECURE	2
+-#define COO_DOMAIN	4
+-#define COO_PATH	8
+-#define COO_DISCARD	16
+-#define COO_OVERRIDE	32	/* user chose to override security checks */
+-
+-#define COO_OVERRIDE_OK	32	/* flag to specify that an error is overridable */
+-						/* version 0 refers to the original cookie_spec.html */
+-						/* version 1 refers to RFC 2109 */
+-						/* version 1' refers to the Internet draft to obsolete RFC 2109 */
+-#define COO_EINTERNAL	(1)	/* unknown error; probably forgot to convert "return 1" in cookie.c */
+-#define COO_ETAIL	(2 | COO_OVERRIDE_OK)	/* tail match failed (version 0) */
+-#define COO_ESPECIAL	(3)	/* special domain check failed (version 0) */
+-#define COO_EPATH	(4)	/* Path attribute mismatch (version 1 case 1) */
+-#define COO_ENODOT	(5 | COO_OVERRIDE_OK)	/* no embedded dots in Domain (version 1 case 2.1) */
+-#define COO_ENOTV1DOM	(6 | COO_OVERRIDE_OK)	/* Domain does not start with a dot (version 1 case 2.2) */
+-#define COO_EDOM	(7 | COO_OVERRIDE_OK)	/* domain-match failed (version 1 case 3) */
+-#define COO_EBADHOST	(8 | COO_OVERRIDE_OK)	/* dot in matched host name in FQDN (version 1 case 4) */
+-#define COO_EPORT	(9)	/* Port match failed (version 1' case 5) */
+-#define COO_EMAX	COO_EPORT
+-#endif				/* USE_COOKIE */
+-
+ /* modes for align() */
+ 
+ #define ALIGN_CENTER 0
+@@ -1058,11 +1015,6 @@ global int migemo_active init(0);
+ global char *migemo_command init(DEF_MIGEMO_COMMAND);
+ #endif				/* USE_MIGEMO */
+ 
+-global struct auth_cookie *Auth_cookie init(NULL);
+-#ifdef USE_COOKIE
+-global struct cookie *First_cookie init(NULL);
+-#endif				/* USE_COOKIE */
+-
+ global char *mailcap_files init(USER_MAILCAP ", " SYS_MAILCAP);
+ global char *mimetypes_files init(USER_MIMETYPES ", " SYS_MIMETYPES);
+ #ifdef USE_EXTERNAL_URI_LOADER
+@@ -1164,23 +1116,6 @@ global MouseAction mouse_action;
+ #define LIMIT_MOUSE_MENU 100
+ #endif				/* USE_MOUSE */
+ 
+-#ifdef USE_COOKIE
+-global int default_use_cookie init(TRUE);
+-global int use_cookie init(TRUE);
+-global int show_cookie init(FALSE);
+-global int accept_cookie init(TRUE);
+-#define ACCEPT_BAD_COOKIE_DISCARD	0
+-#define ACCEPT_BAD_COOKIE_ACCEPT	1
+-#define ACCEPT_BAD_COOKIE_ASK		2
+-global int accept_bad_cookie init(ACCEPT_BAD_COOKIE_DISCARD);
+-global char *cookie_reject_domains init(NULL);
+-global char *cookie_accept_domains init(NULL);
+-global char *cookie_avoid_wrong_number_of_dots init(NULL);
+-global TextList *Cookie_reject_domains;
+-global TextList *Cookie_accept_domains;
+-global TextList *Cookie_avoid_wrong_number_of_dots_domains;
+-#endif				/* USE_COOKIE */
+-
+ #ifdef USE_IMAGE
+ global int view_unseenobject init(FALSE);
+ #else
+--- a/cookie.c
++++ b/cookie.c
+@@ -9,6 +9,7 @@
+  */
+ 
+ #include "fm.h"
++#include "cookie.h"
+ #include "html.h"
+ 
+ #ifdef USE_COOKIE
+@@ -474,7 +475,7 @@ readcol(char **p)
+     return tmp;
+ }
+ 
+-void
++static void
+ load_cookies(void)
+ {
+     struct cookie *cookie, *p;
+--- a/file.c
++++ b/file.c
+@@ -15,6 +15,7 @@
+ #include <utime.h>
+ /* foo */
+ 
++#include "cookie.h"
+ #include "html.h"
+ #include "parsetagx.h"
+ #include "local.h"
+--- a/main.c
++++ b/main.c
+@@ -38,6 +38,7 @@ extern int do_getch(void);
+ #endif				/* defined(USE_GPM) || defined(USE_SYSMOUSE) */
+ #endif
+ 
++#include "cookie.h"
+ #include "util.h"
+ 
+ #ifdef __MINGW32_VERSION
+--- a/rc.c
++++ b/rc.c
+@@ -13,6 +13,7 @@
+ #include <stdlib.h>
+ #include <stddef.h>
+ #include "rc.h"
++#include "cookie.h"
+ 
+ struct param_ptr {
+     char *name;
+--- a/url.c
++++ b/url.c
+@@ -20,6 +20,7 @@
+ #include <io.h>			/* ?? */
+ #endif				/* __EMX__ */
+ 
++#include "cookie.h"
+ #include "html.h"
+ #include "Str.h"
+ #include "myctype.h"
+--- a/proto.h
++++ b/proto.h
+@@ -653,7 +653,6 @@ extern int add_cookie(ParsedURL *pu, Str
+ 		      Str domain, Str path, int flag, Str comment, int version,
+ 		      Str port, Str commentURL);
+ extern void save_cookies(void);
+-extern void load_cookies(void);
+ extern void initCookie(void);
+ extern void cooLst(void);
+ extern Buffer *cookie_list_panel(void);

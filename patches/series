@@ -71,6 +71,9 @@ Enable-folding-in-pre-tags.patch
 gemini.patch
 Zero-based-link-no.patch
 Use-https-with-USE_SSL-and-retry_http.patch
+# META
+Remove-VCS-Id-lines.patch
+Add-vi-modelines.patch
 # WARNINGS
 Enable-more-optimization.patch
 Enable-Wcast-qual.patch
@@ -149,10 +152,16 @@ gophertmp.patch
 Reset-optimization.patch
 Remove-unused-variable-2.patch
 Remove-redundant-cast.patch
+Truncate-cookie-file-if-no-cookies-left.patch
+Move-declarations-to-appropriate-header.patch
+Refactor-load-cookies.patch
+Refactor-get_cookie_info.patch
+Merge-cookies-if-modified-after-start.patch
+Add-option-to-provide-cookie-jar.patch
+Add-option-to-use-same-cookie-file-format-as-curl.patch
 Enable-lto.patch
 # BORKED
 Enable-command-completion.patch
-Fix-redirection-check.patch
 Add-option-to-auto-accept-self-signed.patch
 0036-Move-chkurl-to-own-translation-unit.patch
 0037-Make-MARK_URL-work-with-display_link_numbers.patch

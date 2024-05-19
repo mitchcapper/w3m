@@ -1,0 +1,142 @@
+From: Rene Kita <mail@rkta.de>
+Date: Sun May 19 10:39:43 CEST 2024
+Subject: Merge cookies if modified after start
+Patch: patches/Merge-cookies-if-modified-after-start.patch
+
+---
+ cookie.c |   89 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 87 insertions(+), 2 deletions(-)
+
+--- a/cookie.c
++++ b/cookie.c
+@@ -20,8 +20,11 @@
+ 
+ #include <errno.h>
+ 
++static long long cf_mtime;
+ static int is_saved = 1;
+ 
++static int load_cookies(struct cookie **cookie);
++
+ #define contain_no_dots(p, ep) (total_dot_number((p),(ep),1)==0)
+ 
+ static unsigned int
+@@ -426,8 +429,80 @@ nth_cookie(int n)
+     return NULL;
+ }
+ 
+-#define str2charp(str) ((str)? (str)->ptr : "")
++static int
++sync_cookies(void)
++{
++    struct cookie *nc, *ncs, *np, *oc, *op;
++    struct stat st;
++
++    if (!First_cookie)
++	return 0;
++
++    if (stat(rcFile(COOKIE_FILE), &st)) {
++	is_saved = 0;
++	if (errno == ENOENT)
++	    return 0;
++	else
++	    goto err;
++    }
++
++    if (cf_mtime == (long long)st.st_mtime)
++	return 0;
++
++    load_cookies(&ncs);
++    if (!ncs) return 0;
++    is_saved = 0;
++
++    oc = First_cookie;
++    if (!(nc = get_cookie_info(ncs, oc->domain, oc->path, oc->name)))
++	goto next;
++    /* Unlink nc */
++    for (np = ncs; np->next; np = np->next)
++	if (np->next == nc)
++	    break;
++    if (np == ncs)
++	ncs = ncs->next;
++    else
++	np->next = nc->next;
++
++    if (!(nc->expires > oc->expires))
++	goto next;
++    /* Replace old cookie with new cookie */
++    op = First_cookie;
++    First_cookie = nc;
++    First_cookie->next = op->next;
++
++next:
++    op = First_cookie;
++    for (oc = op->next; oc; op = oc, oc = oc->next) {
++	if (!(nc = get_cookie_info(ncs, oc->domain, oc->path, oc->name)))
++	    continue;
++	/* Unlink nc */
++	for (np = ncs; np; np = np->next)
++	    if (np->next == nc)
++		break;
++	if (np == ncs)
++	    ncs = ncs->next;
++	else
++	    np->next = nc->next;
++
++	if (!(nc->expires > oc->expires))
++	    continue;
++	op->next = nc;
++	nc->next = oc->next;
++    }
++
++    for (oc = First_cookie; oc->next; oc = oc->next) ;
++    oc->next = ncs;
++
++    return 0;
++
++err:
++    disp_err_message("Can't sync cookies", FALSE);
++    return 1;
++}
+ 
++#define str2charp(str) ((str)? (str)->ptr : "")
+ void
+ save_cookies(void)
+ {
+@@ -439,6 +514,8 @@ save_cookies(void)
+ 	return;
+ 
+     check_expired_cookies();
++    sync_cookies();
++
+     if (is_saved)
+ 	return;
+ 
+@@ -465,6 +542,7 @@ save_cookies(void)
+     fclose(fp);
+     chmod(cookie_file, S_IRUSR | S_IWUSR);
+ }
++#undef str2charp
+ 
+ static Str
+ readcol(char **p)
+@@ -484,11 +562,18 @@ load_cookies(struct cookie **cookie)
+     Str line;
+     char *str;
+     struct cookie *ck, *p;
++    struct stat st;
+ 
++    *cookie = p = NULL;
+     if (!(fp = fopen(rcFile(COOKIE_FILE), "r")))
+ 	return errno;
+ 
+-    *cookie = p = NULL;
++    if (fstat(fileno(fp), &st) == -1) {
++	fclose(fp);
++	return 1;
++    }
++    cf_mtime = (long long)st.st_mtime;
++
+     for (;;) {
+ 	line = Strfgets(fp);
+ 

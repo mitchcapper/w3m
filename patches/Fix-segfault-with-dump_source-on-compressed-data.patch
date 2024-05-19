@@ -20,7 +20,7 @@ could not be loaded.
 
 --- a/file.c
 +++ b/file.c
-@@ -2307,6 +2307,13 @@ fail:
+@@ -2306,6 +2306,13 @@ fail:
  	&& !(w3m_dump & DUMP_EXTRA)) {
  	uncompress_stream(&f, &pu.real_file);
      }
@@ -34,7 +34,7 @@ could not be loaded.
      else if (f.compression != CMP_NOCOMPRESS) {
  	if (!(w3m_dump & DUMP_SOURCE) &&
  	    (w3m_dump & ~DUMP_FRAME || is_text_type(t)
-@@ -2374,6 +2381,8 @@ fail:
+@@ -2373,6 +2380,8 @@ fail:
      }
      else if (w3m_dump & DUMP_FRAME)
  	return NULL;

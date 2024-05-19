@@ -9,7 +9,7 @@ Subject: [PATCH 140/172] Remove redundant NULL check
 
 --- a/file.c
 +++ b/file.c
-@@ -7914,8 +7914,7 @@ loadImageBuffer(URLFile *uf, Buffer *new
+@@ -7913,8 +7913,7 @@ loadImageBuffer(URLFile *uf, Buffer *new
      init_stream(&f, SCM_LOCAL, newStrStream(tmp));
      loadHTMLstream(&f, newBuf, src, TRUE);
      UFclose(&f);

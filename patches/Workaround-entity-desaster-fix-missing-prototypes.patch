@@ -54,7 +54,7 @@ speaks for themself.
  extern char *allocStr(const char *s, int len);
 --- a/file.c
 +++ b/file.c
-@@ -32,6 +32,8 @@
+@@ -31,6 +31,8 @@
  
  Buffer * loadGeminiBuffer(URLFile *uf, Buffer *volatile newBuf);
  

@@ -1,68 +1,80 @@
 ---
- Makefile.in            |    1 +
- libwc/Makefile.in      |    1 +
- w3mimg/Makefile.in     |    1 +
- w3mimg/fb/Makefile.in  |    1 +
- w3mimg/win/Makefile.in |    1 +
- w3mimg/x11/Makefile.in |    1 +
- 6 files changed, 6 insertions(+)
+ Makefile.in            |    3 ++-
+ libwc/Makefile.in      |    3 ++-
+ w3mimg/Makefile.in     |    3 ++-
+ w3mimg/fb/Makefile.in  |    3 ++-
+ w3mimg/win/Makefile.in |    3 ++-
+ w3mimg/x11/Makefile.in |    3 ++-
+ 6 files changed, 12 insertions(+), 6 deletions(-)
 
 --- a/Makefile.in
 +++ b/Makefile.in
-@@ -56,6 +56,7 @@ WARNINGS += -Wuninitialized
+@@ -55,7 +55,8 @@ WARNINGS += -Wtype-limits
+ WARNINGS += -Wuninitialized
  WARNINGS += -Wunused
  WARNINGS += -D_FORTIFY_SOURCE=2
- WARNINGS += -O3 -g3
+-WARNINGS += -O1 -g3
++WARNINGS += -O3 -g3
 +WARNINGS += -flto
  WARNINGS += -Wno-missing-field-initializers
  WARNINGS += -Wno-unused-result
  
 --- a/libwc/Makefile.in
 +++ b/libwc/Makefile.in
-@@ -9,6 +9,7 @@ CC=@CC@
+@@ -8,7 +8,8 @@ LIBRARY = libwc.a
+ CC=@CC@
  DEFAULTS= -Wall
  DEFAULTS += -D_FORTIFY_SOURCE=2
- DEFAULTS += -O3 -g3
+-DEFAULTS += -O1 -g3
++DEFAULTS += -O3 -g3
 +DEFAULTS += -flto
  DEFAULTS += -Wcast-qual
  DEFAULTS += -Werror=vla
  DEFAULTS += -Wduplicated-branches
 --- a/w3mimg/Makefile.in
 +++ b/w3mimg/Makefile.in
-@@ -9,6 +9,7 @@ VPATH = $(srcdir):.
+@@ -8,7 +8,8 @@ top_srcdir = @top_srcdir@
+ VPATH = $(srcdir):.
  DEFAULTS= -Wall
  DEFAULTS += -D_FORTIFY_SOURCE=2
- DEFAULTS += -O3 -g3
+-DEFAULTS += -O1 -g3
++DEFAULTS += -O3 -g3
 +DEFAULTS += -flto
  DEFAULTS += -Wcast-qual
  DEFAULTS += -Werror=vla
  DEFAULTS += -Wduplicated-branches
 --- a/w3mimg/fb/Makefile.in
 +++ b/w3mimg/fb/Makefile.in
-@@ -10,6 +10,7 @@ VPATH = $(srcdir):.
+@@ -9,7 +9,8 @@ top_srcdir = @top_srcdir@
+ VPATH = $(srcdir):.
  DEFAULTS= -Wall
  DEFAULTS += -D_FORTIFY_SOURCE=2
- DEFAULTS += -O3 -g3
+-DEFAULTS += -O1 -g3
++DEFAULTS += -O3 -g3
 +DEFAULTS += -flto
  DEFAULTS += -Wcast-qual
  DEFAULTS += -Werror=vla
  DEFAULTS += -Wduplicated-branches
 --- a/w3mimg/win/Makefile.in
 +++ b/w3mimg/win/Makefile.in
-@@ -10,6 +10,7 @@ VPATH = $(srcdir):.
+@@ -9,7 +9,8 @@ top_srcdir = @top_srcdir@
+ VPATH = $(srcdir):.
  DEFAULTS= -Wall
  DEFAULTS += -D_FORTIFY_SOURCE=2
- DEFAULTS += -O3 -g3
+-DEFAULTS += -O1 -g3
++DEFAULTS += -O3 -g3
 +DEFAULTS += -flto
  DEFAULTS += -Wcast-qual
  DEFAULTS += -Werror=vla
  DEFAULTS += -Wduplicated-branches
 --- a/w3mimg/x11/Makefile.in
 +++ b/w3mimg/x11/Makefile.in
-@@ -10,6 +10,7 @@ VPATH = $(srcdir):.
+@@ -9,7 +9,8 @@ top_srcdir = @top_srcdir@
+ VPATH = $(srcdir):.
  DEFAULTS= -Wall
  DEFAULTS += -D_FORTIFY_SOURCE=2
- DEFAULTS += -O3 -g3
+-DEFAULTS += -O1 -g3
++DEFAULTS += -O3 -g3
 +DEFAULTS += -flto
  DEFAULTS += -Wcast-qual
  DEFAULTS += -Werror=vla

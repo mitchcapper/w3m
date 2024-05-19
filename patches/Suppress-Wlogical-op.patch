@@ -4,7 +4,7 @@
 
 --- a/libwc/ucs.c
 +++ b/libwc/ucs.c
-@@ -39,6 +39,9 @@ wc_get_ucs_table(wc_ccs ccs)
+@@ -40,6 +40,9 @@ wc_get_ucs_table(wc_ccs ccs)
  {
      int f = WC_CCS_INDEX(ccs);
  
@@ -14,7 +14,7 @@
      switch (WC_CCS_TYPE(ccs)) {
      case WC_CCS_A_CS94:
  	if (f < WC_F_ISO_BASE || f > WC_F_CS94_END)
-@@ -71,6 +74,7 @@ wc_get_ucs_table(wc_ccs ccs)
+@@ -72,6 +75,7 @@ wc_get_ucs_table(wc_ccs ccs)
      default:
  	return NULL;
      }
@@ -22,7 +22,7 @@
  }
  
  wc_wchar_t
-@@ -150,6 +154,9 @@ wc_any_to_ucs(wc_wchar_t cc)
+@@ -151,6 +155,9 @@ wc_any_to_ucs(wc_wchar_t cc)
  	map = cs96_ucs_map[f - WC_F_ISO_BASE];
  	cc.code &= 0x7f;
  	break;
@@ -32,7 +32,7 @@
      case WC_CCS_A_CS96W:
  	if (f < WC_F_ISO_BASE || f > WC_F_CS96W_END)
  	    return WC_C_UCS4_ERROR;
-@@ -163,6 +170,7 @@ wc_any_to_ucs(wc_wchar_t cc)
+@@ -164,6 +171,7 @@ wc_any_to_ucs(wc_wchar_t cc)
  	map = cs942_ucs_map[f - WC_F_ISO_BASE];
  	cc.code &= 0x7f;
  	break;
