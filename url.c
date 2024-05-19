@@ -1,3 +1,4 @@
+/* vi: set sw=4 ts=8 ai sm noet : */
 #include "fm.h"
 #ifndef __MINGW32_VERSION
 #include <unistd.h>

@@ -1,3 +1,4 @@
+/* vi: set sw=4 ts=8 ai sm noet : */
 #define REGEX_MAX	64
 #define STORAGE_MAX	256
 

@@ -1,3 +1,4 @@
+/* vi: set sw=4 ts=8 ai sm noet : */
 #if (defined(MESCHACH) && !defined(MATRIX))
 #define MATRIX
 #endif				/* (defined(MESCHACH) && !defined(MATRIX)) */

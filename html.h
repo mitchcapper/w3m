@@ -1,3 +1,4 @@
+/* vi: set sw=4 ts=8 ai sm noet : */
 #ifndef _HTML_H
 #define _HTML_H
 #include "config.h"

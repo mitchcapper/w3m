@@ -1,3 +1,4 @@
+/* vi: set sw=4 ts=8 ai sm noet : */
 /* 
  * An original curses library for EUC-kanji by Akinori ITO,     December 1989
  * revised by Akinori ITO, January 1995

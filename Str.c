@@ -1,3 +1,4 @@
+/* vi: set sw=4 ts=8 ai sm noet : */
 /* 
  * String manipulation library for Boehm GC
  *

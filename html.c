@@ -1,3 +1,4 @@
+/* vi: set sw=4 ts=8 ai sm noet : */
 #include "html.h"
 
 #define ARR_SZ(arr) (sizeof(arr) / sizeof(arr[0]))

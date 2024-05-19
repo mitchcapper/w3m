@@ -1,3 +1,4 @@
+/* vi: set sw=4 ts=8 ai sm noet : */
 /* 
  * matrix.h, matrix.c: Liner equation solver using LU decomposition.
  *

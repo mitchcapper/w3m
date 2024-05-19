@@ -1,3 +1,4 @@
+/* vi: set sw=4 ts=8 ai sm noet : */
 
 #ifndef _WC_SJIS_H
 #define _WC_SJIS_H

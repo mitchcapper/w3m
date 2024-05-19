@@ -1,3 +1,4 @@
+/* vi: set sw=4 ts=8 ai sm noet : */
 #ifndef IO_STREAM_H
 #define IO_STREAM_H
 

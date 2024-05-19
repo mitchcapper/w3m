@@ -1,3 +1,4 @@
+/* vi: set sw=4 ts=8 ai sm noet : */
 /*
  * References for version 0 cookie:                                  
  *   [NETACAPE] http://www.netscape.com/newsref/std/cookie_spec.html

@@ -1,3 +1,4 @@
+/* vi: set sw=4 ts=8 ai sm noet : */
 #include <stdio.h>
 #include <stdlib.h>
 #include "myctype.h"

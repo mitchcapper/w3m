@@ -1,3 +1,4 @@
+/* vi: set sw=4 ts=8 ai sm noet : */
 #define MAINPROGRAM
 #include "fm.h"
 #include <stdio.h>

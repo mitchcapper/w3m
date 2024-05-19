@@ -1,3 +1,4 @@
+/* vi: set sw=4 ts=8 ai sm noet : */
 /*
  * Copyright (c) 2000, NBG01720@nifty.ne.jp
  *

@@ -1,3 +1,4 @@
+/* vi: set sw=4 ts=8 ai sm noet : */
 #ifndef fb_header
 #define fb_header
 #if defined(__linux__)

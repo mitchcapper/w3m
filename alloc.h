@@ -1,3 +1,4 @@
+/* vi: set sw=4 ts=8 ai sm noet : */
 /*
  * by Scarlett. public domain.
  * replacements for w3m's allocation macros which add overflow
