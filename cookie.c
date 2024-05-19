@@ -194,11 +194,11 @@ match_cookie(ParsedURL *pu, struct cookie *cookie, char *domainname)
 }
 
 static struct cookie *
-get_cookie_info(Str domain, Str path, Str name)
+get_cookie_info(struct cookie *first_node, Str domain, Str path, Str name)
 {
     struct cookie *p;
 
-    for (p = First_cookie; p; p = p->next) {
+    for (p = first_node; p; p = p->next) {
 	if (Strcasecmp(p->domain, domain) == 0 &&
 	    Strcmp(p->path, path) == 0 && Strcasecmp(p->name, name) == 0)
 	    return p;
@@ -369,7 +369,7 @@ add_cookie(ParsedURL *pu, Str name, Str value,
 	    Strshrink(path, 1);
     }
 
-    p = get_cookie_info(domain, path, name);
+    p = get_cookie_info(First_cookie, domain, path, name);
     if (!p) {
 	p = New(struct cookie);
 	p->flag = 0;
