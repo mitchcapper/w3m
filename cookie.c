@@ -432,12 +432,19 @@ save_cookies(void)
     char *cookie_file;
     FILE *fp;
 
-    check_expired_cookies();
+    if (no_rc_dir)
+	return;
 
-    if (!First_cookie || is_saved || no_rc_dir)
+    check_expired_cookies();
+    if (is_saved)
 	return;
 
     cookie_file = rcFile(COOKIE_FILE);
+    if (!First_cookie) {
+	unlink(cookie_file);
+	return;
+    }
+
     if (!(fp = fopen(cookie_file, "w")))
 	return;
 
