@@ -46,6 +46,7 @@ struct cookie {
     char version;
     char flag;
     struct cookie *next;
+    int used;
 };
 global struct cookie *First_cookie init(NULL);
 
