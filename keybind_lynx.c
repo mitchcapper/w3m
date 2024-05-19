@@ -1,4 +1,3 @@
-/* $Id: keybind_lynx.c,v 1.8 2006/05/29 12:17:25 inu Exp $ */
 /* 
  * Lynx-like key binding.
  *

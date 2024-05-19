@@ -1,4 +1,3 @@
-/* $Id: matrix.h,v 1.7 2002/07/18 14:59:02 ukai Exp $ */
 /* 
  * matrix.h, matrix.c: Liner equation solver using LU decomposition.
  * 

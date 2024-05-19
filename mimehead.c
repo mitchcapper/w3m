@@ -1,4 +1,3 @@
-/* $Id: mimehead.c,v 1.10 2003/10/05 18:52:51 ukai Exp $ */
 /* 
  * MIME header support by Akinori ITO
  */

@@ -1,4 +1,3 @@
-/* $Id: Str.c,v 1.8 2002/12/24 17:20:46 ukai Exp $ */
 /* 
  * String manipulation library for Boehm GC
  *

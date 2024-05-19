@@ -1,4 +1,3 @@
-/* $Id: win_w3mimg.cpp,v 1.2 2010/12/24 09:52:06 htrb Exp $ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

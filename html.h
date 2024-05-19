@@ -1,4 +1,3 @@
-/* $Id: html.h,v 1.31 2010/08/14 01:29:40 htrb Exp $ */
 #ifndef _HTML_H
 #define _HTML_H
 #include "config.h"

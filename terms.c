@@ -1,4 +1,3 @@
-/* $Id: terms.c,v 1.63 2010/08/20 09:34:47 htrb Exp $ */
 /* 
  * An original curses library for EUC-kanji by Akinori ITO,     December 1989
  * revised by Akinori ITO, January 1995

@@ -1,4 +1,3 @@
-/* $Id: x11_w3mimg.c,v 1.29 2004/11/08 17:14:06 ukai Exp $ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

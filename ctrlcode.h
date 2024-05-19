@@ -1,4 +1,3 @@
-/* $Id: ctrlcode.h,v 1.3 2003/09/22 21:02:17 ukai Exp $ */
 /* control characters */
 
 #define CTRL_A          1

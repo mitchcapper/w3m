@@ -1,4 +1,3 @@
-/* $Id: indep.h,v 1.16 2003/09/22 21:02:19 ukai Exp $ */
 #ifndef INDEP_H
 #define INDEP_H
 #include "alloc.h"

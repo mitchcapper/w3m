@@ -1,4 +1,3 @@
-/* $Id: parsetagx.c,v 1.18 2006/06/07 03:52:03 inu Exp $ */
 #include "fm.h"
 #include "myctype.h"
 #include "indep.h"

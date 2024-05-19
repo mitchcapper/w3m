@@ -1,4 +1,3 @@
-/* $Id: w3mimg.h,v 1.9 2010/12/21 10:13:55 htrb Exp $ */
 #ifndef W3MIMG_W3MIMG_H
 #define W3MIMG_W3MIMG_H
 

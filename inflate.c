@@ -1,4 +1,3 @@
-/* $Id: inflate.c,v 1.7 2002/01/31 18:28:24 ukai Exp $ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <zlib.h>

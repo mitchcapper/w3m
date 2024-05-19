@@ -1,4 +1,3 @@
-/* $Id: fm.h,v 1.149 2010/08/20 09:47:09 htrb Exp $ */
 /* 
  * w3m: WWW wo Miru utility
  * 

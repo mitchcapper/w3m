@@ -1,4 +1,3 @@
-/* $Id: keybind.c,v 1.10 2006/05/29 12:17:25 inu Exp $ */
 #include "funcname2.h"
 
 unsigned char GlobalKeymap[128] = {

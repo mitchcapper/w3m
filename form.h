@@ -1,4 +1,3 @@
-/* $Id: form.h,v 1.6 2003/09/22 21:02:18 ukai Exp $ */
 /*
  * HTML forms 
  */

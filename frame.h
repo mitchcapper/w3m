@@ -1,4 +1,3 @@
-/* $Id: frame.h,v 1.6 2003/01/25 17:42:17 ukai Exp $ */
 /*
  * frame support
  */

@@ -1,5 +1,4 @@
 #!@PERL@
-# $Id: w3mhelp.cgi.in,v 1.29 2007/05/29 11:50:24 inu Exp $
 
 if ( $^O =~ /^(ms)?(dos|win(32|nt)?)/i ) {
   $CYGPATH = 1;

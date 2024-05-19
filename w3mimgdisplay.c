@@ -1,4 +1,3 @@
-/* $Id: w3mimgdisplay.c,v 1.19 2010/12/21 10:13:55 htrb Exp $ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
