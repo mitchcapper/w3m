@@ -454,7 +454,7 @@ sync_cookies(void)
     if (!First_cookie)
 	return 0;
 
-    if (stat(rcFile(COOKIE_FILE), &st)) {
+    if (stat(CookieFile, &st)) {
 	is_saved = 0;
 	if (errno == ENOENT)
 	    return 0;
@@ -499,7 +499,6 @@ void
 save_cookies(void)
 {
     struct cookie *p;
-    char *cookie_file;
     FILE *fp;
 
     if (no_rc_dir)
@@ -511,13 +510,12 @@ save_cookies(void)
     if (is_saved)
 	return;
 
-    cookie_file = rcFile(COOKIE_FILE);
     if (!First_cookie) {
-	unlink(cookie_file);
+	unlink(CookieFile);
 	return;
     }
 
-    if (!(fp = fopen(cookie_file, "w")))
+    if (!(fp = fopen(CookieFile, "w")))
 	return;
 
     for (p = First_cookie; p; p = p->next) {
@@ -532,7 +530,7 @@ save_cookies(void)
 		str2charp(p->commentURL));
     }
     fclose(fp);
-    chmod(cookie_file, S_IRUSR | S_IWUSR);
+    chmod(CookieFile, S_IRUSR | S_IWUSR);
 }
 #undef str2charp
 
@@ -557,7 +555,7 @@ load_cookies(struct cookie **cookie)
     struct stat st;
 
     *cookie = p = NULL;
-    if (!(fp = fopen(rcFile(COOKIE_FILE), "r")))
+    if (!(fp = fopen(CookieFile, "r")))
 	return errno;
 
     if (fstat(fileno(fp), &st) == -1) {

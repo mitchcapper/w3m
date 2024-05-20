@@ -260,6 +260,7 @@ fusage(FILE * f, int err)
 #endif				/* USE_MOUSE */
 #ifdef USE_COOKIE
     PUT("-cookie", "use cookie (-no-cookie: don't use cookie)");
+    PUT("-cookie-jar file", "use file instead of default cookie file");
 #endif				/* USE_COOKIE */
     PUT("-graph", "use DEC special graphics for border of table and menu");
     PUT("-no-graph", "use ASCII character for border of table and menu");
@@ -765,6 +766,18 @@ main(int argc, char **argv)
 		use_cookie = TRUE;
 		accept_cookie = TRUE;
 	    }
+	    else if (!strcmp("-cookie-jar", argv[i])) {
+		if (++i >= argc)
+		    usage();
+		CookieFile = argv[i];
+		if (CookieFile[0] != '~' && CookieFile[0] != '/') {
+		    Str tmp = Strnew_charp(CurrentDir);
+		    if (Strlastchar(tmp) != '/')
+			Strcat_char(tmp, '/');
+		    Strcat_charp(tmp, CookieFile);
+		    CookieFile = cleanupName(tmp->ptr);
+		}
+	    }
 #endif				/* USE_COOKIE */
 	    else if (!strcmp("-s", argv[i]))
 		squeezeBlankLine = TRUE;
@@ -868,6 +881,10 @@ main(int argc, char **argv)
     CurrentKey = -1;
     if (BookmarkFile == NULL)
 	BookmarkFile = rcFile(BOOKMARK);
+#ifdef USE_COOKIE
+    if (!CookieFile)
+	CookieFile = rcFile(COOKIE_FILE);
+#endif
 
     if (!isatty(1) && !w3m_dump) /* redirected output */
 	w3m_dump = DUMP_BUFFER;
