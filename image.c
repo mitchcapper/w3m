@@ -9,6 +9,11 @@
 #ifdef HAVE_WAITPID
 #include <sys/wait.h>
 #endif
+#ifdef HAVE_SYS_SELECT_H
+#include <sys/select.h>
+#else
+#include <sys/time.h>
+#endif /* HAVE_SYS_SELECT_H */
 
 #ifdef USE_IMAGE
 
@@ -16,7 +21,7 @@ static int image_index = 0;
 
 /* display image */
 
-typedef struct _termialImage {
+typedef struct _terminalImage {
     ImageCache *cache;
     short x;
     short y;
@@ -34,10 +39,17 @@ static pid_t Imgdisplay_pid = 0;
 static int openImgdisplay(void);
 static void closeImgdisplay(void);
 static int getCharSize(void);
+static int inline_img_protocol_autodetect(void);
 
 void
 initImage()
 {
+    /* This must be checked first and always, since the rest of this module
+     * tests this variable as a boolean, so will get a likely false
+     * positive */
+    if (enable_inline_image == -1)
+	enable_inline_image = inline_img_protocol_autodetect();
+
     if (activeImage)
 	return;
     if (getCharSize())
@@ -131,6 +143,139 @@ openImgdisplay()
     Imgdisplay_pid = 0;
     activeImage = FALSE;
     return FALSE;
+}
+
+static int
+protocol_test_environment(void)
+{
+    const char * envptr;
+
+    if ((envptr = getenv("TERM"))) {
+	/* The purpose of strncmp(3) where used below is like the glob `prefix*',
+	 * or the regex `^prefix' */
+	if (strcmp(envptr, "xterm-kitty") == 0)
+	    return INLINE_IMG_KITTY;
+	if (strncmp(envptr, "mlterm", 6) == 0)
+	    return INLINE_IMG_OSC5379;
+	/* yaft doesn't correctly respond to \e[c, but is sixel-capable
+	 * anyway. Thanks to hackerb9/lsix */
+	if (strncmp(envptr, "yaft", 4) == 0)
+	    return INLINE_IMG_SIXEL;
+    }
+
+    if ((envptr = getenv("KONSOLE_VERSION")) && strcmp(envptr, "220770") >= 0)
+	return INLINE_IMG_KITTY;
+
+    return INLINE_IMG_NONE;
+}
+
+static int
+have_img2sixel(void)
+{
+    pid_t child_pid;
+    int wstatus;
+
+    if (getenv("W3M_IMG2SIXEL"))
+	return 1;
+
+    switch (child_pid = fork()) {
+    case -1:
+	return 0;
+    case 0:
+	close(STDOUT_FILENO);
+	close(STDERR_FILENO);
+	execlp("img2sixel", "img2sixel", "--version", NULL);
+	/* if exec fails */
+	_exit(-1);
+    default:
+	return
+#ifdef HAVE_WAITPID
+	    waitpid(child_pid, &wstatus, 0) != -1
+#else
+	    wait(&wstatus) != -1
+#endif
+	    && WIFEXITED(wstatus)
+	    && WEXITSTATUS(wstatus) == 0;
+    }
+}
+
+/* NB: in theory, user input could be snarfed up with the read(2); in
+ * practice, only museum pieces have such low latency, so we should get
+ * the device attributes (and only the device attributes) immediately. If
+ * ever this becomes an issue (which it won't), ungetch(3) can be used on
+ * any extraneous input */
+static int
+protocol_test_for_sixel(void)
+{
+    static const char errstr[] = "Can't get terminal attributes";
+
+    /* the string in the following sizeof expression is what I think the
+     * largest possible response could be. See
+     *	https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
+     * for more information, specifically the section on CSI Ps c ("\e[c") */
+    char term_response[sizeof "\033[?65;1;2;3;4;6;8;9;15;16;17;18;21;22;28;29c"] = "";
+    char * ptr; /* general-purpose pointer to the above buffer */
+    ssize_t nchars_read;
+
+    /* request tty send primary device attributes */
+    write(STDOUT_FILENO, "\033[c", 3);
+
+    /* wait for stdin to become available; don't let us get stuck hanging
+     * indefinitely on a response that won't come */
+    {
+	int nret;
+	fd_set fds;
+	struct timeval timeout = { 0, 0.2 * 1000000 }; /* wait 0.2s, from terms.c */
+	FD_ZERO(&fds);
+	FD_SET(STDIN_FILENO, &fds);
+	if ((nret = select(STDIN_FILENO + 1, &fds, NULL, NULL, &timeout)) <= 0) {
+	    fprintf(stderr, "%s: %s\n", errstr, nret == 0 ? "timed out" : strerror(errno));
+	    return INLINE_IMG_NONE;
+	}
+    }
+
+    if ((nchars_read = read(STDIN_FILENO, term_response, sizeof term_response - 1)) == -1) {
+	perror(errstr);
+	return INLINE_IMG_NONE;
+    }
+
+    /* NUL-terminate overall response */
+    term_response[nchars_read] = '\0';
+
+    /* validate response */
+    if (nchars_read < 5
+	|| memcmp(term_response, "\033[?", 3) != 0
+	|| !(ptr = memchr(term_response, 'c', nchars_read)))
+    {
+	fputs("Malformed terminal attributes\n", stderr);
+	return INLINE_IMG_NONE;
+    }
+
+    /* NUL-terminate the specific portion of data that is the terminal response */
+    if (ptr[1])
+	ptr[1] = '\0';
+
+    /* separate the response parameters by ';' and look for '4' */
+    ptr = term_response;
+    while ((ptr = strchr(ptr, ';'))) {
+	if (*++ptr != '4')
+	    continue;
+	switch (*++ptr) {
+	case ';': case 'c':
+	    if (have_img2sixel())
+		return INLINE_IMG_SIXEL;
+	}
+    }
+
+    /* default */
+    return INLINE_IMG_NONE;
+}
+
+static int
+inline_img_protocol_autodetect(void)
+{
+    int result = protocol_test_environment();
+    return result ? result : protocol_test_for_sixel();
 }
 
 static void
@@ -256,6 +401,10 @@ drawImage(void)
 		put_image_iterm2(url, x, y, sw, sh);
 	    } else if (enable_inline_image == INLINE_IMG_KITTY) {
 		put_image_kitty(url, x, y, i->width, i->height, i->sx, i->sy, sw * pixel_per_char, sh * pixel_per_line_i, sw, sh);
+#ifdef DEBUG
+	    } else {
+		fprintf(stderr, "Unrecognised inline image protocol: %d\n", enable_inline_image);
+#endif
 	    }
 
 	    continue ;

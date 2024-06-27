@@ -127,7 +127,7 @@ static int searchKeyNum(void);
 #define help() fusage(stdout, 0)
 #define usage() fusage(stderr, 1)
 
-int enable_inline_image;
+signed char enable_inline_image = -1;
 
 static void
 fversion(FILE * f)
