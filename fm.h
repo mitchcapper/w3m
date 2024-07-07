@@ -510,6 +510,7 @@ typedef struct _Buffer {
 #ifdef USE_ALARM
     struct _AlarmEvent *event;
 #endif
+    int mainline;
 } Buffer;
 
 typedef struct _BufferPos {

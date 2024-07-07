@@ -3595,6 +3595,18 @@ _followForm(int submit)
     displayBuffer(Currentbuf, B_FORCE_REDRAW);
 }
 
+DEFUN(goMain, MAIN, "Goto main content")
+{
+    if (!Currentbuf->mainline) {
+	disp_err_message(_("<main> not found"), FALSE);
+	return;
+    }
+    gotoLine(Currentbuf, Currentbuf->mainline);
+    Currentbuf->pos = 0;
+    arrangeCursor(Currentbuf);
+    displayBuffer(Currentbuf, B_NORMAL);
+}
+
 /* go to the top anchor */
 DEFUN(topA, LINK_BEGIN, "Move to the first hyperlink")
 {

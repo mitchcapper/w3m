@@ -5417,6 +5417,10 @@ HTMLtagproc1(struct parsed_tag *tag, struct html_feed_environ *h_env)
     case HTML_HEAD:
     case HTML_N_BODY:
 	return 1;
+    case HTML_MAIN:
+	Strcopy_charp(obuf->line, "<main>");
+	flushline(h_env, obuf, 0, 0, h_env->limit);
+	return 1;
     default:
 	/* obuf->prevchar = '\0'; */
 	return 0;
@@ -6116,6 +6120,9 @@ HTMLlineproc2body(Buffer *buf, Str (*feed) (void), int llimit)
 		    break;
 		case HTML_N_SYMBOL:
 		    effect &= ~PC_SYMBOL;
+		    break;
+		case HTML_MAIN:
+		    buf->mainline = currentLn(buf);
 		    break;
 		}
 #ifdef	ID_EXT
