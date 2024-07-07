@@ -158,9 +158,11 @@ Refactor-load-cookies.patch
 Refactor-get_cookie_info.patch
 Merge-cookies-if-modified-after-start.patch
 Add-option-to-provide-cookie-jar.patch
-Add-option-to-use-same-cookie-file-format-as-curl.patch
+Update-URLHist-mtime-when-saving-history.patch
+Add-goto-main-command.patch
 Enable-lto.patch
 # BORKED
+Refactor-regex-library.patch
 Enable-command-completion.patch
 Add-option-to-auto-accept-self-signed.patch
 0036-Move-chkurl-to-own-translation-unit.patch

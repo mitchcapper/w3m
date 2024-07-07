@@ -2,13 +2,13 @@
  config.h.in            |    1 
  doc-de/README.func     |    1 
  doc/README.func        |    1 
- doc/w3m.1              |   20 +++++++++
+ doc/w3m.1              |   20 ++++++++
  fm.h                   |    2 
- main.c                 |  106 ++++++++++++++++++++++++++++++++++++++++++++++++-
+ main.c                 |  114 ++++++++++++++++++++++++++++++++++++++++++++++++-
  proto.h                |    1 
  rc.c                   |    4 +
  scripts/w3mhelp.cgi.in |    3 -
- 9 files changed, 136 insertions(+), 3 deletions(-)
+ 9 files changed, 144 insertions(+), 3 deletions(-)
 
 --- a/config.h.in
 +++ b/config.h.in
@@ -70,20 +70,21 @@
  	    else if (!strcmp("-F", argv[i]))
  		RenderFrame = TRUE;
  	    else if (!strcmp("-W", argv[i])) {
-@@ -916,8 +930,42 @@ main(int argc, char **argv)
+@@ -916,8 +930,43 @@ main(int argc, char **argv)
      if (ssl_known_hosts)
  	known_hosts = load_known_hosts();
  
 -#ifdef USE_M17N
 -#endif
++    /* Restore a previously saved session */
 +    if (RestoreSession || opt_restore) {
 +	FILE *fp;
 +	Str line;
 +	char *sf, **session;
-+	int m = 16, n = 0;
++	int max = 16, n = 0;
 +
 +	sf = session_file ? session_file : rcFile(SESSION_FILE);
-+	session = New_N(char *, m);
++	session = New_N(char *, max);
 +	if (!(fp = fopen(sf, "r"))) {
 +	    disp_err_message(strerror(errno), FALSE);
 +	    return 1;
@@ -94,17 +95,17 @@
 +	    Strchop(line);
 +	    if (line->length == 0)
 +		break;
-+	    if (n > m) {
-+		m <<= 1;
-+		New_Reuse(char *, session, m);
++	    if (n > max) {
++		max <<= 1;
++		New_Reuse(char *, session, max);
 +	    }
 +	    session[n++] = line->ptr;
 +	}
 +
 +	for (int i = 0; i < load_argc; i++) {
-+	    if (n > m) {
-+		m <<= 1;
-+		New_Reuse(char *, session, m);
++	    if (n > max) {
++		max <<= 1;
++		New_Reuse(char *, session, max);
 +	    }
 +	    session[n++] = load_argv[i];
 +	}
@@ -115,7 +116,7 @@
  
      if (w3m_backend)
  	backend();
-@@ -2614,6 +2662,10 @@ _quitfm(int confirm)
+@@ -2614,6 +2663,10 @@ _quitfm(int confirm)
  #endif				/* USE_HISTORY */
      if ((err = save_known_hosts()))
  	perror(NULL);
@@ -126,7 +127,7 @@
      w3m_exit(err);
  }
  
-@@ -4370,6 +4422,56 @@ DEFUN(adBmark, ADD_BOOKMARK, "Add curren
+@@ -4370,6 +4423,63 @@ DEFUN(adBmark, ADD_BOOKMARK, "Add curren
  		request);
  }
  
@@ -150,6 +151,11 @@
 +	for (buf = tab->firstBuffer; buf; buf = buf->nextBuffer) {
 +	    if ((url = baseURL(buf)))
 +		fprintf(f, "%s\n", parsedURL2Str(url)->ptr);
++	    /*
++	     * Needs refactoring of HistoryPage handling first.
++	    else if (!strcmp(buf->buffername, "HistoryPage"))
++		fprintf(f, "%s\n", buf->buffername);
++	    */
 +	    else
 +		disp_err_message(buf->buffername, FALSE);
 +	}
@@ -178,6 +184,8 @@
 +    if (!*sf)
 +	sf = def;
 +    _strSession(sf);
++    save_cookies();
++    saveUrlHistory();
 +}
 +
  /* option setting */

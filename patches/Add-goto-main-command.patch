@@ -1,0 +1,91 @@
+From: Rene Kita <mail@rkta.de>
+Date: Sun Jul  7 09:19:40 CEST 2024
+Subject: Add goto main command
+Patch: patches/Add-goto-main-command.patch
+
+---
+ file.c       |    7 +++++++
+ fm.h         |    1 +
+ html.h       |    1 +
+ main.c       |    8 ++++++++
+ proto.h      |    1 +
+ tagtable.tab |    1 +
+ 6 files changed, 19 insertions(+)
+
+--- a/file.c
++++ b/file.c
+@@ -5575,6 +5575,10 @@ HTMLtagproc1(struct parsed_tag *tag, str
+     case HTML_HEAD:
+     case HTML_N_BODY:
+ 	return 1;
++    case HTML_MAIN:
++	Strcopy_charp(obuf->line, "<main>");
++	flushline(h_env, obuf, 0, 0, h_env->limit);
++	return 1;
+     default:
+ 	/* obuf->prevchar = '\0'; */
+ 	return 0;
+@@ -6275,6 +6279,9 @@ HTMLlineproc2body(Buffer *buf, Str (*fee
+ 		case HTML_N_SYMBOL:
+ 		    effect &= ~PC_SYMBOL;
+ 		    break;
++		case HTML_MAIN:
++		    buf->mainline = currentLn(buf);
++		    break;
+ 		}
+ #ifdef	ID_EXT
+ 		id = NULL;
+--- a/fm.h
++++ b/fm.h
+@@ -511,6 +511,7 @@ typedef struct _Buffer {
+ #ifdef USE_ALARM
+     struct _AlarmEvent *event;
+ #endif
++    int mainline;
+ } Buffer;
+ 
+ typedef struct _BufferPos {
+--- a/html.h
++++ b/html.h
+@@ -242,6 +242,7 @@ typedef struct {
+ #define HTML_N_DD       148
+ #define HTML_DFN        149
+ #define HTML_N_DFN      150
++#define HTML_MAIN       151
+ 
+    /* pseudo tag */
+ #define HTML_SELECT_INT     160
+--- a/main.c
++++ b/main.c
+@@ -3700,6 +3700,14 @@ _followForm(int submit)
+     displayBuffer(Currentbuf, B_FORCE_REDRAW);
+ }
+ 
++DEFUN(goMain, MAIN, "Goto main content")
++{
++    gotoLine(Currentbuf, Currentbuf->mainline);
++    Currentbuf->pos = 0;
++    arrangeCursor(Currentbuf);
++    displayBuffer(Currentbuf, B_NORMAL);
++}
++
+ /* go to the top anchor */
+ DEFUN(topA, LINK_BEGIN, "Move to the first hyperlink")
+ {
+--- a/proto.h
++++ b/proto.h
+@@ -82,6 +82,7 @@ extern void backBf(void);
+ extern void deletePrevBuf(void);
+ extern void goURL(void);
+ extern void goHome(void);
++extern void goMain(void);
+ extern void gorURL(void);
+ extern void ldBmark(void);
+ extern void adBmark(void);
+--- a/tagtable.tab
++++ b/tagtable.tab
+@@ -211,3 +211,4 @@ pre_plain	HTML_PRE_PLAIN
+ /pre_plain	HTML_N_PRE_PLAIN
+ div_int		HTML_DIV_INT
+ /div_int	HTML_N_DIV_INT
++main		HTML_MAIN
