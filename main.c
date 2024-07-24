@@ -692,9 +692,6 @@ main(int argc, char **argv)
 		if (++i >= argc)
 		    usage();
 		COLS = atoi(argv[i]);
-		if (COLS > MAXIMUM_COLS) {
-		    COLS = MAXIMUM_COLS;
-		}
 	    }
 	    else if (!strcmp("-ppc", argv[i])) {
 		double ppc;
