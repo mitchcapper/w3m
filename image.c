@@ -44,11 +44,9 @@ static int inline_img_protocol_autodetect(void);
 void
 initImage()
 {
-    /* This must be checked first and always, since the rest of this module
-     * tests this variable as a boolean, so will get a likely false
-     * positive */
-    if (enable_inline_image == -1)
-	enable_inline_image = inline_img_protocol_autodetect();
+    enable_inline_image = enable_inline_image_config == INLINE_IMG_AUTO
+	    ? inline_img_protocol_autodetect()
+	    : enable_inline_image_config;
 
     if (activeImage)
 	return;
@@ -176,11 +174,11 @@ have_img2sixel(void)
     int wstatus;
 
     if (getenv("W3M_IMG2SIXEL"))
-	return 1;
+	return TRUE;
 
     switch (child_pid = fork()) {
     case -1:
-	return 0;
+	return FALSE;
     case 0:
 	close(STDOUT_FILENO);
 	close(STDERR_FILENO);
