@@ -103,7 +103,6 @@ void bzero(void *, int);
 #define LINELEN	256		/* Initial line length */
 #define PAGER_MAX_LINE	10000	/* Maximum line kept as pager */
 
-#define MAXIMUM_COLS 1024
 #define DEFAULT_COLS 80
 
 #ifdef USE_IMAGE
