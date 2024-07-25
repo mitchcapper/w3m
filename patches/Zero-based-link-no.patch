@@ -47,7 +47,7 @@
  	    line = checkType(line, &propBuf, NULL);
 --- a/fm.h
 +++ b/fm.h
-@@ -970,6 +970,7 @@ global int nextpage_topline init(FALSE);
+@@ -969,6 +969,7 @@ global int nextpage_topline init(FALSE);
  global char *displayTitleTerm init(NULL);
  global int displayLink init(FALSE);
  global int displayLinkNumber init(FALSE);
@@ -57,7 +57,7 @@
  global int retryAsHttp init(TRUE);
 --- a/main.c
 +++ b/main.c
-@@ -3669,7 +3669,7 @@ DEFUN(topA, LINK_BEGIN, "Move to the fir
+@@ -3666,7 +3666,7 @@ DEFUN(topA, LINK_BEGIN, "Move to the fir
      if (prec_num > hl->nmark)
  	hseq = hl->nmark - 1;
      else if (prec_num > 0)

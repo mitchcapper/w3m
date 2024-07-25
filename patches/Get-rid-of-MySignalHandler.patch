@@ -191,7 +191,7 @@ Subject: Get rid of MySignalHandler
  #endif
  
  #ifdef USE_MARK
-@@ -1439,7 +1439,7 @@ cmp_anchor_hseq(const void *a, const voi
+@@ -1437,7 +1437,7 @@ cmp_anchor_hseq(const void *a, const voi
  static void
  do_dump(Buffer *buf)
  {
@@ -200,7 +200,7 @@ Subject: Get rid of MySignalHandler
  
      prevtrap = mySignal(SIGINT, intTrap);
      if (SETJMP(IntReturn) != 0) {
-@@ -1639,20 +1639,18 @@ repBuffer(Buffer *oldbuf, Buffer *buf)
+@@ -1637,20 +1637,18 @@ repBuffer(Buffer *oldbuf, Buffer *buf)
  }
  
  
@@ -223,7 +223,7 @@ Subject: Get rid of MySignalHandler
  }
  
  static void
-@@ -1667,14 +1665,13 @@ resize_screen(void)
+@@ -1665,14 +1663,13 @@ resize_screen(void)
  #endif				/* SIGWINCH */
  
  #ifdef SIGPIPE
@@ -239,7 +239,7 @@ Subject: Get rid of MySignalHandler
  }
  #endif
  
-@@ -1833,7 +1830,7 @@ clear_mark(Line *l)
+@@ -1831,7 +1828,7 @@ clear_mark(Line *l)
  static int
  srchcore(const char *str, int (*func) (Buffer *, const char *))
  {
@@ -248,7 +248,7 @@ Subject: Get rid of MySignalHandler
      volatile int i, result = SR_NOTFOUND;
  
      if (str != NULL && str != SearchString)
-@@ -2235,7 +2232,7 @@ DEFUN(pipesh, PIPE_SHELL, "Execute shell
+@@ -2233,7 +2230,7 @@ DEFUN(pipesh, PIPE_SHELL, "Execute shell
  DEFUN(readsh, READ_SHELL, "Execute shell command and display output")
  {
      Buffer *buf;
@@ -257,7 +257,7 @@ Subject: Get rid of MySignalHandler
      char *cmd;
  
      CurrentKeyData = NULL;	/* not allowed in w3m-control: */
-@@ -6250,7 +6247,7 @@ DEFUN(execCmd, COMMAND, "Invoke w3m func
+@@ -6255,7 +6252,7 @@ DEFUN(execCmd, COMMAND, "Invoke w3m func
  }
  
  #ifdef USE_ALARM
@@ -266,7 +266,7 @@ Subject: Get rid of MySignalHandler
  SigAlarm(SIGNAL_ARG)
  {
      char *data;
-@@ -6286,7 +6283,6 @@ SigAlarm(SIGNAL_ARG)
+@@ -6291,7 +6288,6 @@ SigAlarm(SIGNAL_ARG)
  	    alarm(CurrentAlarm->sec);
  	}
      }

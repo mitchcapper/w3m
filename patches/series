@@ -1,4 +1,5 @@
 # PENDING
+Drop-upper-limit-on-COLS.patch
 # modernC
 0002-Fix-build-error-with-disable-color.patch
 0006-Remove-declaration-of-libc-functions.patch

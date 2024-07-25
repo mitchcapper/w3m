@@ -47,7 +47,7 @@ make this behaviour permanent.
  
 --- a/fm.h
 +++ b/fm.h
-@@ -1042,6 +1042,8 @@ global int ignore_null_img_alt init(TRUE
+@@ -1041,6 +1041,8 @@ global int ignore_null_img_alt init(TRUE
  #define DISPLAY_INS_DEL_FONTIFY	2
  global int displayInsDel init(DISPLAY_INS_DEL_NORMAL);
  global int FoldTextarea init(FALSE);
@@ -58,7 +58,7 @@ make this behaviour permanent.
  #define DEFAULT_URL_CURRENT	1
 --- a/main.c
 +++ b/main.c
-@@ -4801,6 +4801,14 @@ DEFUN(vwSrc, SOURCE VIEW, "Toggle betwee
+@@ -4798,6 +4798,14 @@ DEFUN(vwSrc, SOURCE VIEW, "Toggle betwee
      displayBuffer(Currentbuf, B_NORMAL);
  }
  
@@ -73,7 +73,7 @@ make this behaviour permanent.
  /* reload */
  DEFUN(reload, RELOAD, "Load current document anew")
  {
-@@ -4924,6 +4932,7 @@ DEFUN(reload, RELOAD, "Load current docu
+@@ -4921,6 +4929,7 @@ DEFUN(reload, RELOAD, "Load current docu
  	restorePosition(Currentbuf, &sbuf);
      }
      displayBuffer(Currentbuf, B_FORCE_REDRAW);

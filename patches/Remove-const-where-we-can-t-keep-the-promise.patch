@@ -38,7 +38,7 @@ cast away and there was no easy way to keep the const.
      image.url = uf->url;
 --- a/fm.h
 +++ b/fm.h
-@@ -278,7 +278,7 @@ extern int REV_LB[];
+@@ -277,7 +277,7 @@ extern int REV_LB[];
  #define SCONF_NO_REFERER_TO	4
  #define SCONF_USER_AGENT	5
  #define SCONF_N_FIELD		6

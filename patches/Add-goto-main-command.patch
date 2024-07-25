@@ -7,10 +7,10 @@ Patch: patches/Add-goto-main-command.patch
  file.c       |    7 +++++++
  fm.h         |    1 +
  html.h       |    1 +
- main.c       |    8 ++++++++
+ main.c       |   12 ++++++++++++
  proto.h      |    1 +
  tagtable.tab |    1 +
- 6 files changed, 19 insertions(+)
+ 6 files changed, 23 insertions(+)
 
 --- a/file.c
 +++ b/file.c
@@ -37,7 +37,7 @@ Patch: patches/Add-goto-main-command.patch
  		id = NULL;
 --- a/fm.h
 +++ b/fm.h
-@@ -511,6 +511,7 @@ typedef struct _Buffer {
+@@ -510,6 +510,7 @@ typedef struct _Buffer {
  #ifdef USE_ALARM
      struct _AlarmEvent *event;
  #endif
@@ -57,12 +57,16 @@ Patch: patches/Add-goto-main-command.patch
  #define HTML_SELECT_INT     160
 --- a/main.c
 +++ b/main.c
-@@ -3700,6 +3700,14 @@ _followForm(int submit)
+@@ -3697,6 +3697,18 @@ _followForm(int submit)
      displayBuffer(Currentbuf, B_FORCE_REDRAW);
  }
  
 +DEFUN(goMain, MAIN, "Goto main content")
 +{
++    if (!Currentbuf->mainline) {
++	disp_err_message(_("<main> not found"), FALSE);
++	return;
++    }
 +    gotoLine(Currentbuf, Currentbuf->mainline);
 +    Currentbuf->pos = 0;
 +    arrangeCursor(Currentbuf);

@@ -187,7 +187,7 @@ This is in preparation for the next patch.
  #define ldHist nulcmd
 --- a/main.c
 +++ b/main.c
-@@ -910,7 +910,7 @@ main(int argc, char **argv)
+@@ -907,7 +907,7 @@ main(int argc, char **argv)
  #endif				/* USE_COOKIE */
  #ifdef USE_HISTORY
      if (UseHistory)
@@ -196,7 +196,7 @@ This is in preparation for the next patch.
  #endif				/* not USE_HISTORY */
      known_hosts_file = rcFile("known_hosts");
      if (ssl_known_hosts)
-@@ -2610,7 +2610,7 @@ _quitfm(int confirm)
+@@ -2607,7 +2607,7 @@ _quitfm(int confirm)
  #endif				/* USE_COOKIE */
  #ifdef USE_HISTORY
      if (UseHistory && SaveURLHist)

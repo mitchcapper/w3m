@@ -15,7 +15,7 @@ Subject: [PATCH 085/172] Remove redundant declarations
 
 --- a/fm.h
 +++ b/fm.h
-@@ -818,7 +818,6 @@ typedef struct http_request {
+@@ -817,7 +817,6 @@ typedef struct http_request {
   * Globals.
   */
  
@@ -23,7 +23,7 @@ Subject: [PATCH 085/172] Remove redundant declarations
  #if defined(__CYGWIN__)
  extern int LASTLINE;
  #else				/* not defined(__CYGWIN__) */
-@@ -1139,7 +1138,6 @@ global char *config_file init(NULL);
+@@ -1138,7 +1137,6 @@ global char *config_file init(NULL);
  
  #ifdef USE_MOUSE
  global int use_mouse init(TRUE);

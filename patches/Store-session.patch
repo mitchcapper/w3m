@@ -70,7 +70,7 @@
  	    else if (!strcmp("-F", argv[i]))
  		RenderFrame = TRUE;
  	    else if (!strcmp("-W", argv[i])) {
-@@ -916,8 +930,43 @@ main(int argc, char **argv)
+@@ -913,8 +927,43 @@ main(int argc, char **argv)
      if (ssl_known_hosts)
  	known_hosts = load_known_hosts();
  
@@ -116,7 +116,7 @@
  
      if (w3m_backend)
  	backend();
-@@ -2614,6 +2663,10 @@ _quitfm(int confirm)
+@@ -2611,6 +2660,10 @@ _quitfm(int confirm)
  #endif				/* USE_HISTORY */
      if ((err = save_known_hosts()))
  	perror(NULL);
@@ -127,7 +127,7 @@
      w3m_exit(err);
  }
  
-@@ -4370,6 +4423,63 @@ DEFUN(adBmark, ADD_BOOKMARK, "Add curren
+@@ -4367,6 +4420,63 @@ DEFUN(adBmark, ADD_BOOKMARK, "Add curren
  		request);
  }
  
@@ -223,7 +223,7 @@
      {"close_tab_back", P_INT, PI_ONOFF, (void *)&close_tab_back,
 --- a/fm.h
 +++ b/fm.h
-@@ -1081,6 +1081,8 @@ global int UseHistory init(TRUE);
+@@ -1080,6 +1080,8 @@ global int UseHistory init(TRUE);
  global int URLHistSize init(100);
  global int SaveURLHist init(TRUE);
  #endif				/* USE_HISTORY */

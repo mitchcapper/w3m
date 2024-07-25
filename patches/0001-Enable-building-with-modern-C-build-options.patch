@@ -174,7 +174,7 @@ make OPTS="-Werror=implicit-function-declaration -Werror=implicit-int
  
 --- a/fm.h
 +++ b/fm.h
-@@ -1152,7 +1152,7 @@ global int relative_wheel_scroll init(FA
+@@ -1151,7 +1151,7 @@ global int relative_wheel_scroll init(FA
  global int fixed_wheel_scroll_count init(5);
  global int relative_wheel_scroll_ratio init(30);
  typedef struct _MouseActionMap {
@@ -442,7 +442,7 @@ make OPTS="-Werror=implicit-function-declaration -Werror=implicit-int
  #define getch()	do_getch()
  #endif				/* defined(USE_GPM) || defined(USE_SYSMOUSE) */
  #endif
-@@ -1532,7 +1532,7 @@ static Str currentURL(void);
+@@ -1529,7 +1529,7 @@ static Str currentURL(void);
  
  #ifdef USE_BUFINFO
  void
@@ -451,7 +451,7 @@ make OPTS="-Werror=implicit-function-declaration -Werror=implicit-int
  {
      FILE *fp;
  
-@@ -1790,7 +1790,7 @@ clear_mark(Line *l)
+@@ -1787,7 +1787,7 @@ clear_mark(Line *l)
  static int
  srchcore(char *volatile str, int (*func) (Buffer *, char *))
  {
@@ -460,7 +460,7 @@ make OPTS="-Werror=implicit-function-declaration -Werror=implicit-int
      volatile int i, result = SR_NOTFOUND;
  
      if (str != NULL && str != SearchString)
-@@ -2195,7 +2195,7 @@ DEFUN(pipesh, PIPE_SHELL, "Execute shell
+@@ -2192,7 +2192,7 @@ DEFUN(pipesh, PIPE_SHELL, "Execute shell
  DEFUN(readsh, READ_SHELL, "Execute shell command and display output")
  {
      Buffer *buf;
@@ -469,7 +469,7 @@ make OPTS="-Werror=implicit-function-declaration -Werror=implicit-int
      char *cmd;
  
      CurrentKeyData = NULL;	/* not allowed in w3m-control: */
-@@ -5992,7 +5992,7 @@ getCodePage(void)
+@@ -5989,7 +5989,7 @@ getCodePage(void)
  #endif
  
  void

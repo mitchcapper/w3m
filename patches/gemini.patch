@@ -544,7 +544,7 @@ w3m-0.5.3+git20230121.
  int
  main(int argc, char **argv)
  {
-@@ -886,6 +912,9 @@ main(int argc, char **argv)
+@@ -883,6 +909,9 @@ main(int argc, char **argv)
      if (UseHistory)
  	loadHistory(URLHist);
  #endif				/* not USE_HISTORY */
@@ -554,7 +554,7 @@ w3m-0.5.3+git20230121.
  
  #ifdef USE_M17N
  #endif
-@@ -2527,10 +2556,36 @@ DEFUN(movRW, NEXT_WORD, "Move to the nex
+@@ -2524,10 +2553,36 @@ DEFUN(movRW, NEXT_WORD, "Move to the nex
      displayBuffer(Currentbuf, B_NORMAL);
  }
  
@@ -591,7 +591,7 @@ w3m-0.5.3+git20230121.
  
      if (checkDownloadList())
  	/* FIXME: gettextize? */
-@@ -2557,7 +2612,9 @@ _quitfm(int confirm)
+@@ -2554,7 +2609,9 @@ _quitfm(int confirm)
      if (UseHistory && SaveURLHist)
  	saveHistory(URLHist, URLHistSize);
  #endif				/* USE_HISTORY */
@@ -602,7 +602,7 @@ w3m-0.5.3+git20230121.
  }
  
  /* Quit */
-@@ -4724,6 +4781,13 @@ DEFUN(vwSrc, SOURCE VIEW, "Toggle betwee
+@@ -4721,6 +4778,13 @@ DEFUN(vwSrc, SOURCE VIEW, "Toggle betwee
  	displayBuffer(Currentbuf, B_NORMAL);
  	return;
      }
@@ -616,7 +616,7 @@ w3m-0.5.3+git20230121.
      if (Currentbuf->sourcefile == NULL) {
  	if (Currentbuf->pagerSource &&
  	    !strcasecmp(Currentbuf->type, "text/plain")) {
-@@ -4809,6 +4873,91 @@ DEFUN(fold_pre, FOLD_PRE, "Fold long lin
+@@ -4806,6 +4870,91 @@ DEFUN(fold_pre, FOLD_PRE, "Fold long lin
      FoldPre = FoldPreOpt;
  }
  
@@ -708,7 +708,7 @@ w3m-0.5.3+git20230121.
  /* reload */
  DEFUN(reload, RELOAD, "Load current document anew")
  {
-@@ -5034,6 +5183,7 @@ chkURLBuffer(Buffer *buf)
+@@ -5031,6 +5180,7 @@ chkURLBuffer(Buffer *buf)
  	"https?://[a-zA-Z0-9:%\\-\\./_@]*\\[[a-fA-F0-9:][a-fA-F0-9:\\.]*\\][a-zA-Z0-9:%\\-\\./?=~_\\&+@#,\\$;]*",
  	"ftp://[a-zA-Z0-9:%\\-\\./_@]*\\[[a-fA-F0-9:][a-fA-F0-9:\\.]*\\][a-zA-Z0-9:%\\-\\./=_+@#,\\$]*",
  #endif				/* INET6 */
