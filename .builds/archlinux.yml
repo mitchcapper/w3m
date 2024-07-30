@@ -1,0 +1,123 @@
+image: archlinux
+sources:
+  - https://git.sr.ht/~rkta/w3m
+packages:
+  - imlib2
+  - gdk-pixbuf-xlib
+  - tcc
+triggers:
+  - action: email
+    condition: failure
+    to: mail@rkta.de
+environment:
+  OPTS: '-flto'
+tasks:
+  - default: |
+      cd w3m
+      make distclean || :
+      ./configure
+      make -j4
+      test -x w3m
+      cd tests
+      sh run_tests
+
+  - debian: |
+      cd w3m
+      make distclean || :
+      ./configure \
+        --enable-alarm \
+        --enable-ansi_color \
+        --enable-color \
+        --enable-cookie \
+        --enable-external_uri_loader \
+        --enable-gopher \
+        --enable-image \
+        --enable-ipv6 \
+        --enable-m17n \
+        --enable-menu \
+        --enable-mouse \
+        --enable-nls \
+        --enable-nntp \
+        --enable-sslverify \
+        --enable-unicode \
+        --enable-w3mmailer \
+        --with-gc \
+        --with-imagelib=imlib2 \
+        --with-migemo="cmigemo -q -d /usr/share/cmigemo/utf-8/migemo-dict" \
+        --with-ssl
+      make -j4
+      test -x w3m
+      cd tests
+      sh run_tests
+
+  - gdk-pixbuf: |
+      cd w3m
+      make distclean || :
+      ./configure \
+        --enable-alarm \
+        --enable-ansi_color \
+        --enable-color \
+        --enable-cookie \
+        --enable-external_uri_loader \
+        --enable-gopher \
+        --enable-image \
+        --enable-ipv6 \
+        --enable-m17n \
+        --enable-menu \
+        --enable-mouse \
+        --enable-nls \
+        --enable-nntp \
+        --enable-sslverify \
+        --enable-unicode \
+        --enable-w3mmailer \
+        --with-gc \
+        --with-imagelib=gdk-pixbuf \
+        --with-migemo="cmigemo -q -d /usr/share/cmigemo/utf-8/migemo-dict" \
+        --with-ssl
+      make -j4
+      test -x w3m
+      cd tests
+      sh run_tests
+
+  - tcc: |
+      cd w3m
+      make distclean || :
+      env CC=tcc ./configure \
+        --enable-alarm \
+        --enable-ansi_color \
+        --enable-bgcolor \
+        --enable-color \
+        --enable-cookie \
+        --enable-dict \
+        --enable-digest_auth \
+        --enable-external_uri_loader \
+        --enable-gopher \
+        --enable-help_cgi \
+        --enable-history \
+        --enable-image \
+        --enable-ipv6 \
+        --enable-japanese \
+        --enable-keymap=w3m \
+        --enable-m17n \
+        --enable-menu \
+        --enable-messagel10n \
+        --enable-mouse \
+        --enable-nls \
+        --enable-nntp \
+        --enable-sslverify \
+        --enable-unicode \
+        --enable-w3mmailer \
+        --enable-xface \
+        --with-browser \
+        --with-editor \
+        --with-gc \
+        --with-imagelib=imlib2 \
+        --with-mailer \
+        --with-migemo="cmigemo -q -d /usr/share/cmigemo/utf-8/migemo-dict" \
+        --with-ssl \
+        --with-termlib \
+        --with-x
+      make -j4
+      test -x w3m
+      cd tests
+      sh run_tests
