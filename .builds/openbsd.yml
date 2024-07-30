@@ -1,0 +1,102 @@
+image: openbsd/latest
+sources:
+  - https://git.sr.ht/~rkta/w3m
+packages:
+  - boehm-gc
+  - gettext-tools
+triggers:
+  - action: email
+    condition: failure
+    to: mail@rkta.de
+environment:
+  OPTS: '-Werror -flto -Wno-invalid-source-encoding'
+tasks:
+  - default: |
+      cd w3m
+      make distclean || :
+      ./configure
+      make -j4
+      test -x w3m
+      cd tests
+      sh run_tests
+
+  - debian: |
+      cd w3m
+      make distclean || :
+      ./configure \
+        --enable-alarm \
+        --enable-ansi_color \
+        --enable-color \
+        --enable-cookie \
+        --enable-external_uri_loader \
+        --enable-gopher \
+        --enable-image \
+        --enable-ipv6 \
+        --enable-m17n \
+        --enable-menu \
+        --enable-mouse \
+        --enable-nls \
+        --enable-nntp \
+        --enable-sslverify \
+        --enable-unicode \
+        --enable-w3mmailer \
+        --with-gc \
+        --with-imagelib=imlib2 \
+        --with-migemo="cmigemo -q -d /usr/share/cmigemo/utf-8/migemo-dict" \
+        --with-ssl
+      make -j4
+      test -x w3m
+      cd tests
+      sh run_tests
+
+  - gdk-pixbuf: |
+      cd w3m
+      make distclean || :
+      ./configure \
+        --enable-alarm \
+        --enable-ansi_color \
+        --enable-color \
+        --enable-cookie \
+        --enable-external_uri_loader \
+        --enable-gopher \
+        --enable-image \
+        --enable-ipv6 \
+        --enable-m17n \
+        --enable-menu \
+        --enable-mouse \
+        --enable-nls \
+        --enable-nntp \
+        --enable-sslverify \
+        --enable-unicode \
+        --enable-w3mmailer \
+        --with-gc \
+        --with-imagelib=gdk-pixbuf \
+        --with-migemo="cmigemo -q -d /usr/share/cmigemo/utf-8/migemo-dict" \
+        --with-ssl
+      make -j4
+      test -x w3m
+      cd tests
+      sh run_tests
+
+  - disable: |
+      cd w3m
+      make distclean || :
+      ./configure \
+        --disable-alarm \
+        --disable-color\
+        --disable-cookie \
+        --disable-external_uri_loader \
+        --disable-gopher \
+        --disable-image \
+        --disable-ipv6 \
+        --disable-m17n \
+        --disable-menu \
+        --disable-mouse \
+        --disable-nls \
+        --disable-nntp \
+        --disable-sslverify \
+        --disable-unicode \
+        --disable-w3mmailer \
+        --without-ssl
+      make -j4
+      test -x w3m
