@@ -8,10 +8,8 @@ Replace-deprecated-md5.patch
 Fix-gopher-selector-string.patch
 Fix-potential-null-dereference-with-gopher-I.patch
 Fix-segfault-with-dump_source-on-compressed-data.patch
-# PENDING
 Avoid-leaking-by-using-Str-function.patch
 Fix-possible-buffer-overflow-in-addMultirowsImg.patch
-Drop-upper-limit-on-COLS.patch
 # modernC
 0006-Remove-declaration-of-libc-functions.patch
 Get-rid-of-io_file_handle.patch
@@ -21,6 +19,8 @@ Align-function-signature-with-standard-functions.patch
 0001-Enable-building-with-modern-C-build-options.patch
 Enable-warnings-for-modern-C.patch
 Label-endif-else-that-is-far-away-from-ifdef.patch
+# PENDING
+Drop-upper-limit-on-COLS.patch
 #266 reorder
 Replace-reserved-chars-with-HTML-entities.patch
 Move-buffer.patch
