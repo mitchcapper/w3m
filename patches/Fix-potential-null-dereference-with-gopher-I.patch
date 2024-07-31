@@ -18,7 +18,7 @@ being displayed.
 
 --- a/file.c
 +++ b/file.c
-@@ -1974,7 +1974,8 @@ loadGeneralFile(char *path, ParsedURL *v
+@@ -1988,7 +1988,8 @@ loadGeneralFile(char *path, ParsedURL *v
  	    break;
  	case 'I':
  	    t = guessContentType(pu.file);

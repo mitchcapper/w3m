@@ -20,7 +20,7 @@ while (*m && *m++ != ';');
 
 --- a/fm.h
 +++ b/fm.h
-@@ -302,8 +302,8 @@ extern int REV_LB[];
+@@ -303,8 +303,8 @@ extern int REV_LB[];
  #endif				/* __EMX__ */
  
  

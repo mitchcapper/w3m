@@ -1,16 +1,16 @@
 From 265add370068ad12068b44393763df2afd7c57ff Mon Sep 17 00:00:00 2001
 From: Rene Kita <mail@rkta.de>
 Date: Fri, 17 Nov 2023 16:42:48 +0100
-Subject: [PATCH 2/2] Check for buffer underruns in checkType
+Subject: Check for buffer underruns in checkType
 
-This fixes Issue #282.
+This fixes GitHub Issue #282. Some buffer underrun found by some fuzzer.
 ---
  etc.c |   46 ++++++++++++++++++++++++++++++++--------------
  1 file changed, 32 insertions(+), 14 deletions(-)
 
 --- a/etc.c
 +++ b/etc.c
-@@ -389,15 +389,23 @@ checkType(Str s, Lineprop **oprop, Linec
+@@ -388,15 +388,23 @@ checkType(Str s, Lineprop **oprop, Linec
  			}
  			else {
  			    Strshrink(s, plen);
@@ -40,7 +40,7 @@ This fixes Issue #282.
  			    str += 2;
  			}
  		    }
-@@ -418,15 +426,23 @@ checkType(Str s, Lineprop **oprop, Linec
+@@ -417,15 +425,23 @@ checkType(Str s, Lineprop **oprop, Linec
  			}
  			else {
  			    Strshrink(s, plen);
@@ -69,8 +69,8 @@ This fixes Issue #282.
 +			    }
  			    str++;
  			}
- #else	/* USE_M17N */
-@@ -436,10 +452,12 @@ checkType(Str s, Lineprop **oprop, Linec
+ #else
+@@ -435,10 +451,12 @@ checkType(Str s, Lineprop **oprop, Linec
  			}
  			else {
  			    Strshrink(s, 1);

@@ -33,7 +33,7 @@ exceeding the maximum number of allowed redirections in such a case.
 
 --- a/file.c
 +++ b/file.c
-@@ -1650,28 +1650,16 @@ getAuthCookie(struct http_auth *hauth, c
+@@ -1636,28 +1636,16 @@ getAuthCookie(struct http_auth *hauth, c
  }
  
  static int
@@ -63,7 +63,7 @@ exceeding the maximum number of allowed redirections in such a case.
      if (nredir >= FollowRedirection) {
  	/* FIXME: gettextize? */
  	tmp = Sprintf("Number of redirections exceeded %d at %s",
-@@ -1679,22 +1667,6 @@ checkRedirection(ParsedURL *pu)
+@@ -1665,22 +1653,6 @@ checkRedirection(ParsedURL *pu)
  	disp_err_message(tmp->ptr, FALSE);
  	return FALSE;
      }

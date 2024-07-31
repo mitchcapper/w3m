@@ -19,12 +19,12 @@ complain about it - just let's stick to the standard.
 
 --- a/url.c
 +++ b/url.c
-@@ -1964,7 +1964,7 @@ openURL(char *url, ParsedURL *pu, Parsed
+@@ -1954,7 +1954,7 @@ openURL(char *url, ParsedURL *pu, Parsed
  	    if (pu->file == NULL)
  		pu->file = "1";
  	    tmp = Strnew_charp(file_unquote(pu->file));
 -	    Strcat_char(tmp, '\n');
 +	    Strcat_charp(tmp, "\r\n");
  	}
- #ifdef USE_SSL
- 	if (pu->scheme == SCM_GOPHERS) {
+ 	write(sock, tmp->ptr, tmp->length);
+ 	if(type != '\0') {

@@ -1,7 +1,7 @@
 From 1ff86c4280c2a517cdd7d03a6ca1f7149ad2a766 Mon Sep 17 00:00:00 2001
 From: fcd <git@fcd.dev>
 Date: Sun, 30 Jul 2023 15:54:07 +0300
-Subject: [PATCH] create history file if it doesn't exist
+Subject: [PATCH] Create history file if it doesn't exist
 
 When history is enabled but there is no history file, w3m logs an error
 message. Change that behavior to create a history file if it doesn't

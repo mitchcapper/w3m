@@ -1,7 +1,7 @@
 From 29f3d944fdb8d1bade8244b51ad627f4b81a1624 Mon Sep 17 00:00:00 2001
 From: Rene Kita <mail@rkta.de>
 Date: Wed, 13 Dec 2023 06:15:16 +0100
-Subject: [PATCH 2/6] Fix build error with --disable-color
+Subject: Fix build error with --disable-color
 
 With --disable-color highIntensityColors is not declared.
 ---

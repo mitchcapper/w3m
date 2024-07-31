@@ -1,37 +1,40 @@
+creat-hist-file.patch
+Remove-redirection-loop-check.patch
+Add-tilde-to-gopher-regex-for-chkURL.patch
+Fix-build-error-with-disable-color.patch
+Check-for-buffer-underruns-in-checkType.patch
+Fix-skip-blank-macros.patch
+Replace-deprecated-md5.patch
+Fix-gopher-selector-string.patch
+Fix-potential-null-dereference-with-gopher-I.patch
+Fix-segfault-with-dump_source-on-compressed-data.patch
 # PENDING
+Avoid-leaking-by-using-Str-function.patch~
+Fix-possible-buffer-overflow-in-addMultirowsImg.patch
 Drop-upper-limit-on-COLS.patch
 # modernC
-0002-Fix-build-error-with-disable-color.patch
 0006-Remove-declaration-of-libc-functions.patch
 Get-rid-of-io_file_handle.patch
 Remove-unused-argument-check.patch
 Remove-unnecessary-casts-from-istream.patch
 Align-function-signature-with-standard-functions.patch
 0001-Enable-building-with-modern-C-build-options.patch
-#276
 Enable-warnings-for-modern-C.patch
-creat-hist-file.patch
-#285 checkType underruns
 Label-endif-else-that-is-far-away-from-ifdef.patch
-Check-for-buffer-underruns-in-checkType.patch
 #266 reorder
 Replace-reserved-chars-with-HTML-entities.patch
 Move-buffer.patch
 # ?
 Fix-slow-backward-search.patch
 #278 md5
-Fix-skip-blank-macros.patch
 Reduce-scope-of-dangerous-macro.patch
 Fix-potential-null-dereference.patch
 Fix-potential-null-dereference-to_str.patch
-Avoid-leaking-by-using-Str-function.patch
 Simplify-reshapeBuffer.patch
-Replace-deprecated-md5.patch
 Add-an-include-guard-for-proto.h.patch
 Remove-unnecessary-macro.patch
 Get-rid-of-DO_EXTERNAL-macro.patch
 Remove-code-duplication.patch
-Add-tilde-to-gopher-regex-for-chkURL.patch
 Do-not-reshape-all-new-buffers.patch
 Add-a-comment.patch
 Use-correct-format-specifier-for-sprintf.patch
@@ -40,8 +43,6 @@ Remove-left-over-FORMAT_NICE-code.patch
 Remove-redundant-initialization.patch
 Remove-assignment-of-unread-value.patch
 Handle-errors-in-mySystem.patch
-# 288
-Remove-redirection-loop-check.patch
 # gophers
 refactor-openUrl-scheme-handling.patch
 Add-gophers-support.patch
@@ -141,12 +142,9 @@ Drop-support-for-old-ss-family.patch
 Remove-obsolete-checks-in-configure.patch
 Replace-AC_TRY_CPP.patch
 run-autoupdate.patch
-Fix-gopher-selector-string.patch
 Remove-unused-CurrentKeyData.patch
 Add-cd-command.patch
-Fix-potential-null-dereference-with-gopher-I.patch
 do_download.patch
-Fix-segfault-with-dump_source-on-compressed-data.patch
 Remove-unused-variable-amp_len.patch
 Fix-scan-build-issues.patch
 gophertmp.patch
