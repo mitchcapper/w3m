@@ -9,7 +9,7 @@ Fix-gopher-selector-string.patch
 Fix-potential-null-dereference-with-gopher-I.patch
 Fix-segfault-with-dump_source-on-compressed-data.patch
 # PENDING
-Avoid-leaking-by-using-Str-function.patch~
+Avoid-leaking-by-using-Str-function.patch
 Fix-possible-buffer-overflow-in-addMultirowsImg.patch
 Drop-upper-limit-on-COLS.patch
 # modernC
