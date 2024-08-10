@@ -4270,12 +4270,14 @@ goURL0(char *prompt, int relative)
 	    referer = NO_REFERER;
 	else
 	    referer = parsedURL2RefererStr(&Currentbuf->currentURL)->ptr;
-	url = url_encode(url, current, Currentbuf->document_charset);
+	if (url)
+	    url = url_encode(url, current, Currentbuf->document_charset);
     }
     else {
 	current = NULL;
 	referer = NULL;
-	url = url_encode(url, NULL, 0);
+	if (url)
+	    url = url_encode(url, NULL, 0);
     }
     if (url == NULL || *url == '\0') {
 	displayBuffer(Currentbuf, B_FORCE_REDRAW);
