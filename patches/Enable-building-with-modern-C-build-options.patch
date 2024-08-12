@@ -1,7 +1,7 @@
 From 0d2b6c38f0cb682a0c209b2df17e7d08b18642e1 Mon Sep 17 00:00:00 2001
 From: Rene Kita <mail@rkta.de>
 Date: Tue, 12 Dec 2023 13:17:24 +0100
-Subject: [PATCH 1/6] Enable building with "modern C" build options
+Subject: Enable building with "modern C" build options
 
 Enable building with "modern C" build options
 
@@ -16,7 +16,7 @@ make OPTS="-Werror=implicit-function-declaration -Werror=implicit-int
 ---
  Str.c                     |    2 -
  buffer.c                  |    2 -
- display.c                 |   21 ++++++++++++++++----
+ display.c                 |   41 +++++++++++++++++++++++++++------------
  file.c                    |   12 +++++------
  fm.h                      |    2 -
  func.h                    |    2 -
@@ -45,7 +45,7 @@ make OPTS="-Werror=implicit-function-declaration -Werror=implicit-int
  w3mimg/w3mimg.h           |    6 ++---
  w3mimg/win/win_w3mimg.cpp |    6 ++---
  w3mimg/x11/x11_w3mimg.c   |    2 -
- 31 files changed, 128 insertions(+), 113 deletions(-)
+ 31 files changed, 140 insertions(+), 121 deletions(-)
 
 --- a/buffer.c
 +++ b/buffer.c
@@ -80,7 +80,30 @@ make OPTS="-Werror=implicit-function-declaration -Werror=implicit-int
  #define EFFECT_ANCHOR_START       effect_anchor_start()
  #define EFFECT_ANCHOR_END         effect_anchor_end()
  #define EFFECT_IMAGE_START        effect_image_start()
-@@ -83,7 +96,7 @@ define_effect(EFFECT_MARK_START, EFFECT_
+@@ -72,18 +85,22 @@
+ static void name_start { if (useColor) { color_start; } else { mono_start; }}\
+ static void name_end { if (useColor) { color_end; } else { mono_end; }}
+ 
+-define_effect(EFFECT_ANCHOR_START, EFFECT_ANCHOR_END, EFFECT_ANCHOR_START_C,
+-	      EFFECT_ANCHOR_END_C, EFFECT_ANCHOR_START_M, EFFECT_ANCHOR_END_M)
+-define_effect(EFFECT_IMAGE_START, EFFECT_IMAGE_END, EFFECT_IMAGE_START_C,
+-	      EFFECT_IMAGE_END_C, EFFECT_IMAGE_START_M, EFFECT_IMAGE_END_M)
+-define_effect(EFFECT_FORM_START, EFFECT_FORM_END, EFFECT_FORM_START_C,
+-	      EFFECT_FORM_END_C, EFFECT_FORM_START_M, EFFECT_FORM_END_M)
+-define_effect(EFFECT_MARK_START, EFFECT_MARK_END, EFFECT_MARK_START_C,
+-	      EFFECT_MARK_END_C, EFFECT_MARK_START_M, EFFECT_MARK_END_M)
++define_effect(effect_anchor_start(void), effect_anchor_end(void),
++	      EFFECT_ANCHOR_START_C, EFFECT_ANCHOR_END_C,
++	      EFFECT_ANCHOR_START_M, EFFECT_ANCHOR_END_M)
++define_effect(effect_image_start(void), effect_image_end(void),
++	      EFFECT_IMAGE_START_C, EFFECT_IMAGE_END_C,
++	      EFFECT_IMAGE_START_M, EFFECT_IMAGE_END_M)
++define_effect(effect_form_start(void), effect_form_end(void),
++	      EFFECT_FORM_START_C, EFFECT_FORM_END_C,
++	      EFFECT_FORM_START_M, EFFECT_FORM_END_M)
++define_effect(effect_mark_start(void), effect_mark_end(void),
++	      EFFECT_MARK_START_C, EFFECT_MARK_END_C,
++	      EFFECT_MARK_START_M, EFFECT_MARK_END_M)
  
  /*****************/
  static void
@@ -89,7 +112,7 @@ make OPTS="-Werror=implicit-function-declaration -Werror=implicit-int
  {
      if (useColor) {
  	if (useActiveColor) {
-@@ -104,7 +117,7 @@ EFFECT_ACTIVE_START
+@@ -104,7 +121,7 @@ EFFECT_ACTIVE_START
  }
  
  static void
@@ -98,7 +121,7 @@ make OPTS="-Werror=implicit-function-declaration -Werror=implicit-int
  {
      if (useColor) {
  	if (useActiveColor) {
-@@ -118,7 +131,7 @@ EFFECT_ACTIVE_END
+@@ -118,7 +135,7 @@ EFFECT_ACTIVE_END
  }
  
  static void
@@ -107,7 +130,7 @@ make OPTS="-Werror=implicit-function-declaration -Werror=implicit-int
  {
      if (useVisitedColor) {
  	if (useColor) {
-@@ -130,7 +143,7 @@ EFFECT_VISITED_START
+@@ -130,7 +147,7 @@ EFFECT_VISITED_START
  }
  
  static void
@@ -118,7 +141,7 @@ make OPTS="-Werror=implicit-function-declaration -Werror=implicit-int
  	if (useColor) {
 --- a/file.c
 +++ b/file.c
-@@ -5588,7 +5588,7 @@ ex_efct(int ex)
+@@ -5584,7 +5584,7 @@ ex_efct(int ex)
  }
  
  static void
@@ -127,7 +150,7 @@ make OPTS="-Werror=implicit-function-declaration -Werror=implicit-int
  {
      static char *outc = NULL;
      static Lineprop *outp = NULL;
-@@ -8193,7 +8193,7 @@ save2tmp(URLFile uf, char *tmpf)
+@@ -8189,7 +8189,7 @@ save2tmp(URLFile uf, char *tmpf)
      MySignalHandler(*volatile prevtrap) (SIGNAL_ARG) = NULL;
      static JMP_BUF env_bak;
      volatile int retval = 0;
@@ -136,7 +159,7 @@ make OPTS="-Werror=implicit-function-declaration -Werror=implicit-int
  
      ff = fopen(tmpf, "wb");
      if (ff == NULL) {
-@@ -8234,7 +8234,7 @@ save2tmp(URLFile uf, char *tmpf)
+@@ -8230,7 +8230,7 @@ save2tmp(URLFile uf, char *tmpf)
      {
  	int count;
  
@@ -145,7 +168,7 @@ make OPTS="-Werror=implicit-function-declaration -Werror=implicit-int
  	while ((count = ISread_n(uf.stream, buf, SAVE_BUF_SIZE)) > 0) {
  	    if (fwrite(buf, 1, count, ff) != count) {
  		retval = -2;
-@@ -8361,7 +8361,7 @@ _MoveFile(char *path1, char *path2)
+@@ -8357,7 +8357,7 @@ _MoveFile(char *path1, char *path2)
      FILE *f2;
      int is_pipe;
      clen_t linelen = 0, trbyte = 0;
@@ -154,7 +177,7 @@ make OPTS="-Werror=implicit-function-declaration -Werror=implicit-int
      int count;
  
      f1 = openIS(path1);
-@@ -8380,7 +8380,7 @@ _MoveFile(char *path1, char *path2)
+@@ -8376,7 +8376,7 @@ _MoveFile(char *path1, char *path2)
  	return -1;
      }
      current_content_length = 0;
@@ -163,7 +186,7 @@ make OPTS="-Werror=implicit-function-declaration -Werror=implicit-int
      while ((count = ISread_n(f1, buf, SAVE_BUF_SIZE)) > 0) {
  	fwrite(buf, 1, count, f2);
  	linelen += count;
-@@ -8747,7 +8747,7 @@ uncompress_stream(URLFile *uf, char **sr
+@@ -8743,7 +8743,7 @@ uncompress_stream(URLFile *uf, char **sr
  	}
  	if (pid2 == 0) {
  	    /* child2 */
@@ -174,7 +197,7 @@ make OPTS="-Werror=implicit-function-declaration -Werror=implicit-int
  
 --- a/fm.h
 +++ b/fm.h
-@@ -1151,7 +1151,7 @@ global int relative_wheel_scroll init(FA
+@@ -1152,7 +1152,7 @@ global int relative_wheel_scroll init(FA
  global int fixed_wheel_scroll_count init(5);
  global int relative_wheel_scroll_ratio init(30);
  typedef struct _MouseActionMap {
@@ -442,7 +465,7 @@ make OPTS="-Werror=implicit-function-declaration -Werror=implicit-int
  #define getch()	do_getch()
  #endif				/* defined(USE_GPM) || defined(USE_SYSMOUSE) */
  #endif
-@@ -1529,7 +1529,7 @@ static Str currentURL(void);
+@@ -1532,7 +1532,7 @@ static Str currentURL(void);
  
  #ifdef USE_BUFINFO
  void
@@ -451,7 +474,7 @@ make OPTS="-Werror=implicit-function-declaration -Werror=implicit-int
  {
      FILE *fp;
  
-@@ -1787,7 +1787,7 @@ clear_mark(Line *l)
+@@ -1790,7 +1790,7 @@ clear_mark(Line *l)
  static int
  srchcore(char *volatile str, int (*func) (Buffer *, char *))
  {
@@ -460,7 +483,7 @@ make OPTS="-Werror=implicit-function-declaration -Werror=implicit-int
      volatile int i, result = SR_NOTFOUND;
  
      if (str != NULL && str != SearchString)
-@@ -2192,7 +2192,7 @@ DEFUN(pipesh, PIPE_SHELL, "Execute shell
+@@ -2195,7 +2195,7 @@ DEFUN(pipesh, PIPE_SHELL, "Execute shell
  DEFUN(readsh, READ_SHELL, "Execute shell command and display output")
  {
      Buffer *buf;
@@ -469,7 +492,7 @@ make OPTS="-Werror=implicit-function-declaration -Werror=implicit-int
      char *cmd;
  
      CurrentKeyData = NULL;	/* not allowed in w3m-control: */
-@@ -5989,7 +5989,7 @@ getCodePage(void)
+@@ -5992,7 +5992,7 @@ getCodePage(void)
  #endif
  
  void

@@ -1,7 +1,7 @@
 From 16464d476923e478a00e96f9b419e428f9e5d3b0 Mon Sep 17 00:00:00 2001
 From: Rene Kita <mail@rkta.de>
 Date: Tue, 19 Dec 2023 18:00:54 +0100
-Subject: [PATCH 6/6] Remove declaration of libc functions
+Subject: Remove declaration of libc functions
 
 ---
  w3mbookmark.c    |    1 -

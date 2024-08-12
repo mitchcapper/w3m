@@ -8,14 +8,12 @@ mis-positioned images on lines shorter than their intended line.
 
 May be related to 4e464819.
 ---
- anchor.c | 7 +++++++
+ anchor.c |    7 +++++++
  1 file changed, 7 insertions(+)
 
-diff --git a/anchor.c b/anchor.c
-index b6d121c0..0736bda6 100644
 --- a/anchor.c
 +++ b/anchor.c
-@@ -614,6 +614,13 @@ addMultirowsImg(Buffer *buf, AnchorList *al)
+@@ -614,6 +614,13 @@ addMultirowsImg(Buffer *buf, AnchorList
  	    a->slave = TRUE;
  	    a->image = img;
  	    a->end.pos = pos + ecol - col;
@@ -29,6 +27,3 @@ index b6d121c0..0736bda6 100644
  	    for (k = pos; k < a->end.pos; k++)
  		l->propBuf[k] |= PE_IMAGE;
  	    if (a_href.url) {
--- 
-2.39.2
-

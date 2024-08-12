@@ -191,7 +191,7 @@ without casting.
  		uf->guess_type = "text/plain";
  		return;
  	    }
-@@ -7916,7 +7916,7 @@ loadcmdout(char *cmd,
+@@ -7912,7 +7912,7 @@ loadcmdout(char *cmd,
      f = popen(cmd, "r");
      if (f == NULL)
  	return NULL;
@@ -200,7 +200,7 @@ without casting.
      buf = loadproc(&uf, defaultbuf);
      UFclose(&uf);
      return buf;
-@@ -7954,7 +7954,7 @@ getpipe(char *cmd)
+@@ -7950,7 +7950,7 @@ getpipe(char *cmd)
      if (f == NULL)
  	return NULL;
      buf = newBuffer(INIT_BUFFER_WIDTH);
@@ -209,7 +209,7 @@ without casting.
      buf->filename = cmd;
      buf->buffername = Sprintf("%s %s", PIPEBUFFERNAME,
  			      conv_from_system(cmd))->ptr;
-@@ -8782,7 +8782,7 @@ uncompress_stream(URLFile *uf, char **sr
+@@ -8778,7 +8778,7 @@ uncompress_stream(URLFile *uf, char **sr
  	    uf->scheme = SCM_LOCAL;
      }
      UFhalfclose(uf);
@@ -220,7 +220,7 @@ without casting.
  
 --- a/main.c
 +++ b/main.c
-@@ -958,7 +958,7 @@ main(int argc, char **argv)
+@@ -961,7 +961,7 @@ main(int argc, char **argv)
      if (load_argc == 0) {
  	/* no URL specified */
  	if (!isatty(0)) {
