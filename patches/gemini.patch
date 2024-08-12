@@ -54,7 +54,7 @@ w3m-0.5.3+git20230121.
      char *volatile tpath;
      char *volatile t = "text/plain", *p, *volatile real_type = NULL;
      Buffer *volatile t_buf = NULL;
-@@ -2008,6 +2010,166 @@ loadGeneralFile(char *path, ParsedURL *v
+@@ -2009,6 +2011,166 @@ loadGeneralFile(char *path, ParsedURL *v
      else if (pu.scheme == SCM_DATA) {
  	t = f.guess_type;
      }
@@ -221,7 +221,7 @@ w3m-0.5.3+git20230121.
      else if (searchHeader) {
  	searchHeader = SearchHeader = FALSE;
  	if (t_buf == NULL)
-@@ -2185,6 +2347,8 @@ loadGeneralFile(char *path, ParsedURL *v
+@@ -2193,6 +2355,8 @@ loadGeneralFile(char *path, ParsedURL *v
  
      if (is_html_type(t))
  	proc = loadHTMLBuffer;
@@ -230,7 +230,7 @@ w3m-0.5.3+git20230121.
      else if (is_plain_text_type(t))
  	proc = loadBuffer;
  #ifdef USE_IMAGE
-@@ -2439,7 +2603,6 @@ is_boundary(unsigned char *ch1, unsigned
+@@ -2449,7 +2613,6 @@ is_boundary(unsigned char *ch1, unsigned
      return 1;
  }
  
@@ -238,7 +238,7 @@ w3m-0.5.3+git20230121.
  static void
  set_breakpoint(struct readbuffer *obuf, int tag_length)
  {
-@@ -7472,6 +7635,130 @@ loadGopherSearch0(ParsedURL *pu)
+@@ -7482,6 +7645,130 @@ loadGopherSearch0(ParsedURL *pu)
  }
  #endif				/* USE_GOPHER */
  
@@ -460,7 +460,7 @@ w3m-0.5.3+git20230121.
      case SCM_NNTP_GROUP:
 --- a/display.c
 +++ b/display.c
-@@ -395,7 +395,8 @@ displayBuffer(Buffer *buf, int mode)
+@@ -399,7 +399,8 @@ displayBuffer(Buffer *buf, int mode)
      if (buf->height == 0)
  	buf->height = LASTLINE + 1;
      if ((buf->width != INIT_BUFFER_WIDTH &&
@@ -602,7 +602,7 @@ w3m-0.5.3+git20230121.
  }
  
  /* Quit */
-@@ -4721,6 +4778,13 @@ DEFUN(vwSrc, SOURCE VIEW, "Toggle betwee
+@@ -4723,6 +4780,13 @@ DEFUN(vwSrc, SOURCE VIEW, "Toggle betwee
  	displayBuffer(Currentbuf, B_NORMAL);
  	return;
      }
@@ -616,7 +616,7 @@ w3m-0.5.3+git20230121.
      if (Currentbuf->sourcefile == NULL) {
  	if (Currentbuf->pagerSource &&
  	    !strcasecmp(Currentbuf->type, "text/plain")) {
-@@ -4806,6 +4870,91 @@ DEFUN(fold_pre, FOLD_PRE, "Fold long lin
+@@ -4808,6 +4872,91 @@ DEFUN(fold_pre, FOLD_PRE, "Fold long lin
      FoldPre = FoldPreOpt;
  }
  
@@ -708,7 +708,7 @@ w3m-0.5.3+git20230121.
  /* reload */
  DEFUN(reload, RELOAD, "Load current document anew")
  {
-@@ -5031,6 +5180,7 @@ chkURLBuffer(Buffer *buf)
+@@ -5033,6 +5182,7 @@ chkURLBuffer(Buffer *buf)
  	"https?://[a-zA-Z0-9:%\\-\\./_@]*\\[[a-fA-F0-9:][a-fA-F0-9:\\.]*\\][a-zA-Z0-9:%\\-\\./?=~_\\&+@#,\\$;]*",
  	"ftp://[a-zA-Z0-9:%\\-\\./_@]*\\[[a-fA-F0-9:][a-fA-F0-9:\\.]*\\][a-zA-Z0-9:%\\-\\./=_+@#,\\$]*",
  #endif				/* INET6 */

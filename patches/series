@@ -1,23 +1,4 @@
-creat-hist-file.patch
-Remove-redirection-loop-check.patch
-Add-tilde-to-gopher-regex-for-chkURL.patch
-Fix-build-error-with-disable-color.patch
-Check-for-buffer-underruns-in-checkType.patch
-Fix-skip-blank-macros.patch
-Fix-gopher-selector-string.patch
-Fix-potential-null-dereference-with-gopher-I.patch
-Fix-segfault-with-dump_source-on-compressed-data.patch
-Avoid-leaking-by-using-Str-function.patch
-Fix-possible-buffer-overflow-in-addMultirowsImg.patch
-Replace-deprecated-md5.patch
 # modernC
-Remove-declaration-of-libc-functions.patch
-Get-rid-of-io_file_handle.patch
-Remove-unused-argument-check.patch
-Remove-unnecessary-casts-from-istream.patch
-Align-function-signature-with-standard-functions.patch
-Enable-building-with-modern-C-build-options.patch
-Enable-warnings-for-modern-C.patch
 Label-endif-else-that-is-far-away-from-ifdef.patch
 # PENDING
 Drop-upper-limit-on-COLS.patch
@@ -145,7 +126,6 @@ run-autoupdate.patch
 Remove-unused-CurrentKeyData.patch
 Add-cd-command.patch
 do_download.patch
-Remove-unused-variable-amp_len.patch
 Fix-scan-build-issues.patch
 gophertmp.patch
 Reset-optimization.patch

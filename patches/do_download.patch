@@ -168,7 +168,7 @@ Next step: use 'flags' parameter for all options, include do_download.
  	/* download only */
  	char *file;
  	TRAP_OFF;
-@@ -2354,11 +2349,7 @@ fail:
+@@ -2361,11 +2356,7 @@ fail:
  #endif
      else if (w3m_backend) ;
      else if (!(w3m_dump & ~DUMP_FRAME) || is_dump_text_type(t)) {
@@ -313,7 +313,7 @@ Next step: use 'flags' parameter for all options, include do_download.
      if (buf == NULL) {
  	char *emsg = Sprintf(_("Can't load %s"), conv_from_system(url))->ptr;
  	disp_err_message(emsg, FALSE);
-@@ -5120,7 +5124,8 @@ DEFUN(reload, RELOAD, "Load current docu
+@@ -5122,7 +5126,8 @@ DEFUN(reload, RELOAD, "Load current docu
  #endif
      SearchHeader = Currentbuf->search_header;
      DefaultType = Currentbuf->real_type;
@@ -323,7 +323,7 @@ Next step: use 'flags' parameter for all options, include do_download.
  #ifdef USE_M17N
      DocumentCharset = old_charset;
  #endif
-@@ -6012,7 +6017,7 @@ execdict(const char *word)
+@@ -6014,7 +6019,7 @@ execdict(const char *word)
      }
      dictcmd = Sprintf("%s?%s", DictCommand,
  		      Str_form_quote(Strnew_charp(w))->ptr)->ptr;

@@ -95,7 +95,7 @@
  Buffer *
 --- a/file.c
 +++ b/file.c
-@@ -6725,7 +6725,7 @@ addnewline(Buffer *buf, char *line, Line
+@@ -6735,7 +6735,7 @@ addnewline(Buffer *buf, char *line, Line
      if (pos > 0) {
  	s = allocStr(line, pos);
  	p = NewAtom_N(Lineprop, pos);
@@ -104,7 +104,7 @@
      }
      else {
  	s = NullLine;
-@@ -6734,7 +6734,7 @@ addnewline(Buffer *buf, char *line, Line
+@@ -6744,7 +6744,7 @@ addnewline(Buffer *buf, char *line, Line
  #ifdef USE_ANSI_COLOR
      if (pos > 0 && color) {
  	c = NewAtom_N(Linecolor, pos);
@@ -420,7 +420,7 @@
      }
  }
  
-@@ -4636,7 +4636,7 @@ _peekURL(int only_img)
+@@ -4638,7 +4638,7 @@ _peekURL(int only_img)
  #ifdef USE_M17N
      s = checkType(s, &pp, NULL);
      p = NewAtom_N(Lineprop, s->length);
@@ -429,7 +429,7 @@
  #endif
    disp:
      n = searchKeyNum();
-@@ -4695,7 +4695,7 @@ DEFUN(curURL, PEEK, "Show current addres
+@@ -4697,7 +4697,7 @@ DEFUN(curURL, PEEK, "Show current addres
  #ifdef USE_M17N
  	s = checkType(s, &pp, NULL);
  	p = NewAtom_N(Lineprop, s->length);

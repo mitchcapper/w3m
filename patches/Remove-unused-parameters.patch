@@ -16,7 +16,7 @@
  		t = "gopher:search";
  	    }
  	    TRAP_OFF;
-@@ -2984,7 +2984,7 @@ flushline(struct html_feed_environ *h_en
+@@ -2994,7 +2994,7 @@ flushline(struct html_feed_environ *h_en
  
  void
  do_blankline(struct html_feed_environ *h_env, struct readbuffer *obuf,
@@ -25,7 +25,7 @@
  {
      if (h_env->blank_lines == 0)
  	flushline(h_env, obuf, indent, 1, width);
-@@ -3135,7 +3135,7 @@ process_title(struct parsed_tag *tag)
+@@ -3145,7 +3145,7 @@ process_title(struct parsed_tag *tag)
  }
  
  static Str
@@ -34,7 +34,7 @@
  {
      Str tmp;
  
-@@ -4484,8 +4484,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -4494,8 +4494,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	CLOSE_A;
  	if (!(obuf->flag & RB_IGNORE_P)) {
  	    flushline(h_env, obuf, envs[h_env->envc].indent, 1, h_env->limit);
@@ -44,7 +44,7 @@
  	}
  	obuf->flag |= RB_IGNORE_P;
  	if (cmd == HTML_P) {
-@@ -4502,8 +4501,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -4512,8 +4511,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
      case HTML_H:
  	if (!(obuf->flag & (RB_PREMODE | RB_IGNORE_P))) {
  	    flushline(h_env, obuf, envs[h_env->envc].indent, 0, h_env->limit);
@@ -54,7 +54,7 @@
  	}
  	HTMLlineproc1("<b>", h_env);
  	set_alignment(obuf, tag);
-@@ -4513,7 +4511,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -4523,7 +4521,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	if (!(obuf->flag & RB_PREMODE)) {
  	    flushline(h_env, obuf, envs[h_env->envc].indent, 0, h_env->limit);
  	}
@@ -63,7 +63,7 @@
  	RB_RESTORE_FLAG(obuf);
  	close_anchor(h_env, obuf);
  	obuf->flag |= RB_IGNORE_P;
-@@ -4526,8 +4524,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -4536,8 +4534,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	    flushline(h_env, obuf, envs[h_env->envc].indent, 0, h_env->limit);
  	    if (!(obuf->flag & RB_PREMODE) &&
  		(h_env->envc == 0 || cmd == HTML_BLQ))
@@ -73,7 +73,7 @@
  	}
  	PUSH_ENV(cmd);
  	if (cmd == HTML_UL || cmd == HTML_OL) {
-@@ -4559,8 +4556,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -4569,8 +4566,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	    if (!(obuf->flag & RB_PREMODE) &&
  		(h_env->envc == 0 || cmd == HTML_N_BLQ)) {
  		do_blankline(h_env, obuf,
@@ -83,7 +83,7 @@
  		obuf->flag |= RB_IGNORE_P;
  	    }
  	}
-@@ -4573,7 +4569,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -4583,7 +4579,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	    if (!(obuf->flag & RB_PREMODE) && envs[h_env->envc].env != HTML_DL
  		    && envs[h_env->envc].env != HTML_DL_COMPACT
  		    && envs[h_env->envc].env != HTML_DD)
@@ -92,7 +92,7 @@
  			     h_env->limit);
  	}
  	PUSH_ENV_NOINDENT(cmd);
-@@ -4724,7 +4720,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -4734,7 +4730,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	    return 1;
  	obuf->flag &= ~RB_TITLE;
  	obuf->end_tag = 0;
@@ -101,7 +101,7 @@
  	if (tmp)
  	    HTMLlineproc1(tmp->ptr, h_env);
  	return 1;
-@@ -4781,7 +4777,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -4791,7 +4787,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	if (!(obuf->flag & RB_IGNORE_P)) {
  	    flushline(h_env, obuf, envs[h_env->envc].indent, 0, h_env->limit);
  	    if (!x)
@@ -110,7 +110,7 @@
  			     h_env->limit);
  	}
  	else
-@@ -4792,8 +4788,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -4802,8 +4798,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
      case HTML_N_PRE:
  	flushline(h_env, obuf, envs[h_env->envc].indent, 0, h_env->limit);
  	if (!(obuf->flag & RB_IGNORE_P)) {
@@ -120,7 +120,7 @@
  	    obuf->flag |= RB_IGNORE_P;
  	    h_env->blank_lines++;
  	}
-@@ -4830,8 +4825,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -4840,8 +4835,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	CLOSE_A;
  	if (!(obuf->flag & RB_IGNORE_P)) {
  	    flushline(h_env, obuf, envs[h_env->envc].indent, 0, h_env->limit);
@@ -130,7 +130,7 @@
  	}
  	obuf->flag |= (RB_PRE | RB_IGNORE_P);
  	return 1;
-@@ -4839,8 +4833,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -4849,8 +4843,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	CLOSE_A;
  	if (!(obuf->flag & RB_IGNORE_P)) {
  	    flushline(h_env, obuf, envs[h_env->envc].indent, 0, h_env->limit);
@@ -140,7 +140,7 @@
  	    obuf->flag |= RB_IGNORE_P;
  	}
  	obuf->flag &= ~RB_PRE;
-@@ -4851,8 +4844,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -4861,8 +4854,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	CLOSE_A;
  	if (!(obuf->flag & RB_IGNORE_P)) {
  	    flushline(h_env, obuf, envs[h_env->envc].indent, 0, h_env->limit);
@@ -150,7 +150,7 @@
  	}
  	obuf->flag |= (RB_PLAIN | RB_IGNORE_P);
  	switch (cmd) {
-@@ -4872,8 +4864,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -4882,8 +4874,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	CLOSE_A;
  	if (!(obuf->flag & RB_IGNORE_P)) {
  	    flushline(h_env, obuf, envs[h_env->envc].indent, 0, h_env->limit);
@@ -160,7 +160,7 @@
  	    obuf->flag |= RB_IGNORE_P;
  	}
  	obuf->flag &= ~RB_PLAIN;
-@@ -5227,7 +5218,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -5237,7 +5228,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  		tmp = Sprintf("Refresh (%d sec)", refresh_interval);
  	    if (tmp) {
  		HTMLlineproc1(tmp->ptr, h_env);
@@ -169,7 +169,7 @@
  			     h_env->limit);
  		if (!is_redisplay &&
  		    !((obuf->flag & RB_NOFRAMES) && RenderFrame)) {
-@@ -6278,8 +6269,7 @@ proc_escape(struct readbuffer *obuf, cha
+@@ -6288,8 +6279,7 @@ proc_escape(struct readbuffer *obuf, cha
  
  
  static int
@@ -179,7 +179,7 @@
  {
      char ch;
  
-@@ -6478,7 +6468,7 @@ HTMLlineproc0(char *line, struct html_fe
+@@ -6488,7 +6478,7 @@ HTMLlineproc0(char *line, struct html_fe
  		if (tbl->vspace > 0 && !(obuf->flag & RB_IGNORE_P)) {
  		    int indent = h_env->envs[h_env->envc].indent;
  		    flushline(h_env, obuf, indent, 0, h_env->limit);
@@ -188,7 +188,7 @@
  		}
  		save_fonteffect(h_env, obuf);
  		initRenderTable();
-@@ -6487,7 +6477,7 @@ HTMLlineproc0(char *line, struct html_fe
+@@ -6497,7 +6487,7 @@ HTMLlineproc0(char *line, struct html_fe
  		obuf->flag &= ~RB_IGNORE_P;
  		if (tbl->vspace > 0) {
  		    int indent = h_env->envs[h_env->envc].indent;
@@ -197,7 +197,7 @@
  		    obuf->flag |= RB_IGNORE_P;
  		}
  		set_space_to_prevchar(obuf->prevchar);
-@@ -6632,7 +6622,7 @@ HTMLlineproc0(char *line, struct html_fe
+@@ -6642,7 +6632,7 @@ HTMLlineproc0(char *line, struct html_fe
  				   mode);
  		}
  	    }
@@ -206,7 +206,7 @@
  		char *bp = obuf->line->ptr + obuf->bp.len;
  		char *tp = bp - obuf->bp.tlen;
  		int i = 0;
-@@ -7452,10 +7442,10 @@ loadGopherDir0(URLFile *uf, ParsedURL *p
+@@ -7462,10 +7452,10 @@ loadGopherDir0(URLFile *uf, ParsedURL *p
  
  #ifdef USE_M17N
  Str
@@ -314,7 +314,7 @@
  extern void draw_menu_item(Menu *menu, int mselect);
 --- a/table.c
 +++ b/table.c
-@@ -757,7 +757,7 @@ do_refill(struct table *tbl, int row, in
+@@ -754,7 +754,7 @@ do_refill(struct table *tbl, int row, in
      if (h_env.limit > maxlimit)
  	h_env.limit = maxlimit;
      if (tbl->border_mode != BORDER_NONE && tbl->vcellpadding > 0)
@@ -323,7 +323,7 @@
      for (l = orgdata->first; l != NULL; l = l->next) {
  	if (TAG_IS(l->ptr, "<table_alt", 10)) {
  	    int id = -1;
-@@ -774,7 +774,7 @@ do_refill(struct table *tbl, int row, in
+@@ -771,7 +771,7 @@ do_refill(struct table *tbl, int row, in
  		save_fonteffect(&h_env, h_env.obuf);
  		flushline(&h_env, &obuf, 0, 2, h_env.limit);
  		if (t->vspace > 0 && !(obuf.flag & RB_IGNORE_P))
@@ -332,7 +332,7 @@
  		if (RB_GET_ALIGN(h_env.obuf) == RB_CENTER)
  		    alignment = ALIGN_CENTER;
  		else if (RB_GET_ALIGN(h_env.obuf) == RB_RIGHT)
-@@ -794,7 +794,7 @@ do_refill(struct table *tbl, int row, in
+@@ -791,7 +791,7 @@ do_refill(struct table *tbl, int row, in
  		obuf.flag &= ~RB_IGNORE_P;
  		h_env.blank_lines = 0;
  		if (t->vspace > 0) {
@@ -341,7 +341,7 @@
  		    obuf.flag |= RB_IGNORE_P;
  		}
  	    }
-@@ -812,7 +812,7 @@ do_refill(struct table *tbl, int row, in
+@@ -809,7 +809,7 @@ do_refill(struct table *tbl, int row, in
  	int rowspan = table_rowspan(tbl, row, col);
  	if (row + rowspan <= tbl->maxrow) {
  	    if (tbl->vcellpadding > 0 && !(obuf.flag & RB_IGNORE_P))
@@ -350,7 +350,7 @@
  	}
  	else {
  	    if (tbl->vspace > 0)
-@@ -822,7 +822,7 @@ do_refill(struct table *tbl, int row, in
+@@ -819,7 +819,7 @@ do_refill(struct table *tbl, int row, in
      else {
  	if (tbl->vcellpadding > 0) {
  	    if (!(obuf.flag & RB_IGNORE_P))
@@ -359,7 +359,7 @@
  	}
  	else
  	    purgeline(&h_env);
-@@ -2159,7 +2159,7 @@ check_minimum0(struct table *t, int min)
+@@ -2156,7 +2156,7 @@ check_minimum0(struct table *t, int min)
  }
  
  static int
@@ -368,7 +368,7 @@
  {
      int w;
      int width = t->tabcontentssize;
-@@ -2187,7 +2187,7 @@ setwidth0(struct table *t, struct table_
+@@ -2184,7 +2184,7 @@ setwidth0(struct table *t, struct table_
  static void
  setwidth(struct table *t, struct table_mode *mode)
  {
@@ -377,7 +377,7 @@
      if (width < 0)
  	return;
  #ifdef NOWRAP
-@@ -3124,7 +3124,7 @@ feed_table_tag(struct table *tbl, char *
+@@ -3121,7 +3121,7 @@ feed_table_tag(struct table *tbl, char *
  		    tbl->fixed_width[tbl->col] = w;
  	    }
  #endif

@@ -41,7 +41,7 @@ Subject: Get rid of MySignalHandler
      TextList *extra_header = newTextList();
      volatile Str uname = NULL;
      volatile Str pwd = NULL;
-@@ -7271,7 +7270,7 @@ loadHTMLstream(URLFile *f, Buffer *newBu
+@@ -7281,7 +7280,7 @@ loadHTMLstream(URLFile *f, Buffer *newBu
  #ifdef USE_IMAGE
      int volatile image_flag;
  #endif
@@ -50,7 +50,7 @@ Subject: Get rid of MySignalHandler
  
  #ifdef USE_M17N
      if (fmInitialized && graph_ok()) {
-@@ -7436,7 +7435,7 @@ Buffer *
+@@ -7446,7 +7445,7 @@ Buffer *
  loadHTMLString(Str page)
  {
      URLFile f;
@@ -59,7 +59,7 @@ Subject: Get rid of MySignalHandler
      Buffer *newBuf;
  
      init_stream(&f, SCM_LOCAL, newStrStream(page));
-@@ -7487,7 +7486,7 @@ loadGopherDir0(URLFile *uf, ParsedURL *p
+@@ -7497,7 +7496,7 @@ loadGopherDir0(URLFile *uf, ParsedURL *p
      Str lbuf, name, file, host, port, type;
      char *volatile p, *volatile q;
      int link, pre;
@@ -68,7 +68,7 @@ Subject: Get rid of MySignalHandler
  #ifdef USE_M17N
      wc_ces doc_charset = DocumentCharset;
  #endif
-@@ -7642,7 +7641,7 @@ loadGeminiBuffer(URLFile *uf, Buffer *vo
+@@ -7652,7 +7651,7 @@ loadGeminiBuffer(URLFile *uf, Buffer *vo
      int hseq, len, nlines, pre = 0;
      clen_t linelen = 0, trbyte = 0;
      Lineprop *propBuf = NULL;
@@ -77,7 +77,7 @@ Subject: Get rid of MySignalHandler
  
      if (SETJMP(AbortLoading) != 0) {
  	goto _end;
-@@ -7775,7 +7774,7 @@ loadBuffer(URLFile *uf, Buffer *volatile
+@@ -7785,7 +7784,7 @@ loadBuffer(URLFile *uf, Buffer *volatile
  #ifdef USE_ANSI_COLOR
      Linecolor *colorBuffer = NULL;
  #endif
@@ -86,7 +86,7 @@ Subject: Get rid of MySignalHandler
  
      if (newBuf == NULL)
  	newBuf = newBuffer(INIT_BUFFER_WIDTH);
-@@ -7864,7 +7863,7 @@ loadImageBuffer(URLFile *uf, Buffer *new
+@@ -7874,7 +7873,7 @@ loadImageBuffer(URLFile *uf, Buffer *new
      Str tmp, tmpf;
      FILE *src = NULL;
      URLFile f;
@@ -95,7 +95,7 @@ Subject: Get rid of MySignalHandler
      struct stat st;
      ParsedURL *pu = newBuf ? &newBuf->currentURL : NULL;
  
-@@ -8192,7 +8191,7 @@ getNextPage(Buffer *buf, int plen)
+@@ -8202,7 +8201,7 @@ getNextPage(Buffer *buf, int plen)
  #ifdef USE_ANSI_COLOR
      Linecolor *colorBuffer = NULL;
  #endif
@@ -104,7 +104,7 @@ Subject: Get rid of MySignalHandler
  
      if (buf->pagerSource == NULL)
  	return NULL;
-@@ -8301,7 +8300,7 @@ save2tmp(URLFile uf, const char *tmpf)
+@@ -8311,7 +8310,7 @@ save2tmp(URLFile uf, const char *tmpf)
  {
      FILE *ff;
      clen_t linelen = 0, trbyte = 0;
@@ -257,7 +257,7 @@ Subject: Get rid of MySignalHandler
      char *cmd;
  
      CurrentKeyData = NULL;	/* not allowed in w3m-control: */
-@@ -6255,7 +6252,7 @@ DEFUN(execCmd, COMMAND, "Invoke w3m func
+@@ -6257,7 +6254,7 @@ DEFUN(execCmd, COMMAND, "Invoke w3m func
  }
  
  #ifdef USE_ALARM
@@ -266,7 +266,7 @@ Subject: Get rid of MySignalHandler
  SigAlarm(SIGNAL_ARG)
  {
      char *data;
-@@ -6291,7 +6288,6 @@ SigAlarm(SIGNAL_ARG)
+@@ -6293,7 +6290,6 @@ SigAlarm(SIGNAL_ARG)
  	    alarm(CurrentAlarm->sec);
  	}
      }

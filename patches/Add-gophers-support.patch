@@ -19,7 +19,7 @@ Subject: add gophers support
  	p = pu.file;
  	while(*p == '/')
  	    ++p;
-@@ -2125,7 +2125,7 @@ loadGeneralFile(char *path, ParsedURL *v
+@@ -2126,7 +2126,7 @@ loadGeneralFile(char *path, ParsedURL *v
  		return NULL;
  	    file = guess_filename(pu.file);
  #ifdef USE_GOPHER
@@ -126,7 +126,7 @@ Subject: add gophers support
  	while(*p == '/') {
 @@ -1956,11 +1967,25 @@ openURL(char *url, ParsedURL *pu, Parsed
  	    tmp = Strnew_charp(file_unquote(pu->file));
- 	    Strcat_char(tmp, '\n');
+ 	    Strcat_charp(tmp, "\r\n");
  	}
 -	write(sock, tmp->ptr, tmp->length);
 +#ifdef USE_SSL
@@ -186,7 +186,7 @@ Subject: add gophers support
  #endif				/* _HTML_H */
 --- a/main.c
 +++ b/main.c
-@@ -5070,7 +5070,7 @@ chkURLBuffer(Buffer *buf)
+@@ -5072,7 +5072,7 @@ chkURLBuffer(Buffer *buf)
  	"https?://[a-zA-Z0-9][a-zA-Z0-9:%\\-\\./?=~_\\&+@#,\\$;]*[a-zA-Z0-9_/=\\-]",
  	"file:/[a-zA-Z0-9:%\\-\\./=_\\+@#,\\$;]*",
  #ifdef USE_GOPHER

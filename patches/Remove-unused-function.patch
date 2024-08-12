@@ -20,7 +20,7 @@ Subject: [PATCH 018/172] Remove unused function
 
 --- a/display.c
 +++ b/display.c
-@@ -1452,14 +1452,6 @@ cursorLeft(Buffer *buf, int n)
+@@ -1456,14 +1456,6 @@ cursorLeft(Buffer *buf, int n)
      buf->cursorX = buf->visualpos - l->bwidth;
  }
  

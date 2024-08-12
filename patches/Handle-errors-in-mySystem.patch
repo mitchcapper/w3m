@@ -54,7 +54,7 @@ Check the return value of system() calls and display an error message.
  extern int is_localhost(const char *host);
 --- a/file.c
 +++ b/file.c
-@@ -8213,7 +8213,7 @@ doExternal(URLFile uf, char *type, Buffe
+@@ -8195,7 +8195,7 @@ doExternal(URLFile uf, char *type, Buffe
  {
      Str tmpf, command;
      struct mailcap *mcap;
@@ -63,7 +63,7 @@ Check the return value of system() calls and display an error message.
      Buffer *buf = NULL;
      char *header, *src = NULL, *ext = uf.ext;
  
-@@ -8289,8 +8289,11 @@ doExternal(URLFile uf, char *type, Buffe
+@@ -8271,8 +8271,11 @@ doExternal(URLFile uf, char *type, Buffe
      else {
  	if (mcap->flags & MAILCAP_NEEDSTERMINAL || !BackgroundExtViewer) {
  	    fmTerm();

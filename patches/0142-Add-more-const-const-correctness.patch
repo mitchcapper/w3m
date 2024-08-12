@@ -96,7 +96,7 @@ Subject: [PATCH 142/172] Add more const const correctness
  	if (*p == '\t')
 --- a/file.c
 +++ b/file.c
-@@ -4361,7 +4361,7 @@ process_n_form(void)
+@@ -4371,7 +4371,7 @@ process_n_form(void)
  static void
  clear_ignore_p_flag(int cmd, struct readbuffer *obuf)
  {
@@ -283,7 +283,7 @@ Subject: [PATCH 142/172] Add more const const correctness
  {
      int n = nent;
      int k = 0;
-@@ -853,9 +853,9 @@ table_rule_width(struct table *t)
+@@ -850,9 +850,9 @@ table_rule_width(struct table *t)
  }
  
  static void
@@ -296,7 +296,7 @@ Subject: [PATCH 142/172] Add more const const correctness
  {
      int i, j, k, brow, erow;
      int sheight, height;
-@@ -886,9 +886,9 @@ check_cell_height(int *tabheight, int *c
+@@ -883,9 +883,9 @@ check_cell_height(int *tabheight, int *c
  }
  
  static void
@@ -309,7 +309,7 @@ Subject: [PATCH 142/172] Add more const const correctness
  {
      int i, j, k, bcol, ecol;
      int swidth, width;
-@@ -3444,7 +3444,7 @@ correct_table_matrix2(struct table *t, i
+@@ -3441,7 +3441,7 @@ correct_table_matrix2(struct table *t, i
  }
  
  static void
@@ -318,7 +318,7 @@ Subject: [PATCH 142/172] Add more const const correctness
  		      double b)
  {
      int i, j;
-@@ -3471,7 +3471,7 @@ correct_table_matrix3(struct table *t, i
+@@ -3468,7 +3468,7 @@ correct_table_matrix3(struct table *t, i
  }
  
  static void

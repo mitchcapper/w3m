@@ -17,7 +17,7 @@ Subject: [PATCH 1/2] Label #endif/#else that is far away from #ifdef
      if (!do_copy) {
  	for (; str < endp && IS_ASCII(*str); str++) {
  	    *(prop++) = PE_NORMAL | (IS_CNTRL(*str) ? PC_CTRL : PC_ASCII);
-@@ -404,7 +405,7 @@ checkType(Str s, Lineprop **oprop, Linec
+@@ -412,7 +413,7 @@ checkType(Str s, Lineprop **oprop, Linec
  			str += 2;
  		    }
  		}
@@ -26,8 +26,8 @@ Subject: [PATCH 1/2] Label #endif/#else that is far away from #ifdef
  		else {
  		    if (s->length) {
  #ifdef USE_M17N
-@@ -428,7 +429,7 @@ checkType(Str s, Lineprop **oprop, Linec
- 				plen = *(--plens);
+@@ -444,7 +445,7 @@ checkType(Str s, Lineprop **oprop, Linec
+ 			    }
  			    str++;
  			}
 -#else
@@ -35,7 +35,7 @@ Subject: [PATCH 1/2] Label #endif/#else that is far away from #ifdef
  			if (*(str - 1) == *(str + 1)) {
  			    *(prop - 1) |= PE_BOLD;
  			    str += 2;
-@@ -442,7 +443,7 @@ checkType(Str s, Lineprop **oprop, Linec
+@@ -460,7 +461,7 @@ checkType(Str s, Lineprop **oprop, Linec
  #endif
  			    str++;
  			}
@@ -44,7 +44,7 @@ Subject: [PATCH 1/2] Label #endif/#else that is far away from #ifdef
  		    }
  		    else {
  			str++;
-@@ -457,6 +458,7 @@ checkType(Str s, Lineprop **oprop, Linec
+@@ -475,6 +476,7 @@ checkType(Str s, Lineprop **oprop, Linec
  		bs = memchr(str, '\b', endp - str);
  #endif
  	}
@@ -52,7 +52,7 @@ Subject: [PATCH 1/2] Label #endif/#else that is far away from #ifdef
  #ifdef USE_ANSI_COLOR
  	if (es != NULL) {
  	    if (str == es) {
-@@ -501,7 +503,7 @@ checkType(Str s, Lineprop **oprop, Linec
+@@ -519,7 +521,7 @@ checkType(Str s, Lineprop **oprop, Linec
  	    str += plen;
  	}
  	else
