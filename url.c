@@ -1694,12 +1694,12 @@ openURL(char *url, ParsedURL *pu, ParsedURL *current,
 	    /* local CGI: POST */
 	    uf.stream = newFileStream(localcgi_post(pu->real_file, pu->query,
 						    request, option->referer),
-				      (void (*)())fclose);
+				      fclose);
 	else
 	    /* lodal CGI: GET */
 	    uf.stream = newFileStream(localcgi_get(pu->real_file, pu->query,
 						   option->referer),
-				      (void (*)())fclose);
+				      fclose);
 	if (uf.stream) {
 	    uf.is_cgi = TRUE;
 	    uf.scheme = pu->scheme = SCM_LOCAL_CGI;
@@ -1954,7 +1954,7 @@ openURL(char *url, ParsedURL *pu, ParsedURL *current,
 	    if (pu->file == NULL)
 		pu->file = "1";
 	    tmp = Strnew_charp(file_unquote(pu->file));
-	    Strcat_char(tmp, '\n');
+	    Strcat_charp(tmp, "\r\n");
 	}
 	write(sock, tmp->ptr, tmp->length);
 	if(type != '\0') {

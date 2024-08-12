@@ -303,8 +303,8 @@ extern int REV_LB[];
 #endif				/* __EMX__ */
 
 
-#define SKIP_BLANKS(p) {while(*(p)&&IS_SPACE(*(p)))(p)++;}
-#define SKIP_NON_BLANKS(p) {while(*(p)&&!IS_SPACE(*(p)))(p)++;}
+#define SKIP_BLANKS(p) do{while(*(p)&&IS_SPACE(*(p)))(p)++;}while(0)
+#define SKIP_NON_BLANKS(p) do{while(*(p)&&!IS_SPACE(*(p)))(p)++;}while(0)
 #define IS_ENDL(c) ((c)=='\0'||(c)=='\r'||(c)=='\n')
 #define IS_ENDT(c) (IS_ENDL(c)||(c)==';')
 
@@ -1152,7 +1152,7 @@ global int relative_wheel_scroll init(FALSE);
 global int fixed_wheel_scroll_count init(5);
 global int relative_wheel_scroll_ratio init(30);
 typedef struct _MouseActionMap {
-    void (*func) ();
+    void (*func) (void);
     char *data;
 } MouseActionMap;
 typedef struct _MouseAction {

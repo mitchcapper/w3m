@@ -401,7 +401,7 @@ examineFile(char *path, URLFile *uf)
 		return;
 	    if ((fp = lessopen_stream(path))) {
 		UFclose(uf);
-		uf->stream = newFileStream(fp, (void (*)())pclose);
+		uf->stream = newFileStream(fp, pclose);
 		uf->guess_type = "text/plain";
 		return;
 	    }
@@ -1186,7 +1186,7 @@ AuthBasicCred(struct http_auth *ha, Str uname, Str pw, ParsedURL *pu,
 }
 
 #ifdef USE_DIGEST_AUTH
-#include <openssl/md5.h>
+#include <openssl/evp.h>
 
 /* RFC2617: 3.2.2 The Authorization Request Header
  * 
@@ -1212,6 +1212,20 @@ AuthBasicCred(struct http_auth *ha, Str uname, Str pw, ParsedURL *pu,
  *                     "8" | "9" | "a" | "b" |
  *                     "c" | "d" | "e" | "f"
  */
+
+#define MD5_DIGEST_LENGTH 16
+
+static void
+MD5(const unsigned char *d, unsigned long n, unsigned char *md)
+{
+    EVP_MD_CTX *ctx = EVP_MD_CTX_new();
+
+    EVP_DigestInit_ex(ctx, EVP_md5(), NULL);
+    EVP_DigestUpdate(ctx, d, n);
+    EVP_DigestFinal_ex(ctx, md, NULL);
+    EVP_MD_CTX_free(ctx);
+}
+
 
 static Str
 digest_hex(unsigned char *p)
@@ -1636,28 +1650,16 @@ getAuthCookie(struct http_auth *hauth, char *auth_header,
 }
 
 static int
-same_url_p(ParsedURL *pu1, ParsedURL *pu2)
-{
-    return (pu1->scheme == pu2->scheme && pu1->port == pu2->port &&
-	    (pu1->host ? pu2->host ? !strcasecmp(pu1->host, pu2->host) : 0 : 1)
-	    && (pu1->file ? pu2->
-		file ? !strcmp(pu1->file, pu2->file) : 0 : 1));
-}
-
-static int
 checkRedirection(ParsedURL *pu)
 {
-    static ParsedURL *puv = NULL;
     static int nredir = 0;
-    static int nredir_size = 0;
     Str tmp;
 
     if (pu == NULL) {
 	nredir = 0;
-	nredir_size = 0;
-	puv = NULL;
 	return TRUE;
     }
+
     if (nredir >= FollowRedirection) {
 	/* FIXME: gettextize? */
 	tmp = Sprintf("Number of redirections exceeded %d at %s",
@@ -1665,22 +1667,6 @@ checkRedirection(ParsedURL *pu)
 	disp_err_message(tmp->ptr, FALSE);
 	return FALSE;
     }
-    else if (nredir_size > 0 &&
-	     (same_url_p(pu, &puv[(nredir - 1) % nredir_size]) ||
-	      (!(nredir % 2)
-	       && same_url_p(pu, &puv[(nredir / 2) % nredir_size])))) {
-	/* FIXME: gettextize? */
-	tmp = Sprintf("Redirection loop detected (%s)",
-		      parsedURL2Str(pu)->ptr);
-	disp_err_message(tmp->ptr, FALSE);
-	return FALSE;
-    }
-    if (!puv) {
-	nredir_size = FollowRedirection / 2 + 1;
-	puv = New_N(ParsedURL, nredir_size);
-	memset(puv, 0, sizeof(ParsedURL) * nredir_size);
-    }
-    copyParsedURL(&puv[nredir % nredir_size], pu);
     nredir++;
     return TRUE;
 }
@@ -2002,7 +1988,8 @@ loadGeneralFile(char *path, ParsedURL *volatile current, char *referer,
 	    break;
 	case 'I':
 	    t = guessContentType(pu.file);
-	    if(strncasecmp(t, "image/", 6) != 0) {
+	    /* TODO(rkta): Defaulting to png in any case is not a good UX */
+	    if(!t || strncasecmp(t, "image/", 6) != 0) {
 		t = "image/png";
 	    }
 	    break;
@@ -2200,6 +2187,13 @@ loadGeneralFile(char *path, ParsedURL *volatile current, char *referer,
 	&& !(w3m_dump & DUMP_EXTRA)) {
 	uncompress_stream(&f, &pu.real_file);
     }
+    /*
+     * TODO(rkta): Something wrong here with DUMP_SOURCE and compressed streams
+     * If DUMP_SOURCE is set and the data is compressed, t will be set to the
+     * type of the compressed data which is not handled in the later if-else
+     * block to determine the function to assign to loadproc. loadproc will be
+     * NULL leading to an error when loading the page.
+    */
     else if (f.compression != CMP_NOCOMPRESS) {
 	if (!(w3m_dump & DUMP_SOURCE) &&
 	    (w3m_dump & ~DUMP_FRAME || is_text_type(t)
@@ -2269,6 +2263,8 @@ loadGeneralFile(char *path, ParsedURL *volatile current, char *referer,
     }
     else if (w3m_dump & DUMP_FRAME)
 	return NULL;
+    else
+	proc = NULL;
 
     if (t_buf == NULL)
 	t_buf = newBuffer(INIT_BUFFER_WIDTH);
@@ -5588,7 +5584,7 @@ ex_efct(int ex)
 }
 
 static void
-HTMLlineproc2body(Buffer *buf, Str (*feed) (), int llimit)
+HTMLlineproc2body(Buffer *buf, Str (*feed) (void), int llimit)
 {
     static char *outc = NULL;
     static Lineprop *outp = NULL;
@@ -7916,7 +7912,7 @@ loadcmdout(char *cmd,
     f = popen(cmd, "r");
     if (f == NULL)
 	return NULL;
-    init_stream(&uf, SCM_UNKNOWN, newFileStream(f, (void (*)())pclose));
+    init_stream(&uf, SCM_UNKNOWN, newFileStream(f, pclose));
     buf = loadproc(&uf, defaultbuf);
     UFclose(&uf);
     return buf;
@@ -7954,7 +7950,7 @@ getpipe(char *cmd)
     if (f == NULL)
 	return NULL;
     buf = newBuffer(INIT_BUFFER_WIDTH);
-    buf->pagerSource = newFileStream(f, (void (*)())pclose);
+    buf->pagerSource = newFileStream(f, pclose);
     buf->filename = cmd;
     buf->buffername = Sprintf("%s %s", PIPEBUFFERNAME,
 			      conv_from_system(cmd))->ptr;
@@ -8193,7 +8189,7 @@ save2tmp(URLFile uf, char *tmpf)
     MySignalHandler(*volatile prevtrap) (SIGNAL_ARG) = NULL;
     static JMP_BUF env_bak;
     volatile int retval = 0;
-    char *volatile buf = NULL;
+    unsigned char *volatile buf = NULL;
 
     ff = fopen(tmpf, "wb");
     if (ff == NULL) {
@@ -8234,7 +8230,7 @@ save2tmp(URLFile uf, char *tmpf)
     {
 	int count;
 
-	buf = NewWithoutGC_N(char, SAVE_BUF_SIZE);
+	buf = NewWithoutGC_N(unsigned char, SAVE_BUF_SIZE);
 	while ((count = ISread_n(uf.stream, buf, SAVE_BUF_SIZE)) > 0) {
 	    if (fwrite(buf, 1, count, ff) != count) {
 		retval = -2;
@@ -8361,7 +8357,7 @@ _MoveFile(char *path1, char *path2)
     FILE *f2;
     int is_pipe;
     clen_t linelen = 0, trbyte = 0;
-    char *buf = NULL;
+    unsigned char *buf = NULL;
     int count;
 
     f1 = openIS(path1);
@@ -8380,7 +8376,7 @@ _MoveFile(char *path1, char *path2)
 	return -1;
     }
     current_content_length = 0;
-    buf = NewWithoutGC_N(char, SAVE_BUF_SIZE);
+    buf = NewWithoutGC_N(unsigned char, SAVE_BUF_SIZE);
     while ((count = ISread_n(f1, buf, SAVE_BUF_SIZE)) > 0) {
 	fwrite(buf, 1, count, f2);
 	linelen += count;
@@ -8747,7 +8743,7 @@ uncompress_stream(URLFile *uf, char **src)
 	}
 	if (pid2 == 0) {
 	    /* child2 */
-	    char *buf = NewWithoutGC_N(char, SAVE_BUF_SIZE);
+	    unsigned char *buf = NewWithoutGC_N(unsigned char, SAVE_BUF_SIZE);
 	    int count;
 	    FILE *f = NULL;
 
@@ -8782,7 +8778,7 @@ uncompress_stream(URLFile *uf, char **src)
 	    uf->scheme = SCM_LOCAL;
     }
     UFhalfclose(uf);
-    uf->stream = newFileStream(f1, (void (*)())fclose);
+    uf->stream = newFileStream(f1, fclose);
 #endif /* __MINGW32_VERSION */
 }
 
