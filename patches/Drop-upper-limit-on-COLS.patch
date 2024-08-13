@@ -18,7 +18,7 @@ This fixes Debian BTS #1076944 and GH issue #286.
 
 --- a/fm.h
 +++ b/fm.h
-@@ -103,7 +103,6 @@ void bzero(void *, int);
+@@ -99,7 +99,6 @@ typedef int wc_ces;	/* XXX: not used */
  #define LINELEN	256		/* Initial line length */
  #define PAGER_MAX_LINE	10000	/* Maximum line kept as pager */
  
@@ -28,7 +28,7 @@ This fixes Debian BTS #1076944 and GH issue #286.
  #ifdef USE_IMAGE
 --- a/main.c
 +++ b/main.c
-@@ -692,9 +692,6 @@ main(int argc, char **argv)
+@@ -690,9 +690,6 @@ main(int argc, char **argv)
  		if (++i >= argc)
  		    usage();
  		COLS = atoi(argv[i]);

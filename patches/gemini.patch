@@ -253,7 +253,7 @@ w3m-0.5.3+git20230121.
 +    int hseq, len, nlines, pre = 0;
 +    clen_t linelen = 0, trbyte = 0;
 +    Lineprop *propBuf = NULL;
-+    MySignalHandler(*volatile prevtrap) (SIGNAL_ARG) = NULL;
++    void(*volatile prevtrap) (SIGNAL_ARG) = NULL;
 +
 +    if (SETJMP(AbortLoading) != 0) {
 +	goto _end;

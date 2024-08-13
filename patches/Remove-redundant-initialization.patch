@@ -13,7 +13,7 @@ initialized value is overwritten before it is read.
 
 --- a/file.c
 +++ b/file.c
-@@ -6313,7 +6313,7 @@ proc_escape(struct readbuffer *obuf, cha
+@@ -6312,7 +6312,7 @@ proc_escape(struct readbuffer *obuf, cha
      char *str = *str_return, *estr;
      int ech = getescapechar(str_return);
      int width, n_add = *str_return - str;

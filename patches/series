@@ -41,7 +41,6 @@ Fix-some-casts-that-discard-qualifiers.patch
 Remove-const-where-we-can-t-keep-the-promise.patch
 Remove-declarations-without-definition.patch
 Remove-unused-function-declarations.patch
-Remove-unused-prototyp.patch
 Remove-unused-function.patch
 Move-declarations-to-the-correct-header-file.patch
 Remove-redundant-declarations.patch
