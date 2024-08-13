@@ -9,7 +9,7 @@ Subject: [PATCH 101/172] WIP getch Fix warning (strict-prototype)
 
 --- a/terms.c
 +++ b/terms.c
-@@ -2276,6 +2276,7 @@ getch(void)
+@@ -2274,6 +2274,7 @@ getch(void)
   * E.g. SELECT_MENU will segfault if you remove it.
   * TODO(rkta): wgetch belongs to libcurses, something fishy is going on here.
   */
@@ -17,7 +17,7 @@ Subject: [PATCH 101/172] WIP getch Fix warning (strict-prototype)
  char
  wgetch(void *p)
  {
-@@ -2292,6 +2293,7 @@ wgetch(void *p)
+@@ -2290,6 +2291,7 @@ wgetch(void *p)
      return c;
  }
  

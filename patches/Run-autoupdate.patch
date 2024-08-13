@@ -1,6 +1,6 @@
 From: Rene Kita <mail@rkta.de>
 Date: Sat Oct 28 12:28:37 CEST 2023
-Subject: run autoupdate
+Subject: Run autoupdate
 ---
  acinclude.m4 |   27 ++++++------------
  configure    |   85 +++++++++++++++++++++++++++++------------------------------

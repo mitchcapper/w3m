@@ -8,7 +8,7 @@ Date: Sun, 12 Dec 2021 19:44:34 +0100
 
 --- a/url.c
 +++ b/url.c
-@@ -606,7 +606,6 @@ openSocket(char *const hostname,
+@@ -605,7 +605,6 @@ openSocket(char *const hostname,
  	    /* try next ai family */
  	    continue;
  	}

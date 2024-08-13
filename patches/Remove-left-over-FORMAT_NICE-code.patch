@@ -33,11 +33,10 @@ Date:   2003-03-10T17:28:52+00:00
     * configure.in (AC_PROG_CPP): added
     From: Fumitoshi UKAI  <ukai@debian.or.jp>
 ---
- config.h.dist |    1 -
- config.h.in   |    1 -
- file.c        |   57 ---------------------------------------------------------
- fm.h          |    3 ---
- 4 files changed, 62 deletions(-)
+ config.h.in |    1 -
+ file.c      |   57 ---------------------------------------------------------
+ fm.h        |    3 ---
+ 3 files changed, 61 deletions(-)
 
 --- a/config.h.in
 +++ b/config.h.in
@@ -51,7 +50,7 @@ Date:   2003-03-10T17:28:52+00:00
  #undef INET6
 --- a/file.c
 +++ b/file.c
-@@ -2488,9 +2488,6 @@ set_breakpoint(struct readbuffer *obuf,
+@@ -2487,9 +2487,6 @@ set_breakpoint(struct readbuffer *obuf,
      obuf->bp.pos = obuf->pos;
      obuf->bp.tlen = tag_length;
      obuf->bp.flag = obuf->flag;
@@ -61,7 +60,7 @@ Date:   2003-03-10T17:28:52+00:00
      obuf->bp.top_margin = obuf->top_margin;
      obuf->bp.bottom_margin = obuf->bottom_margin;
  
-@@ -2895,47 +2892,6 @@ flushline(struct html_feed_environ *h_en
+@@ -2894,47 +2891,6 @@ flushline(struct html_feed_environ *h_en
  	else if (RB_GET_ALIGN(obuf) == RB_LEFT && obuf->flag & RB_INTABLE) {
  	    align(lbuf, width, ALIGN_LEFT);
  	}
@@ -109,7 +108,7 @@ Date:   2003-03-10T17:28:52+00:00
  #ifdef TABLE_DEBUG
  	if (w3m_debug) {
  	    FILE *f = fopen("zzzproc1", "a");
-@@ -6753,15 +6709,8 @@ HTMLlineproc0(char *line, struct html_fe
+@@ -6752,15 +6708,8 @@ HTMLlineproc0(char *line, struct html_fe
  		    bp = obuf->line->ptr + obuf->bp.len;
  		    line = Strnew_charp(bp);
  		    Strshrink(obuf->line, obuf->line->length - obuf->bp.len);
@@ -125,7 +124,7 @@ Date:   2003-03-10T17:28:52+00:00
  		    HTMLlineproc1(line->ptr, h_env);
  		}
  	    }
-@@ -6782,13 +6731,7 @@ HTMLlineproc0(char *line, struct html_fe
+@@ -6781,13 +6730,7 @@ HTMLlineproc0(char *line, struct html_fe
  	    i = 1;
  	indent = h_env->envs[h_env->envc].indent;
  	if (obuf->pos - i > h_env->limit) {
@@ -141,7 +140,7 @@ Date:   2003-03-10T17:28:52+00:00
  }
 --- a/fm.h
 +++ b/fm.h
-@@ -668,9 +668,6 @@ struct readbuffer {
+@@ -664,9 +664,6 @@ struct readbuffer {
  #define RB_SPECIAL	(RB_PRE | RB_PRE_INT | RB_SCRIPT | RB_STYLE | RB_PLAIN | RB_NOBR)
  #define RB_PLAIN_PRE	0x40000
  
@@ -151,13 +150,3 @@ Date:   2003-03-10T17:28:52+00:00
  #define RB_DEL		0x100000
  #define RB_S		0x200000
  #define RB_HTML5	0x400000
---- a/config.h.dist
-+++ b/config.h.dist
-@@ -27,7 +27,6 @@
- /*
-  * Do word fill
-  */
--#undef FORMAT_NICE
- 
- /*
-  * Enable id attribute

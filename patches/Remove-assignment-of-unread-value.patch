@@ -9,7 +9,7 @@ Subject: [PATCH 134/172] Remove assignment of unread value
 
 --- a/indep.c
 +++ b/indep.c
-@@ -412,7 +412,7 @@ cleanup_line(Str s, int mode)
+@@ -385,7 +385,7 @@ cleanup_line(Str s, int mode)
  int
  getescapechar(char **str)
  {

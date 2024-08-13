@@ -10,7 +10,7 @@ Subject: add gophers support
 
 --- a/file.c
 +++ b/file.c
-@@ -1952,7 +1952,7 @@ loadGeneralFile(char *path, ParsedURL *v
+@@ -1951,7 +1951,7 @@ loadGeneralFile(char *path, ParsedURL *v
      }
  #endif				/* USE_NNTP */
  #ifdef USE_GOPHER
@@ -19,7 +19,7 @@ Subject: add gophers support
  	p = pu.file;
  	while(*p == '/')
  	    ++p;
-@@ -2126,7 +2126,7 @@ loadGeneralFile(char *path, ParsedURL *v
+@@ -2125,7 +2125,7 @@ loadGeneralFile(char *path, ParsedURL *v
  		return NULL;
  	    file = guess_filename(pu.file);
  #ifdef USE_GOPHER
@@ -54,7 +54,7 @@ Subject: add gophers support
  	return allocStr("1", -1);
  #endif				/* USE_GOPHER */
      case SCM_LOCAL:
-@@ -963,7 +966,8 @@ parseURL(char *url, ParsedURL *p_url, Pa
+@@ -961,7 +964,8 @@ parseURL(char *url, ParsedURL *p_url, Pa
  
      q = p;
  #ifdef USE_GOPHER
@@ -64,7 +64,7 @@ Subject: add gophers support
  	if (*q == '/')
  	    q++;
  	if (*q && q[0] != '/' && q[1] != '/' && q[2] == '/')
-@@ -977,7 +981,8 @@ parseURL(char *url, ParsedURL *p_url, Pa
+@@ -975,7 +979,8 @@ parseURL(char *url, ParsedURL *p_url, Pa
  	goto do_query;
      }
  #ifdef USE_GOPHER
@@ -74,7 +74,7 @@ Subject: add gophers support
  	if (!*++p) {
  	    p_url->file = "";
  	    goto do_query;
-@@ -1146,7 +1151,8 @@ parseURL2(char *url, ParsedURL *pu, Pars
+@@ -1144,7 +1149,8 @@ parseURL2(char *url, ParsedURL *pu, Pars
  #endif
  		if (
  #ifdef USE_GOPHER
@@ -84,7 +84,7 @@ Subject: add gophers support
  #endif				/* USE_GOPHER */
  		       pu->file[0] != '/'
  #ifdef SUPPORT_DOS_DRIVE_PREFIX
-@@ -1169,7 +1175,8 @@ parseURL2(char *url, ParsedURL *pu, Pars
+@@ -1167,7 +1173,8 @@ parseURL2(char *url, ParsedURL *pu, Pars
  		}
  	    }
  #ifdef USE_GOPHER
@@ -94,7 +94,7 @@ Subject: add gophers support
  		p = pu->file;
  		pu->file = allocStr(p + 1, -1);
  	    }
-@@ -1225,7 +1232,8 @@ parseURL2(char *url, ParsedURL *pu, Pars
+@@ -1223,7 +1230,8 @@ parseURL2(char *url, ParsedURL *pu, Pars
  	}
  	else if (
  #ifdef USE_GOPHER
@@ -104,7 +104,7 @@ Subject: add gophers support
  #endif				/* USE_GOPHER */
  		    pu->file[0] == '/') {
  	    /*
-@@ -1255,9 +1263,11 @@ static Str
+@@ -1253,9 +1261,11 @@ static Str
  _parsedURL2Str(ParsedURL *pu, int pass, int user, int label)
  {
      Str tmp;
@@ -116,7 +116,7 @@ Subject: add gophers support
  #ifdef USE_SSL
  	"https",
  #endif				/* USE_SSL */
-@@ -1898,6 +1908,7 @@ openURL(char *url, ParsedURL *pu, Parsed
+@@ -1896,6 +1906,7 @@ openURL(char *url, ParsedURL *pu, Parsed
  	return uf;
  #ifdef USE_GOPHER
      case SCM_GOPHER:
@@ -124,7 +124,7 @@ Subject: add gophers support
  	p = pu->file;
  	n = 0;
  	while(*p == '/') {
-@@ -1956,11 +1967,25 @@ openURL(char *url, ParsedURL *pu, Parsed
+@@ -1954,11 +1965,25 @@ openURL(char *url, ParsedURL *pu, Parsed
  	    tmp = Strnew_charp(file_unquote(pu->file));
  	    Strcat_charp(tmp, "\r\n");
  	}
@@ -152,7 +152,7 @@ Subject: add gophers support
  	return uf;
  #endif				/* USE_GOPHER */
  #ifdef USE_NNTP
-@@ -2415,6 +2440,7 @@ schemeToProxy(int scheme)
+@@ -2413,6 +2438,7 @@ schemeToProxy(int scheme)
  	break;
  #ifdef USE_GOPHER
      case SCM_GOPHER:
@@ -186,7 +186,7 @@ Subject: add gophers support
  #endif				/* _HTML_H */
 --- a/main.c
 +++ b/main.c
-@@ -5072,7 +5072,7 @@ chkURLBuffer(Buffer *buf)
+@@ -5067,7 +5067,7 @@ chkURLBuffer(Buffer *buf)
  	"https?://[a-zA-Z0-9][a-zA-Z0-9:%\\-\\./?=~_\\&+@#,\\$;]*[a-zA-Z0-9_/=\\-]",
  	"file:/[a-zA-Z0-9:%\\-\\./=_\\+@#,\\$;]*",
  #ifdef USE_GOPHER

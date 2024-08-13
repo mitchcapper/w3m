@@ -98,7 +98,7 @@ Subject: [PATCH 018/172] Remove unused function
  Buffer *
 --- a/indep.c
 +++ b/indep.c
-@@ -314,40 +314,6 @@ strcasestr(const char *s1, const char *s
+@@ -287,40 +287,6 @@ strcasestr(const char *s1, const char *s
  }
  #endif
  
@@ -151,7 +151,7 @@ Subject: [PATCH 018/172] Remove unused function
  extern int non_null(char *s);
 --- a/terms.c
 +++ b/terms.c
-@@ -2086,12 +2086,6 @@ clrtobot_eol(void (*clrtoeol) (void))
+@@ -2084,12 +2084,6 @@ clrtobot_eol(void (*clrtoeol) (void))
  }
  
  void
@@ -164,7 +164,7 @@ Subject: [PATCH 018/172] Remove unused function
  clrtobotx(void)
  {
      clrtobot_eol(clrtoeolx);
-@@ -2179,29 +2173,6 @@ crmode(void)
+@@ -2177,29 +2171,6 @@ crmode(void)
  #endif				/* HAVE_SGTTY_H */
  
  void
@@ -241,7 +241,7 @@ Subject: [PATCH 018/172] Remove unused function
  
 --- a/main.c
 +++ b/main.c
-@@ -3156,15 +3156,6 @@ DEFUN(followA, GOTO_LINK, "Follow curren
+@@ -3151,15 +3151,6 @@ DEFUN(followA, GOTO_LINK, "Follow curren
      displayBuffer(Currentbuf, B_NORMAL);
  }
  
@@ -257,7 +257,7 @@ Subject: [PATCH 018/172] Remove unused function
  /* view inline image */
  DEFUN(followI, VIEW_IMAGE, "Display image in viewer")
  {
-@@ -3412,13 +3403,6 @@ DEFUN(submitForm, SUBMIT, "Submit form")
+@@ -3407,13 +3398,6 @@ DEFUN(submitForm, SUBMIT, "Submit form")
      _followForm(TRUE);
  }
  
