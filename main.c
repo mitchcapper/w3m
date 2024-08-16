@@ -5926,7 +5926,7 @@ execdict(char *word)
 
 DEFUN(dictword, DICT_WORD, "Execute dictionary command (see README.dict)")
 {
-    execdict(inputStr("(dictionary)!", ""));
+    execdict(inputStr(DictPrompt, ""));
 }
 
 DEFUN(dictwordat, DICT_WORD_AT,
