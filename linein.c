@@ -1,4 +1,5 @@
 /* vi: set sw=4 ts=8 ai sm noet : */
+#include "buffer.h"
 #include "fm.h"
 #include "local.h"
 #include "myctype.h"
@@ -40,6 +41,7 @@ static void _editor(void);
 static void _enter(void);
 static void _esc(void);
 static void _inbrk(void);
+static void _iword(void);
 static void _mvB(void);
 static void _mvE(void);
 static void _mvL(void);
@@ -73,7 +75,7 @@ void (*InputKeymap[32]) (void) = {
 /*  C-@     C-a     C-b     C-c     C-d     C-e     C-f     C-g     */
     _compl, _mvB,   _mvL,   _inbrk, delC,   _mvE,   _mvR,   _inbrk,
 /*  C-h     C-i     C-j     C-k     C-l     C-m     C-n     C-o     */
-    _bs,    _noop,  _enter, killn,  _noop,  _enter, _next,  _editor,
+    _bs,    _iword, _enter, killn,  _noop,  _enter, _next,  _editor,
 /*  C-p     C-q     C-r     C-s     C-t     C-u     C-v     C-w     */
     _prev,  _quo,   _bsw,   _noop,  _mvLw,  killb,  _quo,   _bsw,
 /*  C-x     C-y     C-z     C-[     C-\     C-]     C-^     C-_     */
@@ -611,6 +613,12 @@ static void
 _enter(void)
 {
     i_cont = FALSE;
+}
+
+static void
+_iword(void)
+{
+    ins_char(Strnew_charp(GetWord(Currentbuf)));
 }
 
 static void
