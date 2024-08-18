@@ -6046,7 +6046,8 @@ getCurWord(Buffer *buf, int *spos, int *epos)
     return &p[b];
 }
 
-static char *
+char * GetWord(Buffer *buf);
+char *
 GetWord(Buffer *buf)
 {
     int b, e;
