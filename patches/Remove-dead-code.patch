@@ -88,7 +88,7 @@ Subject: [PATCH 014/172] Remove dead code
  extern void wrapToggle(void);
 --- a/file.c
 +++ b/file.c
-@@ -216,7 +216,6 @@ int
+@@ -217,7 +217,6 @@ int
  currentLn(Buffer *buf)
  {
      if (buf->currentLine)
@@ -96,7 +96,7 @@ Subject: [PATCH 014/172] Remove dead code
  	return buf->currentLine->linenumber + 1;
      else
  	return 1;
-@@ -1845,15 +1844,6 @@ loadGeneralFile(char *path, ParsedURL *v
+@@ -1846,15 +1845,6 @@ loadGeneralFile(char *path, ParsedURL *v
  	}
  	if (t_buf == NULL)
  	    t_buf = newBuffer(INIT_BUFFER_WIDTH);
@@ -112,7 +112,7 @@ Subject: [PATCH 014/172] Remove dead code
  	readHeader(&f, t_buf, FALSE, &pu);
  	if (((http_response_code >= 301 && http_response_code <= 303)
  	     || http_response_code == 307)
-@@ -2003,13 +1993,6 @@ loadGeneralFile(char *path, ParsedURL *v
+@@ -2004,13 +1994,6 @@ loadGeneralFile(char *path, ParsedURL *v
  	if (f.compression != CMP_NOCOMPRESS) {
  	    char *t1 = uncompressed_file_type(pu.file, NULL);
  	    real_type = f.guess_type;
@@ -126,7 +126,7 @@ Subject: [PATCH 014/172] Remove dead code
  	    if (t1)
  		t = t1;
  	    else
-@@ -2021,20 +2004,6 @@ loadGeneralFile(char *path, ParsedURL *v
+@@ -2022,20 +2005,6 @@ loadGeneralFile(char *path, ParsedURL *v
  		real_type = "text/plain";
  	    t = real_type;
  	}
@@ -147,7 +147,7 @@ Subject: [PATCH 014/172] Remove dead code
      }
      else if (pu.scheme == SCM_DATA) {
  	t = f.guess_type;
-@@ -2722,26 +2691,6 @@ passthrough(struct readbuffer *obuf, cha
+@@ -2723,26 +2692,6 @@ passthrough(struct readbuffer *obuf, cha
      }
  }
  
@@ -174,7 +174,7 @@ Subject: [PATCH 014/172] Remove dead code
  static void
  fillline(struct readbuffer *obuf, int indent)
  {
-@@ -6351,7 +6300,6 @@ need_flushline(struct html_feed_environ
+@@ -6352,7 +6301,6 @@ need_flushline(struct html_feed_environ
      }
  
      ch = Strlastchar(obuf->line);
@@ -182,7 +182,7 @@ Subject: [PATCH 014/172] Remove dead code
      if (ch == ' ')
  	return 0;
  
-@@ -6970,7 +6918,6 @@ showProgress(clen_t * linelen, clen_t *
+@@ -6971,7 +6919,6 @@ showProgress(clen_t * linelen, clen_t *
  	for (j = pos + 1; j <= i; j++)
  	    addch('|');
  	standend();
@@ -190,7 +190,7 @@ Subject: [PATCH 014/172] Remove dead code
  	refresh();
      }
      else {
-@@ -7126,32 +7073,6 @@ print_internal_information(struct html_f
+@@ -7127,32 +7074,6 @@ print_internal_information(struct html_f
  			   html_quote(henv->title), "\">", NULL);
  	pushTextLine(tl, newTextLine(s, 0));
      }
@@ -223,7 +223,7 @@ Subject: [PATCH 014/172] Remove dead code
  #ifdef MENU_SELECT
      if (n_select > 0) {
  	FormSelectOptionItem *ip;
-@@ -7293,10 +7214,6 @@ loadHTMLstream(URLFile *f, Buffer *newBu
+@@ -7294,10 +7215,6 @@ loadHTMLstream(URLFile *f, Buffer *newBu
  	doc_charset = WC_CES_UTF_8;
      meta_charset = 0;
  #endif
@@ -234,7 +234,7 @@ Subject: [PATCH 014/172] Remove dead code
      if (IStype(f->stream) != IST_ENCODED)
  	f->stream = newEncodedStream(f->stream, f->encoding);
      while ((lineBuf2 = StrmyUFgets(f)) && lineBuf2->length) {
-@@ -7305,9 +7222,6 @@ loadHTMLstream(URLFile *f, Buffer *newBu
+@@ -7306,9 +7223,6 @@ loadHTMLstream(URLFile *f, Buffer *newBu
  	    Strshrinkfirst(lineBuf2, 1);
  	    if (lineBuf2->ptr[0] == '\n' || lineBuf2->ptr[0] == '\r' ||
  		lineBuf2->ptr[0] == '\0') {
@@ -244,7 +244,7 @@ Subject: [PATCH 014/172] Remove dead code
  		break;
  	    }
  	}
-@@ -7320,10 +7234,6 @@ loadHTMLstream(URLFile *f, Buffer *newBu
+@@ -7321,10 +7235,6 @@ loadHTMLstream(URLFile *f, Buffer *newBu
  	if (w3m_dump & DUMP_SOURCE)
  	    continue;
  	showProgress(&linelen, &trbyte);
@@ -255,7 +255,7 @@ Subject: [PATCH 014/172] Remove dead code
  #ifdef USE_M17N
  	if (meta_charset) {	/* <META> */
  	    if (content_charset == 0 && UseContentCharset) {
-@@ -8489,12 +8399,6 @@ doFileSave(URLFile uf, char *defstr)
+@@ -8490,12 +8400,6 @@ doFileSave(URLFile uf, char *defstr)
  	    disp_err_message(msg->ptr, FALSE);
  	    return -1;
  	}
@@ -268,7 +268,7 @@ Subject: [PATCH 014/172] Remove dead code
  	lock = tmpfname(TMPF_DFL, ".lock")->ptr;
  #if defined(HAVE_SYMLINK) && defined(HAVE_LSTAT)
  	symlink(p, lock);
-@@ -8775,40 +8679,6 @@ lessopen_stream(char *path)
+@@ -8776,40 +8680,6 @@ lessopen_stream(char *path)
      return fp;
  }
  
@@ -401,7 +401,7 @@ Subject: [PATCH 014/172] Remove dead code
      fmInitialized = FALSE;
 --- a/frame.c
 +++ b/frame.c
-@@ -335,9 +335,6 @@ frame_download_source(struct frame_body
+@@ -337,9 +337,6 @@ frame_download_source(struct frame_body
      parseURL2(b->url, &url, currentURL);
      switch (url.scheme) {
      case SCM_LOCAL:
@@ -411,7 +411,7 @@ Subject: [PATCH 014/172] Remove dead code
  	b->flags = 0;
      default:
  	is_redisplay = TRUE;
-@@ -890,8 +887,6 @@ renderFrame(Buffer *Cbuf, int force_relo
+@@ -892,8 +889,6 @@ renderFrame(Buffer *Cbuf, int force_relo
      f = fopen(tmp->ptr, "w");
      if (f == NULL)
  	return NULL;
@@ -513,7 +513,7 @@ Subject: [PATCH 014/172] Remove dead code
      fprintf(f, "    -W               toggle search wrap mode\n");
      fprintf(f, "    -X               don't use termcap init/deinit\n");
      fprintf(f,
-@@ -584,14 +575,6 @@ main(int argc, char **argv)
+@@ -586,14 +577,6 @@ main(int argc, char **argv)
  		    PagerMax = atoi(argv[i]);
  	    }
  #ifdef USE_M17N
@@ -528,7 +528,7 @@ Subject: [PATCH 014/172] Remove dead code
  	    else if (!strncmp("-I", argv[i], 2)) {
  		if (argv[i][2] != '\0')
  		    p = argv[i] + 2;
-@@ -764,11 +747,7 @@ main(int argc, char **argv)
+@@ -766,11 +749,7 @@ main(int argc, char **argv)
  		accept_cookie = TRUE;
  	    }
  #endif				/* USE_COOKIE */
@@ -540,7 +540,7 @@ Subject: [PATCH 014/172] Remove dead code
  		squeezeBlankLine = TRUE;
  	    else if (!strcmp("-X", argv[i]))
  		Do_not_use_ti_te = TRUE;
-@@ -905,9 +884,6 @@ main(int argc, char **argv)
+@@ -907,9 +886,6 @@ main(int argc, char **argv)
  #endif				/* not USE_HISTORY */
  
  #ifdef USE_M17N
@@ -550,7 +550,7 @@ Subject: [PATCH 014/172] Remove dead code
  #endif
  
      if (w3m_backend)
-@@ -1735,11 +1711,6 @@ DEFUN(ctrCsrV, CENTER_V, "Center on curs
+@@ -1740,11 +1716,6 @@ DEFUN(ctrCsrV, CENTER_V, "Center on curs
  	return;
      offsety = Currentbuf->LINES / 2 - Currentbuf->cursorY;
      if (offsety != 0) {
@@ -562,7 +562,7 @@ Subject: [PATCH 014/172] Remove dead code
  	Currentbuf->topLine =
  	    lineSkip(Currentbuf, Currentbuf->topLine, -offsety, FALSE);
  	arrangeLine(Currentbuf);
-@@ -3156,14 +3127,6 @@ DEFUN(followA, GOTO_LINK, "Follow curren
+@@ -3161,14 +3132,6 @@ DEFUN(followA, GOTO_LINK, "Follow curren
      }
      if (handleMailto(a->url))
  	return;
@@ -577,7 +577,7 @@ Subject: [PATCH 014/172] Remove dead code
      url = a->url;
  #ifdef USE_IMAGE
      if (map)
-@@ -4191,14 +4154,6 @@ cmd_loadURL(char *url, ParsedURL *curren
+@@ -4196,14 +4159,6 @@ cmd_loadURL(char *url, ParsedURL *curren
  
      if (handleMailto(url))
  	return;
@@ -592,7 +592,7 @@ Subject: [PATCH 014/172] Remove dead code
  
      refresh();
      buf = loadGeneralFile(url, current, referer, 0, request);
-@@ -5305,10 +5260,6 @@ DEFUN(dispI, DISPLAY_IMAGE, "Restart loa
+@@ -5310,10 +5265,6 @@ DEFUN(dispI, DISPLAY_IMAGE, "Restart loa
      if (!activeImage)
  	return;
      displayImage = TRUE;
@@ -603,7 +603,7 @@ Subject: [PATCH 014/172] Remove dead code
      Currentbuf->image_flag = IMG_FLAG_AUTO;
      Currentbuf->need_reshape = TRUE;
      displayBuffer(Currentbuf, B_REDRAW_IMAGE);
-@@ -5318,10 +5269,6 @@ DEFUN(stopI, STOP_IMAGE, "Stop loading a
+@@ -5323,10 +5274,6 @@ DEFUN(stopI, STOP_IMAGE, "Stop loading a
  {
      if (!activeImage)
  	return;
@@ -614,7 +614,7 @@ Subject: [PATCH 014/172] Remove dead code
      Currentbuf->image_flag = IMG_FLAG_SKIP;
      displayBuffer(Currentbuf, B_REDRAW_IMAGE);
  }
-@@ -6317,11 +6264,7 @@ void
+@@ -6323,11 +6270,7 @@ void
  calcTabPos(void)
  {
      TabBuffer *tab;
@@ -751,7 +751,7 @@ Subject: [PATCH 014/172] Remove dead code
  void clrtoeol(void);		/* conflicts with curs_clear(3)? */
  
  static int write1(char);
-@@ -1216,12 +1213,6 @@ getTCstr(void)
+@@ -1218,12 +1215,6 @@ getTCstr(void)
      GETSTR(T_op, "op");		/* set default color pair to its original value */
  #if defined( CYGWIN ) && CYGWIN < 1
      /* for TERM=pcansi on MS-DOS prompt. */
@@ -764,7 +764,7 @@ Subject: [PATCH 014/172] Remove dead code
      T_eA = "";
      T_as = "";
      T_ae = "";
-@@ -2020,24 +2011,6 @@ rscroll(int n)
+@@ -2022,24 +2013,6 @@ rscroll(int n)
  }
  #endif
  
@@ -789,7 +789,7 @@ Subject: [PATCH 014/172] Remove dead code
  /* XXX: conflicts with curses's clrtoeol(3) ? */
  void
  clrtoeol(void)
-@@ -2122,17 +2095,6 @@ clrtobotx(void)
+@@ -2124,17 +2097,6 @@ clrtobotx(void)
      clrtobot_eol(clrtoeolx);
  }
  
@@ -809,7 +809,7 @@ Subject: [PATCH 014/172] Remove dead code
  {
 --- a/url.c
 +++ b/url.c
-@@ -418,13 +418,8 @@ openSSLHandle(int sock, char *hostname,
+@@ -419,13 +419,8 @@ openSSLHandle(int sock, char *hostname,
  
  #ifdef USE_SSL_VERIFY
  	/* derived from openssl-0.9.5/apps/s_{client,cb}.c */
@@ -824,7 +824,7 @@ Subject: [PATCH 014/172] Remove dead code
  	if (ssl_cert_file != NULL && *ssl_cert_file != '\0') {
  	    int ng = 1;
  	    if (SSL_CTX_use_certificate_file
-@@ -2478,17 +2473,6 @@ url_encode(const char *url, const Parsed
+@@ -2480,17 +2475,6 @@ url_encode(const char *url, const Parsed
  			  url_to_charset(url, base, doc_charset));
  }
  
@@ -844,7 +844,7 @@ Subject: [PATCH 014/172] Remove dead code
  {
 --- a/fm.h
 +++ b/fm.h
-@@ -910,10 +910,6 @@ global int CurrentPid;
+@@ -914,10 +914,6 @@ global int CurrentPid;
  #if defined(DONT_CALL_GC_AFTER_FORK) && defined(USE_IMAGE)
  global char *MyProgramName init("w3m");
  #endif /* defined(DONT_CALL_GC_AFTER_FORK) && defined(USE_IMAGE) */

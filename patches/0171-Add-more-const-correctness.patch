@@ -49,7 +49,7 @@ Subject: [PATCH 171/172] Add more const correctness
  extern char *expandName(char *name);
 --- a/url.c
 +++ b/url.c
-@@ -1255,7 +1255,7 @@ parseURL2(char *url, ParsedURL *pu, Pars
+@@ -1256,7 +1256,7 @@ parseURL2(char *url, ParsedURL *pu, Pars
  }
  
  static Str
@@ -58,7 +58,7 @@ Subject: [PATCH 171/172] Add more const correctness
  {
      Str tmp;
      /* See SCM_* defines in html.h for correct order of entries. */
-@@ -1351,7 +1351,7 @@ _parsedURL2Str(ParsedURL *pu, int pass,
+@@ -1352,7 +1352,7 @@ _parsedURL2Str(ParsedURL *pu, int pass,
  }
  
  Str

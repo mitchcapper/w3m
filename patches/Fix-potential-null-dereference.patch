@@ -21,7 +21,7 @@ Subject: [PATCH 123/172] Fix potential null dereference
      n = frame[0]->num;
 --- a/news.c
 +++ b/news.c
-@@ -114,7 +114,8 @@ name_from_address(char *str, int n)
+@@ -115,7 +115,8 @@ name_from_address(char *str, int n)
      char *s, *p;
      int l, space = TRUE;
  
@@ -31,7 +31,7 @@ Subject: [PATCH 123/172] Fix potential null dereference
      SKIP_BLANKS(s);
      if (*s == '<' && (p = strchr(s, '>'))) {
  	*p++ = '\0';
-@@ -159,6 +160,9 @@ html_quote_s(char *str)
+@@ -160,6 +161,9 @@ html_quote_s(char *str)
      char *p, *q;
      int space = TRUE;
  

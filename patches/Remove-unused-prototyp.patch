@@ -1,0 +1,21 @@
+From 863a1cdfcd7c148e0633348bee10aa99a42967ed Mon Sep 17 00:00:00 2001
+From: Rene Kita <mail@rkta.de>
+Date: Tue, 22 Nov 2022 10:25:09 +0100
+Subject: [PATCH 148/172] Remove unused prototyp
+
+---
+ proto.h |    3 ---
+ 1 file changed, 3 deletions(-)
+
+--- a/proto.h
++++ b/proto.h
+@@ -348,9 +348,6 @@ extern int columnLen(Line *line, int col
+ extern Line *lineSkip(Buffer *buf, Line *line, int offset, int last);
+ extern Line *currentLineSkip(Buffer *buf, Line *line, int offset, int last);
+ extern int gethtmlcmd(char **s);
+-#ifndef USE_ANSI_COLOR
+-#define checkType(a,b,c) _checkType(a,b)
+-#endif
+ extern Str checkType(Str s, Lineprop **oprop, Linecolor **ocolor);
+ extern int calcPosition(char *l, Lineprop *pr, int len, int pos, int bpos,
+ 			int mode);

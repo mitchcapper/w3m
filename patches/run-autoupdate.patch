@@ -1,0 +1,220 @@
+From: Rene Kita <mail@rkta.de>
+Date: Sat Oct 28 12:28:37 CEST 2023
+Subject: run autoupdate
+---
+ acinclude.m4 |   27 ++++++------------
+ configure    |   85 +++++++++++++++++++++++++++++------------------------------
+ configure.ac |   15 +++++-----
+ 3 files changed, 60 insertions(+), 67 deletions(-)
+
+--- a/configure
++++ b/configure
+@@ -9733,56 +9733,28 @@ then :
+ fi
+ 
+ 
+- ac_header= ac_cache=
+-for ac_item in $ac_header_c_list
+-do
+-  if test $ac_cache; then
+-    ac_fn_c_check_header_compile "$LINENO" $ac_header ac_cv_header_$ac_cache "$ac_includes_default"
+-    if eval test \"x\$ac_cv_header_$ac_cache\" = xyes; then
+-      printf "%s\n" "#define $ac_item 1" >> confdefs.h
+-    fi
+-    ac_header= ac_cache=
+-  elif test $ac_header; then
+-    ac_cache=$ac_item
+-  else
+-    ac_header=$ac_item
+-  fi
+-done
+-
+-
+-
+-
+-
+-
+-
+-
+-if test $ac_cv_header_stdlib_h = yes && test $ac_cv_header_string_h = yes
+-then :
+-
+-printf "%s\n" "#define STDC_HEADERS 1" >>confdefs.h
+-
+-fi
+-as_ac_Header=`printf "%s\n" "ac_cv_header_#include <sys/consio.h>
+-   MOUSE_GETINFO" | $as_tr_sh`
+-ac_fn_c_check_header_compile "$LINENO" "#include <sys/consio.h>
+-   MOUSE_GETINFO" "$as_ac_Header" "$ac_includes_default"
+-if eval test \"x\$"$as_ac_Header"\" = x"yes"
++ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
++/* end confdefs.h.  */
++#include <sys/consio.h>
++   int test = MOUSE_GETINFO;
++_ACEOF
++if ac_fn_c_try_compile "$LINENO"
+ then :
+   printf "%s\n" "#define USE_SYSMOUSE 1" >>confdefs.h
+ 
+ else $as_nop
+-  as_ac_Header=`printf "%s\n" "ac_cv_header_#include <machine/console.h>
+-      MOUSE_GETINFO" | $as_tr_sh`
+-ac_fn_c_check_header_compile "$LINENO" "#include <machine/console.h>
+-      MOUSE_GETINFO" "$as_ac_Header" "$ac_includes_default"
+-if eval test \"x\$"$as_ac_Header"\" = x"yes"
++  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
++/* end confdefs.h.  */
++#include <machine/console.h>
++      MOUSE_GETINFO
++_ACEOF
++if ac_fn_c_try_compile "$LINENO"
+ then :
+-  printf "%s\n" "#define USE_SYSMOUSE 1" >>confdefs.h
+ 
+ fi
+-
++rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
+ fi
+-
++rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
+ fi
+ 
+ { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking terminal library" >&5
+@@ -9844,6 +9816,35 @@ fi
+ 
+  done
+ 
++ac_header= ac_cache=
++for ac_item in $ac_header_c_list
++do
++  if test $ac_cache; then
++    ac_fn_c_check_header_compile "$LINENO" $ac_header ac_cv_header_$ac_cache "$ac_includes_default"
++    if eval test \"x\$ac_cv_header_$ac_cache\" = xyes; then
++      printf "%s\n" "#define $ac_item 1" >> confdefs.h
++    fi
++    ac_header= ac_cache=
++  elif test $ac_header; then
++    ac_cache=$ac_item
++  else
++    ac_header=$ac_item
++  fi
++done
++
++
++
++
++
++
++
++
++if test $ac_cv_header_stdlib_h = yes && test $ac_cv_header_string_h = yes
++then :
++
++printf "%s\n" "#define STDC_HEADERS 1" >>confdefs.h
++
++fi
+ { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking GC library exists" >&5
+ printf %s "checking GC library exists... " >&6; }
+ 
+--- a/configure.ac
++++ b/configure.ac
+@@ -1,6 +1,6 @@
+ dnl w3m autoconf
+ dnl Process this file with autoconf to produce a configure script.
+-AC_INIT(w3m, 0.5.3)
++AC_INIT([w3m],[0.5.3])
+ PACKAGE=w3m
+ VERSION=0.5.3
+ AC_DEFINE_UNQUOTED(PACKAGE, "$PACKAGE")
+@@ -15,7 +15,7 @@ AC_DEFINE(W3M, w3m)
+ AC_SUBST(W3M_LANG)
+ W3M_LANG=${LC_ALL:-$LANG}
+ dnl AM_INIT_AUTOMAKE(w3m, 0.4)
+-AC_CONFIG_HEADER(config.h)
++AC_CONFIG_HEADERS([config.h])
+ dnl Checks for programs.
+ AC_PROG_CXX
+ AC_PROG_AWK
+@@ -98,10 +98,10 @@ if test x"$enable_mouse" = xyes; then
+  AC_CHECK_LIB(gpm, Gpm_Open, [AC_DEFINE(USE_GPM)
+    		W3M_LIBS="$W3M_LIBS -lgpm"])
+  AC_SUBST(USE_SYSMOUSE)
+- AC_CHECK_HEADER([#include <sys/consio.h>
+-   MOUSE_GETINFO], [AC_DEFINE(USE_SYSMOUSE)],
+-   [AC_CHECK_HEADER([#include <machine/console.h>
+-      MOUSE_GETINFO], [AC_DEFINE(USE_SYSMOUSE)])])
++ AC_COMPILE_IFELSE([AC_LANG_SOURCE([#include <sys/consio.h>
++   int test = MOUSE_GETINFO;])], [AC_DEFINE(USE_SYSMOUSE)],
++   [AC_COMPILE_IFELSE([AC_LANG_SOURCE([#include <machine/console.h>
++      MOUSE_GETINFO], [AC_DEFINE(USE_SYSMOUSE)])])])
+ fi
+ AC_SUBST(AUXBIN_TARGETS)
+ AC_W3M_TERMLIB
+@@ -160,7 +160,7 @@ DOCDIRS="doc:en_English doc-jp:ja_Japane
+ AC_DEFINE_UNQUOTED(DOCDIRS, "$DOCDIRS")
+ 
+ AC_W3M_VERSION
+-AC_OUTPUT([Makefile posubst po/Makefile.in \
++AC_CONFIG_FILES([Makefile posubst po/Makefile.in \
+ scripts/Makefile scripts/dirlist.cgi \
+ scripts/w3mhelp.cgi \
+ scripts/w3mmail.cgi scripts/xface2xpm \
+@@ -172,5 +172,6 @@ libwc/Makefile \
+ w3mimg/Makefile w3mimg/fb/Makefile w3mimg/x11/Makefile w3mimg/win/Makefile \
+ w3mhelp-w3m_en.html w3mhelp-w3m_ja.html \
+ w3mhelp-lynx_en.html w3mhelp-lynx_ja.html])
++AC_OUTPUT
+ 
+ chmod +x posubst
+--- a/acinclude.m4
++++ b/acinclude.m4
+@@ -578,12 +578,9 @@ AC_DEFUN([AC_W3M_ALARM],
+  [enable_alarm="yes"])
+  AC_MSG_RESULT($enable_alarm)
+  if test x"$enable_alarm" = xyes; then
+-   AC_TRY_COMPILE(
+-    [#include <unistd.h>
+-#include <signal.h>],
+-    [int sa = SIGALRM;
+-     void (*a) = alarm;],
+-   [AC_DEFINE(USE_ALARM)])
++   AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <unistd.h>
++#include <signal.h>]], [[int sa = SIGALRM;
++     void (*a) = alarm;]])],[AC_DEFINE(USE_ALARM)],[])
+  fi])
+ #
+ # ----------------------------------------------------------------
+@@ -869,15 +866,13 @@ if test x"$enable_ipv6" = xyes; then
+  if test x"$enable_ipv6" = xyes; then
+     AC_SUBST(HAVE_OLD_SS_FAMILY)
+     AC_MSG_CHECKING(if struct sockaddr_storage has an ss_family member)
+-    AC_TRY_COMPILE([
++    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+ #include <sys/types.h>
+ #include <sys/socket.h>
+-      ], [
++      ]], [[
+ 	struct sockaddr_storage ss;
+ 	int i = ss.ss_family;
+-      ],
+-      [AC_MSG_RESULT(yes)],
+-      [AC_MSG_RESULT(no)
++      ]])],[AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no)
+       AC_MSG_WARN(IPv6 support is disabled)
+       enable_ipv6="no"])
+  fi
+@@ -892,11 +887,7 @@ fi])
+ AC_DEFUN([AC_W3M_SIGSETJMP],
+ [AC_SUBST(HAVE_SIGSETJMP)
+ AC_MSG_CHECKING(for sigsetjmp)
+-AC_TRY_COMPILE(
+-[#include <setjmp.h>
+- #include <stdlib.h>],
+-[ jmp_buf env;
+-   if (sigsetjmp(env, 1) != 0) { exit(0); } siglongjmp(env, 1);],
+-[have_sigsetjmp="yes"; AC_DEFINE(HAVE_SIGSETJMP)],
+-[have_sigsetjmp="no"])
++AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <setjmp.h>
++ #include <stdlib.h>]], [[ jmp_buf env;
++   if (sigsetjmp(env, 1) != 0) { exit(0); } siglongjmp(env, 1);]])],[have_sigsetjmp="yes"; AC_DEFINE(HAVE_SIGSETJMP)],[have_sigsetjmp="no"])
+ AC_MSG_RESULT($have_sigsetjmp)])

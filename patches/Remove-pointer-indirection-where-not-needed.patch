@@ -73,7 +73,7 @@ This functions do not need to use a pointer to a pointer.
  
 --- a/file.c
 +++ b/file.c
-@@ -2668,7 +2668,7 @@ passthrough(struct readbuffer *obuf, cha
+@@ -2669,7 +2669,7 @@ passthrough(struct readbuffer *obuf, cha
  	str_bak = str;
  	if (sloppy_parse_line(&str)) {
  	    char *q = str_bak;

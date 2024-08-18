@@ -48,7 +48,7 @@
      fprintf(f, "    -T type          specify content-type\n");
      fprintf(f, "    -m               internet message mode\n");
      fprintf(f, "    -v               visual startup mode\n");
-@@ -438,6 +444,7 @@ main(int argc, char **argv)
+@@ -440,6 +446,7 @@ main(int argc, char **argv)
      char *default_type = NULL;
      char *post_file = NULL;
      Str err_msg;
@@ -56,7 +56,7 @@
  #ifdef USE_M17N
      char *Locale = NULL;
      wc_uint8 auto_detect;
-@@ -658,6 +665,13 @@ main(int argc, char **argv)
+@@ -660,6 +667,13 @@ main(int argc, char **argv)
  		    BookmarkFile = cleanupName(tmp->ptr);
  		}
  	    }
@@ -70,7 +70,7 @@
  	    else if (!strcmp("-F", argv[i]))
  		RenderFrame = TRUE;
  	    else if (!strcmp("-W", argv[i])) {
-@@ -911,8 +925,43 @@ main(int argc, char **argv)
+@@ -913,8 +927,43 @@ main(int argc, char **argv)
      if (ssl_known_hosts)
  	known_hosts = load_known_hosts();
  
@@ -116,7 +116,7 @@
  
      if (w3m_backend)
  	backend();
-@@ -2606,6 +2655,10 @@ _quitfm(int confirm)
+@@ -2611,6 +2660,10 @@ _quitfm(int confirm)
  #endif				/* USE_HISTORY */
      if ((err = save_known_hosts()))
  	perror(NULL);
@@ -127,7 +127,7 @@
      w3m_exit(err);
  }
  
-@@ -4364,6 +4417,63 @@ DEFUN(adBmark, ADD_BOOKMARK, "Add curren
+@@ -4369,6 +4422,63 @@ DEFUN(adBmark, ADD_BOOKMARK, "Add curren
  		request);
  }
  

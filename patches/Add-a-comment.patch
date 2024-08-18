@@ -9,7 +9,7 @@ Subject: [PATCH 120/172] Add a comment
 
 --- a/indep.c
 +++ b/indep.c
-@@ -79,7 +79,7 @@ allocStr(const char *s, int len)
+@@ -106,7 +106,7 @@ allocStr(const char *s, int len)
  }
  
  int

@@ -1,28 +1,25 @@
 From: Rene Kita <mail@rkta.de>
 Date: Sat Oct 28 11:31:40 CEST 2023
 Subject: Get rid of MySignalHandler
-
-With C99 it's void. No need to check anymore.
-
 ---
  acinclude.m4 |   13 -------------
  config.h.in  |    3 ---
  configure    |   44 --------------------------------------------
  configure.ac |    1 -
- file.c       |   19 +++++++++----------
+ file.c       |   21 ++++++++++-----------
  frame.c      |    4 ++--
  ftp.c        |    5 ++---
  istream.c    |    2 +-
  main.c       |   24 ++++++++++--------------
  news.c       |    5 ++---
- proto.h      |    6 +++---
+ proto.h      |    2 +-
  terms.c      |   26 ++++++++++++--------------
  url.c        |    7 +++----
- 13 files changed, 44 insertions(+), 115 deletions(-)
+ 13 files changed, 43 insertions(+), 114 deletions(-)
 
 --- a/file.c
 +++ b/file.c
-@@ -187,11 +187,10 @@ static struct compression_decoder {
+@@ -190,11 +190,10 @@ static struct compression_decoder {
  
  #define SAVE_BUF_SIZE 1536
  
@@ -35,7 +32,7 @@ With C99 it's void. No need to check anymore.
  }
  
  static void
-@@ -1694,7 +1693,7 @@ loadGeneralFile(char *path, ParsedURL *v
+@@ -1692,7 +1691,7 @@ loadGeneralFile(char *path, ParsedURL *v
      Buffer *volatile t_buf = NULL;
      int volatile searchHeader = SearchHeader;
      int volatile searchHeader_through = TRUE;
@@ -44,7 +41,7 @@ With C99 it's void. No need to check anymore.
      TextList *extra_header = newTextList();
      volatile Str uname = NULL;
      volatile Str pwd = NULL;
-@@ -7268,7 +7267,7 @@ loadHTMLstream(URLFile *f, Buffer *newBu
+@@ -7281,7 +7280,7 @@ loadHTMLstream(URLFile *f, Buffer *newBu
  #ifdef USE_IMAGE
      int volatile image_flag;
  #endif
@@ -53,7 +50,7 @@ With C99 it's void. No need to check anymore.
  
  #ifdef USE_M17N
      if (fmInitialized && graph_ok()) {
-@@ -7444,7 +7443,7 @@ Buffer *
+@@ -7446,7 +7445,7 @@ Buffer *
  loadHTMLString(Str page)
  {
      URLFile f;
@@ -62,7 +59,7 @@ With C99 it's void. No need to check anymore.
      Buffer *newBuf;
  
      init_stream(&f, SCM_LOCAL, newStrStream(page));
-@@ -7495,7 +7494,7 @@ loadGopherDir0(URLFile *uf, ParsedURL *p
+@@ -7497,7 +7496,7 @@ loadGopherDir0(URLFile *uf, ParsedURL *p
      Str lbuf, name, file, host, port, type;
      char *volatile p, *volatile q;
      int link, pre;
@@ -71,7 +68,16 @@ With C99 it's void. No need to check anymore.
  #ifdef USE_M17N
      wc_ces doc_charset = DocumentCharset;
  #endif
-@@ -7659,7 +7658,7 @@ loadBuffer(URLFile *uf, Buffer *volatile
+@@ -7652,7 +7651,7 @@ loadGeminiBuffer(URLFile *uf, Buffer *vo
+     int hseq, len, nlines, pre = 0;
+     clen_t linelen = 0, trbyte = 0;
+     Lineprop *propBuf = NULL;
+-    MySignalHandler(*volatile prevtrap) (SIGNAL_ARG) = NULL;
++    void (*volatile prevtrap) (SIGNAL_ARG) = NULL;
+ 
+     if (SETJMP(AbortLoading) != 0) {
+ 	goto _end;
+@@ -7785,7 +7784,7 @@ loadBuffer(URLFile *uf, Buffer *volatile
  #ifdef USE_ANSI_COLOR
      Linecolor *colorBuffer = NULL;
  #endif
@@ -80,16 +86,16 @@ With C99 it's void. No need to check anymore.
  
      if (newBuf == NULL)
  	newBuf = newBuffer(INIT_BUFFER_WIDTH);
-@@ -7748,7 +7747,7 @@ loadImageBuffer(URLFile *uf, Buffer *new
+@@ -7874,7 +7873,7 @@ loadImageBuffer(URLFile *uf, Buffer *new
      Str tmp, tmpf;
      FILE *src = NULL;
      URLFile f;
 -    MySignalHandler(*volatile prevtrap) (SIGNAL_ARG) = NULL;
 +    void (*volatile prevtrap) (SIGNAL_ARG) = NULL;
      struct stat st;
-     const ParsedURL *pu = newBuf ? &newBuf->currentURL : NULL;
+     ParsedURL *pu = newBuf ? &newBuf->currentURL : NULL;
  
-@@ -8077,7 +8076,7 @@ getNextPage(Buffer *buf, int plen)
+@@ -8202,7 +8201,7 @@ getNextPage(Buffer *buf, int plen)
  #ifdef USE_ANSI_COLOR
      Linecolor *colorBuffer = NULL;
  #endif
@@ -98,7 +104,7 @@ With C99 it's void. No need to check anymore.
  
      if (buf->pagerSource == NULL)
  	return NULL;
-@@ -8186,7 +8185,7 @@ save2tmp(URLFile uf, char *tmpf)
+@@ -8311,7 +8310,7 @@ save2tmp(URLFile uf, const char *tmpf)
  {
      FILE *ff;
      clen_t linelen = 0, trbyte = 0;
@@ -118,7 +124,7 @@ With C99 it's void. No need to check anymore.
  KeyAbort(SIGNAL_ARG)
  {
      LONGJMP(AbortLoading, 1);
-@@ -408,7 +408,7 @@ createFrameFile(struct frameset *f, FILE
+@@ -405,7 +405,7 @@ createFrameFile(struct frameset *f, FILE
  #endif
      char *d_target, *p_target, *s_target, *t_target;
      ParsedURL *currentURL, base;
@@ -153,7 +159,7 @@ With C99 it's void. No need to check anymore.
  
 --- a/istream.c
 +++ b/istream.c
-@@ -178,7 +178,7 @@ newEncodedStream(InputStream is, char en
+@@ -180,7 +180,7 @@ newEncodedStream(InputStream is, char en
  int
  ISclose(InputStream stream)
  {
@@ -164,7 +170,7 @@ With C99 it's void. No need to check anymore.
      if (stream->base.close != NULL) {
 --- a/main.c
 +++ b/main.c
-@@ -66,17 +66,17 @@ static AlarmEvent DefaultAlarm = {
+@@ -67,17 +67,17 @@ static AlarmEvent DefaultAlarm = {
      0, AL_UNSET, FUNCNAME_nulcmd, NULL
  };
  static AlarmEvent *CurrentAlarm = &DefaultAlarm;
@@ -185,7 +191,7 @@ With C99 it's void. No need to check anymore.
  #endif
  
  #ifdef USE_MARK
-@@ -1391,7 +1391,7 @@ cmp_anchor_hseq(const void *a, const voi
+@@ -1437,7 +1437,7 @@ cmp_anchor_hseq(const void *a, const voi
  static void
  do_dump(Buffer *buf)
  {
@@ -194,7 +200,7 @@ With C99 it's void. No need to check anymore.
  
      prevtrap = mySignal(SIGINT, intTrap);
      if (SETJMP(IntReturn) != 0) {
-@@ -1591,20 +1591,18 @@ repBuffer(Buffer *oldbuf, Buffer *buf)
+@@ -1637,20 +1637,18 @@ repBuffer(Buffer *oldbuf, Buffer *buf)
  }
  
  
@@ -217,7 +223,7 @@ With C99 it's void. No need to check anymore.
  }
  
  static void
-@@ -1619,14 +1617,13 @@ resize_screen(void)
+@@ -1665,14 +1663,13 @@ resize_screen(void)
  #endif				/* SIGWINCH */
  
  #ifdef SIGPIPE
@@ -233,16 +239,16 @@ With C99 it's void. No need to check anymore.
  }
  #endif
  
-@@ -1790,7 +1787,7 @@ clear_mark(Line *l)
+@@ -1831,7 +1828,7 @@ clear_mark(Line *l)
  static int
- srchcore(char *volatile str, int (*func) (Buffer *, char *))
+ srchcore(const char *str, int (*func) (Buffer *, const char *))
  {
 -    MySignalHandler(*prevtrap) (SIGNAL_ARG);
 +    void (*prevtrap) (SIGNAL_ARG);
      volatile int i, result = SR_NOTFOUND;
  
      if (str != NULL && str != SearchString)
-@@ -2195,7 +2192,7 @@ DEFUN(pipesh, PIPE_SHELL, "Execute shell
+@@ -2233,7 +2230,7 @@ DEFUN(pipesh, PIPE_SHELL, "Execute shell
  DEFUN(readsh, READ_SHELL, "Execute shell command and display output")
  {
      Buffer *buf;
@@ -251,7 +257,7 @@ With C99 it's void. No need to check anymore.
      char *cmd;
  
      CurrentKeyData = NULL;	/* not allowed in w3m-control: */
-@@ -6088,7 +6085,7 @@ DEFUN(execCmd, COMMAND, "Invoke w3m func
+@@ -6257,7 +6254,7 @@ DEFUN(execCmd, COMMAND, "Invoke w3m func
  }
  
  #ifdef USE_ALARM
@@ -260,7 +266,7 @@ With C99 it's void. No need to check anymore.
  SigAlarm(SIGNAL_ARG)
  {
      char *data;
-@@ -6124,7 +6121,6 @@ SigAlarm(SIGNAL_ARG)
+@@ -6293,7 +6290,6 @@ SigAlarm(SIGNAL_ARG)
  	    alarm(CurrentAlarm->sec);
  	}
      }
@@ -283,7 +289,7 @@ With C99 it's void. No need to check anymore.
  }
  
  static Str
-@@ -320,7 +319,7 @@ loadNewsgroup0(ParsedURL *pu)
+@@ -324,7 +323,7 @@ loadNewsgroup0(ParsedURL *pu)
      char *volatile scheme, *volatile group, *volatile list;
      int status, i, first, last;
      volatile int flag = 0, start = 0, end = 0;
@@ -294,8 +300,8 @@ With C99 it's void. No need to check anymore.
  
 --- a/proto.h
 +++ b/proto.h
-@@ -8,7 +8,7 @@
- extern int main(int argc, char **argv);
+@@ -9,7 +9,7 @@
+ #define W3M_PROTO_H__
  extern void nulcmd(void);
  extern void pushEvent(int cmd, void *data);
 -extern MySignalHandler intTrap(SIGNAL_ARG);
@@ -303,29 +309,18 @@ With C99 it's void. No need to check anymore.
  extern void pgFore(void);
  extern void pgBack(void);
  extern void hpgFore(void);
-@@ -465,8 +465,8 @@ extern void set_cc(int spec, int val);
- extern void close_tty(void);
- extern char *ttyname_tty(void);
- extern void reset_tty(void);
--extern MySignalHandler reset_exit(SIGNAL_ARG);
--extern MySignalHandler error_dump(SIGNAL_ARG);
-+extern void reset_exit(SIGNAL_ARG);
-+extern void error_dump(SIGNAL_ARG);
- extern void set_int(void);
- extern void getTCstr(void);
- extern void setlinescols(void);
 --- a/terms.c
 +++ b/terms.c
-@@ -261,7 +261,7 @@ check_cygwin_console(void)
+@@ -259,7 +259,7 @@ check_cygwin_console(void)
+ }
  #endif				/* __CYGWIN__ */
  
- char *getenv(const char *);
 -MySignalHandler reset_exit(SIGNAL_ARG), reset_error_exit(SIGNAL_ARG), error_dump(SIGNAL_ARG);
 +void reset_exit(SIGNAL_ARG), reset_error_exit(SIGNAL_ARG), error_dump(SIGNAL_ARG);
- void setlinescols(void);
- void flush_tty(void);
  
-@@ -555,9 +555,9 @@ put_image_kitty(char *url, int x, int y,
+ #ifndef SIGIOT
+ #define SIGIOT SIGABRT
+@@ -549,9 +549,9 @@ put_image_kitty(char *url, int x, int y,
      int c, i, j, m, t, is_anim;
      struct stat st;
      pid_t pid;
@@ -338,7 +333,7 @@ With C99 it's void. No need to check anymore.
  
      if (!url)
  	return;
-@@ -773,9 +773,9 @@ put_image_sixel(char *url, int x, int y,
+@@ -767,9 +767,9 @@ put_image_sixel(char *url, int x, int y,
  {
      pid_t pid;
      int do_anim;
@@ -351,7 +346,7 @@ With C99 it's void. No need to check anymore.
  
      MOVE(y,x);
      flush_tty();
-@@ -1087,7 +1087,7 @@ reset_tty(void)
+@@ -1081,7 +1081,7 @@ reset_tty(void)
          close_tty();
  }
  
@@ -360,7 +355,7 @@ With C99 it's void. No need to check anymore.
  reset_exit_with_value(SIGNAL_ARG, int rval)
  {
  #ifdef USE_MOUSE
-@@ -1096,28 +1096,26 @@ reset_exit_with_value(SIGNAL_ARG, int rv
+@@ -1090,28 +1090,26 @@ reset_exit_with_value(SIGNAL_ARG, int rv
  #endif				/* USE_MOUSE */
      reset_tty();
      w3m_exit(rval);
@@ -392,7 +387,7 @@ With C99 it's void. No need to check anymore.
  }
  
  void
-@@ -2398,7 +2396,7 @@ do_getch(void)
+@@ -2335,7 +2333,7 @@ do_getch(void)
  	return sysm_getch();
  }
  
@@ -403,7 +398,7 @@ With C99 it's void. No need to check anymore.
      struct mouse_info mi;
 --- a/url.c
 +++ b/url.c
-@@ -240,11 +240,10 @@ DefaultFile(int scheme)
+@@ -246,11 +246,10 @@ DefaultFile(int scheme)
      return NULL;
  }
  
@@ -424,8 +419,8 @@ With C99 it's void. No need to check anymore.
 +    void (*volatile prevtrap) (SIGNAL_ARG) = NULL;
  
      if (fmInitialized) {
- 	/* FIXME: gettextize? */
-@@ -2122,7 +2121,7 @@ check_no_proxy(char *domain)
+ 	message(Sprintf(_("Opening socket..."))->ptr, 0, 0);
+@@ -2176,7 +2175,7 @@ check_no_proxy(char *domain)
  {
      TextListItem *tl;
      volatile int ret = 0;

@@ -5,7 +5,7 @@
 
 --- a/main.c
 +++ b/main.c
-@@ -5738,6 +5738,8 @@ DEFUN(sgrmouse, SGRMOUSE, "SGR 1006 mous
+@@ -5743,6 +5743,8 @@ DEFUN(sgrmouse, SGRMOUSE, "SGR 1006 mous
  }
  
  #ifdef USE_GPM
@@ -24,7 +24,7 @@
  #endif				/* USE_GPM */
  #ifdef USE_SYSMOUSE
  #include <osreldate.h>
-@@ -2421,7 +2422,6 @@ void
+@@ -2423,7 +2424,6 @@ void
  mouse_init(void)
  {
      Gpm_Connect conn;

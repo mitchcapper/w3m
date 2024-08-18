@@ -4,12 +4,12 @@
 
 --- a/terms.c
 +++ b/terms.c
-@@ -2269,6 +2269,11 @@ getch(void)
+@@ -2271,6 +2271,11 @@ getch(void)
  
  #ifdef USE_MOUSE
  #ifdef USE_GPM
 +/*
-+ * While wgetch seems to be unused, it's needed.
++ * While wgetch seems to be unused, it's need.
 + * E.g. SELECT_MENU will segfault if you remove it.
 + * TODO(rkta): wgetch belongs to libcurses, something fishy is going on here.
 + */

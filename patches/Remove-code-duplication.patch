@@ -12,7 +12,7 @@ returns an empty string.
 
 --- a/indep.c
 +++ b/indep.c
-@@ -71,22 +71,11 @@ strtoclen(const char *s)
+@@ -98,22 +98,11 @@ bzero(void *ptr, int len)
  char *
  allocStr(const char *s, int len)
  {

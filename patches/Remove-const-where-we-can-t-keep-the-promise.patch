@@ -6,6 +6,7 @@ Subject: [PATCH 170/172] Remove const where we can't keep the promise
 In all that cases compiling with -Wcast-qual shows, that the const was
 cast away and there was no easy way to keep the const.
 ---
+ Str.c   |    2 +-
  file.c  |    4 ++--
  fm.h    |    2 +-
  form.c  |    2 +-
@@ -13,11 +14,11 @@ cast away and there was no easy way to keep the const.
  proto.h |   10 +++++-----
  rc.c    |    8 ++++----
  url.c   |   10 +++++-----
- 7 files changed, 21 insertions(+), 21 deletions(-)
+ 8 files changed, 22 insertions(+), 22 deletions(-)
 
 --- a/file.c
 +++ b/file.c
-@@ -1718,7 +1718,7 @@ loadGeneralFile(char *path, ParsedURL *v
+@@ -1719,7 +1719,7 @@ loadGeneralFile(char *path, ParsedURL *v
  
    load_doc:
      {
@@ -26,9 +27,9 @@ cast away and there was no easy way to keep the const.
  	parseURL2(tpath, &pu, current);
  	sc_redirect = query_SCONF_SUBSTITUTE_URL(&pu);
  	if (sc_redirect && *sc_redirect && checkRedirection(&pu)) {
-@@ -7600,7 +7600,7 @@ loadImageBuffer(URLFile *uf, Buffer *new
+@@ -7601,7 +7601,7 @@ loadImageBuffer(URLFile *uf, Buffer *new
      URLFile f;
-     void (*volatile prevtrap) (SIGNAL_ARG) = NULL;
+     MySignalHandler(*volatile prevtrap) (SIGNAL_ARG) = NULL;
      struct stat st;
 -    const ParsedURL *pu = newBuf ? &newBuf->currentURL : NULL;
 +    ParsedURL *pu = newBuf ? &newBuf->currentURL : NULL;
@@ -37,7 +38,7 @@ cast away and there was no easy way to keep the const.
      image.url = uf->url;
 --- a/fm.h
 +++ b/fm.h
-@@ -273,7 +273,7 @@ extern int REV_LB[];
+@@ -277,7 +277,7 @@ extern int REV_LB[];
  #define SCONF_NO_REFERER_TO	4
  #define SCONF_USER_AGENT	5
  #define SCONF_N_FIELD		6
@@ -143,7 +144,7 @@ cast away and there was no easy way to keep the const.
  
 --- a/url.c
 +++ b/url.c
-@@ -2447,14 +2447,14 @@ schemeToProxy(int scheme)
+@@ -2449,14 +2449,14 @@ schemeToProxy(int scheme)
  
  #ifdef USE_M17N
  wc_ces
@@ -161,7 +162,7 @@ cast away and there was no easy way to keep the const.
  	pu = &pu_buf;
      } else {
  	pu = base;
-@@ -2467,14 +2467,14 @@ url_to_charset(const char *url, const Pa
+@@ -2469,14 +2469,14 @@ url_to_charset(const char *url, const Pa
  }
  
  char *
@@ -177,4 +178,15 @@ cast away and there was no easy way to keep the const.
 +url_decode2(char *url, Buffer *buf)
  {
      wc_ces url_charset;
+ 
+--- a/Str.c
++++ b/Str.c
+@@ -169,7 +169,7 @@ Strcopy(Str x, Str y)
+ 	    exit(1);
+ 	x->area_size = y->length + 1;
+     }
+-    bcopy((void *)y->ptr, (void *)x->ptr, y->length + 1);
++    bcopy((const void *)y->ptr, (void *)x->ptr, y->length + 1);
+     x->length = y->length;
+ }
  

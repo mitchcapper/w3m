@@ -1,11 +1,3 @@
-Replace-deprecated-bcopy.patch
-Get-rid-of-MySignalHandler.patch
-Remove-config.h.hist.patch
-Drop-wait3-support.patch
-Drop-support-for-old-ss-family.patch
-Remove-obsolete-checks-in-configure.patch
-Replace-AC_TRY_CPP.patch
-Run-autoupdate.patch
 # modernC
 Label-endif-else-that-is-far-away-from-ifdef.patch
 # PENDING
@@ -41,6 +33,7 @@ Fix-some-casts-that-discard-qualifiers.patch
 Remove-const-where-we-can-t-keep-the-promise.patch
 Remove-declarations-without-definition.patch
 Remove-unused-function-declarations.patch
+Remove-unused-prototyp.patch
 Remove-unused-function.patch
 Move-declarations-to-the-correct-header-file.patch
 Remove-redundant-declarations.patch
@@ -53,6 +46,8 @@ Remove-unnecessary-casts.patch
 Remove-pointer-indirection-where-not-needed.patch
 Remove-redundant-assignment.patch
 Fix-Wstrict-prototypes.patch
+# NEXT
+Replace-deprecated-bcopy.patch
 # FEATURES
 Display-error-for-unkown-command.patch
 Enable-folding-in-pre-tags.patch
@@ -121,6 +116,13 @@ save-history.patch
 Store-session.patch
 shorten-not-assigned-in-help.patch
 Use-gettext-for-user-facing-strings.patch
+Get-rid-of-MySignalHandler.patch
+Remove-config.h.hist.patch
+Drop-wait3-support.patch
+Drop-support-for-old-ss-family.patch
+Remove-obsolete-checks-in-configure.patch
+Replace-AC_TRY_CPP.patch
+run-autoupdate.patch
 Remove-unused-CurrentKeyData.patch
 Add-cd-command.patch
 do_download.patch
