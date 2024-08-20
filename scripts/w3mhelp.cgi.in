@@ -172,8 +172,8 @@ print "<P><A HREF=\"$keymap\">$head</A>\n";
 
 &show_keymap('Miscellaneous',
 	     split(" ", "mainMn ldhelp ldOpt dispVer cooLst ldHist ldDL
-		docCSet defCSet
-		msgs msToggle wrapToggle execCmd setAlarm setOpt setEnv defKey
+		docCSet defCSet msgs userMessage
+		msToggle wrapToggle execCmd setAlarm setOpt setEnv defKey
 		reinit execsh susp qquitfm quitfm"));
 
 &show_keymap_data('User-defined key bindings');
