@@ -139,7 +139,7 @@ print "<P><A HREF=\"$keymap\">$head</A>\n";
 		shiftl shiftr col1L col1R linbeg linend ctrCsrH ctrCsrV
 		goLine goLineF goLineL movRW movLW
 		topA lastA nextA prevA movlistMn
-		nextR nextL nextD nextU nextRD nextLU
+		nextR nextL nextD nextU nextRD nextLU nextI prevI
 		undoPos redoPos cursorTop cursorMiddle cursorBottom"));
 
 &show_keymap('Hyperlink Operations',
