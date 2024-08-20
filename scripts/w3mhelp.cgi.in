@@ -139,7 +139,7 @@ print "<P><A HREF=\"$keymap\">$head</A>\n";
 		shiftl shiftr col1L col1R linbeg linend ctrCsrH ctrCsrV
 		goLine goLineF goLineL movRW movLW
 		topA lastA nextA prevA movlistMn
-		nextR nextL nextD nextU nextRD nextLU
+		nextR nextL nextD nextU nextRD nextLU nextI prevI
 		undoPos redoPos cursorTop cursorMiddle cursorBottom"));
 
 &show_keymap('Hyperlink Operations',
@@ -172,8 +172,8 @@ print "<P><A HREF=\"$keymap\">$head</A>\n";
 
 &show_keymap('Miscellaneous',
 	     split(" ", "mainMn ldhelp ldOpt dispVer cooLst ldHist ldDL
-		docCSet defCSet
-		msgs msToggle wrapToggle execCmd setAlarm setOpt setEnv defKey
+		docCSet defCSet msgs userMessage
+		msToggle wrapToggle execCmd setAlarm setOpt setEnv defKey
 		reinit execsh susp qquitfm quitfm"));
 
 &show_keymap_data('User-defined key bindings');

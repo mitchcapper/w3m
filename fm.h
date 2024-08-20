@@ -832,6 +832,7 @@ global int Tabstop init(8);
 global int IndentIncr init(4);
 global int ShowEffect init(TRUE);
 global int PagerMax init(PAGER_MAX_LINE);
+global int MessageDelay init(2);
 
 global char SearchHeader init(FALSE);
 global char *DefaultType init(NULL);

@@ -60,6 +60,7 @@ MARK_URL	Turn URL-like strings into hyperlinks
 MARK_WORD	Turn current word into hyperlink
 MENU		Pop up menu
 MENU_MOUSE	Pop up menu at mouse pointer
+MESSAGE	Display a message
 MOUSE_TOGGLE	Toggle mouse support
 MOVE_DOWN	Cursor down
 MOVE_DOWN1	Cursor down. With edge touched, slide
@@ -76,6 +77,7 @@ NEW_TAB 	Open a new tab (with current document)
 NEXT		Switch to the next buffer
 NEXT_DOWN	Move downward to the next hyperlink
 NEXT_HALF_PAGE	Scroll down half a page
+NEXT_IMAGE	Move to the next image hyperlink
 NEXT_LEFT	Move left to the next hyperlink
 NEXT_LEFT_UP	Move left or upward to the next hyperlink
 NEXT_LINK	Move to the next hyperlink
@@ -97,6 +99,7 @@ PIPE_BUF	Pipe current buffer through a shell command and display output
 PIPE_SHELL	Execute shell command and display output
 PREV		Switch to the previous buffer
 PREV_HALF_PAGE	Scroll up half a page
+PREV_IMAGE	Move to the previous image hyperlink
 PREV_LINK	Move to the previous hyperlink
 PREV_MARK	Go to the previous mark
 PREV_PAGE	Scroll up one page

@@ -3937,6 +3937,109 @@ _prevA(int visited)
     displayBuffer(Currentbuf, B_NORMAL);
 }
 
+/* go to the next image */
+static void
+_nextI(void)
+{
+    BufferPoint *po;
+    Anchor *an, *pan;
+    AnchorList *al = Currentbuf->img;
+    int i, x, y, n = searchKeyNum();
+
+    if (Currentbuf->firstLine == NULL)
+	return;
+    if (al == NULL)
+	return;
+    if (!al || al->nanchor == 0)
+	return;
+
+    an = retrieveCurrentImg(Currentbuf);
+    if (an == NULL) {
+	an = retrieveCurrentAnchor(Currentbuf);
+	if (an == NULL)
+	    an = retrieveCurrentForm(Currentbuf);
+    }
+    if (an != NULL) {
+	y = an->start.line;
+	x = an->start.pos;
+    } else {
+	y = Currentbuf->currentLine->linenumber;
+	x = Currentbuf->pos;
+    }
+    for (i = 0; i < n; i++) {
+	pan = an;
+	an = closest_next_anchor(Currentbuf->img, NULL, x, y);
+	if (an == NULL && pan == NULL)
+	    return;
+	if (an == NULL) {
+	    an = pan;
+	    break;
+	}
+	x = an->start.pos;
+	y = an->start.line;
+    }
+    po = &an->start;
+    gotoLine(Currentbuf, po->line);
+    Currentbuf->pos = po->pos;
+    arrangeCursor(Currentbuf);
+    displayBuffer(Currentbuf, B_NORMAL);
+}
+
+/* go to the previous image */
+static void
+_prevI(void)
+{
+    BufferPoint *po;
+    Anchor *an, *pan;
+    AnchorList *al = Currentbuf->img;
+    int i, x, y, n = searchKeyNum();
+
+    if (Currentbuf->firstLine == NULL)
+	return;
+    if (al == NULL)
+	return;
+
+    an = retrieveCurrentImg(Currentbuf);
+    if (an == NULL) {
+	an = retrieveCurrentAnchor(Currentbuf);
+	if (an == NULL) {
+	    an = retrieveCurrentForm(Currentbuf);
+	}
+    }
+    if (an != NULL) {
+	y = an->start.line;
+	x = an->start.pos;
+    } else {
+	y = Currentbuf->currentLine->linenumber;
+	x = Currentbuf->pos;
+    }
+    for (i = 0; i < n; i++) {
+	pan = an;
+	an = closest_prev_anchor(Currentbuf->img, NULL, x, y);
+	if (an == NULL && pan == NULL)
+	    return;
+	if (an == NULL) {
+	    an = pan;
+	    break;
+	}
+	x = an->start.pos;
+	y = an->start.line;
+    }
+    po = &an->start;
+    gotoLine(Currentbuf, po->line);
+    Currentbuf->pos = po->pos;
+    arrangeCursor(Currentbuf);
+    displayBuffer(Currentbuf, B_NORMAL);
+}
+
+DEFUN(nextI, NEXT_IMAGE, "Move to the next image hyperlink") {
+    _nextI();
+}
+
+DEFUN(prevI, PREV_IMAGE, "Move to the previous image hyperlink") {
+    _prevI();
+}
+
 /* go to the next left/right anchor */
 static void
 nextX(int d, int dy)
@@ -6969,4 +7072,17 @@ DEFUN(cursorBottom, CURSOR_BOTTOM, "Move cursor to the bottom of the screen")
                                               offsety, FALSE);
     arrangeLine(Currentbuf);
     displayBuffer(Currentbuf, B_NORMAL);
+}
+
+DEFUN(userMessage, MESSAGE , "Display a message")
+{
+    char *msg;
+
+    msg = CurrentCmdData;
+    if (msg == NULL || *msg == '\0') {
+	displayBuffer(Currentbuf, B_NORMAL);
+	return;
+    }
+
+    disp_message_nsec(msg, FALSE, MessageDelay, FALSE, TRUE);
 }

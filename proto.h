@@ -70,6 +70,8 @@ extern void nextA(void);
 extern void prevA(void);
 extern void nextVA(void);
 extern void prevVA(void);
+extern void nextI(void);
+extern void prevI(void);
 extern void nextL(void);
 extern void nextLU(void);
 extern void nextR(void);
@@ -824,3 +826,5 @@ long lrand48(void);
 #endif
 
 extern Str base64_encode(const char *src, size_t len);
+
+extern void userMessage(void);
