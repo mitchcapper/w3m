@@ -26,7 +26,7 @@ Subject: [PATCH 171/172] Add more const correctness
  #ifdef USE_M17N
 --- a/proto.h
 +++ b/proto.h
-@@ -506,7 +506,7 @@ extern int openSocket(char *hostname, ch
+@@ -508,7 +508,7 @@ extern int openSocket(char *hostname, ch
  extern void parseURL(char *url, ParsedURL *p_url, ParsedURL *current);
  extern void copyParsedURL(ParsedURL *p, const ParsedURL *q);
  extern void parseURL2(char *url, ParsedURL *pu, ParsedURL *current);
@@ -35,7 +35,7 @@ Subject: [PATCH 171/172] Add more const correctness
  extern Str parsedURL2RefererStr(ParsedURL *pu);
  extern int getURLScheme(char **url);
  extern void init_stream(URLFile *uf, int scheme, InputStream stream);
-@@ -635,9 +635,9 @@ extern Str myEditor(char *cmd, char *fil
+@@ -637,9 +637,9 @@ extern Str myEditor(char *cmd, char *fil
  extern int is_localhost(const char *host);
  extern char *file_to_url(char *file);
  #ifdef USE_M17N

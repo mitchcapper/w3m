@@ -31,7 +31,7 @@ Subject: [PATCH 033/172] Remove unused function declarations
  extern void topA(void);
  extern void lastA(void);
  extern void nthA(void);
-@@ -603,9 +601,7 @@ extern Buffer *link_list_panel(Buffer *b
+@@ -605,9 +603,7 @@ extern Buffer *link_list_panel(Buffer *b
  extern Str decodeB(char **ww);
  extern void decodeB_to_growbuf(struct growbuf *gb, char **ww);
  extern Str decodeQ(char **ww);
@@ -41,7 +41,7 @@ Subject: [PATCH 033/172] Remove unused function declarations
  extern void decodeU_to_growbuf(struct growbuf *gb, char **ww);
  #ifdef USE_M17N
  extern Str decodeWord(char **ow, wc_ces * charset);
-@@ -771,7 +767,6 @@ extern int addMenuList(MenuList **list,
+@@ -773,7 +769,6 @@ extern int addMenuList(MenuList **list,
  extern int getMenuN(MenuList *list, char *id);
  
  extern void popupMenu(int x, int y, Menu *menu);

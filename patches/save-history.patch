@@ -18,7 +18,7 @@
  #endif				/* not USE_HISTORY */
 --- a/main.c
 +++ b/main.c
-@@ -4560,6 +4560,13 @@ DEFUN(ldHist, HISTORY, "Show browsing hi
+@@ -4663,6 +4663,13 @@ DEFUN(ldHist, HISTORY, "Show browsing hi
  {
      cmd_loadBuffer(historyBuffer(URLHist), BP_NO_URL, LB_NOLINK);
  }
@@ -44,7 +44,7 @@
  SAVE_SCREEN	Speichere verarbeitetes Dokument
 --- a/doc/README.func
 +++ b/doc/README.func
-@@ -115,6 +115,7 @@ RELOAD		Load current document anew
+@@ -118,6 +118,7 @@ RELOAD		Load current document anew
  RESHAPE 	Re-render document
  RIGHT		Shift screen one column right
  SAVE		Save document source
@@ -60,6 +60,6 @@
  &show_keymap('Miscellaneous',
 -	     split(" ", "mainMn ldhelp ldOpt dispVer cooLst ldHist ldDL
 +	     split(" ", "mainMn ldhelp ldOpt dispVer cooLst ldHist svHist ldDL
- 		docCSet defCSet
- 		msgs msToggle wrapToggle execCmd setAlarm setOpt setEnv defKey
+ 		docCSet defCSet msgs userMessage
+ 		msToggle wrapToggle execCmd setAlarm setOpt setEnv defKey
  		reinit execsh susp qquitfm quitfm"));

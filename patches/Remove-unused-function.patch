@@ -37,7 +37,7 @@ Subject: [PATCH 018/172] Remove unused function
   * current position.
 --- a/proto.h
 +++ b/proto.h
-@@ -299,7 +299,6 @@ extern Buffer *newBuffer(int width);
+@@ -301,7 +301,6 @@ extern Buffer *newBuffer(int width);
  extern Buffer *nullBuffer(void);
  extern void clearBuffer(Buffer *buf);
  extern void discardBuffer(Buffer *buf);
@@ -45,7 +45,7 @@ Subject: [PATCH 018/172] Remove unused function
  extern Buffer *deleteBuffer(Buffer *first, Buffer *delbuf);
  extern Buffer *replaceBuffer(Buffer *first, Buffer *delbuf, Buffer *newbuf);
  extern Buffer *nthBuffer(Buffer *firstbuf, int n);
-@@ -337,7 +336,6 @@ extern void cursorDown(Buffer *buf, int
+@@ -339,7 +338,6 @@ extern void cursorDown(Buffer *buf, int
  extern void cursorUpDown(Buffer *buf, int n);
  extern void cursorRight(Buffer *buf, int n);
  extern void cursorLeft(Buffer *buf, int n);
@@ -53,7 +53,7 @@ Subject: [PATCH 018/172] Remove unused function
  extern void arrangeCursor(Buffer *buf);
  extern void arrangeLine(Buffer *buf);
  extern void cursorXY(Buffer *buf, int x, int y);
-@@ -490,14 +488,11 @@ extern void rscroll(int);
+@@ -492,14 +490,11 @@ extern void rscroll(int);
  #endif
  extern void clrtoeol(void);
  extern void clrtoeolx(void);
