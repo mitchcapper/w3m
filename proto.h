@@ -826,3 +826,5 @@ long lrand48(void);
 #endif
 
 extern Str base64_encode(const char *src, size_t len);
+
+extern void userMessage(void);

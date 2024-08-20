@@ -7073,3 +7073,16 @@ DEFUN(cursorBottom, CURSOR_BOTTOM, "Move cursor to the bottom of the screen")
     arrangeLine(Currentbuf);
     displayBuffer(Currentbuf, B_NORMAL);
 }
+
+DEFUN(userMessage, MESSAGE , "Display a message")
+{
+    char *msg;
+
+    msg = CurrentCmdData;
+    if (msg == NULL || *msg == '\0') {
+	displayBuffer(Currentbuf, B_NORMAL);
+	return;
+    }
+
+    disp_message_nsec(msg, FALSE, MessageDelay, FALSE, TRUE);
+}

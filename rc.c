@@ -65,6 +65,7 @@ static int OptionEncode = FALSE;
 #define CMT_INDENT_INCR  N_("Indent for HTML rendering")
 #define CMT_PIXEL_PER_CHAR N_("Number of pixels per character (4.0...32.0)")
 #define CMT_PIXEL_PER_LINE N_("Number of pixels per line (4.0...64.0)")
+#define CMT_MESSAGE_DELAY N_("Number of seconds to display user messages")
 #define CMT_PAGERLINE    N_("Number of remembered lines when used as a pager")
 #define CMT_HISTORY	 N_("Use URL history")
 #define CMT_HISTSIZE     N_("Number of remembered URL")
@@ -460,6 +461,8 @@ struct param_ptr params1[] = {
     {"show_lnum", P_INT, PI_ONOFF, (void *)&showLineNum, CMT_SHOW_NUM, NULL},
     {"show_srch_str", P_INT, PI_ONOFF, (void *)&show_srch_str,
      CMT_SHOW_SRCH_STR, NULL},
+    {"message_delay", P_NZINT, PI_TEXT, (void *)&MessageDelay, CMT_MESSAGE_DELAY,
+     NULL},
     {"label_topline", P_INT, PI_ONOFF, (void *)&label_topline,
      CMT_LABEL_TOPLINE, NULL},
     {"nextpage_topline", P_INT, PI_ONOFF, (void *)&nextpage_topline,
