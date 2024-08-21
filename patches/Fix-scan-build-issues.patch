@@ -74,7 +74,7 @@ Patch: patches/Fix-scan-build-issues.patch
  	    break;
 --- a/main.c
 +++ b/main.c
-@@ -4532,7 +4532,7 @@ _strSession(char *sf)
+@@ -4427,7 +4427,7 @@ _strSession(char *sf)
  	sep = "\n";
      }
  
@@ -83,7 +83,7 @@ Patch: patches/Fix-scan-build-issues.patch
      if ((r = fclose(f)) == EOF) goto fail;
      return;
  
-@@ -6353,11 +6353,9 @@ DEFUN(execCmd, COMMAND, "Invoke w3m func
+@@ -6248,11 +6248,9 @@ DEFUN(execCmd, COMMAND, "Invoke w3m func
  static void
  SigAlarm(SIGNAL_ARG)
  {

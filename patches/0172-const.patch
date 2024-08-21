@@ -679,7 +679,7 @@ Subject: [PATCH 172/172] const
  
 --- a/fm.h
 +++ b/fm.h
-@@ -988,7 +988,7 @@ global int image_map_list init(TRUE);
+@@ -987,7 +987,7 @@ global int image_map_list init(TRUE);
  global int displayImage init(FALSE);	/* XXX: emacs-w3m use display_image=off */
  #endif
  global int pseudoInlines init(TRUE);
@@ -688,7 +688,7 @@ Subject: [PATCH 172/172] const
  #ifdef USE_W3MMAILER
  global char *Mailer init(NULL);
  #else
-@@ -1032,10 +1032,10 @@ global int WrapSearch init(FALSE);
+@@ -1031,10 +1031,10 @@ global int WrapSearch init(FALSE);
  global int squeezeBlankLine init(FALSE);
  global char *BookmarkFile init(NULL);
  global int UseExternalDirBuffer init(TRUE);
@@ -701,7 +701,7 @@ Subject: [PATCH 172/172] const
  #endif				/* USE_DICT */
  global int ignore_null_img_alt init(TRUE);
  #define DISPLAY_INS_DEL_SIMPLE	0
-@@ -1223,10 +1223,10 @@ global int use_lessopen init(FALSE);
+@@ -1222,10 +1222,10 @@ global int use_lessopen init(FALSE);
  global char *keymap_file init(KEYMAP_FILE);
  
  #ifdef USE_M17N
@@ -1395,7 +1395,7 @@ Subject: [PATCH 172/172] const
  {
      if (l == NULL || *l == '\0' || Currentbuf->currentLine == NULL) {
  	displayBuffer(Currentbuf, B_FORCE_REDRAW);
-@@ -4321,7 +4321,7 @@ cmd_loadURL(char *url, ParsedURL *curren
+@@ -4218,7 +4218,7 @@ cmd_loadURL(char *url, ParsedURL *curren
  
  /* go to specified URL */
  static void
@@ -1404,7 +1404,7 @@ Subject: [PATCH 172/172] const
  {
      char *url, *referer;
      ParsedURL p_url, *current;
-@@ -5373,10 +5373,10 @@ DEFUN(rFrame, FRAME, "Toggle rendering H
+@@ -5270,10 +5270,10 @@ DEFUN(rFrame, FRAME, "Toggle rendering H
  
  /* spawn external browser */
  static void
@@ -1417,7 +1417,7 @@ Subject: [PATCH 172/172] const
      int bg = 0, len;
  
      CurrentKeyData = NULL;	/* not allowed in w3m-control: */
-@@ -6031,7 +6031,7 @@ GetWord(Buffer *buf)
+@@ -5928,7 +5928,7 @@ GetWord(Buffer *buf)
  
  #ifdef USE_DICT
  static void
@@ -1426,7 +1426,7 @@ Subject: [PATCH 172/172] const
  {
      char *w, *dictcmd;
      Buffer *buf;
-@@ -6701,7 +6701,7 @@ DEFUN(tabA, TAB_LINK, "Follow current hy
+@@ -6598,7 +6598,7 @@ DEFUN(tabA, TAB_LINK, "Follow current hy
  }
  
  static void
@@ -1480,7 +1480,7 @@ Subject: [PATCH 172/172] const
  #endif				/* not PARSETAG_H */
 --- a/rc.c
 +++ b/rc.c
-@@ -862,7 +862,7 @@ create_option_search_table(void)
+@@ -859,7 +859,7 @@ create_option_search_table(void)
  }
  
  static struct param_ptr *
@@ -1489,7 +1489,7 @@ Subject: [PATCH 172/172] const
  {
      size_t b, e, i;
      int cmp;
-@@ -982,7 +982,7 @@ show_params(FILE * fp)
+@@ -979,7 +979,7 @@ show_params(FILE * fp)
  }
  
  int
@@ -1498,7 +1498,7 @@ Subject: [PATCH 172/172] const
  {
      if (value == NULL)
  	return 1;
-@@ -1010,7 +1010,7 @@ str_to_bool(char *value, int old)
+@@ -1007,7 +1007,7 @@ str_to_bool(char *value, int old)
  
  #ifdef USE_COLOR
  static int
@@ -1507,7 +1507,7 @@ Subject: [PATCH 172/172] const
  {
      if (value == NULL)
  	return 8;		/* terminal */
-@@ -1051,7 +1051,7 @@ str_to_color(char *value)
+@@ -1048,7 +1048,7 @@ str_to_color(char *value)
  #endif
  
  static int
@@ -1516,7 +1516,7 @@ Subject: [PATCH 172/172] const
  {
      struct param_ptr *p;
      double ppc;
-@@ -1083,7 +1083,7 @@ set_param(char *name, char *value)
+@@ -1080,7 +1080,7 @@ set_param(char *name, char *value)
  	*(char *)p->varptr = value[0];
  	break;
      case P_STRING:
@@ -1525,7 +1525,7 @@ Subject: [PATCH 172/172] const
  	break;
  #if defined(USE_SSL) && defined(USE_SSL_VERIFY)
      case P_SSLPATH:
-@@ -1685,26 +1685,26 @@ rcFile(char *base)
+@@ -1682,26 +1682,26 @@ rcFile(char *base)
  }
  
  char *
@@ -1824,7 +1824,7 @@ Subject: [PATCH 172/172] const
      const char *p = NULL, *p1, *p2;
 --- a/proto.h
 +++ b/proto.h
-@@ -185,8 +185,8 @@ extern char *url_decode0(const char *url
+@@ -183,8 +183,8 @@ extern char *url_decode0(const char *url
  #endif /* !defined(USE_M17N) */
  extern void examineFile(char *path, URLFile *uf);
  extern char *acceptableEncoding(void);
@@ -1835,7 +1835,7 @@ Subject: [PATCH 172/172] const
  #ifdef USE_M17N
  extern char **get_symbol(wc_ces charset, int *width);
  extern char **set_symbol(int width);
-@@ -203,7 +203,7 @@ extern void update_utf8_symbol(void);
+@@ -201,7 +201,7 @@ extern void update_utf8_symbol(void);
  #endif
  extern Buffer *loadGeneralFile(char *path, ParsedURL *current, char *referer,
  			       int flag, FormList *request);
@@ -1844,7 +1844,7 @@ Subject: [PATCH 172/172] const
  extern void push_render_image(Str str, int width, int limit,
  			      struct html_feed_environ *h_env);
  extern void flushline(struct html_feed_environ *h_env, struct readbuffer *obuf,
-@@ -223,7 +223,7 @@ extern ImageCache *getImage(Image * imag
+@@ -221,7 +221,7 @@ extern ImageCache *getImage(Image * imag
  extern int getImageSize(ImageCache * cache);
  #endif
  extern Str process_img(struct parsed_tag *tag, int width);
@@ -1853,7 +1853,7 @@ Subject: [PATCH 172/172] const
  extern Str process_input(struct parsed_tag *tag);
  extern Str process_button(struct parsed_tag *tag);
  extern Str process_n_button(void);
-@@ -236,7 +236,7 @@ extern Str process_n_textarea(void);
+@@ -234,7 +234,7 @@ extern Str process_n_textarea(void);
  extern void feed_textarea(char *str);
  extern Str process_form(struct parsed_tag *tag);
  extern Str process_n_form(void);
@@ -1862,7 +1862,7 @@ Subject: [PATCH 172/172] const
  extern int HTMLtagproc1(struct parsed_tag *tag,
  			struct html_feed_environ *h_env);
  extern void HTMLlineproc2(Buffer *buf, TextLineList *tl);
-@@ -276,19 +276,19 @@ extern Buffer *getpipe(char *cmd);
+@@ -274,19 +274,19 @@ extern Buffer *getpipe(char *cmd);
  extern Buffer *openPagerBuffer(InputStream stream, Buffer *buf);
  extern Buffer *openGeneralPagerBuffer(InputStream stream);
  extern Line *getNextPage(Buffer *buf, int plen);
@@ -1891,7 +1891,7 @@ Subject: [PATCH 172/172] const
  extern TabBuffer *newTab(void);
  extern void calcTabPos(void);
  extern TabBuffer *deleteTab(TabBuffer * tab);
-@@ -318,10 +318,10 @@ extern void addChar(char c, Lineprop mod
+@@ -316,10 +316,10 @@ extern void addChar(char c, Lineprop mod
  #ifdef USE_M17N
  extern void addMChar(char *c, Lineprop mode, size_t len);
  #endif
@@ -1904,7 +1904,7 @@ Subject: [PATCH 172/172] const
  extern void disp_message_nsec(const char *s, int redraw_current, int sec,
  			      int purge, int mouse);
  extern void disp_message(const char *s, int redraw_current);
-@@ -330,7 +330,7 @@ extern void disp_message_nomouse(char *s
+@@ -328,7 +328,7 @@ extern void disp_message_nomouse(char *s
  #else
  #define disp_message_nomouse disp_message
  #endif
@@ -1913,7 +1913,7 @@ Subject: [PATCH 172/172] const
  extern void cursorUp0(Buffer *buf, int n);
  extern void cursorUp(Buffer *buf, int n);
  extern void cursorDown0(Buffer *buf, int n);
-@@ -347,13 +347,13 @@ extern int columnPos(Line *line, int col
+@@ -345,13 +345,13 @@ extern int columnPos(Line *line, int col
  extern int columnLen(Line *line, int column);
  extern Line *lineSkip(Buffer *buf, Line *line, int offset, int last);
  extern Line *currentLineSkip(Buffer *buf, Line *line, int offset, int last);
@@ -1931,7 +1931,7 @@ Subject: [PATCH 172/172] const
  extern int next_status(char c, int *status);
  extern int read_token(Str buf, char **instr, int *status, int pre, int append);
  extern Str correct_irrtag(int status);
-@@ -382,7 +382,7 @@ extern Buffer *historyBuffer(Hist *hist)
+@@ -380,7 +380,7 @@ extern Buffer *historyBuffer(Hist *hist)
  #endif				/* not USE_HISTORY */
  extern struct table *newTable(void);
  extern void pushdata(struct table *t, int row, int col, char *data);
@@ -1940,7 +1940,7 @@ Subject: [PATCH 172/172] const
  extern void align(TextLine *lbuf, int width, int mode);
  extern void print_item(struct table *t, int row, int col, int width, Str buf);
  extern void print_sep(struct table *t, int row, int type, int maxcol, Str buf);
-@@ -487,13 +487,13 @@ extern void clrtoeolx(void);
+@@ -485,13 +485,13 @@ extern void clrtoeolx(void);
  extern void clrtobotx(void);
  extern void addstr(const char *s);
  extern void addnstr(const char *s, int n);
@@ -1956,7 +1956,7 @@ Subject: [PATCH 172/172] const
  extern void toggle_stand(void);
  extern void bell(void);
  extern int sleep_till_anykey(int sec, int purge);
-@@ -518,14 +518,14 @@ extern URLFile openURL(char *url, Parsed
+@@ -516,14 +516,14 @@ extern URLFile openURL(char *url, Parsed
  		       URLOption *option, FormList *request,
  		       TextList *extra_header, URLFile *ouf,
  		       HRequest *hr, unsigned char *status);
@@ -1976,7 +1976,7 @@ Subject: [PATCH 172/172] const
  extern TextList *make_domain_list(char *domain_list);
  extern int check_no_proxy(char *domain);
  extern InputStream openFTPStream(ParsedURL *pu, URLFile *uf);
-@@ -607,14 +607,14 @@ extern Buffer *load_option_panel(void);
+@@ -605,14 +605,14 @@ extern Buffer *load_option_panel(void);
  extern void panel_set_option(struct parsed_tagarg *);
  extern void sync_with_option(void);
  extern char *rcFile(char *base);
@@ -1995,7 +1995,7 @@ Subject: [PATCH 172/172] const
  extern FILE *localcgi_post(char *, char *, FormList *, char *);
  #define localcgi_get(u, q, r) localcgi_post((u), (q), NULL, (r))
  extern FILE *openSecretFile(char *fname);
-@@ -632,8 +632,8 @@ extern Str romanAlphabet(int n);
+@@ -630,8 +630,8 @@ extern Str romanAlphabet(int n);
  extern void setup_child(int child, int i, int f);
  extern void myExec(char *command);
  extern int mySystem(char *command, int background);
@@ -2006,7 +2006,7 @@ Subject: [PATCH 172/172] const
  extern int is_localhost(const char *host);
  extern char *file_to_url(char *file);
  #ifdef USE_M17N
-@@ -643,7 +643,7 @@ extern char *url_unquote_conv0(const cha
+@@ -641,7 +641,7 @@ extern char *url_unquote_conv0(const cha
  #define url_unquote_conv(url, charset) url_unquote_conv0(url)
  #endif
  extern char *expandName(char *name);
@@ -2015,7 +2015,7 @@ Subject: [PATCH 172/172] const
  extern time_t mymktime(char *timestr);
  extern void (*mySignal(int signal_number, void (*action) (int))) (int);
  #ifdef USE_COOKIE
-@@ -721,7 +721,7 @@ extern char *searchKeyData(void);
+@@ -719,7 +719,7 @@ extern char *searchKeyData(void);
  extern void setKeymap(char *p, int lineno, int verbose);
  extern void initKeymap(int force);
  extern int getFuncList(char *id);

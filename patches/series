@@ -139,6 +139,7 @@ Merge-cookies-if-modified-after-start.patch
 Add-option-to-provide-cookie-jar.patch
 Update-URLHist-mtime-when-saving-history.patch
 Add-goto-main-command.patch
+Add-key-binding-to-insert-word-under-cursor.patch
 Enable-lto.patch
 # BORKED
 Refactor-regex-library.patch

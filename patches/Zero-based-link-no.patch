@@ -8,7 +8,7 @@
 
 --- a/rc.c
 +++ b/rc.c
-@@ -79,6 +79,7 @@ static int OptionEncode = FALSE;
+@@ -78,6 +78,7 @@ static int OptionEncode = FALSE;
  #define CMT_OPEN_TAB_DL_LIST N_("Open download list panel on new tab")
  #define CMT_DISPLINK     N_("Display link URL automatically")
  #define CMT_DISPLINKNUMBER N_("Display link numbers")
@@ -16,7 +16,7 @@
  #define CMT_DECODE_URL   N_("Display decoded URL")
  #define CMT_DISPLINEINFO N_("Display current line number")
  #define CMT_DISP_IMAGE   N_("Display inline images")
-@@ -399,6 +400,8 @@ struct param_ptr params1[] = {
+@@ -398,6 +399,8 @@ struct param_ptr params1[] = {
       NULL},
      {"display_link_number", P_INT, PI_ONOFF, (void *)&displayLinkNumber,
       CMT_DISPLINKNUMBER, NULL},
@@ -47,7 +47,7 @@
  	    line = checkType(line, &propBuf, NULL);
 --- a/fm.h
 +++ b/fm.h
-@@ -970,6 +970,7 @@ global int nextpage_topline init(FALSE);
+@@ -969,6 +969,7 @@ global int nextpage_topline init(FALSE);
  global char *displayTitleTerm init(NULL);
  global int displayLink init(FALSE);
  global int displayLinkNumber init(FALSE);

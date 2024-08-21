@@ -420,7 +420,7 @@
      }
  }
  
-@@ -4741,7 +4741,7 @@ _peekURL(int only_img)
+@@ -4638,7 +4638,7 @@ _peekURL(int only_img)
  #ifdef USE_M17N
      s = checkType(s, &pp, NULL);
      p = NewAtom_N(Lineprop, s->length);
@@ -429,7 +429,7 @@
  #endif
    disp:
      n = searchKeyNum();
-@@ -4800,7 +4800,7 @@ DEFUN(curURL, PEEK, "Show current addres
+@@ -4697,7 +4697,7 @@ DEFUN(curURL, PEEK, "Show current addres
  #ifdef USE_M17N
  	s = checkType(s, &pp, NULL);
  	p = NewAtom_N(Lineprop, s->length);

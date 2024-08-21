@@ -87,7 +87,7 @@ Subject: [PATCH 155/172] Add more const to anchor
      };
 --- a/proto.h
 +++ b/proto.h
-@@ -567,9 +567,9 @@ extern Anchor *retrieveCurrentForm(Buffe
+@@ -565,9 +565,9 @@ extern Anchor *retrieveCurrentForm(Buffe
  extern Anchor *searchAnchor(AnchorList *al, char *str);
  extern Anchor *searchURLLabel(Buffer *buf, char *url);
  extern void reAnchorWord(Buffer *buf, Line *l, int spos, int epos);

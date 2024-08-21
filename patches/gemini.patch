@@ -602,7 +602,7 @@ w3m-0.5.3+git20230121.
  }
  
  /* Quit */
-@@ -4826,6 +4883,13 @@ DEFUN(vwSrc, SOURCE VIEW, "Toggle betwee
+@@ -4723,6 +4780,13 @@ DEFUN(vwSrc, SOURCE VIEW, "Toggle betwee
  	displayBuffer(Currentbuf, B_NORMAL);
  	return;
      }
@@ -616,7 +616,7 @@ w3m-0.5.3+git20230121.
      if (Currentbuf->sourcefile == NULL) {
  	if (Currentbuf->pagerSource &&
  	    !strcasecmp(Currentbuf->type, "text/plain")) {
-@@ -4911,6 +4975,91 @@ DEFUN(fold_pre, FOLD_PRE, "Fold long lin
+@@ -4808,6 +4872,91 @@ DEFUN(fold_pre, FOLD_PRE, "Fold long lin
      FoldPre = FoldPreOpt;
  }
  
@@ -708,7 +708,7 @@ w3m-0.5.3+git20230121.
  /* reload */
  DEFUN(reload, RELOAD, "Load current document anew")
  {
-@@ -5136,6 +5285,7 @@ chkURLBuffer(Buffer *buf)
+@@ -5033,6 +5182,7 @@ chkURLBuffer(Buffer *buf)
  	"https?://[a-zA-Z0-9:%\\-\\./_@]*\\[[a-fA-F0-9:][a-fA-F0-9:\\.]*\\][a-zA-Z0-9:%\\-\\./?=~_\\&+@#,\\$;]*",
  	"ftp://[a-zA-Z0-9:%\\-\\./_@]*\\[[a-fA-F0-9:][a-fA-F0-9:\\.]*\\][a-zA-Z0-9:%\\-\\./=_+@#,\\$]*",
  #endif				/* INET6 */
@@ -718,7 +718,7 @@ w3m-0.5.3+git20230121.
      int i;
 --- a/proto.h
 +++ b/proto.h
-@@ -98,6 +98,7 @@ extern void peekURL(void);
+@@ -96,6 +96,7 @@ extern void peekURL(void);
  extern void peekIMG(void);
  extern void curURL(void);
  extern void vwSrc(void);
@@ -978,7 +978,7 @@ w3m-0.5.3+git20230121.
  #define P_INT      0
  #define P_SHORT    1
  #define P_CHARINT  2
-@@ -211,6 +213,7 @@ static int OptionEncode = FALSE;
+@@ -210,6 +212,7 @@ static int OptionEncode = FALSE;
  #define CMT_SSL_CA_PATH N_("Path to directory for PEM encoded certificates of CAs")
  #define CMT_SSL_CA_FILE N_("File consisting of PEM encoded certificates of CAs")
  #define CMT_SSL_CA_DEFAULT N_("Use default locations for PEM encoded certificates of CAs")
@@ -986,7 +986,7 @@ w3m-0.5.3+git20230121.
  #endif				/* USE_SSL_VERIFY */
  #define CMT_SSL_FORBID_METHOD N_("List of forbidden SSL methods (2: SSLv2, 3: SSLv3, t: TLSv1.0, 5: TLSv1.1, 6: TLSv1.2, 7: TLSv1.3)")
  #ifdef SSL_CTX_set_min_proto_version
-@@ -641,6 +644,8 @@ struct param_ptr params7[] = {
+@@ -638,6 +641,8 @@ struct param_ptr params7[] = {
       NULL},
      {"ssl_ca_default", P_INT, PI_ONOFF, (void *)&ssl_ca_default,
       CMT_SSL_CA_DEFAULT, NULL},

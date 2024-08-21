@@ -127,7 +127,7 @@
      w3m_exit(err);
  }
  
-@@ -4472,6 +4525,63 @@ DEFUN(adBmark, ADD_BOOKMARK, "Add curren
+@@ -4369,6 +4422,63 @@ DEFUN(adBmark, ADD_BOOKMARK, "Add curren
  		request);
  }
  
@@ -193,7 +193,7 @@
  {
 --- a/proto.h
 +++ b/proto.h
-@@ -86,6 +86,7 @@ extern void goHome(void);
+@@ -84,6 +84,7 @@ extern void goHome(void);
  extern void gorURL(void);
  extern void ldBmark(void);
  extern void adBmark(void);
@@ -203,7 +203,7 @@
  extern void pginfo(void);
 --- a/rc.c
 +++ b/rc.c
-@@ -72,6 +72,8 @@ static int OptionEncode = FALSE;
+@@ -71,6 +71,8 @@ static int OptionEncode = FALSE;
  #define CMT_HISTORY	 N_("Use URL history")
  #define CMT_HISTSIZE     N_("Number of remembered URL")
  #define CMT_SAVEHIST     N_("Save URL history")
@@ -212,7 +212,7 @@
  #define CMT_FRAME        N_("Render frames automatically")
  #define CMT_ARGV_IS_URL  N_("Treat argument without scheme as URL")
  #define CMT_TSELF        N_("Use _self as default target")
-@@ -509,6 +511,8 @@ struct param_ptr params3[] = {
+@@ -506,6 +508,8 @@ struct param_ptr params3[] = {
      {"history", P_INT, PI_TEXT, (void *)&URLHistSize, CMT_HISTSIZE, NULL},
      {"save_hist", P_INT, PI_ONOFF, (void *)&SaveURLHist, CMT_SAVEHIST, NULL},
  #endif				/* USE_HISTORY */
@@ -223,7 +223,7 @@
      {"close_tab_back", P_INT, PI_ONOFF, (void *)&close_tab_back,
 --- a/fm.h
 +++ b/fm.h
-@@ -1081,6 +1081,8 @@ global int UseHistory init(TRUE);
+@@ -1080,6 +1080,8 @@ global int UseHistory init(TRUE);
  global int URLHistSize init(100);
  global int SaveURLHist init(TRUE);
  #endif				/* USE_HISTORY */
@@ -287,7 +287,7 @@
  TAB_GOTO	Öffne das angegebene Dokument in einem neuen Reiter
 --- a/doc/README.func
 +++ b/doc/README.func
-@@ -136,6 +136,7 @@ SHIFT_LEFT	Shift screen left
+@@ -133,6 +133,7 @@ SHIFT_LEFT	Shift screen left
  SHIFT_RIGHT	Shift screen right
  SOURCE		Toggle between HTML shown or processed
  STOP_IMAGE	Stop loading and drawing of images
@@ -304,6 +304,6 @@
 -	     split(" ", "mainMn ldhelp ldOpt dispVer cooLst ldHist svHist ldDL
 +	     split(" ", "mainMn ldhelp ldOpt dispVer cooLst ldHist svHist
 +		strSession ldDL
- 		docCSet defCSet msgs userMessage
- 		msToggle wrapToggle execCmd setAlarm setOpt setEnv defKey
+ 		docCSet defCSet
+ 		msgs msToggle wrapToggle execCmd setAlarm setOpt setEnv defKey
  		reinit execsh susp qquitfm quitfm"));

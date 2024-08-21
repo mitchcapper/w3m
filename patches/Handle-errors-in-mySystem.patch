@@ -43,7 +43,7 @@ Check the return value of system() calls and display an error message.
  Str
 --- a/proto.h
 +++ b/proto.h
-@@ -665,7 +665,7 @@ extern Str romanNumeral(int n);
+@@ -663,7 +663,7 @@ extern Str romanNumeral(int n);
  extern Str romanAlphabet(int n);
  extern void setup_child(int child, int i, int f);
  extern void myExec(char *command);
