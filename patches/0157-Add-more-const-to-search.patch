@@ -10,7 +10,7 @@ Subject: [PATCH 157/172] Add more const to search
 
 --- a/proto.h
 +++ b/proto.h
-@@ -359,12 +359,12 @@ extern Str correct_irrtag(int status);
+@@ -361,12 +361,12 @@ extern Str correct_irrtag(int status);
  extern void init_migemo(void);
  #endif
  #ifdef USE_M17N

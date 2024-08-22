@@ -173,7 +173,7 @@ Found with -Wcast-qual.
      }
 --- a/proto.h
 +++ b/proto.h
-@@ -642,7 +642,7 @@ extern FILE *openSecretFile(char *fname)
+@@ -644,7 +644,7 @@ extern FILE *openSecretFile(char *fname)
  extern void loadPasswd(void);
  extern void loadPreForm(void);
  extern int find_auth_user_passwd(ParsedURL *pu, char *realm,

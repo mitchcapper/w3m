@@ -78,7 +78,7 @@ Patch: patches/Add-goto-main-command.patch
  {
 --- a/proto.h
 +++ b/proto.h
-@@ -82,6 +82,7 @@ extern void backBf(void);
+@@ -84,6 +84,7 @@ extern void backBf(void);
  extern void deletePrevBuf(void);
  extern void goURL(void);
  extern void goHome(void);

@@ -304,7 +304,7 @@ Next step: use 'flags' parameter for all options, include do_download.
      if (buf == NULL) {
  	char *emsg = Sprintf(_("Can't load %s"), a->url)->ptr;
  	disp_err_message(emsg, FALSE);
-@@ -4227,7 +4231,7 @@ cmd_loadURL(char *url, ParsedURL *curren
+@@ -4330,7 +4334,7 @@ cmd_loadURL(char *url, ParsedURL *curren
  	return;
  
      refresh();
@@ -313,7 +313,7 @@ Next step: use 'flags' parameter for all options, include do_download.
      if (buf == NULL) {
  	char *emsg = Sprintf(_("Can't load %s"), conv_from_system(url))->ptr;
  	disp_err_message(emsg, FALSE);
-@@ -5122,7 +5126,8 @@ DEFUN(reload, RELOAD, "Load current docu
+@@ -5225,7 +5229,8 @@ DEFUN(reload, RELOAD, "Load current docu
  #endif
      SearchHeader = Currentbuf->search_header;
      DefaultType = Currentbuf->real_type;
@@ -323,7 +323,7 @@ Next step: use 'flags' parameter for all options, include do_download.
  #ifdef USE_M17N
      DocumentCharset = old_charset;
  #endif
-@@ -6014,7 +6019,7 @@ execdict(const char *word)
+@@ -6117,7 +6122,7 @@ execdict(const char *word)
      }
      dictcmd = Sprintf("%s?%s", DictCommand,
  		      Str_form_quote(Strnew_charp(w))->ptr)->ptr;
@@ -334,7 +334,7 @@ Next step: use 'flags' parameter for all options, include do_download.
  	return;
 --- a/proto.h
 +++ b/proto.h
-@@ -202,7 +202,7 @@ extern void push_symbol(Str str, char sy
+@@ -204,7 +204,7 @@ extern void push_symbol(Str str, char sy
  extern void update_utf8_symbol(void);
  #endif
  extern Buffer *loadGeneralFile(char *path, ParsedURL *current, char *referer,

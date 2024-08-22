@@ -232,7 +232,7 @@ This functions do not need to use a pointer to a pointer.
  		return cnv;
 --- a/proto.h
 +++ b/proto.h
-@@ -343,7 +343,7 @@ extern int columnPos(Line *line, int col
+@@ -345,7 +345,7 @@ extern int columnPos(Line *line, int col
  extern int columnLen(Line *line, int column);
  extern Line *lineSkip(Buffer *buf, Line *line, int offset, int last);
  extern Line *currentLineSkip(Buffer *buf, Line *line, int offset, int last);
@@ -241,7 +241,7 @@ This functions do not need to use a pointer to a pointer.
  extern Str checkType(Str s, Lineprop **oprop, Linecolor **ocolor);
  extern int calcPosition(char *l, Lineprop *pr, int len, int pos, int bpos,
  			int mode);
-@@ -580,16 +580,16 @@ extern void shiftAnchorPosition(AnchorLi
+@@ -582,16 +582,16 @@ extern void shiftAnchorPosition(AnchorLi
  extern char *getAnchorText(Buffer *buf, AnchorList *al, Anchor *a);
  extern Buffer *link_list_panel(Buffer *buf);
  

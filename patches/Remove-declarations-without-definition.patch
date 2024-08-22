@@ -10,7 +10,7 @@ These protoypes are only declared but never defined.
 
 --- a/proto.h
 +++ b/proto.h
-@@ -203,7 +203,6 @@ extern void update_utf8_symbol(void);
+@@ -205,7 +205,6 @@ extern void update_utf8_symbol(void);
  extern Buffer *loadGeneralFile(char *path, ParsedURL *current, char *referer,
  			       int flag, FormList *request);
  extern int is_boundary(unsigned char *, unsigned char *);
@@ -18,7 +18,7 @@ These protoypes are only declared but never defined.
  extern void push_render_image(Str str, int width, int limit,
  			      struct html_feed_environ *h_env);
  extern void flushline(struct html_feed_environ *h_env, struct readbuffer *obuf,
-@@ -385,7 +384,6 @@ extern Str unescape_spaces(Str s);
+@@ -387,7 +386,6 @@ extern Str unescape_spaces(Str s);
  #ifdef USE_HISTORY
  extern Buffer *historyBuffer(Hist *hist);
  #endif				/* not USE_HISTORY */
@@ -26,7 +26,7 @@ These protoypes are only declared but never defined.
  extern struct table *newTable(void);
  extern void pushdata(struct table *t, int row, int col, char *data);
  extern int visible_length(char *str);
-@@ -400,7 +398,6 @@ extern struct table *begin_table(int bor
+@@ -402,7 +400,6 @@ extern struct table *begin_table(int bor
  				 int vspace);
  extern void end_table(struct table *tbl);
  extern void check_rowcol(struct table *tbl, struct table_mode *mode);
@@ -34,7 +34,7 @@ These protoypes are only declared but never defined.
  extern int feed_table(struct table *tbl, char *line, struct table_mode *mode,
  		      int width, int internal);
  extern void feed_table1(struct table *tbl, Str tok, struct table_mode *mode,
-@@ -500,7 +497,6 @@ extern void clrtoeol(void);
+@@ -502,7 +499,6 @@ extern void clrtoeol(void);
  extern void clrtoeolx(void);
  extern void clrtobot(void);
  extern void clrtobotx(void);

@@ -277,7 +277,7 @@
  	: (CurrentMenu->nitem - 2);
 --- a/proto.h
 +++ b/proto.h
-@@ -205,8 +205,7 @@ extern void push_render_image(Str str, i
+@@ -207,8 +207,7 @@ extern void push_render_image(Str str, i
  extern void flushline(struct html_feed_environ *h_env, struct readbuffer *obuf,
  		      int indent, int force, int width);
  extern void do_blankline(struct html_feed_environ *h_env,
@@ -287,7 +287,7 @@
  extern void purgeline(struct html_feed_environ *h_env);
  extern void save_fonteffect(struct html_feed_environ *h_env,
  			    struct readbuffer *obuf);
-@@ -254,12 +253,12 @@ extern Buffer *loadHTMLString(Str page);
+@@ -256,12 +255,12 @@ extern Buffer *loadHTMLString(Str page);
  #ifdef USE_GOPHER
  #ifdef USE_M17N
  extern Str loadGopherDir(URLFile *uf, ParsedURL *pu, wc_ces * charset);
@@ -303,7 +303,7 @@
  #endif
  #endif				/* USE_GOPHER */
  extern Buffer *loadBuffer(URLFile *uf, Buffer *newBuf);
-@@ -729,7 +728,7 @@ extern void initMouseAction(void);
+@@ -731,7 +730,7 @@ extern void initMouseAction(void);
  
  #ifdef USE_MENU
  extern void new_menu(Menu *menu, MenuItem *item);
