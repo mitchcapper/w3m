@@ -36,7 +36,7 @@ w3m-0.5.3+git20230121.
  static int frame_source = 0;
  static int need_number = 0;
  
-@@ -247,7 +249,7 @@ loadSomething(URLFile *f,
+@@ -246,7 +248,7 @@ loadSomething(URLFile *f,
         )
  	buf->type = "text/html";
      else
@@ -45,7 +45,7 @@ w3m-0.5.3+git20230121.
      return buf;
  }
  
-@@ -1686,7 +1688,7 @@ loadGeneralFile(char *path, ParsedURL *v
+@@ -1685,7 +1687,7 @@ loadGeneralFile(char *path, ParsedURL *v
      URLFile f, *volatile of = NULL;
      ParsedURL pu;
      Buffer *b = NULL;
@@ -54,7 +54,7 @@ w3m-0.5.3+git20230121.
      char *volatile tpath;
      char *volatile t = "text/plain", *p, *volatile real_type = NULL;
      Buffer *volatile t_buf = NULL;
-@@ -2009,6 +2011,166 @@ loadGeneralFile(char *path, ParsedURL *v
+@@ -2008,6 +2010,166 @@ loadGeneralFile(char *path, ParsedURL *v
      else if (pu.scheme == SCM_DATA) {
  	t = f.guess_type;
      }
@@ -221,7 +221,7 @@ w3m-0.5.3+git20230121.
      else if (searchHeader) {
  	searchHeader = SearchHeader = FALSE;
  	if (t_buf == NULL)
-@@ -2193,6 +2355,8 @@ loadGeneralFile(char *path, ParsedURL *v
+@@ -2192,6 +2354,8 @@ loadGeneralFile(char *path, ParsedURL *v
  
      if (is_html_type(t))
  	proc = loadHTMLBuffer;
@@ -230,7 +230,7 @@ w3m-0.5.3+git20230121.
      else if (is_plain_text_type(t))
  	proc = loadBuffer;
  #ifdef USE_IMAGE
-@@ -2449,7 +2613,6 @@ is_boundary(unsigned char *ch1, unsigned
+@@ -2448,7 +2612,6 @@ is_boundary(unsigned char *ch1, unsigned
      return 1;
  }
  
@@ -238,7 +238,7 @@ w3m-0.5.3+git20230121.
  static void
  set_breakpoint(struct readbuffer *obuf, int tag_length)
  {
-@@ -7482,6 +7645,130 @@ loadGopherSearch0(ParsedURL *pu)
+@@ -7481,6 +7644,130 @@ loadGopherSearch0(ParsedURL *pu)
  }
  #endif				/* USE_GOPHER */
  
@@ -253,7 +253,7 @@ w3m-0.5.3+git20230121.
 +    int hseq, len, nlines, pre = 0;
 +    clen_t linelen = 0, trbyte = 0;
 +    Lineprop *propBuf = NULL;
-+    MySignalHandler(*volatile prevtrap) (SIGNAL_ARG) = NULL;
++    void(*volatile prevtrap) (SIGNAL_ARG) = NULL;
 +
 +    if (SETJMP(AbortLoading) != 0) {
 +	goto _end;
@@ -405,7 +405,7 @@ w3m-0.5.3+git20230121.
  	return allocStr("/", -1);
      }
      return NULL;
-@@ -259,7 +262,7 @@ free_ssl_ctx(void)
+@@ -258,7 +261,7 @@ free_ssl_ctx(void)
      if (ssl_ctx != NULL)
  	SSL_CTX_free(ssl_ctx);
      ssl_ctx = NULL;
@@ -414,7 +414,7 @@ w3m-0.5.3+git20230121.
  }
  
  #if SSLEAY_VERSION_NUMBER >= 0x00905100
-@@ -1263,6 +1266,7 @@ _parsedURL2Str(ParsedURL *pu, int pass,
+@@ -1262,6 +1265,7 @@ _parsedURL2Str(ParsedURL *pu, int pass,
  	"gophers",
  #ifdef USE_SSL
  	"https",
@@ -422,7 +422,7 @@ w3m-0.5.3+git20230121.
  #endif				/* USE_SSL */
      };
  
-@@ -1981,6 +1985,35 @@ openURL(char *url, ParsedURL *pu, Parsed
+@@ -1980,6 +1984,35 @@ openURL(char *url, ParsedURL *pu, Parsed
  	}
  	return uf;
  #endif				/* USE_GOPHER */
@@ -511,7 +511,7 @@ w3m-0.5.3+git20230121.
      UFclose(&f);
 --- a/main.c
 +++ b/main.c
-@@ -396,6 +396,32 @@ die_oom(size_t bytes)
+@@ -394,6 +394,32 @@ die_oom(size_t bytes)
      return NULL;
  }
  
@@ -544,7 +544,7 @@ w3m-0.5.3+git20230121.
  int
  main(int argc, char **argv)
  {
-@@ -883,6 +909,9 @@ main(int argc, char **argv)
+@@ -881,6 +907,9 @@ main(int argc, char **argv)
      if (UseHistory)
  	loadHistory(URLHist);
  #endif				/* not USE_HISTORY */
@@ -554,7 +554,7 @@ w3m-0.5.3+git20230121.
  
  #ifdef USE_M17N
  #endif
-@@ -2524,10 +2553,36 @@ DEFUN(movRW, NEXT_WORD, "Move to the nex
+@@ -2519,10 +2548,36 @@ DEFUN(movRW, NEXT_WORD, "Move to the nex
      displayBuffer(Currentbuf, B_NORMAL);
  }
  
@@ -591,7 +591,7 @@ w3m-0.5.3+git20230121.
  
      if (checkDownloadList())
  	/* FIXME: gettextize? */
-@@ -2554,7 +2609,9 @@ _quitfm(int confirm)
+@@ -2549,7 +2604,9 @@ _quitfm(int confirm)
      if (UseHistory && SaveURLHist)
  	saveHistory(URLHist, URLHistSize);
  #endif				/* USE_HISTORY */
@@ -602,7 +602,7 @@ w3m-0.5.3+git20230121.
  }
  
  /* Quit */
-@@ -4826,6 +4883,13 @@ DEFUN(vwSrc, SOURCE VIEW, "Toggle betwee
+@@ -4821,6 +4878,13 @@ DEFUN(vwSrc, SOURCE VIEW, "Toggle betwee
  	displayBuffer(Currentbuf, B_NORMAL);
  	return;
      }
@@ -616,7 +616,7 @@ w3m-0.5.3+git20230121.
      if (Currentbuf->sourcefile == NULL) {
  	if (Currentbuf->pagerSource &&
  	    !strcasecmp(Currentbuf->type, "text/plain")) {
-@@ -4911,6 +4975,91 @@ DEFUN(fold_pre, FOLD_PRE, "Fold long lin
+@@ -4906,6 +4970,91 @@ DEFUN(fold_pre, FOLD_PRE, "Fold long lin
      FoldPre = FoldPreOpt;
  }
  
@@ -708,7 +708,7 @@ w3m-0.5.3+git20230121.
  /* reload */
  DEFUN(reload, RELOAD, "Load current document anew")
  {
-@@ -5136,6 +5285,7 @@ chkURLBuffer(Buffer *buf)
+@@ -5131,6 +5280,7 @@ chkURLBuffer(Buffer *buf)
  	"https?://[a-zA-Z0-9:%\\-\\./_@]*\\[[a-fA-F0-9:][a-fA-F0-9:\\.]*\\][a-zA-Z0-9:%\\-\\./?=~_\\&+@#,\\$;]*",
  	"ftp://[a-zA-Z0-9:%\\-\\./_@]*\\[[a-fA-F0-9:][a-fA-F0-9:\\.]*\\][a-zA-Z0-9:%\\-\\./=_+@#,\\$]*",
  #endif				/* INET6 */

@@ -38,7 +38,7 @@ it.
      if (showLineNum) {
 --- a/main.c
 +++ b/main.c
-@@ -4960,7 +4960,6 @@ DEFUN(vwSrc, SOURCE VIEW, "Toggle betwee
+@@ -4955,7 +4955,6 @@ DEFUN(vwSrc, SOURCE VIEW, "Toggle betwee
      buf->clone = Currentbuf->clone;
      (*buf->clone)++;
  
@@ -46,7 +46,7 @@ it.
      reshapeBuffer(buf);
      pushBuffer(buf);
      displayBuffer(Currentbuf, B_NORMAL);
-@@ -5094,7 +5093,6 @@ DEFUN(reload, RELOAD, "Load current docu
+@@ -5089,7 +5088,6 @@ DEFUN(reload, RELOAD, "Load current docu
  /* reshape */
  DEFUN(reshape, RESHAPE, "Re-render document")
  {

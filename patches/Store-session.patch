@@ -4,11 +4,11 @@
  doc/README.func        |    1 
  doc/w3m.1              |   20 ++++++++
  fm.h                   |    2 
- main.c                 |  114 ++++++++++++++++++++++++++++++++++++++++++++++++-
+ main.c                 |  115 ++++++++++++++++++++++++++++++++++++++++++++++++-
  proto.h                |    1 
  rc.c                   |    4 +
  scripts/w3mhelp.cgi.in |    3 -
- 9 files changed, 144 insertions(+), 3 deletions(-)
+ 9 files changed, 145 insertions(+), 3 deletions(-)
 
 --- a/config.h.in
 +++ b/config.h.in
@@ -48,7 +48,7 @@
      fprintf(f, "    -T type          specify content-type\n");
      fprintf(f, "    -m               internet message mode\n");
      fprintf(f, "    -v               visual startup mode\n");
-@@ -440,6 +446,7 @@ main(int argc, char **argv)
+@@ -438,6 +444,7 @@ main(int argc, char **argv)
      char *default_type = NULL;
      char *post_file = NULL;
      Str err_msg;
@@ -56,7 +56,7 @@
  #ifdef USE_M17N
      char *Locale = NULL;
      wc_uint8 auto_detect;
-@@ -660,6 +667,13 @@ main(int argc, char **argv)
+@@ -658,6 +665,13 @@ main(int argc, char **argv)
  		    BookmarkFile = cleanupName(tmp->ptr);
  		}
  	    }
@@ -70,7 +70,7 @@
  	    else if (!strcmp("-F", argv[i]))
  		RenderFrame = TRUE;
  	    else if (!strcmp("-W", argv[i])) {
-@@ -913,8 +927,43 @@ main(int argc, char **argv)
+@@ -911,8 +925,43 @@ main(int argc, char **argv)
      if (ssl_known_hosts)
  	known_hosts = load_known_hosts();
  
@@ -116,18 +116,18 @@
  
      if (w3m_backend)
  	backend();
-@@ -2611,6 +2660,10 @@ _quitfm(int confirm)
+@@ -2606,6 +2655,10 @@ _quitfm(int confirm)
  #endif				/* USE_HISTORY */
      if ((err = save_known_hosts()))
  	perror(NULL);
 +    if (StoreSession)
 +	_strSession(NULL);
-+    else if (unlink_session)
++    if (unlink_session)
 +	unlink(rcFile(SESSION_FILE));
      w3m_exit(err);
  }
  
-@@ -4472,6 +4525,63 @@ DEFUN(adBmark, ADD_BOOKMARK, "Add curren
+@@ -4467,6 +4520,64 @@ DEFUN(adBmark, ADD_BOOKMARK, "Add curren
  		request);
  }
  
@@ -164,6 +164,7 @@
 +
 +    int r;
 +    if ((r = fclose(f)) == EOF) goto fail;
++    unlink_session = 0;
 +    return;
 +
 +fail:

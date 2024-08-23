@@ -96,7 +96,7 @@ Subject: [PATCH 142/172] Add more const const correctness
  	if (*p == '\t')
 --- a/file.c
 +++ b/file.c
-@@ -4371,7 +4371,7 @@ process_n_form(void)
+@@ -4370,7 +4370,7 @@ process_n_form(void)
  static void
  clear_ignore_p_flag(int cmd, struct readbuffer *obuf)
  {

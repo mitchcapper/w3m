@@ -1,0 +1,50 @@
+>From 1fdaffba3e0287b92a58779f5796a236e3d37d16 Mon Sep 17 00:00:00 2001
+From: Rene Kita <mail@rkta.de>
+Date: Fri, 16 Aug 2024 19:23:53 +0200
+Subject: [PATCH] Add option to change the dictionary prompt
+
+---
+ fm.h   |    1 +
+ main.c |    2 +-
+ rc.c   |    2 ++
+ 3 files changed, 4 insertions(+), 1 deletion(-)
+
+--- a/fm.h
++++ b/fm.h
+@@ -994,6 +994,7 @@ global const char *DirBufferCommand init
+ #ifdef USE_DICT
+ global int UseDictCommand init(TRUE);
+ global const char *DictCommand init("file:///$LIB/w3mdict" CGI_EXTENSION);
++global char *DictPrompt init("(dictionary)!");
+ #endif				/* USE_DICT */
+ global int ignore_null_img_alt init(TRUE);
+ #define DISPLAY_INS_DEL_SIMPLE	0
+--- a/main.c
++++ b/main.c
+@@ -6168,7 +6168,7 @@ execdict(const char *word)
+ 
+ DEFUN(dictword, DICT_WORD, "Execute dictionary command (see README.dict)")
+ {
+-    execdict(inputStr("(dictionary)!", ""));
++    execdict(inputStr(DictPrompt, ""));
+ }
+ 
+ DEFUN(dictwordat, DICT_WORD_AT,
+--- a/rc.c
++++ b/rc.c
+@@ -190,6 +190,7 @@ static int OptionEncode = FALSE;
+ #ifdef USE_DICT
+ #define CMT_USE_DICTCOMMAND  N_("Enable dictionary lookup through CGI")
+ #define CMT_DICTCOMMAND  N_("URL of dictionary lookup command")
++#define CMT_DICTPROMPT	N_("Dictionary command prompt")
+ #endif				/* USE_DICT */
+ #define CMT_IGNORE_NULL_IMG_ALT	N_("Display link name for images lacking ALT")
+ #define CMT_IFILE        N_("Index file for directories")
+@@ -421,6 +422,7 @@ struct param_ptr params1[] = {
+      CMT_USE_DICTCOMMAND, NULL},
+     {"dictcommand", P_STRING, PI_TEXT, (void *)&DictCommand,
+      CMT_DICTCOMMAND, NULL},
++    {"dictprompt", P_STRING, PI_TEXT, (void *)&DictPrompt, CMT_DICTPROMPT, NULL},
+ #endif				/* USE_DICT */
+     {"multicol", P_INT, PI_ONOFF, (void *)&multicolList, CMT_MULTICOL, NULL},
+     {"alt_entity", P_CHARINT, PI_ONOFF, (void *)&UseAltEntity, CMT_ALT_ENTITY,

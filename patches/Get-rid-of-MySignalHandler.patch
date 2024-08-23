@@ -1,25 +1,28 @@
 From: Rene Kita <mail@rkta.de>
 Date: Sat Oct 28 11:31:40 CEST 2023
 Subject: Get rid of MySignalHandler
+
+No need for this as POSIX says it is void.
+
 ---
  acinclude.m4 |   13 -------------
  config.h.in  |    3 ---
  configure    |   44 --------------------------------------------
  configure.ac |    1 -
- file.c       |   21 ++++++++++-----------
+ file.c       |   19 +++++++++----------
  frame.c      |    4 ++--
  ftp.c        |    5 ++---
  istream.c    |    2 +-
  main.c       |   24 ++++++++++--------------
  news.c       |    5 ++---
- proto.h      |    2 +-
+ proto.h      |    6 +++---
  terms.c      |   26 ++++++++++++--------------
  url.c        |    7 +++----
- 13 files changed, 43 insertions(+), 114 deletions(-)
+ 13 files changed, 44 insertions(+), 115 deletions(-)
 
 --- a/file.c
 +++ b/file.c
-@@ -190,11 +190,10 @@ static struct compression_decoder {
+@@ -187,11 +187,10 @@ static struct compression_decoder {
  
  #define SAVE_BUF_SIZE 1536
  
@@ -32,7 +35,7 @@ Subject: Get rid of MySignalHandler
  }
  
  static void
-@@ -1692,7 +1691,7 @@ loadGeneralFile(char *path, ParsedURL *v
+@@ -1694,7 +1693,7 @@ loadGeneralFile(char *path, ParsedURL *v
      Buffer *volatile t_buf = NULL;
      int volatile searchHeader = SearchHeader;
      int volatile searchHeader_through = TRUE;
@@ -41,7 +44,7 @@ Subject: Get rid of MySignalHandler
      TextList *extra_header = newTextList();
      volatile Str uname = NULL;
      volatile Str pwd = NULL;
-@@ -7281,7 +7280,7 @@ loadHTMLstream(URLFile *f, Buffer *newBu
+@@ -7211,7 +7210,7 @@ loadHTMLstream(URLFile *f, Buffer *newBu
  #ifdef USE_IMAGE
      int volatile image_flag;
  #endif
@@ -50,7 +53,7 @@ Subject: Get rid of MySignalHandler
  
  #ifdef USE_M17N
      if (fmInitialized && graph_ok()) {
-@@ -7446,7 +7445,7 @@ Buffer *
+@@ -7387,7 +7386,7 @@ Buffer *
  loadHTMLString(Str page)
  {
      URLFile f;
@@ -59,7 +62,7 @@ Subject: Get rid of MySignalHandler
      Buffer *newBuf;
  
      init_stream(&f, SCM_LOCAL, newStrStream(page));
-@@ -7497,7 +7496,7 @@ loadGopherDir0(URLFile *uf, ParsedURL *p
+@@ -7438,7 +7437,7 @@ loadGopherDir0(URLFile *uf, ParsedURL *p
      Str lbuf, name, file, host, port, type;
      char *volatile p, *volatile q;
      int link, pre;
@@ -68,16 +71,7 @@ Subject: Get rid of MySignalHandler
  #ifdef USE_M17N
      wc_ces doc_charset = DocumentCharset;
  #endif
-@@ -7652,7 +7651,7 @@ loadGeminiBuffer(URLFile *uf, Buffer *vo
-     int hseq, len, nlines, pre = 0;
-     clen_t linelen = 0, trbyte = 0;
-     Lineprop *propBuf = NULL;
--    MySignalHandler(*volatile prevtrap) (SIGNAL_ARG) = NULL;
-+    void (*volatile prevtrap) (SIGNAL_ARG) = NULL;
- 
-     if (SETJMP(AbortLoading) != 0) {
- 	goto _end;
-@@ -7785,7 +7784,7 @@ loadBuffer(URLFile *uf, Buffer *volatile
+@@ -7602,7 +7601,7 @@ loadBuffer(URLFile *uf, Buffer *volatile
  #ifdef USE_ANSI_COLOR
      Linecolor *colorBuffer = NULL;
  #endif
@@ -86,16 +80,16 @@ Subject: Get rid of MySignalHandler
  
      if (newBuf == NULL)
  	newBuf = newBuffer(INIT_BUFFER_WIDTH);
-@@ -7874,7 +7873,7 @@ loadImageBuffer(URLFile *uf, Buffer *new
+@@ -7691,7 +7690,7 @@ loadImageBuffer(URLFile *uf, Buffer *new
      Str tmp, tmpf;
      FILE *src = NULL;
      URLFile f;
 -    MySignalHandler(*volatile prevtrap) (SIGNAL_ARG) = NULL;
 +    void (*volatile prevtrap) (SIGNAL_ARG) = NULL;
      struct stat st;
-     ParsedURL *pu = newBuf ? &newBuf->currentURL : NULL;
+     const ParsedURL *pu = newBuf ? &newBuf->currentURL : NULL;
  
-@@ -8202,7 +8201,7 @@ getNextPage(Buffer *buf, int plen)
+@@ -8020,7 +8019,7 @@ getNextPage(Buffer *buf, int plen)
  #ifdef USE_ANSI_COLOR
      Linecolor *colorBuffer = NULL;
  #endif
@@ -104,7 +98,7 @@ Subject: Get rid of MySignalHandler
  
      if (buf->pagerSource == NULL)
  	return NULL;
-@@ -8311,7 +8310,7 @@ save2tmp(URLFile uf, const char *tmpf)
+@@ -8129,7 +8128,7 @@ save2tmp(URLFile uf, char *tmpf)
  {
      FILE *ff;
      clen_t linelen = 0, trbyte = 0;
@@ -124,7 +118,7 @@ Subject: Get rid of MySignalHandler
  KeyAbort(SIGNAL_ARG)
  {
      LONGJMP(AbortLoading, 1);
-@@ -405,7 +405,7 @@ createFrameFile(struct frameset *f, FILE
+@@ -410,7 +410,7 @@ createFrameFile(struct frameset *f, FILE
  #endif
      char *d_target, *p_target, *s_target, *t_target;
      ParsedURL *currentURL, base;
@@ -159,7 +153,7 @@ Subject: Get rid of MySignalHandler
  
 --- a/istream.c
 +++ b/istream.c
-@@ -180,7 +180,7 @@ newEncodedStream(InputStream is, char en
+@@ -178,7 +178,7 @@ newEncodedStream(InputStream is, char en
  int
  ISclose(InputStream stream)
  {
@@ -170,7 +164,7 @@ Subject: Get rid of MySignalHandler
      if (stream->base.close != NULL) {
 --- a/main.c
 +++ b/main.c
-@@ -67,17 +67,17 @@ static AlarmEvent DefaultAlarm = {
+@@ -66,17 +66,17 @@ static AlarmEvent DefaultAlarm = {
      0, AL_UNSET, FUNCNAME_nulcmd, NULL
  };
  static AlarmEvent *CurrentAlarm = &DefaultAlarm;
@@ -191,7 +185,7 @@ Subject: Get rid of MySignalHandler
  #endif
  
  #ifdef USE_MARK
-@@ -1437,7 +1437,7 @@ cmp_anchor_hseq(const void *a, const voi
+@@ -1391,7 +1391,7 @@ cmp_anchor_hseq(const void *a, const voi
  static void
  do_dump(Buffer *buf)
  {
@@ -200,7 +194,7 @@ Subject: Get rid of MySignalHandler
  
      prevtrap = mySignal(SIGINT, intTrap);
      if (SETJMP(IntReturn) != 0) {
-@@ -1637,20 +1637,18 @@ repBuffer(Buffer *oldbuf, Buffer *buf)
+@@ -1591,20 +1591,18 @@ repBuffer(Buffer *oldbuf, Buffer *buf)
  }
  
  
@@ -223,7 +217,7 @@ Subject: Get rid of MySignalHandler
  }
  
  static void
-@@ -1665,14 +1663,13 @@ resize_screen(void)
+@@ -1619,14 +1617,13 @@ resize_screen(void)
  #endif				/* SIGWINCH */
  
  #ifdef SIGPIPE
@@ -239,16 +233,16 @@ Subject: Get rid of MySignalHandler
  }
  #endif
  
-@@ -1831,7 +1828,7 @@ clear_mark(Line *l)
+@@ -1790,7 +1787,7 @@ clear_mark(Line *l)
  static int
- srchcore(const char *str, int (*func) (Buffer *, const char *))
+ srchcore(char *volatile str, int (*func) (Buffer *, char *))
  {
 -    MySignalHandler(*prevtrap) (SIGNAL_ARG);
 +    void (*prevtrap) (SIGNAL_ARG);
      volatile int i, result = SR_NOTFOUND;
  
      if (str != NULL && str != SearchString)
-@@ -2233,7 +2230,7 @@ DEFUN(pipesh, PIPE_SHELL, "Execute shell
+@@ -2195,7 +2192,7 @@ DEFUN(pipesh, PIPE_SHELL, "Execute shell
  DEFUN(readsh, READ_SHELL, "Execute shell command and display output")
  {
      Buffer *buf;
@@ -257,7 +251,7 @@ Subject: Get rid of MySignalHandler
      char *cmd;
  
      CurrentKeyData = NULL;	/* not allowed in w3m-control: */
-@@ -6360,7 +6357,7 @@ DEFUN(execCmd, COMMAND, "Invoke w3m func
+@@ -6191,7 +6188,7 @@ DEFUN(execCmd, COMMAND, "Invoke w3m func
  }
  
  #ifdef USE_ALARM
@@ -266,7 +260,7 @@ Subject: Get rid of MySignalHandler
  SigAlarm(SIGNAL_ARG)
  {
      char *data;
-@@ -6396,7 +6393,6 @@ SigAlarm(SIGNAL_ARG)
+@@ -6227,7 +6224,6 @@ SigAlarm(SIGNAL_ARG)
  	    alarm(CurrentAlarm->sec);
  	}
      }
@@ -289,7 +283,7 @@ Subject: Get rid of MySignalHandler
  }
  
  static Str
-@@ -324,7 +323,7 @@ loadNewsgroup0(ParsedURL *pu)
+@@ -320,7 +319,7 @@ loadNewsgroup0(ParsedURL *pu)
      char *volatile scheme, *volatile group, *volatile list;
      int status, i, first, last;
      volatile int flag = 0, start = 0, end = 0;
@@ -300,8 +294,8 @@ Subject: Get rid of MySignalHandler
  
 --- a/proto.h
 +++ b/proto.h
-@@ -9,7 +9,7 @@
- #define W3M_PROTO_H__
+@@ -8,7 +8,7 @@
+ extern int main(int argc, char **argv);
  extern void nulcmd(void);
  extern void pushEvent(int cmd, void *data);
 -extern MySignalHandler intTrap(SIGNAL_ARG);
@@ -309,18 +303,29 @@ Subject: Get rid of MySignalHandler
  extern void pgFore(void);
  extern void pgBack(void);
  extern void hpgFore(void);
+@@ -467,8 +467,8 @@ extern void set_cc(int spec, int val);
+ extern void close_tty(void);
+ extern char *ttyname_tty(void);
+ extern void reset_tty(void);
+-extern MySignalHandler reset_exit(SIGNAL_ARG);
+-extern MySignalHandler error_dump(SIGNAL_ARG);
++extern void reset_exit(SIGNAL_ARG);
++extern void error_dump(SIGNAL_ARG);
+ extern void set_int(void);
+ extern void getTCstr(void);
+ extern void setlinescols(void);
 --- a/terms.c
 +++ b/terms.c
-@@ -259,7 +259,7 @@ check_cygwin_console(void)
- }
+@@ -261,7 +261,7 @@ check_cygwin_console(void)
  #endif				/* __CYGWIN__ */
  
+ char *getenv(const char *);
 -MySignalHandler reset_exit(SIGNAL_ARG), reset_error_exit(SIGNAL_ARG), error_dump(SIGNAL_ARG);
 +void reset_exit(SIGNAL_ARG), reset_error_exit(SIGNAL_ARG), error_dump(SIGNAL_ARG);
+ void setlinescols(void);
+ void flush_tty(void);
  
- #ifndef SIGIOT
- #define SIGIOT SIGABRT
-@@ -549,9 +549,9 @@ put_image_kitty(char *url, int x, int y,
+@@ -555,9 +555,9 @@ put_image_kitty(char *url, int x, int y,
      int c, i, j, m, t, is_anim;
      struct stat st;
      pid_t pid;
@@ -333,7 +338,7 @@ Subject: Get rid of MySignalHandler
  
      if (!url)
  	return;
-@@ -767,9 +767,9 @@ put_image_sixel(char *url, int x, int y,
+@@ -773,9 +773,9 @@ put_image_sixel(char *url, int x, int y,
  {
      pid_t pid;
      int do_anim;
@@ -346,7 +351,7 @@ Subject: Get rid of MySignalHandler
  
      MOVE(y,x);
      flush_tty();
-@@ -1081,7 +1081,7 @@ reset_tty(void)
+@@ -1087,7 +1087,7 @@ reset_tty(void)
          close_tty();
  }
  
@@ -355,7 +360,7 @@ Subject: Get rid of MySignalHandler
  reset_exit_with_value(SIGNAL_ARG, int rval)
  {
  #ifdef USE_MOUSE
-@@ -1090,28 +1090,26 @@ reset_exit_with_value(SIGNAL_ARG, int rv
+@@ -1096,28 +1096,26 @@ reset_exit_with_value(SIGNAL_ARG, int rv
  #endif				/* USE_MOUSE */
      reset_tty();
      w3m_exit(rval);
@@ -387,7 +392,7 @@ Subject: Get rid of MySignalHandler
  }
  
  void
-@@ -2335,7 +2333,7 @@ do_getch(void)
+@@ -2398,7 +2396,7 @@ do_getch(void)
  	return sysm_getch();
  }
  
@@ -398,7 +403,7 @@ Subject: Get rid of MySignalHandler
      struct mouse_info mi;
 --- a/url.c
 +++ b/url.c
-@@ -246,11 +246,10 @@ DefaultFile(int scheme)
+@@ -240,11 +240,10 @@ DefaultFile(int scheme)
      return NULL;
  }
  
@@ -419,8 +424,8 @@ Subject: Get rid of MySignalHandler
 +    void (*volatile prevtrap) (SIGNAL_ARG) = NULL;
  
      if (fmInitialized) {
- 	message(Sprintf(_("Opening socket..."))->ptr, 0, 0);
-@@ -2176,7 +2175,7 @@ check_no_proxy(char *domain)
+ 	/* FIXME: gettextize? */
+@@ -2123,7 +2122,7 @@ check_no_proxy(char *domain)
  {
      TextListItem *tl;
      volatile int ret = 0;
@@ -483,7 +488,7 @@ Subject: Get rid of MySignalHandler
  HAVE_SIGSETJMP
  USE_BINMODE_STREAM
  LIBGC
-@@ -10849,48 +10847,6 @@ fi
+@@ -10855,48 +10853,6 @@ fi
  rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $have_sigsetjmp" >&5
  printf "%s\n" "$have_sigsetjmp" >&6; }

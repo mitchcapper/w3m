@@ -28,7 +28,7 @@ This fixes Debian BTS #1076944 and GH issue #286.
  #ifdef USE_IMAGE
 --- a/main.c
 +++ b/main.c
-@@ -692,9 +692,6 @@ main(int argc, char **argv)
+@@ -690,9 +690,6 @@ main(int argc, char **argv)
  		if (++i >= argc)
  		    usage();
  		COLS = atoi(argv[i]);

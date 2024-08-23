@@ -40,13 +40,13 @@ Subject: [PATCH 085/172] Remove redundant declarations
 -extern int main(int argc, char **argv);
  extern void nulcmd(void);
  extern void pushEvent(int cmd, void *data);
- extern MySignalHandler intTrap(SIGNAL_ARG);
+ extern void intTrap(SIGNAL_ARG);
 @@ -452,8 +451,6 @@ extern void set_cc(int spec, int val);
  extern void close_tty(void);
  extern char *ttyname_tty(void);
  extern void reset_tty(void);
--extern MySignalHandler reset_exit(SIGNAL_ARG);
--extern MySignalHandler error_dump(SIGNAL_ARG);
+-extern void reset_exit(SIGNAL_ARG);
+-extern void error_dump(SIGNAL_ARG);
  extern void set_int(void);
  extern void getTCstr(void);
  extern void setupscreen(void);
@@ -91,7 +91,7 @@ Subject: [PATCH 085/172] Remove redundant declarations
  #endif				/* __CYGWIN__ */
  
 -char *getenv(const char *);
- MySignalHandler reset_exit(SIGNAL_ARG), reset_error_exit(SIGNAL_ARG), error_dump(SIGNAL_ARG);
+ void reset_exit(SIGNAL_ARG), reset_error_exit(SIGNAL_ARG), error_dump(SIGNAL_ARG);
 -void setlinescols(void);
 -void flush_tty(void);
  

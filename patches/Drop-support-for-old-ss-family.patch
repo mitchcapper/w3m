@@ -1,6 +1,8 @@
 From: Rene Kita <mail@rkta.de>
 Date: Sat Oct 28 12:06:21 CEST 2023
 Subject: Drop support for old ss family
+
+POSIX requires struct sockaddr to have a ss_family member.
 ---
  acinclude.m4 |   17 +++--------------
  config.h.in  |    1 -
@@ -36,7 +38,7 @@ Subject: Drop support for old ss family
      AC_DEFINE(INET6)
 --- a/config.h.in
 +++ b/config.h.in
-@@ -86,7 +86,6 @@
+@@ -85,7 +85,6 @@
  #undef CLEAR_BUF
  #undef INET6
  #undef HAVE_SOCKLEN_T

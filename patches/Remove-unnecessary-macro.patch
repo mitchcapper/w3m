@@ -11,7 +11,7 @@ NULL check here.
 
 --- a/url.c
 +++ b/url.c
-@@ -1048,8 +1048,6 @@ parseURL(char *url, ParsedURL *p_url, Pa
+@@ -1047,8 +1047,6 @@ parseURL(char *url, ParsedURL *p_url, Pa
  	p_url->label = NULL;
  }
  
@@ -20,7 +20,7 @@ NULL check here.
  void
  copyParsedURL(ParsedURL *p, const ParsedURL *q)
  {
-@@ -1061,13 +1059,13 @@ copyParsedURL(ParsedURL *p, const Parsed
+@@ -1060,13 +1058,13 @@ copyParsedURL(ParsedURL *p, const Parsed
      p->scheme = q->scheme;
      p->port = q->port;
      p->is_nocache = q->is_nocache;

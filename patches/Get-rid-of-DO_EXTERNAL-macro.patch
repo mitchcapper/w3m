@@ -17,7 +17,7 @@ While there, remove a redundant assignment.
 
 --- a/file.c
 +++ b/file.c
-@@ -1680,7 +1680,6 @@ getLinkNumberStr(int correction)
+@@ -1679,7 +1679,6 @@ getLinkNumberStr(int correction)
  /* 
   * loadGeneralFile: load file to buffer
   */
@@ -25,7 +25,7 @@ While there, remove a redundant assignment.
  Buffer *
  loadGeneralFile(char *path, ParsedURL *volatile current, char *referer,
  		int flag, FormList *volatile request)
-@@ -2153,7 +2152,6 @@ loadGeneralFile(char *path, ParsedURL *v
+@@ -2152,7 +2151,6 @@ loadGeneralFile(char *path, ParsedURL *v
  
      if (real_type == NULL)
  	real_type = t;
@@ -33,7 +33,7 @@ While there, remove a redundant assignment.
  
      current_content_length = 0;
      if ((p = checkHeader(t_buf, "Content-Length:")) != NULL)
-@@ -2240,7 +2238,7 @@ loadGeneralFile(char *path, ParsedURL *v
+@@ -2239,7 +2237,7 @@ loadGeneralFile(char *path, ParsedURL *v
  		!gopher_download &&
  #endif
  		searchExtViewer(t) != NULL) {
@@ -42,7 +42,7 @@ While there, remove a redundant assignment.
  	}
  	else {
  	    TRAP_OFF;
-@@ -2278,7 +2276,7 @@ loadGeneralFile(char *path, ParsedURL *v
+@@ -2277,7 +2275,7 @@ loadGeneralFile(char *path, ParsedURL *v
      t_buf->ssl_certificate = f.ssl_certificate;
  #endif
      frame_source = flag & RG_FRAME_SRC;

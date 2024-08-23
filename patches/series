@@ -1,3 +1,11 @@
+Remove-left-over-FORMAT_NICE-code.patch
+Get-rid-of-MySignalHandler.patch
+Remove-config.h.dist.patch
+Drop-wait3-support.patch
+Drop-support-for-old-ss-family.patch
+Remove-obsolete-checks-in-configure.patch
+Replace-AC_TRY_CPP.patch
+Run-autoupdate.patch
 # modernC
 Label-endif-else-that-is-far-away-from-ifdef.patch
 # PENDING
@@ -20,7 +28,6 @@ Do-not-reshape-all-new-buffers.patch
 Add-a-comment.patch
 Use-correct-format-specifier-for-sprintf.patch
 Check-return-value-of-freopen.patch
-Remove-left-over-FORMAT_NICE-code.patch
 Remove-redundant-initialization.patch
 Remove-assignment-of-unread-value.patch
 Handle-errors-in-mySystem.patch
@@ -116,13 +123,6 @@ save-history.patch
 Store-session.patch
 shorten-not-assigned-in-help.patch
 Use-gettext-for-user-facing-strings.patch
-Get-rid-of-MySignalHandler.patch
-Remove-config.h.hist.patch
-Drop-wait3-support.patch
-Drop-support-for-old-ss-family.patch
-Remove-obsolete-checks-in-configure.patch
-Replace-AC_TRY_CPP.patch
-run-autoupdate.patch
 Remove-unused-CurrentKeyData.patch
 Add-cd-command.patch
 do_download.patch
@@ -140,6 +140,7 @@ Add-option-to-provide-cookie-jar.patch
 Update-URLHist-mtime-when-saving-history.patch
 Add-goto-main-command.patch
 Add-key-binding-to-insert-word-under-cursor.patch
+Add-option-to-change-the-dictionary-prompt.patch
 Enable-lto.patch
 # BORKED
 Refactor-regex-library.patch
