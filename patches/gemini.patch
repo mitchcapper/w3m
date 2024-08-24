@@ -17,13 +17,13 @@ w3m-0.5.3+git20230121.
  html.h                 |    1 
  istream.c              |  140 ++++++++++++++++++-----
  istream.h              |    5 
- main.c                 |  152 +++++++++++++++++++++++++
+ main.c                 |  154 +++++++++++++++++++++++++
  proto.h                |    1 
  rc.c                   |    5 
  rc.h                   |    2 
  scripts/w3mhelp.cgi.in |    5 
  url.c                  |   35 +++++
- 14 files changed, 614 insertions(+), 39 deletions(-)
+ 14 files changed, 616 insertions(+), 39 deletions(-)
 
 --- a/file.c
 +++ b/file.c
@@ -616,7 +616,7 @@ w3m-0.5.3+git20230121.
      if (Currentbuf->sourcefile == NULL) {
  	if (Currentbuf->pagerSource &&
  	    !strcasecmp(Currentbuf->type, "text/plain")) {
-@@ -4906,6 +4970,91 @@ DEFUN(fold_pre, FOLD_PRE, "Fold long lin
+@@ -4906,6 +4970,93 @@ DEFUN(fold_pre, FOLD_PRE, "Fold long lin
      FoldPre = FoldPreOpt;
  }
  
@@ -695,7 +695,9 @@ w3m-0.5.3+git20230121.
 +    buf->sourcefile = Currentbuf->sourcefile;
 +    buf->header_source = Currentbuf->header_source;
 +    buf->search_header = Currentbuf->search_header;
++#ifdef USE_M17N
 +    buf->document_charset = Currentbuf->document_charset;
++#endif
 +    buf->clone = Currentbuf->clone;
 +    (*buf->clone)++;
 +
@@ -708,7 +710,7 @@ w3m-0.5.3+git20230121.
  /* reload */
  DEFUN(reload, RELOAD, "Load current document anew")
  {
-@@ -5131,6 +5280,7 @@ chkURLBuffer(Buffer *buf)
+@@ -5131,6 +5282,7 @@ chkURLBuffer(Buffer *buf)
  	"https?://[a-zA-Z0-9:%\\-\\./_@]*\\[[a-fA-F0-9:][a-fA-F0-9:\\.]*\\][a-zA-Z0-9:%\\-\\./?=~_\\&+@#,\\$;]*",
  	"ftp://[a-zA-Z0-9:%\\-\\./_@]*\\[[a-fA-F0-9:][a-fA-F0-9:\\.]*\\][a-zA-Z0-9:%\\-\\./=_+@#,\\$]*",
  #endif				/* INET6 */

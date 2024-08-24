@@ -40,7 +40,6 @@ Fix-some-casts-that-discard-qualifiers.patch
 Remove-const-where-we-can-t-keep-the-promise.patch
 Remove-declarations-without-definition.patch
 Remove-unused-function-declarations.patch
-Remove-unused-prototyp.patch
 Remove-unused-function.patch
 Move-declarations-to-the-correct-header-file.patch
 Remove-redundant-declarations.patch
@@ -141,6 +140,8 @@ Update-URLHist-mtime-when-saving-history.patch
 Add-goto-main-command.patch
 Add-key-binding-to-insert-word-under-cursor.patch
 Add-option-to-change-the-dictionary-prompt.patch
+Add-smartcase-option-for-search.patch
+WIP-fix-const.patch
 Enable-lto.patch
 # BORKED
 Refactor-regex-library.patch

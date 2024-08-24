@@ -1404,7 +1404,7 @@ Subject: [PATCH 172/172] const
  {
      char *url, *referer;
      ParsedURL p_url, *current;
-@@ -5368,10 +5368,10 @@ DEFUN(rFrame, FRAME, "Toggle rendering H
+@@ -5370,10 +5370,10 @@ DEFUN(rFrame, FRAME, "Toggle rendering H
  
  /* spawn external browser */
  static void
@@ -1417,7 +1417,7 @@ Subject: [PATCH 172/172] const
      int bg = 0, len;
  
      CurrentKeyData = NULL;	/* not allowed in w3m-control: */
-@@ -6026,7 +6026,7 @@ GetWord(Buffer *buf)
+@@ -6028,7 +6028,7 @@ GetWord(Buffer *buf)
  
  #ifdef USE_DICT
  static void
@@ -1426,7 +1426,7 @@ Subject: [PATCH 172/172] const
  {
      char *w, *dictcmd;
      Buffer *buf;
-@@ -6695,7 +6695,7 @@ DEFUN(tabA, TAB_LINK, "Follow current hy
+@@ -6697,7 +6697,7 @@ DEFUN(tabA, TAB_LINK, "Follow current hy
  }
  
  static void
@@ -1913,12 +1913,15 @@ Subject: [PATCH 172/172] const
  extern void cursorUp0(Buffer *buf, int n);
  extern void cursorUp(Buffer *buf, int n);
  extern void cursorDown0(Buffer *buf, int n);
-@@ -347,13 +347,13 @@ extern int columnPos(Line *line, int col
+@@ -347,16 +347,16 @@ extern int columnPos(Line *line, int col
  extern int columnLen(Line *line, int column);
  extern Line *lineSkip(Buffer *buf, Line *line, int offset, int last);
  extern Line *currentLineSkip(Buffer *buf, Line *line, int offset, int last);
 -extern int gethtmlcmd(char *s);
 +extern int gethtmlcmd(const char *s);
+ #ifndef USE_ANSI_COLOR
+ #define checkType(a,b,c) _checkType(a,b)
+ #endif
  extern Str checkType(Str s, Lineprop **oprop, Linecolor **ocolor);
  extern int calcPosition(char *l, Lineprop *pr, int len, int pos, int bpos,
  			int mode);
@@ -1931,7 +1934,7 @@ Subject: [PATCH 172/172] const
  extern int next_status(char c, int *status);
  extern int read_token(Str buf, char **instr, int *status, int pre, int append);
  extern Str correct_irrtag(int status);
-@@ -382,7 +382,7 @@ extern Buffer *historyBuffer(Hist *hist)
+@@ -385,7 +385,7 @@ extern Buffer *historyBuffer(Hist *hist)
  #endif				/* not USE_HISTORY */
  extern struct table *newTable(void);
  extern void pushdata(struct table *t, int row, int col, char *data);
@@ -1940,7 +1943,7 @@ Subject: [PATCH 172/172] const
  extern void align(TextLine *lbuf, int width, int mode);
  extern void print_item(struct table *t, int row, int col, int width, Str buf);
  extern void print_sep(struct table *t, int row, int type, int maxcol, Str buf);
-@@ -487,13 +487,13 @@ extern void clrtoeolx(void);
+@@ -490,13 +490,13 @@ extern void clrtoeolx(void);
  extern void clrtobotx(void);
  extern void addstr(const char *s);
  extern void addnstr(const char *s, int n);
@@ -1956,7 +1959,7 @@ Subject: [PATCH 172/172] const
  extern void toggle_stand(void);
  extern void bell(void);
  extern int sleep_till_anykey(int sec, int purge);
-@@ -518,14 +518,14 @@ extern URLFile openURL(char *url, Parsed
+@@ -521,14 +521,14 @@ extern URLFile openURL(char *url, Parsed
  		       URLOption *option, FormList *request,
  		       TextList *extra_header, URLFile *ouf,
  		       HRequest *hr, unsigned char *status);
@@ -1976,7 +1979,7 @@ Subject: [PATCH 172/172] const
  extern TextList *make_domain_list(char *domain_list);
  extern int check_no_proxy(char *domain);
  extern InputStream openFTPStream(ParsedURL *pu, URLFile *uf);
-@@ -607,14 +607,14 @@ extern Buffer *load_option_panel(void);
+@@ -610,14 +610,14 @@ extern Buffer *load_option_panel(void);
  extern void panel_set_option(struct parsed_tagarg *);
  extern void sync_with_option(void);
  extern char *rcFile(char *base);
@@ -1995,7 +1998,7 @@ Subject: [PATCH 172/172] const
  extern FILE *localcgi_post(char *, char *, FormList *, char *);
  #define localcgi_get(u, q, r) localcgi_post((u), (q), NULL, (r))
  extern FILE *openSecretFile(char *fname);
-@@ -632,8 +632,8 @@ extern Str romanAlphabet(int n);
+@@ -635,8 +635,8 @@ extern Str romanAlphabet(int n);
  extern void setup_child(int child, int i, int f);
  extern void myExec(char *command);
  extern int mySystem(char *command, int background);
@@ -2006,7 +2009,7 @@ Subject: [PATCH 172/172] const
  extern int is_localhost(const char *host);
  extern char *file_to_url(char *file);
  #ifdef USE_M17N
-@@ -643,7 +643,7 @@ extern char *url_unquote_conv0(const cha
+@@ -646,7 +646,7 @@ extern char *url_unquote_conv0(const cha
  #define url_unquote_conv(url, charset) url_unquote_conv0(url)
  #endif
  extern char *expandName(char *name);
@@ -2015,7 +2018,7 @@ Subject: [PATCH 172/172] const
  extern time_t mymktime(char *timestr);
  extern void (*mySignal(int signal_number, void (*action) (int))) (int);
  #ifdef USE_COOKIE
-@@ -721,7 +721,7 @@ extern char *searchKeyData(void);
+@@ -724,7 +724,7 @@ extern char *searchKeyData(void);
  extern void setKeymap(char *p, int lineno, int verbose);
  extern void initKeymap(int force);
  extern int getFuncList(char *id);

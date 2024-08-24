@@ -4,11 +4,11 @@
  doc/README.func        |    1 
  doc/w3m.1              |   20 ++++++++
  fm.h                   |    2 
- main.c                 |  115 ++++++++++++++++++++++++++++++++++++++++++++++++-
+ main.c                 |  119 ++++++++++++++++++++++++++++++++++++++++++++++++-
  proto.h                |    1 
  rc.c                   |    4 +
  scripts/w3mhelp.cgi.in |    3 -
- 9 files changed, 145 insertions(+), 3 deletions(-)
+ 9 files changed, 149 insertions(+), 3 deletions(-)
 
 --- a/config.h.in
 +++ b/config.h.in
@@ -127,7 +127,7 @@
      w3m_exit(err);
  }
  
-@@ -4467,6 +4520,64 @@ DEFUN(adBmark, ADD_BOOKMARK, "Add curren
+@@ -4467,6 +4520,68 @@ DEFUN(adBmark, ADD_BOOKMARK, "Add curren
  		request);
  }
  
@@ -185,8 +185,12 @@
 +    if (!*sf)
 +	sf = def;
 +    _strSession(sf);
++#ifdef USE_COOKIE
 +    save_cookies();
++#endif
++#ifdef USE_HISTORY
 +    saveUrlHistory();
++#endif
 +}
 +
  /* option setting */

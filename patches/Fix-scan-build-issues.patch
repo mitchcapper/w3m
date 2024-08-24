@@ -81,9 +81,9 @@ Patch: patches/Fix-scan-build-issues.patch
 -    int r;
 +    int r; /* TODO(rkta): Remove from store session patch */
      if ((r = fclose(f)) == EOF) goto fail;
+     unlink_session = 0;
      return;
- 
-@@ -6353,11 +6353,9 @@ DEFUN(execCmd, COMMAND, "Invoke w3m func
+@@ -6360,11 +6360,9 @@ DEFUN(execCmd, COMMAND, "Invoke w3m func
  static void
  SigAlarm(SIGNAL_ARG)
  {

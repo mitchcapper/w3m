@@ -238,10 +238,10 @@ This functions do not need to use a pointer to a pointer.
  extern Line *currentLineSkip(Buffer *buf, Line *line, int offset, int last);
 -extern int gethtmlcmd(char **s);
 +extern int gethtmlcmd(char *s);
- extern Str checkType(Str s, Lineprop **oprop, Linecolor **ocolor);
- extern int calcPosition(char *l, Lineprop *pr, int len, int pos, int bpos,
- 			int mode);
-@@ -582,16 +582,16 @@ extern void shiftAnchorPosition(AnchorLi
+ #ifndef USE_ANSI_COLOR
+ #define checkType(a,b,c) _checkType(a,b)
+ #endif
+@@ -585,16 +585,16 @@ extern void shiftAnchorPosition(AnchorLi
  extern char *getAnchorText(Buffer *buf, AnchorList *al, Anchor *a);
  extern Buffer *link_list_panel(Buffer *buf);
  

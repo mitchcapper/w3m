@@ -1,0 +1,125 @@
+From: Rene Kita <mail@rkta.de>
+Date: Sat Aug 24 09:54:38 CEST 2024
+Subject: Add smartcase option for search
+Patch: patches/Add-smartcase-option-for-search.patch
+
+---
+ fm.h     |    1 +
+ rc.c     |    3 +++
+ search.c |   37 ++++++++++++++++++++++++++++---------
+ 3 files changed, 32 insertions(+), 9 deletions(-)
+
+--- a/fm.h
++++ b/fm.h
+@@ -986,6 +986,7 @@ global char *AcceptEncoding init(NULL);
+ global char *AcceptMedia init(NULL);
+ global int WrapDefault init(FALSE);
+ global int IgnoreCase init(TRUE);
++global int SmartCase init(TRUE);
+ global int WrapSearch init(FALSE);
+ global int squeezeBlankLine init(FALSE);
+ global char *BookmarkFile init(NULL);
+--- a/rc.c
++++ b/rc.c
+@@ -213,6 +213,7 @@ static int OptionEncode = FALSE;
+ #define CMT_NOSENDREFERER N_("Suppress `Referer:' header")
+ #define CMT_CROSSORIGINREFERER N_("Exclude pathname and query string from `Referer:' header when cross domain communication")
+ #define CMT_IGNORE_CASE N_("Search case-insensitively")
++#define CMT_SMART_CASE N_("Use vim-like smartcase for searching")
+ #define CMT_USE_LESSOPEN N_("Use LESSOPEN")
+ #ifdef USE_SSL
+ #ifdef USE_SSL_VERIFY
+@@ -534,6 +535,8 @@ struct param_ptr params3[] = {
+     {"wrap_search", P_INT, PI_ONOFF, (void *)&WrapDefault, CMT_WRAP, NULL},
+     {"ignorecase_search", P_INT, PI_ONOFF, (void *)&IgnoreCase,
+      CMT_IGNORE_CASE, NULL},
++    {"smartcase_search", P_INT, PI_ONOFF, (void *)&SmartCase, CMT_SMART_CASE,
++     NULL},
+ #ifdef USE_MIGEMO
+     {"use_migemo", P_INT, PI_ONOFF, (void *)&use_migemo, CMT_USE_MIGEMO,
+      NULL},
+--- a/search.c
++++ b/search.c
+@@ -1,8 +1,10 @@
+ /* vi: set sw=4 ts=8 ai sm noet : */
+ #include "fm.h"
+ #include "regex.h"
+-#include <signal.h>
++
++#include <ctype.h>
+ #include <errno.h>
++#include <signal.h>
+ #include <unistd.h>
+ 
+ static void
+@@ -93,25 +95,40 @@ conv_search_string(const char *str, wc_c
+ }
+ #endif
+ 
++static int
++ignorecase(const char *str)
++{
++    const char *c;
++
++    if (!SmartCase)
++	return IgnoreCase;
++
++    for (c = str; *c; c++)
++	if isupper(*c) return 0;
++    return 1;
++}
++
+ int
+ forwardSearch(Buffer *buf, const char *str)
+ {
+     const char *p, *first, *last;
+     Line *l, *begin;
+     int wrapped = FALSE;
+-    int pos;
++    int icase, pos;
++
++    icase = ignorecase(str);
+ 
+ #ifdef USE_MIGEMO
+     if (migemo_active > 0) {
+-	if (((p = regexCompile(migemostr(str), IgnoreCase)) != NULL)
+-	    && ((p = regexCompile(str, IgnoreCase)) != NULL)) {
++	if (((p = regexCompile(migemostr(str), icase)) != NULL)
++	    && ((p = regexCompile(str, icase)) != NULL)) {
+ 	    message(p, 0, 0);
+ 	    return SR_NOTFOUND;
+ 	}
+     }
+     else
+ #endif
+-    if ((p = regexCompile(str, IgnoreCase)) != NULL) {
++    if ((p = regexCompile(str, icase)) != NULL) {
+ 	message(p, 0, 0);
+ 	return SR_NOTFOUND;
+     }
+@@ -194,19 +211,21 @@ backwardSearch(Buffer *buf, const char *
+     const char *p, *q, *found, *found_last, *first, *last;
+     Line *l, *begin;
+     int wrapped = FALSE;
+-    int pos;
++    int icase, pos;
++
++    icase = ignorecase(str);
+ 
+ #ifdef USE_MIGEMO
+     if (migemo_active > 0) {
+-	if (((p = regexCompile(migemostr(str), IgnoreCase)) != NULL)
+-	    && ((p = regexCompile(str, IgnoreCase)) != NULL)) {
++	if (((p = regexCompile(migemostr(str), icase)) != NULL)
++	    && ((p = regexCompile(str, icase)) != NULL)) {
+ 	    message(p, 0, 0);
+ 	    return SR_NOTFOUND;
+ 	}
+     }
+     else
+ #endif
+-    if ((p = regexCompile(str, IgnoreCase)) != NULL) {
++    if ((p = regexCompile(str, icase)) != NULL) {
+ 	message(p, 0, 0);
+ 	return SR_NOTFOUND;
+     }

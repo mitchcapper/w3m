@@ -57,7 +57,7 @@ Patch: patches/Add-goto-main-command.patch
  #define HTML_SELECT_INT     160
 --- a/main.c
 +++ b/main.c
-@@ -3697,6 +3697,18 @@ _followForm(int submit)
+@@ -3699,6 +3699,18 @@ _followForm(int submit)
      displayBuffer(Currentbuf, B_FORCE_REDRAW);
  }
  
