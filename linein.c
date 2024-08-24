@@ -23,6 +23,8 @@ extern int do_getch(void);
 
 static Str strBuf;
 static Lineprop strProp[STR_LEN];
+static Str ynkBuf;
+static int ynkCon;
 
 static Str CompleteBuf;
 static Str CFileName;
@@ -36,6 +38,7 @@ static int NCFileOffset;
 static void _bs(void);
 static void _bsw(void);
 static void _compl(void);
+static void _cy(void);
 static void _dcompl(void);
 static void _editor(void);
 static void _enter(void);
@@ -50,6 +53,7 @@ static void _mvLw(void);
 static void _mvR(void);
 static void _mvRw(void);
 static void _next(void);
+static void _paste(void);
 static void _prev(void);
 static void _quo(void);
 static void _rcompl(void);
@@ -80,7 +84,7 @@ void (*InputKeymap[32]) (void) = {
 /*  C-p     C-q     C-r     C-s     C-t     C-u     C-v     C-w     */
     _prev,  _quo,   _bsw,   _noop,  _mvLw,  killb,  _quo,   _bsw,
 /*  C-x     C-y     C-z     C-[     C-\     C-]     C-^     C-_     */
-    _tcompl,_mvRw,  _noop,  _esc,   _isrch, _noop,  _noop,  _noop,
+    _tcompl,_cy,    _noop,  _esc,   _isrch, _noop,  _noop,  _noop,
 };
 /* *INDENT-ON* */
 
@@ -205,7 +209,8 @@ inputLineHistSearch(const char *prompt, const char *def_str,
 	cm_clear = TRUE;
 	cm_disp_clear = TRUE;
 	if (!i_quote &&
-	    (((cm_mode & CPL_ALWAYS) && (c == CTRL_I || (space_autocomplete && c == ' '))) ||
+	    (((cm_mode & CPL_ALWAYS) &&
+	      (c == CTRL_I || (space_autocomplete && c == ' '))) ||
 	     ((cm_mode & CPL_ON) && (c == CTRL_I)))) {
 	    if (emacs_like_lineedit && cm_next) {
 		_dcompl();
@@ -267,6 +272,7 @@ inputLineHistSearch(const char *prompt, const char *def_str,
 	    cm_disp_next = -1;
 	    if (CLen + tmp->length > STR_LEN || !tmp->length)
 		goto next_char;
+	    ynkCon = 0;
 	    ins_char(tmp);
 	    if (incrfunc)
 		incrfunc(-1, strBuf, strProp);
@@ -278,6 +284,7 @@ inputLineHistSearch(const char *prompt, const char *def_str,
 	    cm_disp_next = -1;
 	    if (CLen >= STR_LEN)
 		goto next_char;
+	    ynkCon = 0;
 	    insC();
 	    strBuf->ptr[CPos] = c;
 	    if (!is_passwd && get_mctype(&c) == PC_CTRL)
@@ -536,20 +543,44 @@ insC(void)
 static void
 delC(void)
 {
-    int i = CPos;
     int delta = 1;
 
     if (CLen == CPos)
 	return;
 #ifdef USE_M17N
-    while (i + delta < CLen && strProp[i + delta] & PC_WCHAR2)
+    while (CPos + delta < CLen && strProp[CPos + delta] & PC_WCHAR2)
 	delta++;
 #endif
-    for (i = CPos; i < CLen; i++) {
+    for (int i = CPos; i < CLen; i++)
 	strProp[i] = strProp[i + delta];
+
+    if (!is_passwd) {
+	if (!ynkBuf)
+	    ynkBuf = Strnew();
+	if (!ynkCon)
+	    Strshrink(ynkBuf, ynkBuf->length); /* TODO(rkta): same as clear? */
+	Strinsert_charp_n(ynkBuf, 0, &strBuf->ptr[CPos], delta);
+	ynkCon = 1;
     }
     Strdelete(strBuf, CPos, delta);
     CLen -= delta;
+}
+
+static void
+_cy(void)
+{
+    if (rl_paste)
+	_paste();
+    else
+	_mvRw();
+}
+
+static void
+_paste(void)
+{
+    if (!ynkBuf) return;
+    ins_char(ynkBuf);
+    ynkCon = 0;
 }
 
 static void
@@ -561,6 +592,7 @@ _mvL(void)
     while (CPos > 0 && strProp[CPos] & PC_WCHAR2)
 	CPos--;
 #endif
+    ynkCon = 0;
 }
 
 static void
@@ -577,6 +609,7 @@ _mvLw(void)
 	if (!move_word)
 	    break;
     }
+    ynkCon = 0;
 }
 
 static void
@@ -593,6 +626,7 @@ _mvRw(void)
 	if (!move_word)
 	    break;
     }
+    ynkCon = 0;
 }
 
 static void
@@ -604,13 +638,18 @@ _mvR(void)
     while (CPos < CLen && strProp[CPos] & PC_WCHAR2)
 	CPos++;
 #endif
+    ynkCon = 0;
 }
 
 static void
 _bs(void)
 {
+    int y;
+
     if (CPos > 0) {
+	y = ynkCon;
 	_mvL();
+	ynkCon = y;
 	delC();
     }
 }
@@ -618,9 +657,12 @@ _bs(void)
 static void
 _bsw(void)
 {
-    int t = 0;
+    int t = 0, y;
+
     while (CPos > 0 && !t) {
+	y = ynkCon;
 	_mvL();
+	ynkCon = y;
 	t = (move_word && terminated(strBuf->ptr[CPos - 1]));
 	delC();
     }
@@ -661,12 +703,14 @@ static void
 _mvB(void)
 {
     CPos = 0;
+    ynkCon = 0;
 }
 
 static void
 _mvE(void)
 {
     CPos = CLen;
+    ynkCon = 0;
 }
 
 static void

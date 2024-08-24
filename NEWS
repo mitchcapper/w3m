@@ -7,6 +7,7 @@ Unreleased
   - Add keybinding to insert next character while using incremental search
     (C-l)
   - Add keybinding to insert current search term (C-\)
+  - Add option for CTRL Y to insert deleted text (rl_paste)
 
 * bug fixes
   - Ignore C-i, C-l, C-s, C-z, C-\, C-], C-^ and C-_ key presses when
