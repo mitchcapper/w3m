@@ -85,29 +85,6 @@ tasks:
       cd tests
       sh run_tests
 
-  - disable: |
-      cd w3m
-      make distclean || :
-      ./configure \
-        --disable-alarm \
-        --disable-color\
-        --disable-cookie \
-        --disable-external_uri_loader \
-        --disable-gopher \
-        --disable-image \
-        --disable-ipv6 \
-        --disable-m17n \
-        --disable-menu \
-        --disable-mouse \
-        --disable-nls \
-        --disable-nntp \
-        --disable-sslverify \
-        --disable-unicode \
-        --disable-w3mmailer \
-        --without-ssl
-      make -j4
-      test -x w3m
-
   - tcc: |
       cd w3m
       make distclean || :
