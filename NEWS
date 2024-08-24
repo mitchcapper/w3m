@@ -3,6 +3,7 @@ Unreleased
 * new features
   - Add command to change directory (CD)
   - Add keybinding to insert word under cursor when inserting text (C-i)
+  - Add vim-like smartcase option for search
 
 * bug fixes
   - Ignore C-i, C-l, C-s, C-z, C-\, C-], C-^ and C-_ key presses when
