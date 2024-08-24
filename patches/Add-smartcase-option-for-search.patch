@@ -15,7 +15,7 @@ Patch: patches/Add-smartcase-option-for-search.patch
  global char *AcceptMedia init(NULL);
  global int WrapDefault init(FALSE);
  global int IgnoreCase init(TRUE);
-+global int SmartCase init(TRUE);
++global int SmartCase init(FALSE);
  global int WrapSearch init(FALSE);
  global int squeezeBlankLine init(FALSE);
  global char *BookmarkFile init(NULL);
@@ -65,7 +65,7 @@ Patch: patches/Add-smartcase-option-for-search.patch
 +	return IgnoreCase;
 +
 +    for (c = str; *c; c++)
-+	if isupper(*c) return 0;
++	if (isupper(*c)) return 0;
 +    return 1;
 +}
 +

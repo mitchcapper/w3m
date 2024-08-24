@@ -1,0 +1,143 @@
+From: Rene Kita <mail@rkta.de>
+Date: Sat Aug 24 13:53:29 CEST 2024
+Subject: Make CTRL Y insert delete text
+Patch: patches/Make-CTRL-Y-insert-delete-text.patch
+
+---
+ fm.h     |    1 +
+ linein.c |   45 +++++++++++++++++++++++++++++++++++++++------
+ rc.c     |    3 +++
+ 3 files changed, 43 insertions(+), 6 deletions(-)
+
+--- a/linein.c
++++ b/linein.c
+@@ -22,6 +22,8 @@ extern int do_getch(void);
+ 
+ static Str strBuf;
+ static Lineprop strProp[STR_LEN];
++static Str ynkBuf;
++static int yanking; /* True while user deletes, false when entering text */
+ 
+ static Str CompleteBuf;
+ static Str CFileName;
+@@ -32,7 +34,7 @@ static char **CFileBuf = NULL;
+ static int NCFileBuf;
+ static int NCFileOffset;
+ 
+-static void _iword(void),
++static void _iword(void), _Cy(void), _paste(void),
+ _mvR(void), _mvL(void), _mvRw(void), _mvLw(void), delC(void), insC(void),
+ _mvB(void), _mvE(void), _enter(void), _quo(void), _bs(void), _bsw(void),
+ killn(void), killb(void), _inbrk(void), _esc(void), _editor(void),
+@@ -57,7 +59,7 @@ void (*InputKeymap[32]) (void) = {
+ /*  C-p     C-q     C-r     C-s     C-t     C-u     C-v     C-w     */
+     _prev,  _quo,   _bsw,   _iword,  _mvLw,  killb,  _quo,   _bsw,
+ /*  C-x     C-y     C-z     C-[     C-\     C-]     C-^     C-_     */
+-    _tcompl,_mvRw,  _iword,  _esc,   _iword,  _iword,  _iword,  _iword,
++    _tcompl,_Cy,    _iword,  _esc,   _iword,  _iword,  _iword,  _iword,
+ };
+ /* *INDENT-ON* */
+ 
+@@ -182,7 +184,8 @@ inputLineHistSearch(const char *prompt,
+ 	cm_clear = TRUE;
+ 	cm_disp_clear = TRUE;
+ 	if (!i_quote &&
+-	    (((cm_mode & CPL_ALWAYS) && (c == CTRL_I || (space_autocomplete && c == ' '))) ||
++	    (((cm_mode & CPL_ALWAYS) &&
++	      (c == CTRL_I || (space_autocomplete && c == ' '))) ||
+ 	     ((cm_mode & CPL_ON) && (c == CTRL_I)))) {
+ 	    if (emacs_like_lineedit && cm_next) {
+ 		_dcompl();
+@@ -382,6 +385,7 @@ ins_char(Str str)
+     Lineprop ctype;
+     int len;
+ 
++    yanking = 0;
+     if (CLen + str->length >= STR_LEN)
+ 	return;
+     while (p < ep) {
+@@ -483,23 +487,52 @@ insC(void)
+ static void
+ delC(void)
+ {
+-    int i = CPos;
+     int delta = 1;
+ 
+     if (CLen == CPos)
+ 	return;
++    if (!ynkBuf)
++	ynkBuf = Strnew();
++    if (!yanking)
++	Strtruncate(ynkBuf, 0);
++    yanking = 1;
+ #ifdef USE_M17N
+-    while (i + delta < CLen && strProp[i + delta] & PC_WCHAR2)
++    while (CPos + delta < CLen && strProp[CPos + delta] & PC_WCHAR2)
+ 	delta++;
+ #endif
+-    for (i = CPos; i < CLen; i++) {
++    for (int i = CPos; i < CLen; i++)
+ 	strProp[i] = strProp[i + delta];
++
++    if (!is_passwd) {
++	while (ynkBuf->length + delta > ynkBuf->area_size) {
++	    if (ynkBuf->area_size == STR_SIZE_MAX) return;
++		Strgrow(ynkBuf);
++	}
++	memmove(ynkBuf->ptr + delta, ynkBuf->ptr, ynkBuf->length);
++	memcpy(ynkBuf->ptr, &strBuf->ptr[CPos], delta);
++	ynkBuf->length += delta;
++	ynkBuf->ptr[ynkBuf->length] = '\0';
+     }
+     Strdelete(strBuf, CPos, delta);
+     CLen -= delta;
+ }
+ 
+ static void
++_Cy(void)
++{
++    if (readline_paste)
++	_paste();
++    else
++	_mvRw();
++}
++
++static void
++_paste(void)
++{
++    ins_char(ynkBuf);
++}
++
++static void
+ _mvL(void)
+ {
+     if (CPos > 0)
+--- a/fm.h
++++ b/fm.h
+@@ -921,6 +921,7 @@ global int confirm_on_quit init(TRUE);
+ global int use_mark init(FALSE);
+ #endif
+ global int emacs_like_lineedit init(FALSE);
++global int readline_paste init(FALSE);
+ global int space_autocomplete init(FALSE);
+ global int vi_prec_num init(FALSE);
+ global int label_topline init(FALSE);
+--- a/rc.c
++++ b/rc.c
+@@ -144,6 +144,7 @@ static int OptionEncode = FALSE;
+ #define CMT_USE_MARK	N_("Enable mark operations")
+ #endif
+ #define CMT_EMACS_LIKE_LINEEDIT	N_("Enable Emacs-style line editing")
++#define CMT_READLINE_PASTE	N_("Use ^Y to paste deleted text")
+ #define CMT_SPACE_AUTOCOMPLETE  N_("Space key triggers file completion while editing URLs")
+ #define CMT_VI_PREC_NUM	 N_("Enable vi-like numeric prefix")
+ #define CMT_LABEL_TOPLINE N_("Move cursor to top line when going to label")
+@@ -526,6 +527,8 @@ struct param_ptr params3[] = {
+ #endif
+     {"emacs_like_lineedit", P_INT, PI_ONOFF, (void *)&emacs_like_lineedit,
+      CMT_EMACS_LIKE_LINEEDIT, NULL},
++    {"readline_paste", P_INT, PI_ONOFF, (void *)&readline_paste,
++     CMT_READLINE_PASTE, NULL},
+     {"space_autocomplete", P_INT, PI_ONOFF, (void *)&space_autocomplete,
+      CMT_SPACE_AUTOCOMPLETE, NULL},
+     {"vi_prec_num", P_INT, PI_ONOFF, (void *)&vi_prec_num, CMT_VI_PREC_NUM,
