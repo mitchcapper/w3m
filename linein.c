@@ -22,6 +22,7 @@ extern int do_getch(void);
 
 static Str strBuf;
 static Lineprop strProp[STR_LEN];
+static Str ynkBuf;
 
 static Str CompleteBuf;
 static Str CFileName;
@@ -32,7 +33,7 @@ static char **CFileBuf = NULL;
 static int NCFileBuf;
 static int NCFileOffset;
 
-static void _iword(void),
+static void _iword(void), _cy(void), _paste(void),
 _mvR(void), _mvL(void), _mvRw(void), _mvLw(void), delC(void), insC(void),
 _mvB(void), _mvE(void), _enter(void), _quo(void), _bs(void), _bsw(void),
 killn(void), killb(void), _inbrk(void), _esc(void), _editor(void),
@@ -53,11 +54,11 @@ void (*InputKeymap[32]) (void) = {
 /*  C-@     C-a     C-b     C-c     C-d     C-e     C-f     C-g     */
     _compl, _mvB,   _mvL,   _inbrk, delC,   _mvE,   _mvR,   _inbrk,
 /*  C-h     C-i     C-j     C-k     C-l     C-m     C-n     C-o     */
-    _bs,    _iword,  _enter, killn,  _iword,  _enter, _next,  _editor,
+    _bs,    _iword, _enter, killn,  _iword, _enter, _next,  _editor,
 /*  C-p     C-q     C-r     C-s     C-t     C-u     C-v     C-w     */
     _prev,  _quo,   _bsw,   _iword,  _mvLw,  killb,  _quo,   _bsw,
 /*  C-x     C-y     C-z     C-[     C-\     C-]     C-^     C-_     */
-    _tcompl,_mvRw,  _iword,  _esc,   _iword,  _iword,  _iword,  _iword,
+    _tcompl,_cy,    _iword, _esc,   _iword, _iword, _iword, _iword,
 };
 /* *INDENT-ON* */
 
@@ -182,7 +183,8 @@ inputLineHistSearch(const char *prompt, const char *def_str,
 	cm_clear = TRUE;
 	cm_disp_clear = TRUE;
 	if (!i_quote &&
-	    (((cm_mode & CPL_ALWAYS) && (c == CTRL_I || (space_autocomplete && c == ' '))) ||
+	    (((cm_mode & CPL_ALWAYS) &&
+	      (c == CTRL_I || (space_autocomplete && c == ' '))) ||
 	     ((cm_mode & CPL_ON) && (c == CTRL_I)))) {
 	    if (emacs_like_lineedit && cm_next) {
 		_dcompl();
@@ -407,6 +409,9 @@ ins_char(Str str)
 	    }
 	}
     }
+    if (ynkBuf)
+	Strfree(ynkBuf);
+    ynkBuf = NULL;
 }
 #endif
 
@@ -483,20 +488,48 @@ insC(void)
 static void
 delC(void)
 {
-    int i = CPos;
     int delta = 1;
 
     if (CLen == CPos)
 	return;
+    if (!ynkBuf)
+	ynkBuf = Strnew();
 #ifdef USE_M17N
-    while (i + delta < CLen && strProp[i + delta] & PC_WCHAR2)
+    while (CPos + delta < CLen && strProp[CPos + delta] & PC_WCHAR2)
 	delta++;
 #endif
-    for (i = CPos; i < CLen; i++) {
+    for (int i = CPos; i < CLen; i++)
 	strProp[i] = strProp[i + delta];
+
+    if (!is_passwd) {
+	while (ynkBuf->length + delta > ynkBuf->area_size) {
+	    if (ynkBuf->area_size == STR_SIZE_MAX) return;
+		Strgrow(ynkBuf);
+	}
+	/* TODO(rkta): Better use Str function, does not exist yet */
+	memmove(ynkBuf->ptr + delta, ynkBuf->ptr, ynkBuf->length);
+	memcpy(ynkBuf->ptr, &strBuf->ptr[CPos], delta);
+	ynkBuf->length += delta;
+	ynkBuf->ptr[ynkBuf->length] = '\0';
     }
     Strdelete(strBuf, CPos, delta);
     CLen -= delta;
+}
+
+static void
+_cy(void)
+{
+    if (readline_paste)
+	_paste();
+    else
+	_mvRw();
+}
+
+static void
+_paste(void)
+{
+    if (!ynkBuf) return;
+    ins_char(ynkBuf);
 }
 
 static void
