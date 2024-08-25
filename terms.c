@@ -430,6 +430,7 @@ char *T_cd, *T_ce, *T_kr, *T_kl, *T_cr, *T_bt, *T_ta, *T_sc, *T_rc,
     *T_ti, *T_te, *T_nd, *T_as, *T_ae, *T_eA, *T_ac, *T_op;
 
 int LINES, COLS;
+int opt_cols;
 #if defined(__CYGWIN__)
 int LASTLINE;
 #endif				/* defined(__CYGWIN__) */
@@ -1269,6 +1270,8 @@ setlinescols(void)
 	LINES = tgetnum("li");	/* number of line */
     if (COLS <= 0)
 	COLS = tgetnum("co");	/* number of column */
+    if (opt_cols && COLS > opt_cols)
+	COLS = opt_cols;
 #if defined(__CYGWIN__)
     LASTLINE = LINES - (isWinConsole == TERM_CYGWIN_RESERVE_IME ? 2 : 1);
 #endif				/* defined(__CYGWIN__) */
