@@ -18,8 +18,8 @@ tasks:
       ./configure
       make -j4
       test -x w3m
-      cd tests
-      sh run_tests
+      cd t
+      sh run
 
   - debian: |
       cd w3m
@@ -47,8 +47,8 @@ tasks:
         --with-ssl
       make -j4
       test -x w3m
-      cd tests
-      sh run_tests
+      cd t
+      sh run
 
   - gdk-pixbuf: |
       cd w3m
@@ -76,8 +76,8 @@ tasks:
         --with-ssl
       make -j4
       test -x w3m
-      cd tests
-      sh run_tests
+      cd t
+      sh run
 
   - disable: |
       cd w3m
@@ -142,5 +142,5 @@ tasks:
         --with-x
       make -j4
       test -x w3m
-      cd tests
-      sh run_tests
+      cd t
+      sh run
