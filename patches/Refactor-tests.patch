@@ -1,0 +1,72 @@
+From: Rene Kita <mail@rkta.de>
+Date: Sun Aug 25 12:44:38 CEST 2024
+Subject: Refactor tests
+Patch: patches/Refactor-tests.patch
+
+---
+ tests/run_tests |   51 ++++++++++++++++++++++++++++++---------------------
+ 1 file changed, 30 insertions(+), 21 deletions(-)
+
+--- a/tests/run_tests
++++ b/tests/run_tests
+@@ -1,30 +1,39 @@
++#!/bin/sh
++
++# Tests should be run from the tests directory
++if ! test "$(basename "$PWD")" = "tests"
++then
++	        cd tests || exit 2
++fi
++
++# We need an executable
++test -x ../w3m || exit 2
++
+ total=0
+ pass=0
+ fail=0
+-w3m="../w3m
+--config
+-/dev/null
+--o
+-ignore_null_img_alt=false"
+-for i in *.html; do
+-	cmd="$w3m
+--I
+-utf-8
+--O
+-utf-8
+--T
+-text/html"
+-	opts="`basename "$i" .html`.opts"
+-	test -f "$opts" && cmd="$cmd
+-`grep -v '^#' $opts`"
+-	if (set -x;IFS='
+-';$cmd) < "$i" | diff -u - "`basename "$i" .html`.expected"; then
+-		pass="`expr 1 + "$pass"`"
++w3m="../w3m -config /dev/null -o ignore_null_img_alt=false"
++w3m="$w3m -I utf-8 -O utf-8 -T text/html"
++
++test "$@" || set -- *.html
++
++for f
++do
++	test -f "$f" || f="$f".html
++	cmd="$w3m -I utf-8 -O utf-8 -T text/html"
++	opts="$(basename "$f" .html).opts"
++	test -f "$opts" && cmd="$cmd $(grep -v '^#' "$opts")"
++	if $cmd < "$f" |
++		diff -u - "$(basename "$f" .html).expected"
++	then
++		pass=$((pass + 1))
+ 	else
+-		fail="`expr 1 + "$fail"`"
++		fail=$((fail + 1))
+ 	fi
+-	total="`expr 1 + "$total"`"
++	total=$((total + 1))
+ done
++
++echo
+ echo "TOTAL: $total test(s)"
+ echo "PASS : $pass"
+ echo "FAIL : $fail"
