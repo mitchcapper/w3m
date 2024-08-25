@@ -3755,7 +3755,8 @@ process_button(struct parsed_tag *tag)
        qq = html_quote(q);
     }
 
-    /*    Strcat_charp(tmp, "<pre_int>"); */
+    if (displayLinkNumber)
+	Strcat(tmp, getLinkNumberStr(0));
     Strcat(tmp, Sprintf("<input_alt hseq=\"%d\" fid=\"%d\" type=\"%s\" "
                        "name=\"%s\" value=\"%s\">",
                        cur_hseq++, cur_form_id, html_quote(p),
@@ -4004,8 +4005,10 @@ process_n_textarea(void)
     if (cur_textarea == NULL)
 	return NULL;
 
-    tmp = Strnew();
-    Strcat(tmp, Sprintf("<pre_int>[<input_alt hseq=\"%d\" fid=\"%d\" "
+    tmp = Strnew_charp("<pre_int>");
+    if (displayLinkNumber)
+	Strcat(tmp, getLinkNumberStr(0));
+    Strcat(tmp, Sprintf("[<input_alt hseq=\"%d\" fid=\"%d\" "
 			"type=textarea name=\"%s\" size=%d rows=%d "
 			"top_margin=%d textareanumber=%d",
 			cur_hseq, cur_form_id,
@@ -4922,6 +4925,7 @@ HTMLtagproc1(struct parsed_tag *tag, struct html_feed_environ *h_env)
 	    obuf->anchor.hseq = cur_hseq;
 	    tmp = process_anchor(tag, h_env->tagbuf->ptr);
 	    push_tag(obuf, tmp->ptr, HTML_A);
+	    need_number = 1;
 	    return 1;
 	}
 	return 0;
@@ -6401,7 +6405,7 @@ HTMLlineproc0(char *line, struct html_feed_environ *h_env, int internal)
 	    if (obuf->status != R_ST_NORMAL)	/* R_ST_AMP ? */
 		obuf->status = R_ST_NORMAL;
 	    str = tokbuf->ptr;
-	    if (need_number) {
+	    if (displayLinkNumber && need_number) {
 		str = Strnew_m_charp(getLinkNumberStr(-1)->ptr, str, NULL)->ptr;
 		need_number = 0;
 	    }
@@ -6529,14 +6533,11 @@ HTMLlineproc0(char *line, struct html_feed_environ *h_env, int internal)
 #endif				/* ID_EXT */
 	    obuf->bp.init_flag = 1;
 	    clear_ignore_p_flag(cmd, obuf);
+	    if (!internal && displayLinkNumber && need_number == 1)
+		continue;
+	    need_number = 0;
 	    if (cmd == HTML_TABLE)
 		goto table_start;
-	    else {
-		if (displayLinkNumber && cmd == HTML_A && !internal)
-		    if (h_env->obuf->anchor.url)
-			need_number = 1;
-		continue;
-	    }
 	}
 
 	if (obuf->flag & (RB_DEL | RB_S))
