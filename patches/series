@@ -144,6 +144,8 @@ Add-smartcase-option-for-search.patch
 Make-CTRL-Y-insert-delete-text.patch
 Show-all-link-numbers.patch
 Refactor-tests.patch
+Drop-MAX_COLUMNS-and-MAX_LINES.patch
+Do-not-override-cols-option-value.patch
 Enable-lto.patch
 # BORKED
 Refactor-regex-library.patch
