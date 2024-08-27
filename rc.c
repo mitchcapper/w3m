@@ -78,7 +78,8 @@ static int OptionEncode = FALSE;
 #define CMT_DISPLINK     N_("Display link URL automatically")
 #define CMT_DISPLINKNUMBER N_("Display link numbers")
 #define CMT_DECODE_URL   N_("Display decoded URL")
-#define CMT_DISPLINEINFO N_("Display current line number")
+#define CMT_DISPLINEINFO N_("Display current line information")
+#define CMT_DISP_COLUMN_NUMBER N_("Display column number in line information")
 #define CMT_DISP_IMAGE   N_("Display inline images")
 #define CMT_PSEUDO_INLINES N_("Display pseudo-ALTs for inline images with no ALT or TITLE string")
 #ifdef USE_IMAGE
@@ -410,6 +411,8 @@ struct param_ptr params1[] = {
     {"decode_url", P_INT, PI_ONOFF, (void *)&DecodeURL, CMT_DECODE_URL, NULL},
     {"display_lineinfo", P_INT, PI_ONOFF, (void *)&displayLineInfo,
      CMT_DISPLINEINFO, NULL},
+    {"display_column_number", P_INT, PI_ONOFF, (void *)&displayColumnNumber,
+     CMT_DISP_COLUMN_NUMBER, NULL},
     {"ext_dirlist", P_INT, PI_ONOFF, (void *)&UseExternalDirBuffer,
      CMT_EXT_DIRLIST, NULL},
     {"dirlist_cmd", P_STRING, PI_TEXT, (void *)&DirBufferCommand,
