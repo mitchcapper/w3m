@@ -65,6 +65,7 @@ insertions tagged with "mh 2016-03-29" and "mh 2016-06-11" come from the latest 
      Local CGI scripts
     </a>
    </li>
+   <li><a href="#Passwords">Password store support</a></li>
   </ul>
   <hr>
   <h2 id="Introduction">
@@ -2445,6 +2446,46 @@ Location: http://www.example.org/
   <p>
    Note that this header has no effect when the CGI script is invoked
    through an HTTP server.
+  </p>
+
+  <hr>
+  <h2 id="Passwords">Password store support</h2>
+  <p>
+  w3m comes with integrated support for password stores.
+  With the cursor on an input or password field calling
+  <code>PASS</code>
+  will invoke
+  <code>passwd_cmd</code>
+  adding the host part of the current URL as parameter.
+  By default,
+  w3m will insert the first line of output from
+  <code>passwd_cmd</code>
+  into the current form.
+  This can be changed by adding a line number when calling
+  <code>PASS</code>.
+  If
+  <code>PASS</code>
+  is mapped to a key,
+  the same can be achieved by pressing a number before the key.
+  </p>
+
+  <h3>Example</h3>
+  <p>
+  When visiting
+  <a href="https://w3m-browser.org">https://w3m-browser.org</a>
+  and calling
+  `<code>PASS 5</code>'
+  w3m will call
+  `<code>passwd_cmd w3m-browser.org</code>'
+  and discard any output except for line 5.
+  If
+  <code>PASS</code>
+  is mapped to the key `p' you can achieve the same by pressing 5p.
+  </p>
+
+  <h3>Caveats</h3>
+  <p>
+  Note that w3m will pass the complete hostname including any subdomains.
   </p>
  </body>
 </html>

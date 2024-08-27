@@ -61,6 +61,7 @@ extern void bufferA(void);
 extern void followI(void);
 extern void submitForm(void);
 extern void followForm(void);
+extern void passForm(void);
 extern void topA(void);
 extern void lastA(void);
 extern void nthA(void);

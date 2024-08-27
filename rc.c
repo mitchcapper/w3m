@@ -148,6 +148,7 @@ static int OptionEncode = FALSE;
 #define CMT_URIMETHODMAP N_("List of urimethodmap files")
 #define CMT_EDITOR       N_("Editor")
 #define CMT_MAILER       N_("Mailer")
+#define CMT_PASSWDSTORE	N_("Password store")
 #define CMT_MAILTO_OPTIONS N_("How to call Mailer for mailto URLs with options")
 #define CMT_EXTBRZ       N_("External browser")
 #define CMT_EXTBRZ2      N_("2nd external browser")
@@ -600,6 +601,8 @@ struct param_ptr params6[] = {
     {"mailto_options", P_INT, PI_SEL_C, (void *)&MailtoOptions,
      CMT_MAILTO_OPTIONS, (void *)mailtooptionsstr},
     {"mailer", P_STRING, PI_TEXT, (void *)&Mailer, CMT_MAILER, NULL},
+    {"passwd_cmd", P_STRING, PI_TEXT, (void *)&passwd_cmd, CMT_PASSWDSTORE,
+     NULL},
     {"extbrowser", P_STRING, PI_TEXT, (void *)&ExtBrowser, CMT_EXTBRZ, NULL},
     {"extbrowser2", P_STRING, PI_TEXT, (void *)&ExtBrowser2, CMT_EXTBRZ2,
      NULL},

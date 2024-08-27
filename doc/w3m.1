@@ -212,6 +212,45 @@ use debug mode (only for debugging)
 .TP
 \fB\-reqlog\fP
 log headers of HTTP communication in file \f(CW~/.w3m/request.log\fP
+.SH Password store support
+.PP
+.BR w3m
+comes with integrated support for password stores.
+With the cursor on an input or password field calling
+.IR PASS
+will invoke
+.IR passwd_cmd
+adding the host part of the current URL as parameter.
+By default,
+.BR w3m
+will insert the first line of output from
+.IR passwd_cmd
+into the current form.
+This can be changed by adding a line number when calling
+.IR PASS .
+If
+.IR PASS
+is mapped to a key, the same can be achieved by pressing a number before the key.
+.SS Example
+When visiting
+.UR https://w3m-browser.org
+.UE
+and calling
+.IR PASS
+.IR 5
+.BR w3m
+will call
+.IR passwd_cmd
+.IR w3m-browser.org
+and discard any output except for line 5.
+If
+.IR PASS
+is mapped to the key 'p' you can achieve the same by pressing
+.IR 5p .
+.SS Caveats
+Note that
+.BR w3m
+will pass the complete hostname including any subdomains.
 .SH EXAMPLES
 .SS Pager-like usage
 .TP

@@ -4223,6 +4223,118 @@ cmd_loadURL(char *url, ParsedURL *current, char *referer, FormList *request)
     displayBuffer(Currentbuf, B_NORMAL);
 }
 
+/* submit form */
+static void _passForm(int submit);
+DEFUN(passForm, PASS, "Enter credentials")
+{
+    int n;
+
+    n = PREC_NUM;
+    if (CurrentCmdData)
+	n = atoi(CurrentCmdData);
+    _passForm(n);
+}
+
+static char *
+_pass(const char *host, int line)
+{
+#include <string.h>
+    FILE *p;
+    Str buf;
+    char *cmd, *err;
+    int c, n;
+
+    if (!passwd_cmd) {
+	err = _("Password store not set!");
+	goto fail;
+    }
+    if (!host) {
+	err = _("No host to look up!");
+	goto fail;
+    }
+
+    cmd = Strnew_m_charp(passwd_cmd, " ", host, NULL)->ptr;
+
+    fmTerm();
+    if (!(p = popen(cmd, "r"))) {
+	err = _("Could not execute password command");
+	goto fail;
+    }
+
+
+    n = 1;
+    buf = Strnew();
+    while (n < line && (c = fgetc(p)) != EOF)	/* Skip to line */
+	if (c == '\n') n++;
+
+    while ((c = fgetc(p)) != EOF && c != '\n')
+	Strcat_char(buf, c);
+
+    fmInit();
+    if (!buf->length) {
+	err = _("Password store command return nothing");
+	goto fail;
+    }
+
+    if ((c = pclose(p) > 0)) {
+	err = Strnew_m_charp("Password command failed with ",
+			     Sprintf("%d, %s", c, strerror(c))->ptr,
+			     NULL)->ptr;
+	goto fail;
+    }
+
+    return buf->ptr;
+
+fail:
+    fmInit();
+    disp_err_message(err, TRUE);
+    return NULL;
+}
+
+static void
+_passForm(int line)
+{
+    Anchor *a;
+    char *p;
+    FormItemList *fi;
+
+    if (Currentbuf->firstLine == NULL)
+	return;
+
+    a = retrieveCurrentForm(Currentbuf);
+    if (a == NULL)
+	return;
+    fi = (FormItemList *)a->url;
+    switch (fi->type) {
+    case FORM_INPUT_TEXT:
+    case FORM_INPUT_PASSWORD:
+	if (fi->readonly)
+	    /* FIXME: gettextize? */
+	    disp_message_nsec("Read only field!", FALSE, 1, TRUE, FALSE);
+	if (!(p = _pass(Currentbuf->currentURL.host, line)) || fi->readonly)
+	    break;
+	fi->value = Strnew_charp(p);
+	formUpdateBuffer(a, Currentbuf, fi);
+	break;
+    case FORM_INPUT_FILE:
+    case FORM_TEXTAREA:
+    case FORM_INPUT_RADIO:
+    case FORM_INPUT_CHECKBOX:
+#ifdef MENU_SELECT
+    case FORM_SELECT:
+#endif				/* MENU_SELECT */
+    case FORM_INPUT_IMAGE:
+    case FORM_INPUT_SUBMIT:
+    case FORM_INPUT_BUTTON:
+    case FORM_INPUT_RESET:
+    case FORM_INPUT_HIDDEN:
+    default:
+	disp_message_nsec("Can't touch this!", FALSE, 1, TRUE, FALSE);
+	break;
+    }
+    displayBuffer(Currentbuf, B_FORCE_REDRAW);
+}
+
 
 /* go to specified URL */
 static void

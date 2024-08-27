@@ -1002,6 +1002,7 @@ global int displayImage init(FALSE);	/* XXX: emacs-w3m use display_image=off */
 #endif
 global int pseudoInlines init(TRUE);
 global char *Editor init(DEF_EDITOR);
+global char *passwd_cmd init(NULL);
 #ifdef USE_W3MMAILER
 global char *Mailer init(NULL);
 #else
