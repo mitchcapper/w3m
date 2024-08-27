@@ -986,6 +986,7 @@ global char *displayTitleTerm init(NULL);
 global int displayLink init(FALSE);
 global int displayLinkNumber init(FALSE);
 global int displayLineInfo init(FALSE);
+global int displayColumnNumber init(FALSE);
 global int DecodeURL init(FALSE);
 global int retryAsHttp init(TRUE);
 global int showLineNum init(FALSE);
