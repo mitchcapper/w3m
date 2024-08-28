@@ -875,7 +875,7 @@ main(int argc, char **argv)
     if (!isatty(1) && !w3m_dump) /* redirected output */
 	w3m_dump = DUMP_BUFFER;
     if (w3m_dump)
-	COLS = opt_cols ? opt_cols : DEFAULT_COLS;
+	COLS = opt_cols ? opt_cols : MaxCols ? MaxCols : DEFAULT_COLS;
 
 #ifdef USE_BINMODE_STREAM
     setmode(fileno(stdout), O_BINARY);

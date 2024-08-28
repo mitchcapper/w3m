@@ -1270,6 +1270,8 @@ setlinescols(void)
 	LINES = tgetnum("li");	/* number of line */
     if (COLS <= 0)
 	COLS = tgetnum("co");	/* number of column */
+    if (MaxCols && COLS > MaxCols)
+	COLS = MaxCols;
     if (opt_cols && COLS > opt_cols)
 	COLS = opt_cols;
 #if defined(__CYGWIN__)

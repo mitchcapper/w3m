@@ -829,6 +829,7 @@ extern int LASTLINE;
 
 global int Tabstop init(8);
 global int IndentIncr init(4);
+global int MaxCols init(0);
 global int ShowEffect init(TRUE);
 global int PagerMax init(PAGER_MAX_LINE);
 global int MessageDelay init(2);

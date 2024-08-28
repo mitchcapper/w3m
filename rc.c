@@ -63,6 +63,7 @@ static int OptionEncode = FALSE;
 #define CMT_HELPER	 N_("External Viewer Setup")
 #define CMT_TABSTOP      N_("Tab width in characters")
 #define CMT_INDENT_INCR  N_("Indent for HTML rendering")
+#define CMT_MAXCOLS	 N_("Max chars per line (0: unset) Needs restart!")
 #define CMT_PIXEL_PER_CHAR N_("Number of pixels per character (4.0...32.0)")
 #define CMT_PIXEL_PER_LINE N_("Number of pixels per line (4.0...64.0)")
 #define CMT_MESSAGE_DELAY N_("Number of seconds to display user messages")
@@ -392,6 +393,7 @@ struct param_ptr params1[] = {
     {"tabstop", P_NZINT, PI_TEXT, (void *)&Tabstop, CMT_TABSTOP, NULL},
     {"indent_incr", P_NZINT, PI_TEXT, (void *)&IndentIncr, CMT_INDENT_INCR,
      NULL},
+    {"maxcols", P_INT, PI_TEXT, (void *)&MaxCols, CMT_MAXCOLS, NULL},
     {"pixel_per_char", P_PIXELS, PI_TEXT, (void *)&pixel_per_char,
      CMT_PIXEL_PER_CHAR, NULL},
 #ifdef USE_IMAGE
