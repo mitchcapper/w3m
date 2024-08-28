@@ -6,11 +6,10 @@ Patch: patches/Add-goto-main-command.patch
 ---
  file.c       |    7 +++++++
  fm.h         |    1 +
- html.h       |    1 +
  main.c       |   12 ++++++++++++
  proto.h      |    1 +
  tagtable.tab |    1 +
- 6 files changed, 23 insertions(+)
+ 5 files changed, 22 insertions(+)
 
 --- a/file.c
 +++ b/file.c
@@ -45,16 +44,6 @@ Patch: patches/Add-goto-main-command.patch
  } Buffer;
  
  typedef struct _BufferPos {
---- a/html.h
-+++ b/html.h
-@@ -242,6 +242,7 @@ typedef struct {
- #define HTML_N_DD       148
- #define HTML_DFN        149
- #define HTML_N_DFN      150
-+#define HTML_MAIN       151
- 
-    /* pseudo tag */
- #define HTML_SELECT_INT     160
 --- a/main.c
 +++ b/main.c
 @@ -3699,6 +3699,18 @@ _followForm(int submit)
@@ -88,7 +77,7 @@ Patch: patches/Add-goto-main-command.patch
  extern void adBmark(void);
 --- a/tagtable.tab
 +++ b/tagtable.tab
-@@ -211,3 +211,4 @@ pre_plain	HTML_PRE_PLAIN
+@@ -213,3 +213,4 @@ pre_plain	HTML_PRE_PLAIN
  /pre_plain	HTML_N_PRE_PLAIN
  div_int		HTML_DIV_INT
  /div_int	HTML_N_DIV_INT

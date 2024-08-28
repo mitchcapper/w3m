@@ -1,0 +1,115 @@
+From: Rene Kita <mail@rkta.de>
+Date: Mon Aug 26 18:45:38 CEST 2024
+Subject: scan build issues
+Patch: patches/scan-build-issues.patch
+
+---
+ file.c     |    4 ++--
+ istream.c  |    4 +---
+ linein.c   |    2 +-
+ mimehead.c |   10 +++++-----
+ table.c    |    2 +-
+ 5 files changed, 10 insertions(+), 12 deletions(-)
+
+--- a/file.c
++++ b/file.c
+@@ -1878,7 +1878,7 @@ loadGeneralFile(char *path, ParsedURL *v
+ 				  0);
+ 	    add_auth_cookie_flag = 0;
+ 	}
+-	if ((p = checkHeader(t_buf, "WWW-Authenticate:")) != NULL &&
++	if (checkHeader(t_buf, "WWW-Authenticate:") &&
+ 	    http_response_code == 401) {
+ 	    /* Authentication needed */
+ 	    struct http_auth hauth;
+@@ -1898,7 +1898,7 @@ loadGeneralFile(char *path, ParsedURL *v
+ 		goto load_doc;
+ 	    }
+ 	}
+-	if ((p = checkHeader(t_buf, "Proxy-Authenticate:")) != NULL &&
++	if (checkHeader(t_buf, "Proxy-Authenticate:") &&
+ 	    http_response_code == 407) {
+ 	    /* Authentication needed */
+ 	    struct http_auth hauth;
+--- a/istream.c
++++ b/istream.c
+@@ -586,9 +586,7 @@ ssl_get_certificate(SSL * ssl, char *hos
+ 	if ((verr = SSL_get_verify_result(ssl))
+ 	    != X509_V_OK) {
+ 	    const char *em = X509_verify_cert_error_string(verr);
+-	    if (accept_this_site(hostname, x))
+-		ans = "y";
+-	    else {
++	    if (!accept_this_site(hostname, x)) {
+ 		if (ssl_known_hosts)
+ 		    emsg = Sprintf("%s: accept? (y)es/(n)o/(a)lways)", em);
+ 		else
+--- a/linein.c
++++ b/linein.c
+@@ -422,7 +422,7 @@ _esc(void)
+     switch (c = getch()) {
+     case '[':
+     case 'O':
+-	switch (c = getch()) {
++	switch (getch()) {
+ 	case 'A':
+ 	    _prev();
+ 	    break;
+--- a/mimehead.c
++++ b/mimehead.c
+@@ -118,7 +118,7 @@ decodeB_to_growbuf(struct growbuf *gb, c
+ last:
+     growbuf_reserve(gb, gb->length + 1);
+     gb->ptr[gb->length] = '\0';
+-    ww = wp;
++    ww = wp; /* TODO(rkta): Check indirection patch or remove */
+     return;
+ }
+ 
+@@ -169,7 +169,7 @@ decodeQ(const char *ww)
+ 	else
+ 	    Strcat_char(a, *w);
+     }
+-    ww = w;
++    ww = w; /* TODO(rkta): Check indirection patch or remove */
+     return a;
+ }
+ 
+@@ -199,7 +199,7 @@ decodeQP_to_growbuf(struct growbuf *gb,
+ 	    gb->ptr[gb->length++] = *w;
+     }
+     gb->ptr[gb->length] = '\0';
+-    ww = w;
++    ww = w; /* TODO(rkta): Check indirection patch or remove */
+     return;
+ }
+ 
+@@ -216,7 +216,7 @@ decodeWord0(const char *ow)
+ #endif
+     const char *p, *w = ow;
+     char method;
+-    Str a = Strnew();
++    Str a;
+     Str tmp = Strnew();
+ 
+     if (*w != '=' || *(w + 1) != '?')
+@@ -259,7 +259,7 @@ decodeWord0(const char *ow)
+ 	if (*w == '=')
+ 	    w++;
+     }
+-    ow = w;
++    ow = w; /* TODO(rkta): Check indirection patch or remove */
+ #ifdef USE_M17N
+     *charset = c;
+ #endif
+--- a/table.c
++++ b/table.c
+@@ -424,7 +424,7 @@ visible_length(const char *str)
+ {
+     int len = 0, n, max_len = 0;
+     int status = R_ST_NORMAL;
+-    int prev_status = status;
++    int prev_status;
+     Str tagbuf = Strnew();
+     char *t, *r2;
+ 

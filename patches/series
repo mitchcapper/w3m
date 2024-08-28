@@ -137,15 +137,18 @@ Refactor-get_cookie_info.patch
 Merge-cookies-if-modified-after-start.patch
 Add-option-to-provide-cookie-jar.patch
 Update-URLHist-mtime-when-saving-history.patch
+Recognize-main-tag.html
 Add-goto-main-command.patch
 Add-key-binding-to-insert-word-under-cursor.patch
 Add-option-to-change-the-dictionary-prompt.patch
 Add-smartcase-option-for-search.patch
-Make-CTRL-Y-insert-delete-text.patch
+Make-CTRL-Y-insert-deleted-text.patch
 Show-all-link-numbers.patch
 Refactor-tests.patch
 Drop-MAX_COLUMNS-and-MAX_LINES.patch
 Do-not-override-cols-option-value.patch
+scan-build-issues.patch
+Add-password-manager-integration.patch
 Enable-lto.patch
 # BORKED
 Refactor-regex-library.patch
