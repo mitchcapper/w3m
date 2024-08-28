@@ -27,6 +27,8 @@ tt		HTML_NOP
 /tt		HTML_NOP
 ul		HTML_UL
 /ul		HTML_N_UL
+main		HTML_MAIN
+/main		HTML_N_MAIN
 menu		HTML_UL
 /menu		HTML_N_UL
 dir		HTML_UL
