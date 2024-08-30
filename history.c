@@ -144,7 +144,8 @@ saveUrlHistory(void)
 
 fail:
     URLHist->mtime = mtime;
-    disp_err_message("Can't open history", FALSE);
+    unlink(tmpf);
+    disp_err_message("Can't save history", FALSE);
     return;
 }
 #endif				/* USE_HISTORY */
