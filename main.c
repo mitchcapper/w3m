@@ -1894,6 +1894,7 @@ dispincsrch(int ch, Str buf, Lineprop *prop)
 {
     static Buffer sbuf;
     char *str;
+    const char *fpos, *lpos;
     int do_next_search = FALSE;
 
     if (ch == 0 && buf == NULL) {
@@ -1903,6 +1904,12 @@ dispincsrch(int ch, Str buf, Lineprop *prop)
 
     str = buf->ptr;
     switch (ch) {
+    case 014:			/* C-l */
+	arrangeCursor(Currentbuf);
+	srchcore(str, searchRoutine);
+	arrangeCursor(Currentbuf);
+	matchedPosition(&fpos,&lpos);
+	return *lpos;
     case 022:			/* C-r */
 	searchRoutine = backwardSearch;
 	do_next_search = TRUE;

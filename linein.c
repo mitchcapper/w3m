@@ -231,6 +231,22 @@ inputLineHistSearch(const char *prompt, const char *def_str,
 	    if (incrfunc == NULL
 		|| (c = incrfunc((int)c, strBuf, strProp)) < 0x20)
 		(*InputKeymap[(int)c]) ();
+	    if (c > 0x20) {
+#ifdef USE_M17N
+		tmp = wc_char_conv(c);
+		ins_char(tmp);
+#else
+	    if (CLen >= STR_LEN)
+		goto next_char;
+	    insC();
+	    strBuf->ptr[CPos] = c;
+	    if (!is_passwd && get_mctype(&c) == PC_CTRL)
+		strProp[CPos] = PC_CTRL;
+	    else
+		strProp[CPos] = PC_ASCII;
+	    CPos++;
+#endif
+	    }
 	    if (incrfunc && c != (unsigned char)-1 && c != CTRL_J)
 		incrfunc(-1, strBuf, strProp);
 	    if (cm_clear)
