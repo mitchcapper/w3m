@@ -147,6 +147,7 @@ scan-build-issues.patch
 Add-password-manager-integration.patch
 WIP-save-history.patch
 Use-Ctrl-L-to-insert-next-char-in-search.patch
+Recognize-aria-label-for-buttons.patch
 Enable-lto.patch
 # BORKED
 Refactor-regex-library.patch

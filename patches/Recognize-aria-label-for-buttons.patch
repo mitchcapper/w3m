@@ -1,0 +1,74 @@
+From: Rene Kita <mail@rkta.de>
+Date: Sat Aug 31 15:46:20 CEST 2024
+Subject: Recognize aria-label for buttons
+Patch: patches/Recognize-aria-label-for-buttons.patch
+
+---
+ file.c |    9 ++++++---
+ html.c |    4 ++--
+ html.h |    1 +
+ 3 files changed, 9 insertions(+), 5 deletions(-)
+
+--- a/html.c
++++ b/html.c
+@@ -44,7 +44,7 @@ unsigned char ALST_INPUT[] =
+     ATTR_CORE
+ };
+ unsigned char ALST_BUTTON[] =
+-    { ATTR_TYPE, ATTR_VALUE, ATTR_NAME, ATTR_CORE };
++    { ATTR_TYPE, ATTR_VALUE, ATTR_NAME, ATTR_CORE, ATTR_ARLABEL };
+ unsigned char ALST_TEXTAREA[] =
+     { ATTR_COLS, ATTR_ROWS, ATTR_NAME, ATTR_READONLY, ATTR_CORE };
+ unsigned char ALST_SELECT[] = { ATTR_NAME, ATTR_MULTIPLE, ATTR_CORE };
+@@ -332,7 +332,7 @@ TagAttrInfo AttrMAP[MAX_TAGATTR] = {
+     {"title", VTYPE_STR, 0},			/* 49 ATTR_TITLE          */
+     {"accesskey", VTYPE_STR, 0},		/* 50 ATTR_ACCESSKEY      */
+     {"public", VTYPE_NONE, 0},			/* 51 ATTR_PUBLIC         */
+-    {NULL, VTYPE_NONE, 0},			/* 52 Undefined           */
++    {"aria-label", VTYPE_STR, 0},		/* 52 ATTR_ARLABEL        */
+     {NULL, VTYPE_NONE, 0},			/* 53 Undefined           */
+     {NULL, VTYPE_NONE, 0},			/* 54 Undefined           */
+     {NULL, VTYPE_NONE, 0},			/* 55 Undefined           */
+--- a/html.h
++++ b/html.h
+@@ -328,6 +328,7 @@ typedef struct {
+ #define ATTR_TITLE		49
+ #define ATTR_ACCESSKEY		50
+ #define ATTR_PUBLIC		51
++#define ATTR_ARLABEL		52
+ 
+ /* Internal attribute */
+ #define ATTR_XOFFSET		60
+--- a/file.c
++++ b/file.c
+@@ -3861,7 +3861,7 @@ Str
+ process_button(struct parsed_tag *tag)
+ {
+     Str tmp = NULL;
+-    char *p, *q, *r, *qq = "";
++    char *l, *p, *q, *r, *qq = "";
+     int v;
+ 
+     if (cur_form_id < 0) {
+@@ -3877,6 +3877,9 @@ process_button(struct parsed_tag *tag)
+     parsedtag_get_value(tag, ATTR_VALUE, &q);
+     r = "";
+     parsedtag_get_value(tag, ATTR_NAME, &r);
++    l = "";
++    if (parsedtag_get_value(tag, ATTR_ARLABEL, &l))
++	l = Strnew_m_charp("(", l, ")", NULL)->ptr;
+ 
+     v = formtype(p);
+     if (v == FORM_UNKNOWN)
+@@ -3911,9 +3914,9 @@ process_button(struct parsed_tag *tag)
+     if (displayLinkNumber)
+ 	Strcat(tmp, getLinkNumberStr(0));
+     Strcat(tmp, Sprintf("<input_alt hseq=\"%d\" fid=\"%d\" type=\"%s\" "
+-                       "name=\"%s\" value=\"%s\">",
++                       "name=\"%s\" value=\"%s\">%s",
+                        cur_hseq++, cur_form_id, html_quote(p),
+-                       html_quote(r), qq));
++                       html_quote(r), qq, l));
+     return tmp;
+ }
+ 
