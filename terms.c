@@ -332,9 +332,6 @@ typedef struct termios TerminalMode;
 char *ttyname(int);
 #endif /* __MINGW32_VERSION */
 
-#define MAX_LINE        200
-#define MAX_COLUMN      400
-
 /* Screen properties */
 #define S_SCREENPROP    0x0f
 #define S_NORMAL        0x00
@@ -433,6 +430,7 @@ char *T_cd, *T_ce, *T_kr, *T_kl, *T_cr, *T_bt, *T_ta, *T_sc, *T_rc,
     *T_ti, *T_te, *T_nd, *T_as, *T_ae, *T_eA, *T_ac, *T_op;
 
 int LINES, COLS;
+int opt_cols;
 #if defined(__CYGWIN__)
 int LASTLINE;
 #endif				/* defined(__CYGWIN__) */
@@ -1272,10 +1270,10 @@ setlinescols(void)
 	LINES = tgetnum("li");	/* number of line */
     if (COLS <= 0)
 	COLS = tgetnum("co");	/* number of column */
-    if (COLS > MAX_COLUMN)
-	COLS = MAX_COLUMN;
-    if (LINES > MAX_LINE)
-	LINES = MAX_LINE;
+    if (MaxCols && COLS > MaxCols)
+	COLS = MaxCols;
+    if (opt_cols && COLS > opt_cols)
+	COLS = opt_cols;
 #if defined(__CYGWIN__)
     LASTLINE = LINES - (isWinConsole == TERM_CYGWIN_RESERVE_IME ? 2 : 1);
 #endif				/* defined(__CYGWIN__) */

@@ -103,7 +103,6 @@ void bzero(void *, int);
 #define LINELEN	256		/* Initial line length */
 #define PAGER_MAX_LINE	10000	/* Maximum line kept as pager */
 
-#define MAXIMUM_COLS 1024
 #define DEFAULT_COLS 80
 
 #ifdef USE_IMAGE
@@ -830,6 +829,7 @@ extern int LASTLINE;
 
 global int Tabstop init(8);
 global int IndentIncr init(4);
+global int MaxCols init(0);
 global int ShowEffect init(TRUE);
 global int PagerMax init(PAGER_MAX_LINE);
 global int MessageDelay init(2);
@@ -986,6 +986,7 @@ global char *displayTitleTerm init(NULL);
 global int displayLink init(FALSE);
 global int displayLinkNumber init(FALSE);
 global int displayLineInfo init(FALSE);
+global int displayColumnNumber init(FALSE);
 global int DecodeURL init(FALSE);
 global int retryAsHttp init(TRUE);
 global int showLineNum init(FALSE);

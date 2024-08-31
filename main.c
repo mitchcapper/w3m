@@ -128,6 +128,7 @@ static int searchKeyNum(void);
 #define usage() fusage(stderr, 1)
 
 int enable_inline_image;
+extern int opt_cols;
 
 static void
 fversion(FILE * f)
@@ -691,10 +692,7 @@ main(int argc, char **argv)
 	    else if (!strcmp("-cols", argv[i])) {
 		if (++i >= argc)
 		    usage();
-		COLS = atoi(argv[i]);
-		if (COLS > MAXIMUM_COLS) {
-		    COLS = MAXIMUM_COLS;
-		}
+		opt_cols = atoi(argv[i]);
 	    }
 	    else if (!strcmp("-ppc", argv[i])) {
 		double ppc;
@@ -874,14 +872,10 @@ main(int argc, char **argv)
     if (BookmarkFile == NULL)
 	BookmarkFile = rcFile(BOOKMARK);
 
-    if (!isatty(1) && !w3m_dump) {
-	/* redirected output */
+    if (!isatty(1) && !w3m_dump) /* redirected output */
 	w3m_dump = DUMP_BUFFER;
-    }
-    if (w3m_dump) {
-	if (COLS == 0)
-	    COLS = DEFAULT_COLS;
-    }
+    if (w3m_dump)
+	COLS = opt_cols ? opt_cols : MaxCols ? MaxCols : DEFAULT_COLS;
 
 #ifdef USE_BINMODE_STREAM
     setmode(fileno(stdout), O_BINARY);
