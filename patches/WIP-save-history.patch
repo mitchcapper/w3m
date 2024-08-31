@@ -1,0 +1,25 @@
+From: Rene Kita <mail@rkta.de>
+Date: Fri Aug 30 09:31:31 CEST 2024
+Subject: WIP save history
+Patch: patches/WIP-save-history.patch
+
+Fix error message.
+
+Remove tmp file in case of failure.
+
+---
+ history.c |    3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+--- a/history.c
++++ b/history.c
+@@ -143,7 +143,8 @@ saveUrlHistory(void)
+ 
+ fail:
+     URLHist->mtime = mtime;
+-    disp_err_message("Can't open history", FALSE);
++    unlink(tmpf);
++    disp_err_message("Can't save history", FALSE);
+     return;
+ }
+ #endif				/* USE_HISTORY */

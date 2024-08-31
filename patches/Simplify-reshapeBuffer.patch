@@ -28,7 +28,7 @@ it.
      if (buf->sourcefile == NULL)
 --- a/display.c
 +++ b/display.c
-@@ -401,7 +401,6 @@ displayBuffer(Buffer *buf, int mode)
+@@ -408,7 +408,6 @@ displayBuffer(Buffer *buf, int mode)
      if ((buf->width != INIT_BUFFER_WIDTH &&
  	 (is_html_type(buf->type) || FoldLine))
  	|| buf->need_reshape) {
@@ -38,7 +38,7 @@ it.
      if (showLineNum) {
 --- a/main.c
 +++ b/main.c
-@@ -4955,7 +4955,6 @@ DEFUN(vwSrc, SOURCE VIEW, "Toggle betwee
+@@ -4952,7 +4952,6 @@ DEFUN(vwSrc, SOURCE VIEW, "Toggle betwee
      buf->clone = Currentbuf->clone;
      (*buf->clone)++;
  
@@ -46,7 +46,7 @@ it.
      reshapeBuffer(buf);
      pushBuffer(buf);
      displayBuffer(Currentbuf, B_NORMAL);
-@@ -5089,7 +5088,6 @@ DEFUN(reload, RELOAD, "Load current docu
+@@ -5086,7 +5085,6 @@ DEFUN(reload, RELOAD, "Load current docu
  /* reshape */
  DEFUN(reshape, RESHAPE, "Re-render document")
  {

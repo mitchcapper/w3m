@@ -185,7 +185,7 @@ No need for this as POSIX says it is void.
  #endif
  
  #ifdef USE_MARK
-@@ -1391,7 +1391,7 @@ cmp_anchor_hseq(const void *a, const voi
+@@ -1385,7 +1385,7 @@ cmp_anchor_hseq(const void *a, const voi
  static void
  do_dump(Buffer *buf)
  {
@@ -194,7 +194,7 @@ No need for this as POSIX says it is void.
  
      prevtrap = mySignal(SIGINT, intTrap);
      if (SETJMP(IntReturn) != 0) {
-@@ -1591,20 +1591,18 @@ repBuffer(Buffer *oldbuf, Buffer *buf)
+@@ -1585,20 +1585,18 @@ repBuffer(Buffer *oldbuf, Buffer *buf)
  }
  
  
@@ -217,7 +217,7 @@ No need for this as POSIX says it is void.
  }
  
  static void
-@@ -1619,14 +1617,13 @@ resize_screen(void)
+@@ -1613,14 +1611,13 @@ resize_screen(void)
  #endif				/* SIGWINCH */
  
  #ifdef SIGPIPE
@@ -233,7 +233,7 @@ No need for this as POSIX says it is void.
  }
  #endif
  
-@@ -1790,7 +1787,7 @@ clear_mark(Line *l)
+@@ -1784,7 +1781,7 @@ clear_mark(Line *l)
  static int
  srchcore(char *volatile str, int (*func) (Buffer *, char *))
  {
@@ -242,7 +242,7 @@ No need for this as POSIX says it is void.
      volatile int i, result = SR_NOTFOUND;
  
      if (str != NULL && str != SearchString)
-@@ -2195,7 +2192,7 @@ DEFUN(pipesh, PIPE_SHELL, "Execute shell
+@@ -2189,7 +2186,7 @@ DEFUN(pipesh, PIPE_SHELL, "Execute shell
  DEFUN(readsh, READ_SHELL, "Execute shell command and display output")
  {
      Buffer *buf;
@@ -251,7 +251,7 @@ No need for this as POSIX says it is void.
      char *cmd;
  
      CurrentKeyData = NULL;	/* not allowed in w3m-control: */
-@@ -6191,7 +6188,7 @@ DEFUN(execCmd, COMMAND, "Invoke w3m func
+@@ -6185,7 +6182,7 @@ DEFUN(execCmd, COMMAND, "Invoke w3m func
  }
  
  #ifdef USE_ALARM
@@ -260,7 +260,7 @@ No need for this as POSIX says it is void.
  SigAlarm(SIGNAL_ARG)
  {
      char *data;
-@@ -6227,7 +6224,6 @@ SigAlarm(SIGNAL_ARG)
+@@ -6221,7 +6218,6 @@ SigAlarm(SIGNAL_ARG)
  	    alarm(CurrentAlarm->sec);
  	}
      }
@@ -325,7 +325,7 @@ No need for this as POSIX says it is void.
  void setlinescols(void);
  void flush_tty(void);
  
-@@ -555,9 +555,9 @@ put_image_kitty(char *url, int x, int y,
+@@ -553,9 +553,9 @@ put_image_kitty(char *url, int x, int y,
      int c, i, j, m, t, is_anim;
      struct stat st;
      pid_t pid;
@@ -338,7 +338,7 @@ No need for this as POSIX says it is void.
  
      if (!url)
  	return;
-@@ -773,9 +773,9 @@ put_image_sixel(char *url, int x, int y,
+@@ -771,9 +771,9 @@ put_image_sixel(char *url, int x, int y,
  {
      pid_t pid;
      int do_anim;
@@ -351,7 +351,7 @@ No need for this as POSIX says it is void.
  
      MOVE(y,x);
      flush_tty();
-@@ -1087,7 +1087,7 @@ reset_tty(void)
+@@ -1085,7 +1085,7 @@ reset_tty(void)
          close_tty();
  }
  
@@ -360,7 +360,7 @@ No need for this as POSIX says it is void.
  reset_exit_with_value(SIGNAL_ARG, int rval)
  {
  #ifdef USE_MOUSE
-@@ -1096,28 +1096,26 @@ reset_exit_with_value(SIGNAL_ARG, int rv
+@@ -1094,28 +1094,26 @@ reset_exit_with_value(SIGNAL_ARG, int rv
  #endif				/* USE_MOUSE */
      reset_tty();
      w3m_exit(rval);
@@ -392,7 +392,7 @@ No need for this as POSIX says it is void.
  }
  
  void
-@@ -2398,7 +2396,7 @@ do_getch(void)
+@@ -2396,7 +2394,7 @@ do_getch(void)
  	return sysm_getch();
  }
  

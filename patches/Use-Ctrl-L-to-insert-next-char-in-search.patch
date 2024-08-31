@@ -1,0 +1,46 @@
+From: Rene Kita <mail@rkta.de>
+Date: Sat Aug 31 08:15:16 CEST 2024
+Subject: Use Ctrl L to insert next char in search
+Patch: patches/Use-Ctrl-L-to-insert-next-char-in-search.patch
+
+---
+ linein.c |    4 ++++
+ main.c   |    7 +++++++
+ 2 files changed, 11 insertions(+)
+
+--- a/linein.c
++++ b/linein.c
+@@ -212,6 +212,10 @@ inputLineHistSearch(const char *prompt,
+ 	    if (incrfunc == NULL
+ 		|| (c = incrfunc((int)c, strBuf, strProp)) < 0x20)
+ 		(*InputKeymap[(int)c]) ();
++	    if (c > 0x20) {
++		tmp = wc_char_conv(c);
++		ins_char(tmp);
++	    }
+ 	    if (incrfunc && c != (unsigned char)-1 && c != CTRL_J)
+ 		incrfunc(-1, strBuf, strProp);
+ 	    if (cm_clear)
+--- a/main.c
++++ b/main.c
+@@ -1882,6 +1882,7 @@ dispincsrch(int ch, Str buf, Lineprop *p
+ {
+     static Buffer sbuf;
+     char *str;
++    const char *fpos, *lpos;
+     int do_next_search = FALSE;
+ 
+     if (ch == 0 && buf == NULL) {
+@@ -1891,6 +1892,12 @@ dispincsrch(int ch, Str buf, Lineprop *p
+ 
+     str = buf->ptr;
+     switch (ch) {
++    case 014:			/* C-l */
++	arrangeCursor(Currentbuf);
++	srchcore(str, searchRoutine);
++	arrangeCursor(Currentbuf);
++	matchedPosition(&fpos,&lpos);
++	return *lpos;
+     case 022:			/* C-r */
+ 	searchRoutine = backwardSearch;
+ 	do_next_search = TRUE;

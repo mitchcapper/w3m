@@ -460,7 +460,7 @@ w3m-0.5.3+git20230121.
      case SCM_NNTP_GROUP:
 --- a/display.c
 +++ b/display.c
-@@ -399,7 +399,8 @@ displayBuffer(Buffer *buf, int mode)
+@@ -406,7 +406,8 @@ displayBuffer(Buffer *buf, int mode)
      if (buf->height == 0)
  	buf->height = LASTLINE + 1;
      if ((buf->width != INIT_BUFFER_WIDTH &&
@@ -511,7 +511,7 @@ w3m-0.5.3+git20230121.
      UFclose(&f);
 --- a/main.c
 +++ b/main.c
-@@ -394,6 +394,32 @@ die_oom(size_t bytes)
+@@ -395,6 +395,32 @@ die_oom(size_t bytes)
      return NULL;
  }
  
@@ -544,7 +544,7 @@ w3m-0.5.3+git20230121.
  int
  main(int argc, char **argv)
  {
-@@ -881,6 +907,9 @@ main(int argc, char **argv)
+@@ -878,6 +904,9 @@ main(int argc, char **argv)
      if (UseHistory)
  	loadHistory(URLHist);
  #endif				/* not USE_HISTORY */
@@ -554,7 +554,7 @@ w3m-0.5.3+git20230121.
  
  #ifdef USE_M17N
  #endif
-@@ -2519,10 +2548,36 @@ DEFUN(movRW, NEXT_WORD, "Move to the nex
+@@ -2516,10 +2545,36 @@ DEFUN(movRW, NEXT_WORD, "Move to the nex
      displayBuffer(Currentbuf, B_NORMAL);
  }
  
@@ -591,7 +591,7 @@ w3m-0.5.3+git20230121.
  
      if (checkDownloadList())
  	/* FIXME: gettextize? */
-@@ -2549,7 +2604,9 @@ _quitfm(int confirm)
+@@ -2546,7 +2601,9 @@ _quitfm(int confirm)
      if (UseHistory && SaveURLHist)
  	saveHistory(URLHist, URLHistSize);
  #endif				/* USE_HISTORY */
@@ -602,7 +602,7 @@ w3m-0.5.3+git20230121.
  }
  
  /* Quit */
-@@ -4821,6 +4878,13 @@ DEFUN(vwSrc, SOURCE VIEW, "Toggle betwee
+@@ -4818,6 +4875,13 @@ DEFUN(vwSrc, SOURCE VIEW, "Toggle betwee
  	displayBuffer(Currentbuf, B_NORMAL);
  	return;
      }
@@ -616,7 +616,7 @@ w3m-0.5.3+git20230121.
      if (Currentbuf->sourcefile == NULL) {
  	if (Currentbuf->pagerSource &&
  	    !strcasecmp(Currentbuf->type, "text/plain")) {
-@@ -4906,6 +4970,93 @@ DEFUN(fold_pre, FOLD_PRE, "Fold long lin
+@@ -4903,6 +4967,93 @@ DEFUN(fold_pre, FOLD_PRE, "Fold long lin
      FoldPre = FoldPreOpt;
  }
  
@@ -710,7 +710,7 @@ w3m-0.5.3+git20230121.
  /* reload */
  DEFUN(reload, RELOAD, "Load current document anew")
  {
-@@ -5131,6 +5282,7 @@ chkURLBuffer(Buffer *buf)
+@@ -5128,6 +5279,7 @@ chkURLBuffer(Buffer *buf)
  	"https?://[a-zA-Z0-9:%\\-\\./_@]*\\[[a-fA-F0-9:][a-fA-F0-9:\\.]*\\][a-zA-Z0-9:%\\-\\./?=~_\\&+@#,\\$;]*",
  	"ftp://[a-zA-Z0-9:%\\-\\./_@]*\\[[a-fA-F0-9:][a-fA-F0-9:\\.]*\\][a-zA-Z0-9:%\\-\\./=_+@#,\\$]*",
  #endif				/* INET6 */
@@ -980,7 +980,7 @@ w3m-0.5.3+git20230121.
  #define P_INT      0
  #define P_SHORT    1
  #define P_CHARINT  2
-@@ -211,6 +213,7 @@ static int OptionEncode = FALSE;
+@@ -213,6 +215,7 @@ static int OptionEncode = FALSE;
  #define CMT_SSL_CA_PATH N_("Path to directory for PEM encoded certificates of CAs")
  #define CMT_SSL_CA_FILE N_("File consisting of PEM encoded certificates of CAs")
  #define CMT_SSL_CA_DEFAULT N_("Use default locations for PEM encoded certificates of CAs")
@@ -988,7 +988,7 @@ w3m-0.5.3+git20230121.
  #endif				/* USE_SSL_VERIFY */
  #define CMT_SSL_FORBID_METHOD N_("List of forbidden SSL methods (2: SSLv2, 3: SSLv3, t: TLSv1.0, 5: TLSv1.1, 6: TLSv1.2, 7: TLSv1.3)")
  #ifdef SSL_CTX_set_min_proto_version
-@@ -641,6 +644,8 @@ struct param_ptr params7[] = {
+@@ -646,6 +649,8 @@ struct param_ptr params7[] = {
       NULL},
      {"ssl_ca_default", P_INT, PI_ONOFF, (void *)&ssl_ca_default,
       CMT_SSL_CA_DEFAULT, NULL},

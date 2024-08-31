@@ -11,7 +11,7 @@ Subject: [PATCH] Add option to change the dictionary prompt
 
 --- a/fm.h
 +++ b/fm.h
-@@ -994,6 +994,7 @@ global const char *DirBufferCommand init
+@@ -996,6 +996,7 @@ global const char *DirBufferCommand init
  #ifdef USE_DICT
  global int UseDictCommand init(TRUE);
  global const char *DictCommand init("file:///$LIB/w3mdict" CGI_EXTENSION);
@@ -21,7 +21,7 @@ Subject: [PATCH] Add option to change the dictionary prompt
  #define DISPLAY_INS_DEL_SIMPLE	0
 --- a/main.c
 +++ b/main.c
-@@ -6177,7 +6177,7 @@ execdict(const char *word)
+@@ -6174,7 +6174,7 @@ execdict(const char *word)
  
  DEFUN(dictword, DICT_WORD, "Execute dictionary command (see README.dict)")
  {
@@ -32,7 +32,7 @@ Subject: [PATCH] Add option to change the dictionary prompt
  DEFUN(dictwordat, DICT_WORD_AT,
 --- a/rc.c
 +++ b/rc.c
-@@ -190,6 +190,7 @@ static int OptionEncode = FALSE;
+@@ -192,6 +192,7 @@ static int OptionEncode = FALSE;
  #ifdef USE_DICT
  #define CMT_USE_DICTCOMMAND  N_("Enable dictionary lookup through CGI")
  #define CMT_DICTCOMMAND  N_("URL of dictionary lookup command")
@@ -40,7 +40,7 @@ Subject: [PATCH] Add option to change the dictionary prompt
  #endif				/* USE_DICT */
  #define CMT_IGNORE_NULL_IMG_ALT	N_("Display link name for images lacking ALT")
  #define CMT_IFILE        N_("Index file for directories")
-@@ -421,6 +422,7 @@ struct param_ptr params1[] = {
+@@ -426,6 +427,7 @@ struct param_ptr params1[] = {
       CMT_USE_DICTCOMMAND, NULL},
      {"dictcommand", P_STRING, PI_TEXT, (void *)&DictCommand,
       CMT_DICTCOMMAND, NULL},

@@ -10,7 +10,7 @@ Subject: [PATCH 162/172] Add more const to display
 
 --- a/display.c
 +++ b/display.c
-@@ -1236,7 +1236,7 @@ message_list_panel(void)
+@@ -1243,7 +1243,7 @@ message_list_panel(void)
  }
  
  void
@@ -19,7 +19,7 @@ Subject: [PATCH 162/172] Add more const to display
  {
      if (!fmInitialized)
  	return;
-@@ -1254,7 +1254,7 @@ disp_err_message(char *s, int redraw_cur
+@@ -1261,7 +1261,7 @@ disp_err_message(char *s, int redraw_cur
  }
  
  void
@@ -28,7 +28,7 @@ Subject: [PATCH 162/172] Add more const to display
  {
      if (QuietMessage)
  	return;
-@@ -1282,7 +1282,7 @@ disp_message_nsec(char *s, int redraw_cu
+@@ -1289,7 +1289,7 @@ disp_message_nsec(char *s, int redraw_cu
  }
  
  void

@@ -119,7 +119,7 @@ Patch: patches/Make-CTRL-Y-insert-deleted-text.patch
      if (CPos > 0)
 --- a/fm.h
 +++ b/fm.h
-@@ -921,6 +921,7 @@ global int confirm_on_quit init(TRUE);
+@@ -922,6 +922,7 @@ global int confirm_on_quit init(TRUE);
  global int use_mark init(FALSE);
  #endif
  global int emacs_like_lineedit init(FALSE);
@@ -129,7 +129,7 @@ Patch: patches/Make-CTRL-Y-insert-deleted-text.patch
  global int label_topline init(FALSE);
 --- a/rc.c
 +++ b/rc.c
-@@ -144,6 +144,7 @@ static int OptionEncode = FALSE;
+@@ -146,6 +146,7 @@ static int OptionEncode = FALSE;
  #define CMT_USE_MARK	N_("Enable mark operations")
  #endif
  #define CMT_EMACS_LIKE_LINEEDIT	N_("Enable Emacs-style line editing")
@@ -137,7 +137,7 @@ Patch: patches/Make-CTRL-Y-insert-deleted-text.patch
  #define CMT_SPACE_AUTOCOMPLETE  N_("Space key triggers file completion while editing URLs")
  #define CMT_VI_PREC_NUM	 N_("Enable vi-like numeric prefix")
  #define CMT_LABEL_TOPLINE N_("Move cursor to top line when going to label")
-@@ -526,6 +527,8 @@ struct param_ptr params3[] = {
+@@ -531,6 +532,8 @@ struct param_ptr params3[] = {
  #endif
      {"emacs_like_lineedit", P_INT, PI_ONOFF, (void *)&emacs_like_lineedit,
       CMT_EMACS_LIKE_LINEEDIT, NULL},

@@ -9,7 +9,7 @@ Subject: [PATCH 159/172] Add more const to rc
 
 --- a/rc.c
 +++ b/rc.c
-@@ -1870,7 +1870,7 @@ querySiteconf(ParsedURL *query_pu, int f
+@@ -1875,7 +1875,7 @@ querySiteconf(ParsedURL *query_pu, int f
  {
      struct siteconf_rec *ent;
      Str u;

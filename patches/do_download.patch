@@ -228,7 +228,7 @@ Next step: use 'flags' parameter for all options, include do_download.
  #else
 --- a/main.c
 +++ b/main.c
-@@ -972,7 +972,7 @@ main(int argc, char **argv)
+@@ -969,7 +969,7 @@ main(int argc, char **argv)
  
  	parseURL2(base_url, &base_pu, NULL);
  	image_source = getimage_args[2];
@@ -237,7 +237,7 @@ Next step: use 'flags' parameter for all options, include do_download.
  	if (!newbuf || !newbuf->real_type ||
  	    strncasecmp(newbuf->real_type, "image/", 6))
  	    unlink(getimage_args[2]);
-@@ -1013,7 +1013,8 @@ main(int argc, char **argv)
+@@ -1010,7 +1010,8 @@ main(int argc, char **argv)
  	    dup2(1, 0);
  	}
  	else if (load_bookmark) {
@@ -247,7 +247,7 @@ Next step: use 'flags' parameter for all options, include do_download.
  	    if (newbuf == NULL)
  		Strcat_charp(err_msg, "w3m: Can't load bookmark.\n");
  	}
-@@ -1037,7 +1038,7 @@ main(int argc, char **argv)
+@@ -1034,7 +1035,7 @@ main(int argc, char **argv)
  	}
  	else if ((p = getenv("HTTP_HOME")) != NULL ||
  		 (p = getenv("WWW_HOME")) != NULL) {
@@ -256,7 +256,7 @@ Next step: use 'flags' parameter for all options, include do_download.
  	    if (newbuf == NULL)
  		Strcat(err_msg, Sprintf("w3m: Can't load %s.\n", p));
  	    else if (newbuf != NO_BUFFER)
-@@ -1076,7 +1077,8 @@ main(int argc, char **argv)
+@@ -1073,7 +1074,8 @@ main(int argc, char **argv)
  	    if (w3m_dump == DUMP_HEAD) {
  		request = New(FormList);
  		request->method = FORM_METHOD_HEAD;
@@ -266,7 +266,7 @@ Next step: use 'flags' parameter for all options, include do_download.
  	    }
  	    else {
  		if (post_file && i == 0) {
-@@ -1104,7 +1106,8 @@ main(int argc, char **argv)
+@@ -1101,7 +1103,8 @@ main(int argc, char **argv)
  		else {
  		    request = NULL;
  		}
@@ -276,7 +276,7 @@ Next step: use 'flags' parameter for all options, include do_download.
  	    }
  	    if (newbuf == NULL) {
  		if (ArgvIsURL && !retry) {
-@@ -2328,7 +2331,7 @@ cmd_loadfile(char *fn)
+@@ -2325,7 +2328,7 @@ cmd_loadfile(char *fn)
  {
      Buffer *buf;
  
@@ -285,7 +285,7 @@ Next step: use 'flags' parameter for all options, include do_download.
      if (buf == NULL) {
  	char *emsg = Sprintf(_("%s not found"), conv_from_system(fn))->ptr;
  	disp_err_message(emsg, FALSE);
-@@ -3031,7 +3034,8 @@ loadLink(char *url, char *target, char *
+@@ -3028,7 +3031,8 @@ loadLink(char *url, char *target, char *
  	referer = NO_REFERER;
      if (referer == NULL)
  	referer = parsedURL2RefererStr(&Currentbuf->currentURL)->ptr;
@@ -295,7 +295,7 @@ Next step: use 'flags' parameter for all options, include do_download.
      if (buf == NULL) {
  	char *emsg = Sprintf("Can't load %s", url)->ptr;
  	disp_err_message(emsg, FALSE);
-@@ -3258,7 +3262,7 @@ DEFUN(followI, VIEW_IMAGE, "Display imag
+@@ -3255,7 +3259,7 @@ DEFUN(followI, VIEW_IMAGE, "Display imag
  	return;
      message(Sprintf(_("loading %s"), a->url)->ptr, 0, 0);
      refresh();
@@ -304,7 +304,7 @@ Next step: use 'flags' parameter for all options, include do_download.
      if (buf == NULL) {
  	char *emsg = Sprintf(_("Can't load %s"), a->url)->ptr;
  	disp_err_message(emsg, FALSE);
-@@ -4330,7 +4334,7 @@ cmd_loadURL(char *url, ParsedURL *curren
+@@ -4327,7 +4331,7 @@ cmd_loadURL(char *url, ParsedURL *curren
  	return;
  
      refresh();
@@ -313,7 +313,7 @@ Next step: use 'flags' parameter for all options, include do_download.
      if (buf == NULL) {
  	char *emsg = Sprintf(_("Can't load %s"), conv_from_system(url))->ptr;
  	disp_err_message(emsg, FALSE);
-@@ -5232,7 +5236,8 @@ DEFUN(reload, RELOAD, "Load current docu
+@@ -5229,7 +5233,8 @@ DEFUN(reload, RELOAD, "Load current docu
  #endif
      SearchHeader = Currentbuf->search_header;
      DefaultType = Currentbuf->real_type;
@@ -323,7 +323,7 @@ Next step: use 'flags' parameter for all options, include do_download.
  #ifdef USE_M17N
      DocumentCharset = old_charset;
  #endif
-@@ -6124,7 +6129,7 @@ execdict(const char *word)
+@@ -6121,7 +6126,7 @@ execdict(const char *word)
      }
      dictcmd = Sprintf("%s?%s", DictCommand,
  		      Str_form_quote(Strnew_charp(w))->ptr)->ptr;

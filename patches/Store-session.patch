@@ -39,7 +39,7 @@
  
  void set_buffer_environ(Buffer *);
  static void save_buffer_position(Buffer *buf);
-@@ -212,6 +216,8 @@ fusage(FILE * f, int err)
+@@ -213,6 +217,8 @@ fusage(FILE * f, int err)
  #endif
      fprintf(f, "    -B               load bookmark\n");
      fprintf(f, "    -bookmark file   specify bookmark file\n");
@@ -48,7 +48,7 @@
      fprintf(f, "    -T type          specify content-type\n");
      fprintf(f, "    -m               internet message mode\n");
      fprintf(f, "    -v               visual startup mode\n");
-@@ -438,6 +444,7 @@ main(int argc, char **argv)
+@@ -439,6 +445,7 @@ main(int argc, char **argv)
      char *default_type = NULL;
      char *post_file = NULL;
      Str err_msg;
@@ -56,7 +56,7 @@
  #ifdef USE_M17N
      char *Locale = NULL;
      wc_uint8 auto_detect;
-@@ -658,6 +665,13 @@ main(int argc, char **argv)
+@@ -659,6 +666,13 @@ main(int argc, char **argv)
  		    BookmarkFile = cleanupName(tmp->ptr);
  		}
  	    }
@@ -70,7 +70,7 @@
  	    else if (!strcmp("-F", argv[i]))
  		RenderFrame = TRUE;
  	    else if (!strcmp("-W", argv[i])) {
-@@ -911,8 +925,43 @@ main(int argc, char **argv)
+@@ -908,8 +922,43 @@ main(int argc, char **argv)
      if (ssl_known_hosts)
  	known_hosts = load_known_hosts();
  
@@ -116,7 +116,7 @@
  
      if (w3m_backend)
  	backend();
-@@ -2606,6 +2655,10 @@ _quitfm(int confirm)
+@@ -2603,6 +2652,10 @@ _quitfm(int confirm)
  #endif				/* USE_HISTORY */
      if ((err = save_known_hosts()))
  	perror(NULL);
@@ -127,7 +127,7 @@
      w3m_exit(err);
  }
  
-@@ -4467,6 +4520,68 @@ DEFUN(adBmark, ADD_BOOKMARK, "Add curren
+@@ -4464,6 +4517,68 @@ DEFUN(adBmark, ADD_BOOKMARK, "Add curren
  		request);
  }
  
@@ -208,7 +208,7 @@
  extern void pginfo(void);
 --- a/rc.c
 +++ b/rc.c
-@@ -72,6 +72,8 @@ static int OptionEncode = FALSE;
+@@ -73,6 +73,8 @@ static int OptionEncode = FALSE;
  #define CMT_HISTORY	 N_("Use URL history")
  #define CMT_HISTSIZE     N_("Number of remembered URL")
  #define CMT_SAVEHIST     N_("Save URL history")
@@ -217,7 +217,7 @@
  #define CMT_FRAME        N_("Render frames automatically")
  #define CMT_ARGV_IS_URL  N_("Treat argument without scheme as URL")
  #define CMT_TSELF        N_("Use _self as default target")
-@@ -509,6 +511,8 @@ struct param_ptr params3[] = {
+@@ -514,6 +516,8 @@ struct param_ptr params3[] = {
      {"history", P_INT, PI_TEXT, (void *)&URLHistSize, CMT_HISTSIZE, NULL},
      {"save_hist", P_INT, PI_ONOFF, (void *)&SaveURLHist, CMT_SAVEHIST, NULL},
  #endif				/* USE_HISTORY */
@@ -228,7 +228,7 @@
      {"close_tab_back", P_INT, PI_ONOFF, (void *)&close_tab_back,
 --- a/fm.h
 +++ b/fm.h
-@@ -1081,6 +1081,8 @@ global int UseHistory init(TRUE);
+@@ -1083,6 +1083,8 @@ global int UseHistory init(TRUE);
  global int URLHistSize init(100);
  global int SaveURLHist init(TRUE);
  #endif				/* USE_HISTORY */

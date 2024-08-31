@@ -104,7 +104,7 @@ Found with -Wcast-qual.
  wc_map *
 --- a/main.c
 +++ b/main.c
-@@ -1356,7 +1356,7 @@ dump_extra(Buffer *buf)
+@@ -1353,7 +1353,7 @@ dump_extra(Buffer *buf)
  static int
  cmp_anchor_hseq(const void *a, const void *b)
  {

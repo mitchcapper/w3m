@@ -109,7 +109,7 @@ Subject: [PATCH 172/172] const
  
 --- a/display.c
 +++ b/display.c
-@@ -1201,7 +1201,7 @@ addChar(char c, Lineprop mode)
+@@ -1208,7 +1208,7 @@ addChar(char c, Lineprop mode)
  static GeneralList *message_list = NULL;
  
  void
@@ -118,7 +118,7 @@ Subject: [PATCH 172/172] const
  {
      if (fmInitialized) {
  	if (!message_list)
-@@ -1247,7 +1247,7 @@ message(const char *s, int return_x, int
+@@ -1254,7 +1254,7 @@ message(const char *s, int return_x, int
  }
  
  void
@@ -127,7 +127,7 @@ Subject: [PATCH 172/172] const
  {
      record_err_message(s);
      disp_message(s, redraw_current);
-@@ -1295,7 +1295,7 @@ disp_message_nomouse(char *s, int redraw
+@@ -1302,7 +1302,7 @@ disp_message_nomouse(char *s, int redraw
  #endif
  
  void
@@ -679,7 +679,7 @@ Subject: [PATCH 172/172] const
  
 --- a/fm.h
 +++ b/fm.h
-@@ -988,7 +988,7 @@ global int image_map_list init(TRUE);
+@@ -990,7 +990,7 @@ global int image_map_list init(TRUE);
  global int displayImage init(FALSE);	/* XXX: emacs-w3m use display_image=off */
  #endif
  global int pseudoInlines init(TRUE);
@@ -688,7 +688,7 @@ Subject: [PATCH 172/172] const
  #ifdef USE_W3MMAILER
  global char *Mailer init(NULL);
  #else
-@@ -1032,10 +1032,10 @@ global int WrapSearch init(FALSE);
+@@ -1034,10 +1034,10 @@ global int WrapSearch init(FALSE);
  global int squeezeBlankLine init(FALSE);
  global char *BookmarkFile init(NULL);
  global int UseExternalDirBuffer init(TRUE);
@@ -701,7 +701,7 @@ Subject: [PATCH 172/172] const
  #endif				/* USE_DICT */
  global int ignore_null_img_alt init(TRUE);
  #define DISPLAY_INS_DEL_SIMPLE	0
-@@ -1223,10 +1223,10 @@ global int use_lessopen init(FALSE);
+@@ -1225,10 +1225,10 @@ global int use_lessopen init(FALSE);
  global char *keymap_file init(KEYMAP_FILE);
  
  #ifdef USE_M17N
@@ -1350,7 +1350,7 @@ Subject: [PATCH 172/172] const
  static void _newT(void);
  static void followTab(TabBuffer * tab);
  static void moveTab(TabBuffer * t, TabBuffer * t2, int right);
-@@ -1805,7 +1805,7 @@ srchcore(const char *str, int (*func) (B
+@@ -1802,7 +1802,7 @@ srchcore(const char *str, int (*func) (B
  }
  
  static void
@@ -1359,7 +1359,7 @@ Subject: [PATCH 172/172] const
  {
      if (str == NULL)
  	str = "";
-@@ -1890,7 +1890,7 @@ dispincsrch(int ch, Str buf, Lineprop *p
+@@ -1887,7 +1887,7 @@ dispincsrch(int ch, Str buf, Lineprop *p
  }
  
  static void
@@ -1368,7 +1368,7 @@ Subject: [PATCH 172/172] const
  {
      char *str;
      Buffer sbuf;
-@@ -1906,7 +1906,7 @@ isrch(int (*func) (Buffer *, const char
+@@ -1903,7 +1903,7 @@ isrch(int (*func) (Buffer *, const char
  }
  
  static void
@@ -1377,7 +1377,7 @@ Subject: [PATCH 172/172] const
  {
      const char *str;
      int result;
-@@ -2576,7 +2576,7 @@ save_known_hosts(void)
+@@ -2573,7 +2573,7 @@ save_known_hosts(void)
  static void
  _quitfm(int confirm)
  {
@@ -1386,7 +1386,7 @@ Subject: [PATCH 172/172] const
      int err = 0;
  
      if (checkDownloadList())
-@@ -2703,7 +2703,7 @@ DEFUN(susp, INTERRUPT SUSPEND, "Suspend
+@@ -2700,7 +2700,7 @@ DEFUN(susp, INTERRUPT SUSPEND, "Suspend
  
  /* Go to specified line */
  static void
@@ -1395,7 +1395,7 @@ Subject: [PATCH 172/172] const
  {
      if (l == NULL || *l == '\0' || Currentbuf->currentLine == NULL) {
  	displayBuffer(Currentbuf, B_FORCE_REDRAW);
-@@ -4316,7 +4316,7 @@ cmd_loadURL(char *url, ParsedURL *curren
+@@ -4313,7 +4313,7 @@ cmd_loadURL(char *url, ParsedURL *curren
  
  /* go to specified URL */
  static void
@@ -1404,7 +1404,7 @@ Subject: [PATCH 172/172] const
  {
      char *url, *referer;
      ParsedURL p_url, *current;
-@@ -5370,10 +5370,10 @@ DEFUN(rFrame, FRAME, "Toggle rendering H
+@@ -5367,10 +5367,10 @@ DEFUN(rFrame, FRAME, "Toggle rendering H
  
  /* spawn external browser */
  static void
@@ -1417,7 +1417,7 @@ Subject: [PATCH 172/172] const
      int bg = 0, len;
  
      CurrentKeyData = NULL;	/* not allowed in w3m-control: */
-@@ -6028,7 +6028,7 @@ GetWord(Buffer *buf)
+@@ -6025,7 +6025,7 @@ GetWord(Buffer *buf)
  
  #ifdef USE_DICT
  static void
@@ -1426,7 +1426,7 @@ Subject: [PATCH 172/172] const
  {
      char *w, *dictcmd;
      Buffer *buf;
-@@ -6697,7 +6697,7 @@ DEFUN(tabA, TAB_LINK, "Follow current hy
+@@ -6694,7 +6694,7 @@ DEFUN(tabA, TAB_LINK, "Follow current hy
  }
  
  static void
@@ -1480,7 +1480,7 @@ Subject: [PATCH 172/172] const
  #endif				/* not PARSETAG_H */
 --- a/rc.c
 +++ b/rc.c
-@@ -862,7 +862,7 @@ create_option_search_table(void)
+@@ -867,7 +867,7 @@ create_option_search_table(void)
  }
  
  static struct param_ptr *
@@ -1489,7 +1489,7 @@ Subject: [PATCH 172/172] const
  {
      size_t b, e, i;
      int cmp;
-@@ -982,7 +982,7 @@ show_params(FILE * fp)
+@@ -987,7 +987,7 @@ show_params(FILE * fp)
  }
  
  int
@@ -1498,7 +1498,7 @@ Subject: [PATCH 172/172] const
  {
      if (value == NULL)
  	return 1;
-@@ -1010,7 +1010,7 @@ str_to_bool(char *value, int old)
+@@ -1015,7 +1015,7 @@ str_to_bool(char *value, int old)
  
  #ifdef USE_COLOR
  static int
@@ -1507,7 +1507,7 @@ Subject: [PATCH 172/172] const
  {
      if (value == NULL)
  	return 8;		/* terminal */
-@@ -1051,7 +1051,7 @@ str_to_color(char *value)
+@@ -1056,7 +1056,7 @@ str_to_color(char *value)
  #endif
  
  static int
@@ -1516,7 +1516,7 @@ Subject: [PATCH 172/172] const
  {
      struct param_ptr *p;
      double ppc;
-@@ -1083,7 +1083,7 @@ set_param(char *name, char *value)
+@@ -1088,7 +1088,7 @@ set_param(char *name, char *value)
  	*(char *)p->varptr = value[0];
  	break;
      case P_STRING:
@@ -1525,7 +1525,7 @@ Subject: [PATCH 172/172] const
  	break;
  #if defined(USE_SSL) && defined(USE_SSL_VERIFY)
      case P_SSLPATH:
-@@ -1685,26 +1685,26 @@ rcFile(char *base)
+@@ -1690,26 +1690,26 @@ rcFile(char *base)
  }
  
  char *
@@ -1569,7 +1569,7 @@ Subject: [PATCH 172/172] const
      int status = R_ST_NORMAL;
 --- a/terms.c
 +++ b/terms.c
-@@ -542,7 +542,8 @@ put_image_kitty(char *url, int x, int y,
+@@ -540,7 +540,8 @@ put_image_kitty(char *url, int x, int y,
      int sh, int cols, int rows)
  {
      Str buf, base64;
@@ -1579,7 +1579,7 @@ Subject: [PATCH 172/172] const
      char *argv[4];
      FILE *fp;
      int c, i, j, m, t, is_anim;
-@@ -1318,7 +1319,7 @@ initscr(void)
+@@ -1316,7 +1317,7 @@ initscr(void)
  }
  
  static int
@@ -1588,7 +1588,7 @@ Subject: [PATCH 172/172] const
  {
      putc(c, ttyf);
  #ifdef SCREEN_DEBUG
-@@ -1344,13 +1345,13 @@ move(int line, int column)
+@@ -1342,13 +1343,13 @@ move(int line, int column)
  
  static int
  #ifdef USE_M17N
@@ -1604,7 +1604,7 @@ Subject: [PATCH 172/172] const
  {
      if (c1 != c2)
  	return 1;
-@@ -1374,7 +1375,7 @@ need_redraw(char c1, l_prop pr1, const c
+@@ -1372,7 +1373,7 @@ need_redraw(char c1, l_prop pr1, const c
  
  #ifdef USE_M17N
  void
@@ -1613,7 +1613,7 @@ Subject: [PATCH 172/172] const
  {
      addmch(&c, 1);
  }
-@@ -1392,7 +1393,7 @@ addch(const char pc)
+@@ -1390,7 +1391,7 @@ addch(const char pc)
      static Str tmp = NULL;
      char **p;
      char c = *pc;
@@ -1622,7 +1622,7 @@ Subject: [PATCH 172/172] const
  
      if (tmp == NULL)
  	tmp = Strnew();
-@@ -2092,7 +2093,7 @@ addstr(const char *s)
+@@ -2090,7 +2091,7 @@ addstr(const char *s)
      int len;
  
      while (*s != '\0') {
@@ -1631,7 +1631,7 @@ Subject: [PATCH 172/172] const
  	addmch(s, len);
  	s += len;
      }
-@@ -2110,10 +2111,10 @@ addnstr(const char *s, int n)
+@@ -2108,10 +2109,10 @@ addnstr(const char *s, int n)
      int len, width;
  
      for (i = 0; *s != '\0';) {
@@ -1644,7 +1644,7 @@ Subject: [PATCH 172/172] const
  	addmch(s, len);
  	s += len;
  	i += width;
-@@ -2125,17 +2126,17 @@ addnstr(const char *s, int n)
+@@ -2123,17 +2124,17 @@ addnstr(const char *s, int n)
  }
  
  void
@@ -1665,7 +1665,7 @@ Subject: [PATCH 172/172] const
  	addmch(s, len);
  	s += len;
  	i += width;
-@@ -2226,7 +2227,7 @@ term_cbreak(void)
+@@ -2224,7 +2225,7 @@ term_cbreak(void)
  }
  
  void

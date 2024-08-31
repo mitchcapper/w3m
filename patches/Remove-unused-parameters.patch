@@ -303,7 +303,7 @@
  #endif
  #endif				/* USE_GOPHER */
  extern Buffer *loadBuffer(URLFile *uf, Buffer *newBuf);
-@@ -731,7 +730,7 @@ extern void initMouseAction(void);
+@@ -734,7 +733,7 @@ extern void initMouseAction(void);
  
  #ifdef USE_MENU
  extern void new_menu(Menu *menu, MenuItem *item);

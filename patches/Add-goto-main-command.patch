@@ -46,7 +46,7 @@ Patch: patches/Add-goto-main-command.patch
  typedef struct _BufferPos {
 --- a/main.c
 +++ b/main.c
-@@ -3699,6 +3699,18 @@ _followForm(int submit)
+@@ -3696,6 +3696,18 @@ _followForm(int submit)
      displayBuffer(Currentbuf, B_FORCE_REDRAW);
  }
  

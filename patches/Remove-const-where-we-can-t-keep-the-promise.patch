@@ -119,7 +119,7 @@ cast away and there was no easy way to keep the const.
  #endif
 --- a/rc.c
 +++ b/rc.c
-@@ -1789,7 +1789,7 @@ loadSiteconf(void)
+@@ -1794,7 +1794,7 @@ loadSiteconf(void)
  
  	    /* Second, create a new record. */
  	    newent = newSiteconfRec();
@@ -128,7 +128,7 @@ cast away and there was no easy way to keep the const.
  	    opt = getWord(&p);
  	    SKIP_BLANKS(p);
  	    if (!newent->re_url) {
-@@ -1850,10 +1850,10 @@ loadSiteconf(void)
+@@ -1855,10 +1855,10 @@ loadSiteconf(void)
      fclose(fp);
  }
  
