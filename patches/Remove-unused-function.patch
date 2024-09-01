@@ -37,7 +37,7 @@ Subject: [PATCH 018/172] Remove unused function
   * current position.
 --- a/proto.h
 +++ b/proto.h
-@@ -301,7 +301,6 @@ extern Buffer *newBuffer(int width);
+@@ -302,7 +302,6 @@ extern Buffer *newBuffer(int width);
  extern Buffer *nullBuffer(void);
  extern void clearBuffer(Buffer *buf);
  extern void discardBuffer(Buffer *buf);
@@ -45,7 +45,7 @@ Subject: [PATCH 018/172] Remove unused function
  extern Buffer *deleteBuffer(Buffer *first, Buffer *delbuf);
  extern Buffer *replaceBuffer(Buffer *first, Buffer *delbuf, Buffer *newbuf);
  extern Buffer *nthBuffer(Buffer *firstbuf, int n);
-@@ -339,7 +338,6 @@ extern void cursorDown(Buffer *buf, int
+@@ -340,7 +339,6 @@ extern void cursorDown(Buffer *buf, int
  extern void cursorUpDown(Buffer *buf, int n);
  extern void cursorRight(Buffer *buf, int n);
  extern void cursorLeft(Buffer *buf, int n);
@@ -53,7 +53,7 @@ Subject: [PATCH 018/172] Remove unused function
  extern void arrangeCursor(Buffer *buf);
  extern void arrangeLine(Buffer *buf);
  extern void cursorXY(Buffer *buf, int x, int y);
-@@ -495,14 +493,11 @@ extern void rscroll(int);
+@@ -496,14 +494,11 @@ extern void rscroll(int);
  #endif
  extern void clrtoeol(void);
  extern void clrtoeolx(void);
@@ -241,7 +241,7 @@ Subject: [PATCH 018/172] Remove unused function
  
 --- a/main.c
 +++ b/main.c
-@@ -3148,15 +3148,6 @@ DEFUN(followA, GOTO_LINK, "Follow curren
+@@ -3149,15 +3149,6 @@ DEFUN(followA, GOTO_LINK, "Follow curren
      displayBuffer(Currentbuf, B_NORMAL);
  }
  
@@ -257,7 +257,7 @@ Subject: [PATCH 018/172] Remove unused function
  /* view inline image */
  DEFUN(followI, VIEW_IMAGE, "Display image in viewer")
  {
-@@ -3404,13 +3395,6 @@ DEFUN(submitForm, SUBMIT, "Submit form")
+@@ -3405,13 +3396,6 @@ DEFUN(submitForm, SUBMIT, "Submit form")
      _followForm(TRUE);
  }
  

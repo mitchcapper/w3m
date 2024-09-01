@@ -18,7 +18,7 @@ cast away and there was no easy way to keep the const.
 
 --- a/file.c
 +++ b/file.c
-@@ -1718,7 +1718,7 @@ loadGeneralFile(char *path, ParsedURL *v
+@@ -1719,7 +1719,7 @@ loadGeneralFile(char *path, ParsedURL *v
  
    load_doc:
      {
@@ -27,7 +27,7 @@ cast away and there was no easy way to keep the const.
  	parseURL2(tpath, &pu, current);
  	sc_redirect = query_SCONF_SUBSTITUTE_URL(&pu);
  	if (sc_redirect && *sc_redirect && checkRedirection(&pu)) {
-@@ -7600,7 +7600,7 @@ loadImageBuffer(URLFile *uf, Buffer *new
+@@ -7603,7 +7603,7 @@ loadImageBuffer(URLFile *uf, Buffer *new
      URLFile f;
      void (*volatile prevtrap) (SIGNAL_ARG) = NULL;
      struct stat st;
@@ -84,7 +84,7 @@ cast away and there was no easy way to keep the const.
  
 --- a/proto.h
 +++ b/proto.h
-@@ -174,11 +174,11 @@ extern void chkExternalURIBuffer(Buffer
+@@ -175,11 +175,11 @@ extern void chkExternalURIBuffer(Buffer
  #endif
  extern ParsedURL *schemeToProxy(int scheme);
  #ifdef USE_M17N
@@ -99,7 +99,7 @@ cast away and there was no easy way to keep the const.
  #else /* !defined(USE_M17N) */
  #define url_encode(url, base, cs) url_quote(url)
  extern char *url_decode0(const char *url);
-@@ -634,7 +634,7 @@ extern char *etcFile(char *base);
+@@ -635,7 +635,7 @@ extern char *etcFile(char *base);
  extern char *confFile(char *base);
  extern char *auxbinFile(char *base);
  extern char *helpFile(char *base);
@@ -108,7 +108,7 @@ cast away and there was no easy way to keep the const.
  extern Str localCookie(void);
  extern Str loadLocalDir(char *dirname);
  extern void set_environ(char *var, char *value);
-@@ -751,7 +751,7 @@ extern char *getKeyData(int key);
+@@ -752,7 +752,7 @@ extern char *getKeyData(int key);
  extern char *getWord(char **str);
  extern char *getQWord(char **str);
  struct regex;
@@ -119,7 +119,7 @@ cast away and there was no easy way to keep the const.
  #endif
 --- a/rc.c
 +++ b/rc.c
-@@ -1794,7 +1794,7 @@ loadSiteconf(void)
+@@ -1797,7 +1797,7 @@ loadSiteconf(void)
  
  	    /* Second, create a new record. */
  	    newent = newSiteconfRec();
@@ -128,7 +128,7 @@ cast away and there was no easy way to keep the const.
  	    opt = getWord(&p);
  	    SKIP_BLANKS(p);
  	    if (!newent->re_url) {
-@@ -1855,10 +1855,10 @@ loadSiteconf(void)
+@@ -1858,10 +1858,10 @@ loadSiteconf(void)
      fclose(fp);
  }
  

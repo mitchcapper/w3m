@@ -104,7 +104,7 @@ Found with -Wcast-qual.
  wc_map *
 --- a/main.c
 +++ b/main.c
-@@ -1353,7 +1353,7 @@ dump_extra(Buffer *buf)
+@@ -1354,7 +1354,7 @@ dump_extra(Buffer *buf)
  static int
  cmp_anchor_hseq(const void *a, const void *b)
  {
@@ -162,7 +162,7 @@ Found with -Wcast-qual.
  }
 --- a/file.c
 +++ b/file.c
-@@ -1569,7 +1569,7 @@ getAuthCookie(struct http_auth *hauth, c
+@@ -1570,7 +1570,7 @@ getAuthCookie(struct http_auth *hauth, c
      *uname = NULL;
      *pwd = NULL;
  
@@ -173,7 +173,7 @@ Found with -Wcast-qual.
      }
 --- a/proto.h
 +++ b/proto.h
-@@ -644,7 +644,7 @@ extern FILE *openSecretFile(char *fname)
+@@ -645,7 +645,7 @@ extern FILE *openSecretFile(char *fname)
  extern void loadPasswd(void);
  extern void loadPreForm(void);
  extern int find_auth_user_passwd(ParsedURL *pu, char *realm,

@@ -10,7 +10,7 @@ Subject: add gophers support
 
 --- a/file.c
 +++ b/file.c
-@@ -1951,7 +1951,7 @@ loadGeneralFile(char *path, ParsedURL *v
+@@ -1952,7 +1952,7 @@ loadGeneralFile(char *path, ParsedURL *v
      }
  #endif				/* USE_NNTP */
  #ifdef USE_GOPHER
@@ -19,7 +19,7 @@ Subject: add gophers support
  	p = pu.file;
  	while(*p == '/')
  	    ++p;
-@@ -2125,7 +2125,7 @@ loadGeneralFile(char *path, ParsedURL *v
+@@ -2126,7 +2126,7 @@ loadGeneralFile(char *path, ParsedURL *v
  		return NULL;
  	    file = guess_filename(pu.file);
  #ifdef USE_GOPHER
@@ -186,7 +186,7 @@ Subject: add gophers support
  #endif				/* _HTML_H */
 --- a/main.c
 +++ b/main.c
-@@ -5167,7 +5167,7 @@ chkURLBuffer(Buffer *buf)
+@@ -5178,7 +5178,7 @@ chkURLBuffer(Buffer *buf)
  	"https?://[a-zA-Z0-9][a-zA-Z0-9:%\\-\\./?=~_\\&+@#,\\$;]*[a-zA-Z0-9_/=\\-]",
  	"file:/[a-zA-Z0-9:%\\-\\./=_\\+@#,\\$;]*",
  #ifdef USE_GOPHER

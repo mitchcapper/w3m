@@ -10,7 +10,7 @@ Subject: [PATCH 084/172] Move declarations to the correct header file
 
 --- a/proto.h
 +++ b/proto.h
-@@ -459,7 +459,6 @@ extern void reset_exit(SIGNAL_ARG);
+@@ -460,7 +460,6 @@ extern void reset_exit(SIGNAL_ARG);
  extern void error_dump(SIGNAL_ARG);
  extern void set_int(void);
  extern void getTCstr(void);
@@ -18,7 +18,7 @@ Subject: [PATCH 084/172] Move declarations to the correct header file
  extern void setupscreen(void);
  extern pid_t open_pipe_rw(FILE ** fr, FILE ** fw);
  extern int initscr(void);
-@@ -486,7 +485,6 @@ extern void setbcolor(int color);
+@@ -487,7 +486,6 @@ extern void setbcolor(int color);
  #endif				/* USE_BG_COLOR */
  #endif				/* USE_COLOR */
  extern void refresh(void);
@@ -26,7 +26,7 @@ Subject: [PATCH 084/172] Move declarations to the correct header file
  #ifdef USE_RAW_SCROLL
  extern void scroll(int);
  extern void rscroll(int);
-@@ -503,7 +501,6 @@ extern void term_raw(void);
+@@ -504,7 +502,6 @@ extern void term_raw(void);
  extern void term_cooked(void);
  extern void term_cbreak(void);
  extern void term_title(char *s);
@@ -34,7 +34,7 @@ Subject: [PATCH 084/172] Move declarations to the correct header file
  extern void toggle_stand(void);
  extern void bell(void);
  extern int sleep_till_anykey(int sec, int purge);
-@@ -697,7 +694,6 @@ extern void reMark(void);
+@@ -698,7 +695,6 @@ extern void reMark(void);
  extern void mouse(void);
  extern void sgrmouse(void);
  extern void mouse_init(void);

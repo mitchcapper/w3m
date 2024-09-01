@@ -7,7 +7,7 @@
 
 --- a/file.c
 +++ b/file.c
-@@ -1960,7 +1960,7 @@ loadGeneralFile(char *path, ParsedURL *v
+@@ -1961,7 +1961,7 @@ loadGeneralFile(char *path, ParsedURL *v
  		page = loadGopherDir(&f, &pu, &charset);
  		t = "gopher:directory";
  	    } else {
@@ -16,7 +16,7 @@
  		t = "gopher:search";
  	    }
  	    TRAP_OFF;
-@@ -2993,7 +2993,7 @@ flushline(struct html_feed_environ *h_en
+@@ -2994,7 +2994,7 @@ flushline(struct html_feed_environ *h_en
  
  void
  do_blankline(struct html_feed_environ *h_env, struct readbuffer *obuf,
@@ -25,7 +25,7 @@
  {
      if (h_env->blank_lines == 0)
  	flushline(h_env, obuf, indent, 1, width);
-@@ -3144,7 +3144,7 @@ process_title(struct parsed_tag *tag)
+@@ -3145,7 +3145,7 @@ process_title(struct parsed_tag *tag)
  }
  
  static Str
@@ -34,7 +34,7 @@
  {
      Str tmp;
  
-@@ -4493,8 +4493,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -4494,8 +4494,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	CLOSE_A;
  	if (!(obuf->flag & RB_IGNORE_P)) {
  	    flushline(h_env, obuf, envs[h_env->envc].indent, 1, h_env->limit);
@@ -44,7 +44,7 @@
  	}
  	obuf->flag |= RB_IGNORE_P;
  	if (cmd == HTML_P) {
-@@ -4511,8 +4510,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -4512,8 +4511,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
      case HTML_H:
  	if (!(obuf->flag & (RB_PREMODE | RB_IGNORE_P))) {
  	    flushline(h_env, obuf, envs[h_env->envc].indent, 0, h_env->limit);
@@ -54,7 +54,7 @@
  	}
  	HTMLlineproc1("<b>", h_env);
  	set_alignment(obuf, tag);
-@@ -4522,7 +4520,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -4523,7 +4521,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	if (!(obuf->flag & RB_PREMODE)) {
  	    flushline(h_env, obuf, envs[h_env->envc].indent, 0, h_env->limit);
  	}
@@ -63,7 +63,7 @@
  	RB_RESTORE_FLAG(obuf);
  	close_anchor(h_env, obuf);
  	obuf->flag |= RB_IGNORE_P;
-@@ -4535,8 +4533,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -4536,8 +4534,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	    flushline(h_env, obuf, envs[h_env->envc].indent, 0, h_env->limit);
  	    if (!(obuf->flag & RB_PREMODE) &&
  		(h_env->envc == 0 || cmd == HTML_BLQ))
@@ -73,7 +73,7 @@
  	}
  	PUSH_ENV(cmd);
  	if (cmd == HTML_UL || cmd == HTML_OL) {
-@@ -4568,8 +4565,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -4569,8 +4566,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	    if (!(obuf->flag & RB_PREMODE) &&
  		(h_env->envc == 0 || cmd == HTML_N_BLQ)) {
  		do_blankline(h_env, obuf,
@@ -83,7 +83,7 @@
  		obuf->flag |= RB_IGNORE_P;
  	    }
  	}
-@@ -4582,7 +4578,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -4583,7 +4579,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	    if (!(obuf->flag & RB_PREMODE) && envs[h_env->envc].env != HTML_DL
  		    && envs[h_env->envc].env != HTML_DL_COMPACT
  		    && envs[h_env->envc].env != HTML_DD)
@@ -92,7 +92,7 @@
  			     h_env->limit);
  	}
  	PUSH_ENV_NOINDENT(cmd);
-@@ -4733,7 +4729,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -4734,7 +4730,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	    return 1;
  	obuf->flag &= ~RB_TITLE;
  	obuf->end_tag = 0;
@@ -101,7 +101,7 @@
  	if (tmp)
  	    HTMLlineproc1(tmp->ptr, h_env);
  	return 1;
-@@ -4790,7 +4786,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -4791,7 +4787,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	if (!(obuf->flag & RB_IGNORE_P)) {
  	    flushline(h_env, obuf, envs[h_env->envc].indent, 0, h_env->limit);
  	    if (!x)
@@ -110,7 +110,7 @@
  			     h_env->limit);
  	}
  	else
-@@ -4801,8 +4797,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -4802,8 +4798,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
      case HTML_N_PRE:
  	flushline(h_env, obuf, envs[h_env->envc].indent, 0, h_env->limit);
  	if (!(obuf->flag & RB_IGNORE_P)) {
@@ -120,7 +120,7 @@
  	    obuf->flag |= RB_IGNORE_P;
  	    h_env->blank_lines++;
  	}
-@@ -4839,8 +4834,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -4840,8 +4835,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	CLOSE_A;
  	if (!(obuf->flag & RB_IGNORE_P)) {
  	    flushline(h_env, obuf, envs[h_env->envc].indent, 0, h_env->limit);
@@ -130,7 +130,7 @@
  	}
  	obuf->flag |= (RB_PRE | RB_IGNORE_P);
  	return 1;
-@@ -4848,8 +4842,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -4849,8 +4843,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	CLOSE_A;
  	if (!(obuf->flag & RB_IGNORE_P)) {
  	    flushline(h_env, obuf, envs[h_env->envc].indent, 0, h_env->limit);
@@ -140,7 +140,7 @@
  	    obuf->flag |= RB_IGNORE_P;
  	}
  	obuf->flag &= ~RB_PRE;
-@@ -4860,8 +4853,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -4861,8 +4854,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	CLOSE_A;
  	if (!(obuf->flag & RB_IGNORE_P)) {
  	    flushline(h_env, obuf, envs[h_env->envc].indent, 0, h_env->limit);
@@ -150,7 +150,7 @@
  	}
  	obuf->flag |= (RB_PLAIN | RB_IGNORE_P);
  	switch (cmd) {
-@@ -4881,8 +4873,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -4882,8 +4874,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	CLOSE_A;
  	if (!(obuf->flag & RB_IGNORE_P)) {
  	    flushline(h_env, obuf, envs[h_env->envc].indent, 0, h_env->limit);
@@ -160,7 +160,7 @@
  	    obuf->flag |= RB_IGNORE_P;
  	}
  	obuf->flag &= ~RB_PLAIN;
-@@ -5236,7 +5227,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -5237,7 +5228,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  		tmp = Sprintf("Refresh (%d sec)", refresh_interval);
  	    if (tmp) {
  		HTMLlineproc1(tmp->ptr, h_env);
@@ -169,7 +169,7 @@
  			     h_env->limit);
  		if (!is_redisplay &&
  		    !((obuf->flag & RB_NOFRAMES) && RenderFrame)) {
-@@ -6287,8 +6278,7 @@ proc_escape(struct readbuffer *obuf, cha
+@@ -6288,8 +6279,7 @@ proc_escape(struct readbuffer *obuf, cha
  
  
  static int
@@ -179,7 +179,7 @@
  {
      char ch;
  
-@@ -6487,7 +6477,7 @@ HTMLlineproc0(char *line, struct html_fe
+@@ -6488,7 +6478,7 @@ HTMLlineproc0(char *line, struct html_fe
  		if (tbl->vspace > 0 && !(obuf->flag & RB_IGNORE_P)) {
  		    int indent = h_env->envs[h_env->envc].indent;
  		    flushline(h_env, obuf, indent, 0, h_env->limit);
@@ -188,7 +188,7 @@
  		}
  		save_fonteffect(h_env, obuf);
  		initRenderTable();
-@@ -6496,7 +6486,7 @@ HTMLlineproc0(char *line, struct html_fe
+@@ -6497,7 +6487,7 @@ HTMLlineproc0(char *line, struct html_fe
  		obuf->flag &= ~RB_IGNORE_P;
  		if (tbl->vspace > 0) {
  		    int indent = h_env->envs[h_env->envc].indent;
@@ -197,7 +197,7 @@
  		    obuf->flag |= RB_IGNORE_P;
  		}
  		set_space_to_prevchar(obuf->prevchar);
-@@ -6641,7 +6631,7 @@ HTMLlineproc0(char *line, struct html_fe
+@@ -6643,7 +6633,7 @@ HTMLlineproc0(char *line, struct html_fe
  				   mode);
  		}
  	    }
@@ -206,7 +206,7 @@
  		char *bp = obuf->line->ptr + obuf->bp.len;
  		char *tp = bp - obuf->bp.tlen;
  		int i = 0;
-@@ -7461,10 +7451,10 @@ loadGopherDir0(URLFile *uf, ParsedURL *p
+@@ -7464,10 +7454,10 @@ loadGopherDir0(URLFile *uf, ParsedURL *p
  
  #ifdef USE_M17N
  Str
@@ -277,7 +277,7 @@
  	: (CurrentMenu->nitem - 2);
 --- a/proto.h
 +++ b/proto.h
-@@ -207,8 +207,7 @@ extern void push_render_image(Str str, i
+@@ -208,8 +208,7 @@ extern void push_render_image(Str str, i
  extern void flushline(struct html_feed_environ *h_env, struct readbuffer *obuf,
  		      int indent, int force, int width);
  extern void do_blankline(struct html_feed_environ *h_env,
@@ -287,7 +287,7 @@
  extern void purgeline(struct html_feed_environ *h_env);
  extern void save_fonteffect(struct html_feed_environ *h_env,
  			    struct readbuffer *obuf);
-@@ -256,12 +255,12 @@ extern Buffer *loadHTMLString(Str page);
+@@ -257,12 +256,12 @@ extern Buffer *loadHTMLString(Str page);
  #ifdef USE_GOPHER
  #ifdef USE_M17N
  extern Str loadGopherDir(URLFile *uf, ParsedURL *pu, wc_ces * charset);
@@ -303,7 +303,7 @@
  #endif
  #endif				/* USE_GOPHER */
  extern Buffer *loadBuffer(URLFile *uf, Buffer *newBuf);
-@@ -734,7 +733,7 @@ extern void initMouseAction(void);
+@@ -735,7 +734,7 @@ extern void initMouseAction(void);
  
  #ifdef USE_MENU
  extern void new_menu(Menu *menu, MenuItem *item);

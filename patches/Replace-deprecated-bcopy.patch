@@ -103,7 +103,7 @@ Subject: Replace deprecated bcopy
  	    if (p1->version > version)
 --- a/file.c
 +++ b/file.c
-@@ -2462,8 +2462,8 @@ set_breakpoint(struct readbuffer *obuf,
+@@ -2463,8 +2463,8 @@ set_breakpoint(struct readbuffer *obuf,
      if (!obuf->bp.init_flag)
  	return;
  
@@ -114,7 +114,7 @@ Subject: Replace deprecated bcopy
      obuf->bp.img_alt = obuf->img_alt;
      obuf->bp.input_alt = obuf->input_alt;
      obuf->bp.in_bold = obuf->in_bold;
-@@ -2480,8 +2480,8 @@ static void
+@@ -2481,8 +2481,8 @@ static void
  back_to_breakpoint(struct readbuffer *obuf)
  {
      obuf->flag = obuf->bp.flag;
@@ -125,7 +125,7 @@ Subject: Replace deprecated bcopy
      obuf->img_alt = obuf->bp.img_alt;
      obuf->input_alt = obuf->bp.input_alt;
      obuf->in_bold = obuf->bp.in_bold;
-@@ -2786,7 +2786,7 @@ flushline(struct html_feed_environ *h_en
+@@ -2787,7 +2787,7 @@ flushline(struct html_feed_environ *h_en
  
  	if (obuf->bp.pos == obuf->pos && tp <= ep &&
  	    tp > line->ptr && tp[-1] == ' ') {
@@ -134,7 +134,7 @@ Subject: Replace deprecated bcopy
  	    line->length--;
  	    obuf->pos--;
  	}
-@@ -3035,8 +3035,8 @@ close_effect0(struct readbuffer *obuf, i
+@@ -3036,8 +3036,8 @@ close_effect0(struct readbuffer *obuf, i
      }
      if (i >= 0) {
  	obuf->tag_sp--;
@@ -145,7 +145,7 @@ Subject: Replace deprecated bcopy
  	return 1;
      }
      else if ((p = has_hidden_link(obuf, cmd)) != NULL) {
-@@ -3072,8 +3072,8 @@ close_anchor(struct html_feed_environ *h
+@@ -3073,8 +3073,8 @@ close_anchor(struct html_feed_environ *h
  	    else {
  		if (i >= 0) {
  		    obuf->tag_sp--;
@@ -156,7 +156,7 @@ Subject: Replace deprecated bcopy
  		}
  		else {
  		    passthrough(obuf, p, 1);
-@@ -3097,8 +3097,8 @@ void
+@@ -3098,8 +3098,8 @@ void
  save_fonteffect(struct html_feed_environ *h_env, struct readbuffer *obuf)
  {
      if (obuf->fontstat_sp < FONT_STACK_SIZE)
@@ -167,7 +167,7 @@ Subject: Replace deprecated bcopy
      if (obuf->fontstat_sp < INT_MAX)
  	obuf->fontstat_sp++;
      if (obuf->in_bold)
-@@ -3120,8 +3120,8 @@ restore_fonteffect(struct html_feed_envi
+@@ -3121,8 +3121,8 @@ restore_fonteffect(struct html_feed_envi
      if (obuf->fontstat_sp > 0)
  	obuf->fontstat_sp--;
      if (obuf->fontstat_sp < FONT_STACK_SIZE)
@@ -178,7 +178,7 @@ Subject: Replace deprecated bcopy
      if (obuf->in_bold)
  	push_tag(obuf, "<b>", HTML_B);
      if (obuf->in_italic)
-@@ -6734,7 +6734,7 @@ addnewline(Buffer *buf, char *line, Line
+@@ -6736,7 +6736,7 @@ addnewline(Buffer *buf, char *line, Line
      if (pos > 0) {
  	s = allocStr(line, pos);
  	p = NewAtom_N(Lineprop, pos);
@@ -187,7 +187,7 @@ Subject: Replace deprecated bcopy
      }
      else {
  	s = NullLine;
-@@ -6743,7 +6743,7 @@ addnewline(Buffer *buf, char *line, Line
+@@ -6745,7 +6745,7 @@ addnewline(Buffer *buf, char *line, Line
  #ifdef USE_ANSI_COLOR
      if (pos > 0 && color) {
  	c = NewAtom_N(Linecolor, pos);
@@ -196,7 +196,7 @@ Subject: Replace deprecated bcopy
      }
      else {
  	c = NULL;
-@@ -8036,7 +8036,7 @@ save2tmp(URLFile uf, char *tmpf)
+@@ -8039,7 +8039,7 @@ save2tmp(URLFile uf, char *tmpf)
  	/* fclose(f); */
  	return -1;
      }
@@ -205,7 +205,7 @@ Subject: Replace deprecated bcopy
      if (SETJMP(AbortLoading) != 0) {
  	goto _end;
      }
-@@ -8081,7 +8081,7 @@ save2tmp(URLFile uf, char *tmpf)
+@@ -8084,7 +8084,7 @@ save2tmp(URLFile uf, char *tmpf)
  	}
      }
    _end:
@@ -308,7 +308,7 @@ Subject: Replace deprecated bcopy
  		    if (!seen_dnsname)
 --- a/main.c
 +++ b/main.c
-@@ -4733,7 +4733,7 @@ _peekURL(int only_img)
+@@ -4734,7 +4734,7 @@ _peekURL(int only_img)
  #ifdef USE_M17N
      s = checkType(s, &pp, NULL);
      p = NewAtom_N(Lineprop, s->length);
@@ -317,7 +317,7 @@ Subject: Replace deprecated bcopy
  #endif
    disp:
      n = searchKeyNum();
-@@ -4792,7 +4792,7 @@ DEFUN(curURL, PEEK, "Show current addres
+@@ -4793,7 +4793,7 @@ DEFUN(curURL, PEEK, "Show current addres
  #ifdef USE_M17N
  	s = checkType(s, &pp, NULL);
  	p = NewAtom_N(Lineprop, s->length);

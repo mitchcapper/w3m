@@ -55,7 +55,6 @@ Fix-Wstrict-prototypes.patch
 Replace-deprecated-bcopy.patch
 # FEATURES
 Display-error-for-unkown-command.patch
-Enable-folding-in-pre-tags.patch
 gemini.patch
 Zero-based-link-no.patch
 Use-https-with-USE_SSL-and-retry_http.patch

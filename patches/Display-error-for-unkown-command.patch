@@ -4,7 +4,7 @@
 
 --- a/main.c
 +++ b/main.c
-@@ -6087,8 +6087,11 @@ DEFUN(execCmd, COMMAND, "Invoke w3m func
+@@ -6098,8 +6098,11 @@ DEFUN(execCmd, COMMAND, "Invoke w3m func
  	}
  	p = getWord(&data);
  	cmd = getFuncList(p);
