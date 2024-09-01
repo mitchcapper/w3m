@@ -30,6 +30,7 @@
 
 #define MAX_INPUT_SIZE 80 /* TODO - max should be screen line length */
 
+extern int fold_pre;
 static int frame_source = 0;
 static int need_number = 0;
 
@@ -2604,7 +2605,7 @@ check_breakpoint(struct readbuffer *obuf, int pre_mode, char *ch)
     int tlen, len = obuf->line->length;
 
     append_tags(obuf);
-    if (pre_mode)
+    if (pre_mode && !fold_pre)
 	return;
     tlen = obuf->line->length - len;
     if (tlen > 0
@@ -6695,7 +6696,8 @@ HTMLlineproc0(char *line, struct html_feed_environ *h_env, int internal)
 			proc_mchar(obuf, 1, delta, &str, mode);
 		}
 		if (obuf->flag & (RB_SPECIAL & ~RB_PRE_INT))
-		    continue;
+		    if (!fold_pre)
+			continue;
 	    }
 	    else {
 		if (!IS_SPACE(*str))
@@ -6923,6 +6925,7 @@ loadHTMLBuffer(URLFile *f, Buffer *newBuf)
 	if (src)
 	    newBuf->sourcefile = tmp->ptr;
     }
+    fold_pre |= FoldPre;
 
     loadHTMLstream(f, newBuf, src, newBuf->bufferprop & BP_FRAME);
 

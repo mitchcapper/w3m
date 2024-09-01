@@ -1058,6 +1058,7 @@ global int ignore_null_img_alt init(TRUE);
 #define DISPLAY_INS_DEL_FONTIFY	2
 global int displayInsDel init(DISPLAY_INS_DEL_NORMAL);
 global int FoldTextarea init(FALSE);
+global int FoldPre init(FALSE);
 global int FoldLine init(FALSE);
 #define DEFAULT_URL_EMPTY	0
 #define DEFAULT_URL_CURRENT	1
