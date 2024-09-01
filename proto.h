@@ -99,6 +99,7 @@ extern void peekURL(void);
 extern void peekIMG(void);
 extern void curURL(void);
 extern void vwSrc(void);
+extern void foldPre(void);
 extern void reload(void);
 extern void reshape(void);
 extern void chkURL(void);

@@ -98,6 +98,7 @@ static int OptionEncode = FALSE;
 #define CMT_DISP_BORDERS N_("Display table borders, ignore value of BORDER")
 #define CMT_DISABLE_CENTER N_("Disable center alignment")
 #define CMT_FOLD_TEXTAREA N_("Fold lines in TEXTAREA")
+#define CMT_FOLD_PRE N_("Fold lines in PRE")
 #define CMT_DISP_INS_DEL N_("Display INS, DEL, S and STRIKE element")
 #define CMT_COLOR        N_("Display with color")
 #define CMT_HINTENSITY_COLOR N_("Use high-intensity colors")
@@ -436,6 +437,8 @@ struct param_ptr params1[] = {
      CMT_DISABLE_CENTER, NULL},
     {"fold_textarea", P_CHARINT, PI_ONOFF, (void *)&FoldTextarea,
      CMT_FOLD_TEXTAREA, NULL},
+    {"fold_pre", P_CHARINT, PI_ONOFF, (void *)&FoldPre,
+     CMT_FOLD_PRE, NULL},
     {"display_ins_del", P_INT, PI_SEL_C, (void *)&displayInsDel,
      CMT_DISP_INS_DEL, displayinsdel},
     {"ignore_null_img_alt", P_INT, PI_ONOFF, (void *)&ignore_null_img_alt,

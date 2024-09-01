@@ -31,6 +31,7 @@ EXEC_SHELL	Führe Shell-Befehl aus und zeige Ausgabe an
 EXIT		Sofort beenden
 EXTERN		Verwende externen Browser zur Anzeige
 EXTERN_LINK	Verwende externen Browser zur Anzeige des Linkziels
+FOLD_PRE	Erzwinge Umbruch von langen Zeilen in <pre>-Elementen
 FRAME		Wechsle zwischen Kennung und Umsetzung von HTML-Frames
 GOTO		Öffne angegebenes Dokument in neuem Puffer
 GOTO_HOME	Zurück zur Startseite (die Variablen HTTP_HOME oder WWW_HOME spezifiziert wurden)
