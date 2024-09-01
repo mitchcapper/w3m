@@ -9,7 +9,7 @@ Subject: [PATCH 139/172] Remove redundant NULL check
 
 --- a/file.c
 +++ b/file.c
-@@ -1080,7 +1080,7 @@ extract_auth_val(char **q)
+@@ -1081,7 +1081,7 @@ extract_auth_val(char **q)
  		}
  	    }
  	}

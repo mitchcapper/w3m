@@ -21,7 +21,7 @@ Patch: patches/Fix-scan-build-issues.patch
      *p = '\0';
 --- a/file.c
 +++ b/file.c
-@@ -1144,9 +1144,8 @@ extract_auth_param(char *q, struct auth_
+@@ -1145,9 +1145,8 @@ extract_auth_param(char *q, struct auth_
  	}
  	if (ap->name == NULL) {
  	    /* skip unknown param */
@@ -32,7 +32,7 @@ Patch: patches/Fix-scan-build-issues.patch
  		(IS_SPACE(*q) || *q == '=')) {
  		SKIP_BLANKS(q);
  		if (*q != '=')
-@@ -1514,8 +1513,7 @@ findAuthentication(struct http_auth *hau
+@@ -1515,8 +1514,7 @@ findAuthentication(struct http_auth *hau
  		}
  		if (p0 == p) {
  		    /* all unknown auth failed */
@@ -42,7 +42,7 @@ Patch: patches/Fix-scan-build-issues.patch
  			SKIP_BLANKS(p);
  			p = extract_auth_param(p, none_auth_param);
  		    }
-@@ -6576,7 +6574,6 @@ HTMLlineproc0(char *line, struct html_fe
+@@ -6577,7 +6575,6 @@ HTMLlineproc0(char *line, struct html_fe
  		    str = Strnew_charp_n(str, p - str)->ptr;
  		    line = Strnew_m_charp(p, line, NULL)->ptr;
  		}
@@ -50,7 +50,7 @@ Patch: patches/Fix-scan-build-issues.patch
  		continue;
  	    }
  	    if (obuf->table_level >= 0)
-@@ -7261,7 +7258,7 @@ loadHTMLstream(URLFile *f, Buffer *newBu
+@@ -7262,7 +7259,7 @@ loadHTMLstream(URLFile *f, Buffer *newBu
      struct environment envs[MAX_ENV_LEVEL];
      clen_t linelen = 0;
      clen_t trbyte = 0;
@@ -59,7 +59,7 @@ Patch: patches/Fix-scan-build-issues.patch
  #ifdef USE_M17N
      wc_ces charset = WC_CES_US_ASCII;
      wc_ces volatile doc_charset = DocumentCharset;
-@@ -7502,11 +7499,11 @@ loadGopherDir0(URLFile *uf, ParsedURL *p
+@@ -7503,11 +7500,11 @@ loadGopherDir0(URLFile *uf, ParsedURL *p
  			 "</title>\n</head>\n<body>\n<h1>Index of ", q,
  			 "</h1>\n<table>\n", NULL);
  
@@ -74,7 +74,7 @@ Patch: patches/Fix-scan-build-issues.patch
  	    break;
 --- a/main.c
 +++ b/main.c
-@@ -4529,7 +4529,7 @@ _strSession(char *sf)
+@@ -4530,7 +4530,7 @@ _strSession(char *sf)
  	sep = "\n";
      }
  
@@ -83,7 +83,7 @@ Patch: patches/Fix-scan-build-issues.patch
      if ((r = fclose(f)) == EOF) goto fail;
      unlink_session = 0;
      return;
-@@ -6357,11 +6357,9 @@ DEFUN(execCmd, COMMAND, "Invoke w3m func
+@@ -6359,11 +6359,9 @@ DEFUN(execCmd, COMMAND, "Invoke w3m func
  static void
  SigAlarm(SIGNAL_ARG)
  {

@@ -136,7 +136,7 @@ Move declarations, delete unused auth_cookie.
  /* modes for align() */
  
  #define ALIGN_CENTER 0
-@@ -1060,11 +1017,6 @@ global int migemo_active init(0);
+@@ -1059,11 +1016,6 @@ global int migemo_active init(0);
  global char *migemo_command init(DEF_MIGEMO_COMMAND);
  #endif				/* USE_MIGEMO */
  
@@ -148,7 +148,7 @@ Move declarations, delete unused auth_cookie.
  global char *mailcap_files init(USER_MAILCAP ", " SYS_MAILCAP);
  global char *mimetypes_files init(USER_MIMETYPES ", " SYS_MIMETYPES);
  #ifdef USE_EXTERNAL_URI_LOADER
-@@ -1166,23 +1118,6 @@ global MouseAction mouse_action;
+@@ -1165,23 +1117,6 @@ global MouseAction mouse_action;
  #define LIMIT_MOUSE_MENU 100
  #endif				/* USE_MOUSE */
  

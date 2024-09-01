@@ -23,7 +23,7 @@ Patch: patches/Use-Ctrl-L-to-insert-next-char-in-search.patch
  	    if (cm_clear)
 --- a/main.c
 +++ b/main.c
-@@ -1882,6 +1882,7 @@ dispincsrch(int ch, Str buf, Lineprop *p
+@@ -1883,6 +1883,7 @@ dispincsrch(int ch, Str buf, Lineprop *p
  {
      static Buffer sbuf;
      char *str;
@@ -31,7 +31,7 @@ Patch: patches/Use-Ctrl-L-to-insert-next-char-in-search.patch
      int do_next_search = FALSE;
  
      if (ch == 0 && buf == NULL) {
-@@ -1891,6 +1892,12 @@ dispincsrch(int ch, Str buf, Lineprop *p
+@@ -1892,6 +1893,12 @@ dispincsrch(int ch, Str buf, Lineprop *p
  
      str = buf->ptr;
      switch (ch) {

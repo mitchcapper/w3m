@@ -9,75 +9,100 @@ As we do not talk CSS, add a command to reload the page folding those
 long lines. This is a one-time operation. Additionally add an option to
 make this behaviour permanent.
 ---
- file.c  |    6 ++++--
- fm.h    |    2 ++
- main.c  |    9 +++++++++
- proto.h |    1 +
- rc.c    |    3 +++
- 5 files changed, 19 insertions(+), 2 deletions(-)
+ doc-de/README.func |    1 +
+ doc/README.func    |    1 +
+ file.c             |    7 +++++--
+ fm.h               |    1 +
+ main.c             |   11 +++++++++++
+ proto.h            |    1 +
+ rc.c               |    3 +++
+ 7 files changed, 23 insertions(+), 2 deletions(-)
 
 --- a/file.c
 +++ b/file.c
-@@ -2567,7 +2567,7 @@ check_breakpoint(struct readbuffer *obuf
+@@ -30,6 +30,7 @@
+ 
+ #define MAX_INPUT_SIZE 80 /* TODO - max should be screen line length */
+ 
++extern int fold_pre;
+ static int frame_source = 0;
+ static int need_number = 0;
+ 
+@@ -2567,7 +2568,7 @@ check_breakpoint(struct readbuffer *obuf
      int tlen, len = obuf->line->length;
  
      append_tags(obuf);
 -    if (pre_mode)
-+    if (pre_mode && !FoldPre)
++    if (pre_mode && !fold_pre)
  	return;
      tlen = obuf->line->length - len;
      if (tlen > 0
-@@ -6586,7 +6586,8 @@ HTMLlineproc0(char *line, struct html_fe
+@@ -6586,7 +6587,8 @@ HTMLlineproc0(char *line, struct html_fe
  			proc_mchar(obuf, 1, delta, &str, mode);
  		}
  		if (obuf->flag & (RB_SPECIAL & ~RB_PRE_INT))
 -		    continue;
-+		    if (!FoldPre)
++		    if (!fold_pre)
 +			continue;
  	    }
  	    else {
  		if (!IS_SPACE(*str))
-@@ -6801,6 +6802,7 @@ loadHTMLBuffer(URLFile *f, Buffer *newBu
+@@ -6801,6 +6803,7 @@ loadHTMLBuffer(URLFile *f, Buffer *newBu
  	if (src)
  	    newBuf->sourcefile = tmp->ptr;
      }
-+    FoldPre |= FoldPreOpt;
++    fold_pre |= FoldPre;
  
      loadHTMLstream(f, newBuf, src, newBuf->bufferprop & BP_FRAME);
  
 --- a/fm.h
 +++ b/fm.h
-@@ -1044,6 +1044,8 @@ global int ignore_null_img_alt init(TRUE
+@@ -1044,6 +1044,7 @@ global int ignore_null_img_alt init(TRUE
  #define DISPLAY_INS_DEL_FONTIFY	2
  global int displayInsDel init(DISPLAY_INS_DEL_NORMAL);
  global int FoldTextarea init(FALSE);
 +global int FoldPre init(FALSE);
-+global int FoldPreOpt init(FALSE);
  global int FoldLine init(FALSE);
  #define DEFAULT_URL_EMPTY	0
  #define DEFAULT_URL_CURRENT	1
 --- a/main.c
 +++ b/main.c
-@@ -4895,6 +4895,14 @@ DEFUN(vwSrc, SOURCE VIEW, "Toggle betwee
+@@ -128,6 +128,7 @@ static int searchKeyNum(void);
+ 
+ int enable_inline_image;
+ extern int opt_cols;
++int fold_pre;
+ 
+ static void
+ fversion(FILE * f)
+@@ -4895,6 +4896,14 @@ DEFUN(vwSrc, SOURCE VIEW, "Toggle betwee
      displayBuffer(Currentbuf, B_NORMAL);
  }
  
-+DEFUN(fold_pre, FOLD_PRE, "Fold long lines in <pre> elements")
++DEFUN(foldPre, FOLD_PRE, "Fold long lines in <pre> elements")
 +{
-+    FoldPre = 1;
++    fold_pre = 1;
 +    Currentbuf->need_reshape = TRUE;
 +    displayBuffer(Currentbuf, B_FORCE_REDRAW);
-+    FoldPre = FoldPreOpt;
++    fold_pre = FoldPre;
 +}
 +
  /* reload */
  DEFUN(reload, RELOAD, "Load current document anew")
  {
-@@ -5018,6 +5026,7 @@ DEFUN(reload, RELOAD, "Load current docu
+@@ -4922,6 +4931,7 @@ DEFUN(reload, RELOAD, "Load current docu
+ 	disp_err_message("Can't reload stdin", TRUE);
+ 	return;
+     }
++    fold_pre = FoldPre;
+     copyBuffer(&sbuf, Currentbuf);
+     if (Currentbuf->bufferprop & BP_FRAME &&
+ 	(fbuf = Currentbuf->linkBuffer[LB_N_FRAME])) {
+@@ -5018,6 +5028,7 @@ DEFUN(reload, RELOAD, "Load current docu
  	restorePosition(Currentbuf, &sbuf);
      }
      displayBuffer(Currentbuf, B_FORCE_REDRAW);
-+    FoldPre = FoldPreOpt;
++    fold_pre = FoldPre;
  }
  
  /* reshape */
@@ -87,7 +112,7 @@ make this behaviour permanent.
  extern void peekIMG(void);
  extern void curURL(void);
  extern void vwSrc(void);
-+extern void fold_pre(void);
++extern void foldPre(void);
  extern void reload(void);
  extern void reshape(void);
  extern void chkURL(void);
@@ -105,8 +130,28 @@ make this behaviour permanent.
       CMT_DISABLE_CENTER, NULL},
      {"fold_textarea", P_CHARINT, PI_ONOFF, (void *)&FoldTextarea,
       CMT_FOLD_TEXTAREA, NULL},
-+    {"fold_pre", P_CHARINT, PI_ONOFF, (void *)&FoldPreOpt,
++    {"fold_pre", P_CHARINT, PI_ONOFF, (void *)&FoldPre,
 +     CMT_FOLD_PRE, NULL},
      {"display_ins_del", P_INT, PI_SEL_C, (void *)&displayInsDel,
       CMT_DISP_INS_DEL, displayinsdel},
      {"ignore_null_img_alt", P_INT, PI_ONOFF, (void *)&ignore_null_img_alt,
+--- a/doc-de/README.func
++++ b/doc-de/README.func
+@@ -31,6 +31,7 @@ EXEC_SHELL	Führe Shell-Befehl aus und z
+ EXIT		Sofort beenden
+ EXTERN		Verwende externen Browser zur Anzeige
+ EXTERN_LINK	Verwende externen Browser zur Anzeige des Linkziels
++FOLD_PRE	Erzwinge Umbruch von langen Zeilen in <pre>-Elementen
+ FRAME		Wechsle zwischen Kennung und Umsetzung von HTML-Frames
+ GOTO		Öffne angegebenes Dokument in neuem Puffer
+ GOTO_HOME	Zurück zur Startseite (die Variablen HTTP_HOME oder WWW_HOME spezifiziert wurden)
+--- a/doc/README.func
++++ b/doc/README.func
+@@ -31,6 +31,7 @@ EXEC_SHELL	Execute shell command and dis
+ EXIT		Quit without confirmation
+ EXTERN		Display using an external browser
+ EXTERN_LINK	Display target using an external browser
++FOLD_PRE	Fold long lines in <pre> elements
+ FRAME		Toggle rendering HTML frames
+ GOTO		Open specified document in a new buffer
+ GOTO_HOME	Return to the homepage (specified HTTP_HOME or WWW_HOME variable)

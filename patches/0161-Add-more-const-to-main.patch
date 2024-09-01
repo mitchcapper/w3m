@@ -23,7 +23,7 @@ Subject: [PATCH 161/172] Add more const to main
  
  #ifndef __MINGW32_VERSION
  JMP_BUF IntReturn;
-@@ -1776,7 +1776,7 @@ clear_mark(Line *l)
+@@ -1777,7 +1777,7 @@ clear_mark(Line *l)
  
  /* search by regular expression */
  static int
@@ -32,7 +32,7 @@ Subject: [PATCH 161/172] Add more const to main
  {
      void (*prevtrap) (SIGNAL_ARG);
      volatile int i, result = SR_NOTFOUND;
-@@ -1802,7 +1802,7 @@ srchcore(char *volatile str, int (*func)
+@@ -1803,7 +1803,7 @@ srchcore(char *volatile str, int (*func)
  }
  
  static void
@@ -41,7 +41,7 @@ Subject: [PATCH 161/172] Add more const to main
  {
      if (str == NULL)
  	str = "";
-@@ -1887,7 +1887,7 @@ dispincsrch(int ch, Str buf, Lineprop *p
+@@ -1888,7 +1888,7 @@ dispincsrch(int ch, Str buf, Lineprop *p
  }
  
  static void
@@ -50,7 +50,7 @@ Subject: [PATCH 161/172] Add more const to main
  {
      char *str;
      Buffer sbuf;
-@@ -1903,9 +1903,9 @@ isrch(int (*func) (Buffer *, char *), ch
+@@ -1904,9 +1904,9 @@ isrch(int (*func) (Buffer *, char *), ch
  }
  
  static void
@@ -62,7 +62,7 @@ Subject: [PATCH 161/172] Add more const to main
      int result;
      int disp = FALSE;
      int pos;
-@@ -1964,7 +1964,7 @@ srch_nxtprv(int reverse)
+@@ -1965,7 +1965,7 @@ srch_nxtprv(int reverse)
  {
      int result;
      /* *INDENT-OFF* */
@@ -71,7 +71,7 @@ Subject: [PATCH 161/172] Add more const to main
  	forwardSearch, backwardSearch
      };
      /* *INDENT-ON* */
-@@ -2396,9 +2396,9 @@ DEFUN(movR1, MOVE_RIGHT1, "Cursor right.
+@@ -2397,9 +2397,9 @@ DEFUN(movR1, MOVE_RIGHT1, "Cursor right.
  #define prevChar(s, l)	do { (s)--; } while ((s) > 0 && (l)->propBuf[s] & PC_WCHAR2)
  
  static wc_uint32
@@ -83,7 +83,7 @@ Subject: [PATCH 161/172] Add more const to main
  }
  
  static int
-@@ -2923,8 +2923,8 @@ DEFUN(prevMk, PREV_MARK, "Go to the prev
+@@ -2924,8 +2924,8 @@ DEFUN(prevMk, PREV_MARK, "Go to the prev
  DEFUN(reMark, REG_MARK, "Mark all occurences of a pattern")
  {
      Line *l;

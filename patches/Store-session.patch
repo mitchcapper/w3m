@@ -39,7 +39,7 @@
  
  void set_buffer_environ(Buffer *);
  static void save_buffer_position(Buffer *buf);
-@@ -213,6 +217,8 @@ fusage(FILE * f, int err)
+@@ -214,6 +218,8 @@ fusage(FILE * f, int err)
  #endif
      fprintf(f, "    -B               load bookmark\n");
      fprintf(f, "    -bookmark file   specify bookmark file\n");
@@ -48,7 +48,7 @@
      fprintf(f, "    -T type          specify content-type\n");
      fprintf(f, "    -m               internet message mode\n");
      fprintf(f, "    -v               visual startup mode\n");
-@@ -439,6 +445,7 @@ main(int argc, char **argv)
+@@ -440,6 +446,7 @@ main(int argc, char **argv)
      char *default_type = NULL;
      char *post_file = NULL;
      Str err_msg;
@@ -56,7 +56,7 @@
  #ifdef USE_M17N
      char *Locale = NULL;
      wc_uint8 auto_detect;
-@@ -659,6 +666,13 @@ main(int argc, char **argv)
+@@ -660,6 +667,13 @@ main(int argc, char **argv)
  		    BookmarkFile = cleanupName(tmp->ptr);
  		}
  	    }
@@ -70,7 +70,7 @@
  	    else if (!strcmp("-F", argv[i]))
  		RenderFrame = TRUE;
  	    else if (!strcmp("-W", argv[i])) {
-@@ -908,8 +922,43 @@ main(int argc, char **argv)
+@@ -909,8 +923,43 @@ main(int argc, char **argv)
      if (ssl_known_hosts)
  	known_hosts = load_known_hosts();
  
@@ -116,7 +116,7 @@
  
      if (w3m_backend)
  	backend();
-@@ -2603,6 +2652,10 @@ _quitfm(int confirm)
+@@ -2604,6 +2653,10 @@ _quitfm(int confirm)
  #endif				/* USE_HISTORY */
      if ((err = save_known_hosts()))
  	perror(NULL);
@@ -127,7 +127,7 @@
      w3m_exit(err);
  }
  
-@@ -4464,6 +4517,68 @@ DEFUN(adBmark, ADD_BOOKMARK, "Add curren
+@@ -4465,6 +4518,68 @@ DEFUN(adBmark, ADD_BOOKMARK, "Add curren
  		request);
  }
  
@@ -228,7 +228,7 @@
      {"close_tab_back", P_INT, PI_ONOFF, (void *)&close_tab_back,
 --- a/fm.h
 +++ b/fm.h
-@@ -1083,6 +1083,8 @@ global int UseHistory init(TRUE);
+@@ -1082,6 +1082,8 @@ global int UseHistory init(TRUE);
  global int URLHistSize init(100);
  global int SaveURLHist init(TRUE);
  #endif				/* USE_HISTORY */
@@ -282,7 +282,7 @@
  .TP
 --- a/doc-de/README.func
 +++ b/doc-de/README.func
-@@ -133,6 +133,7 @@ SHIFT_LEFT	Anzeigebereich nach links ver
+@@ -134,6 +134,7 @@ SHIFT_LEFT	Anzeigebereich nach links ver
  SHIFT_RIGHT	Anzeigebereich nach rechts versetzen
  SOURCE		Wechsle zwischen HTML-Wiedergabe und -Verarbeitung
  STOP_IMAGE	Bilder nicht mehr laden und anzeigen
@@ -292,7 +292,7 @@
  TAB_GOTO	Öffne das angegebene Dokument in einem neuen Reiter
 --- a/doc/README.func
 +++ b/doc/README.func
-@@ -136,6 +136,7 @@ SHIFT_LEFT	Shift screen left
+@@ -137,6 +137,7 @@ SHIFT_LEFT	Shift screen left
  SHIFT_RIGHT	Shift screen right
  SOURCE		Toggle between HTML shown or processed
  STOP_IMAGE	Stop loading and drawing of images

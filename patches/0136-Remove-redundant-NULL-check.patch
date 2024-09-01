@@ -9,7 +9,7 @@ Subject: [PATCH 136/172] Remove redundant NULL check
 
 --- a/main.c
 +++ b/main.c
-@@ -3908,7 +3908,7 @@ _prevA(int visited)
+@@ -3909,7 +3909,7 @@ _prevA(int visited)
  	    }
  	    x = an->start.pos;
  	    y = an->start.line;

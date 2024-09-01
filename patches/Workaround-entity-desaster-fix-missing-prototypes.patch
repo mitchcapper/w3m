@@ -60,9 +60,9 @@ speaks for themself.
  
 +char * conv_entity(unsigned int c); /* TODO(rkta): Move to header */
 +
+ extern int fold_pre;
  static int frame_source = 0;
  static int need_number = 0;
- 
 --- a/table.c
 +++ b/table.c
 @@ -12,6 +12,8 @@

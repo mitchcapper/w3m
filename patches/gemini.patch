@@ -33,10 +33,10 @@ w3m-0.5.3+git20230121.
  
 +Buffer * loadGeminiBuffer(URLFile *uf, Buffer *volatile newBuf);
 +
+ extern int fold_pre;
  static int frame_source = 0;
  static int need_number = 0;
- 
-@@ -246,7 +248,7 @@ loadSomething(URLFile *f,
+@@ -247,7 +249,7 @@ loadSomething(URLFile *f,
         )
  	buf->type = "text/html";
      else
@@ -45,7 +45,7 @@ w3m-0.5.3+git20230121.
      return buf;
  }
  
-@@ -1685,7 +1687,7 @@ loadGeneralFile(char *path, ParsedURL *v
+@@ -1686,7 +1688,7 @@ loadGeneralFile(char *path, ParsedURL *v
      URLFile f, *volatile of = NULL;
      ParsedURL pu;
      Buffer *b = NULL;
@@ -54,7 +54,7 @@ w3m-0.5.3+git20230121.
      char *volatile tpath;
      char *volatile t = "text/plain", *p, *volatile real_type = NULL;
      Buffer *volatile t_buf = NULL;
-@@ -2008,6 +2010,166 @@ loadGeneralFile(char *path, ParsedURL *v
+@@ -2009,6 +2011,166 @@ loadGeneralFile(char *path, ParsedURL *v
      else if (pu.scheme == SCM_DATA) {
  	t = f.guess_type;
      }
@@ -221,7 +221,7 @@ w3m-0.5.3+git20230121.
      else if (searchHeader) {
  	searchHeader = SearchHeader = FALSE;
  	if (t_buf == NULL)
-@@ -2192,6 +2354,8 @@ loadGeneralFile(char *path, ParsedURL *v
+@@ -2193,6 +2355,8 @@ loadGeneralFile(char *path, ParsedURL *v
  
      if (is_html_type(t))
  	proc = loadHTMLBuffer;
@@ -230,7 +230,7 @@ w3m-0.5.3+git20230121.
      else if (is_plain_text_type(t))
  	proc = loadBuffer;
  #ifdef USE_IMAGE
-@@ -2448,7 +2612,6 @@ is_boundary(unsigned char *ch1, unsigned
+@@ -2449,7 +2613,6 @@ is_boundary(unsigned char *ch1, unsigned
      return 1;
  }
  
@@ -238,7 +238,7 @@ w3m-0.5.3+git20230121.
  static void
  set_breakpoint(struct readbuffer *obuf, int tag_length)
  {
-@@ -7481,6 +7644,130 @@ loadGopherSearch0(ParsedURL *pu)
+@@ -7482,6 +7645,130 @@ loadGopherSearch0(ParsedURL *pu)
  }
  #endif				/* USE_GOPHER */
  
@@ -511,7 +511,7 @@ w3m-0.5.3+git20230121.
      UFclose(&f);
 --- a/main.c
 +++ b/main.c
-@@ -395,6 +395,32 @@ die_oom(size_t bytes)
+@@ -396,6 +396,32 @@ die_oom(size_t bytes)
      return NULL;
  }
  
@@ -544,7 +544,7 @@ w3m-0.5.3+git20230121.
  int
  main(int argc, char **argv)
  {
-@@ -878,6 +904,9 @@ main(int argc, char **argv)
+@@ -879,6 +905,9 @@ main(int argc, char **argv)
      if (UseHistory)
  	loadHistory(URLHist);
  #endif				/* not USE_HISTORY */
@@ -554,7 +554,7 @@ w3m-0.5.3+git20230121.
  
  #ifdef USE_M17N
  #endif
-@@ -2516,10 +2545,36 @@ DEFUN(movRW, NEXT_WORD, "Move to the nex
+@@ -2517,10 +2546,36 @@ DEFUN(movRW, NEXT_WORD, "Move to the nex
      displayBuffer(Currentbuf, B_NORMAL);
  }
  
@@ -591,7 +591,7 @@ w3m-0.5.3+git20230121.
  
      if (checkDownloadList())
  	/* FIXME: gettextize? */
-@@ -2546,7 +2601,9 @@ _quitfm(int confirm)
+@@ -2547,7 +2602,9 @@ _quitfm(int confirm)
      if (UseHistory && SaveURLHist)
  	saveHistory(URLHist, URLHistSize);
  #endif				/* USE_HISTORY */
@@ -602,7 +602,7 @@ w3m-0.5.3+git20230121.
  }
  
  /* Quit */
-@@ -4818,6 +4875,13 @@ DEFUN(vwSrc, SOURCE VIEW, "Toggle betwee
+@@ -4819,6 +4876,13 @@ DEFUN(vwSrc, SOURCE VIEW, "Toggle betwee
  	displayBuffer(Currentbuf, B_NORMAL);
  	return;
      }
@@ -616,8 +616,8 @@ w3m-0.5.3+git20230121.
      if (Currentbuf->sourcefile == NULL) {
  	if (Currentbuf->pagerSource &&
  	    !strcasecmp(Currentbuf->type, "text/plain")) {
-@@ -4903,6 +4967,93 @@ DEFUN(fold_pre, FOLD_PRE, "Fold long lin
-     FoldPre = FoldPreOpt;
+@@ -4904,6 +4968,93 @@ DEFUN(foldPre, FOLD_PRE, "Fold long line
+     fold_pre = FoldPre;
  }
  
 +DEFUN(geminize, GEMINIZE, "Toggle between text/gemini shown or processed")
@@ -710,7 +710,7 @@ w3m-0.5.3+git20230121.
  /* reload */
  DEFUN(reload, RELOAD, "Load current document anew")
  {
-@@ -5128,6 +5279,7 @@ chkURLBuffer(Buffer *buf)
+@@ -5130,6 +5281,7 @@ chkURLBuffer(Buffer *buf)
  	"https?://[a-zA-Z0-9:%\\-\\./_@]*\\[[a-fA-F0-9:][a-fA-F0-9:\\.]*\\][a-zA-Z0-9:%\\-\\./?=~_\\&+@#,\\$;]*",
  	"ftp://[a-zA-Z0-9:%\\-\\./_@]*\\[[a-fA-F0-9:][a-fA-F0-9:\\.]*\\][a-zA-Z0-9:%\\-\\./=_+@#,\\$]*",
  #endif				/* INET6 */
@@ -725,7 +725,7 @@ w3m-0.5.3+git20230121.
  extern void curURL(void);
  extern void vwSrc(void);
 +extern void geminize(void);
- extern void fold_pre(void);
+ extern void foldPre(void);
  extern void reload(void);
  extern void reshape(void);
 --- a/istream.c
@@ -1008,9 +1008,9 @@ w3m-0.5.3+git20230121.
  #endif /* RC_H */
 --- a/doc-de/README.func
 +++ b/doc-de/README.func
-@@ -32,6 +32,7 @@ EXIT		Sofort beenden
- EXTERN		Verwende externen Browser zur Anzeige
+@@ -33,6 +33,7 @@ EXTERN		Verwende externen Browser zur An
  EXTERN_LINK	Verwende externen Browser zur Anzeige des Linkziels
+ FOLD_PRE	Erzwinge Umbruch von langen Zeilen in <pre>-Elementen
  FRAME		Wechsle zwischen Kennung und Umsetzung von HTML-Frames
 +GEMINIZE	Wechsle zwischen text/gemini-Wiedergabe und -Verarbeitung
  GOTO		Öffne angegebenes Dokument in neuem Puffer
@@ -1018,9 +1018,9 @@ w3m-0.5.3+git20230121.
  GOTO_LINE	Gehe zur angebenen Zeile
 --- a/doc/README.func
 +++ b/doc/README.func
-@@ -32,6 +32,7 @@ EXIT		Quit without confirmation
- EXTERN		Display using an external browser
+@@ -33,6 +33,7 @@ EXTERN		Display using an external browse
  EXTERN_LINK	Display target using an external browser
+ FOLD_PRE	Fold long lines in <pre> elements
  FRAME		Toggle rendering HTML frames
 +GEMINIZE	Toggle between text/gemini shown or processed
  GOTO		Open specified document in a new buffer
