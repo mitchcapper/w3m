@@ -6,6 +6,7 @@ Unreleased
   - Add vim-like smartcase option for search
   - Add keybinding to insert next character while using incremental search
     (C-l)
+  - Add keybinding to insert current search term (C-\)
 
 * bug fixes
   - Ignore C-i, C-l, C-s, C-z, C-\, C-], C-^ and C-_ key presses when
