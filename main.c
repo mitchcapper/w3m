@@ -129,6 +129,7 @@ static int searchKeyNum(void);
 
 int enable_inline_image;
 extern int opt_cols;
+int fold_pre;
 
 static void
 fversion(FILE * f)
@@ -4963,6 +4964,14 @@ DEFUN(vwSrc, SOURCE VIEW, "Toggle between HTML shown or processed")
     displayBuffer(Currentbuf, B_NORMAL);
 }
 
+DEFUN(foldPre, FOLD_PRE, "Fold long lines in <pre> elements")
+{
+    fold_pre = 1;
+    Currentbuf->need_reshape = TRUE;
+    displayBuffer(Currentbuf, B_FORCE_REDRAW);
+    fold_pre = FoldPre;
+}
+
 /* reload */
 DEFUN(reload, RELOAD, "Load current document anew")
 {
@@ -4990,6 +4999,7 @@ DEFUN(reload, RELOAD, "Load current document anew")
 	disp_err_message("Can't reload stdin", TRUE);
 	return;
     }
+    fold_pre = FoldPre;
     copyBuffer(&sbuf, Currentbuf);
     if (Currentbuf->bufferprop & BP_FRAME &&
 	(fbuf = Currentbuf->linkBuffer[LB_N_FRAME])) {
@@ -5086,6 +5096,7 @@ DEFUN(reload, RELOAD, "Load current document anew")
 	restorePosition(Currentbuf, &sbuf);
     }
     displayBuffer(Currentbuf, B_FORCE_REDRAW);
+    fold_pre = FoldPre;
 }
 
 /* reshape */
