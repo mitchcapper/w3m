@@ -134,8 +134,9 @@ static int OptionEncode = FALSE;
 #define CMT_PDROOT      N_("Directory corresponding to /~user")
 #define CMT_CGIBIN      N_("Directory corresponding to /cgi-bin")
 #define CMT_TMP         N_("Directory for temporary files")
-#define CMT_CONFIRM_QQ  N_("Confirm when quitting with q")
-#define CMT_CLOSE_TAB_BACK N_("Close tab if buffer is last when back")
+#define CMT_CONFIRM_QQ  N_("Confirm when calling quit")
+#define CMT_EXIT_ON_LAST  N_("Close w3m/tab if buffer is last when going back")
+#define CMT_CLOSE_TAB_BACK N_("Close tab if buffer is last when going back")
 #ifdef USE_MARK
 #define CMT_USE_MARK	N_("Enable mark operations")
 #endif
@@ -517,6 +518,8 @@ struct param_ptr params3[] = {
     {"save_hist", P_INT, PI_ONOFF, (void *)&SaveURLHist, CMT_SAVEHIST, NULL},
 #endif				/* USE_HISTORY */
     {"confirm_qq", P_INT, PI_ONOFF, (void *)&confirm_on_quit, CMT_CONFIRM_QQ,
+     NULL},
+    {"exit_on_last", P_INT, PI_ONOFF, (void *)&exit_on_last, CMT_EXIT_ON_LAST,
      NULL},
     {"close_tab_back", P_INT, PI_ONOFF, (void *)&close_tab_back,
      CMT_CLOSE_TAB_BACK, NULL},
