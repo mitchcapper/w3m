@@ -24,8 +24,10 @@ prev even if we don't need it, I decided to do the unnecessary computation
 because it's no big deal nowadays. Now I feel dirty like a whore.
 
 ---
- menu.c |   75 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 75 insertions(+)
+ doc-de/MANUAL.html |   45 ++----------------------------
+ doc/MANUAL.html    |   47 ++++---------------------------
+ menu.c             |   78 ++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 3 files changed, 87 insertions(+), 83 deletions(-)
 --- a/menu.c
 +++ b/menu.c
 @@ -242,6 +242,8 @@ static int SelectV = 0;
@@ -37,7 +39,17 @@ because it's no big deal nowadays. Now I feel dirty like a whore.
  
  /* --- SelectMenu (END) --- */
  
-@@ -1442,6 +1444,8 @@ initSelectMenu(void)
+@@ -1387,7 +1389,8 @@ initSelectMenu(void)
+     Str str;
+     char **label;
+     char *p;
+-    static char *comment = " SPC for select / D for delete buffer ";
++    static const char *comment =
++	    " SPC: select | D: delete | </>: move down/up ";
+ 
+     SelectV = -1;
+     for (i = 0, buf = Firstbuf; buf != NULL; i++, buf = buf->nextBuffer) {
+@@ -1442,6 +1445,8 @@ initSelectMenu(void)
      SelectMenu.cursorX = Currentbuf->cursorX + Currentbuf->rootX;
      SelectMenu.cursorY = Currentbuf->cursorY + Currentbuf->rootY;
      SelectMenu.keymap['D'] = smDelBuf;
@@ -46,7 +58,7 @@ because it's no big deal nowadays. Now I feel dirty like a whore.
      SelectMenu.item[nitem].type = MENU_NOP;
  }
  
-@@ -1506,6 +1510,77 @@ smDelBuf(char c)
+@@ -1506,6 +1511,77 @@ smDelBuf(char c)
      return (MENU_NOTHING);
  }
  
@@ -124,3 +136,113 @@ because it's no big deal nowadays. Now I feel dirty like a whore.
  /* --- SelectMenu (END) --- */
  
  /* --- SelTabMenu --- */
+--- a/doc/MANUAL.html
++++ b/doc/MANUAL.html
+@@ -1931,47 +1931,12 @@ mh 2016-06-12 Interrupt is an alias to S
+ 	<h3>Menu Selection Mode</h3>
+       </td>
+     </tr>
+-      <tr>
+-     <td>
+-     BUF:NEXT</td>
+-    <td>
+-     j, C-n, DOWN
+-    </td>
+-    <td>
+-     Next item
+-    </td>
+-   </tr>
+-      <tr>
+-     <td>BUF:PREV
+-     </td>
+-    <td>
+-     k, C-p, UP
+-    </td>
+-    <td>
+-     Previous item
+-    </td>
+-   </tr>
+-      <tr>
+-     <td>
+-     BUF:DELETE</td>
+-    <td>
+-     D
+-    </td>
+-    <td>
+-     Delete item
+-    </td>
+-   </tr>
+-      <tr>
+-     <td>
+-       BUF:GO
+-     </td>
+-    <td>
+-     SPC, RET, RIGHT
+-    </td>
+-    <td>
+-     Select item
+-    </td>
+-   </tr>
++    <tr><td>N/A</td><td>j, C-n, DOWN</td><td>Next item</td></tr>
++    <tr><td>N/A</td><td>k, C-p, UP</td><td>Previous item</td></tr>
++    <tr><td>N/A</td><td>D</td><td>Delete item</td></tr>
++    <tr><td>N/A</td><td>SPC, RET, RIGHT</td><td>Select item</td></tr>
++    <tr><td>N/A</td><td>&lt;</td><td>Move down</td></tr>
++    <tr><td>N/A</td><td>&gt;</td><td>Move up</td></tr>
+ <!--  </table>-->
+     <tr>
+       <td colspan="3">
+--- a/doc-de/MANUAL.html
++++ b/doc-de/MANUAL.html
+@@ -1890,47 +1890,10 @@ mh 2016-06-12 Interrupt is an alias to S
+ 	<h3>Menü-Auswahl-Modus</h3>
+       </td>
+     </tr>
+-      <tr>
+-     <td>
+-     BUF:NEXT</td>
+-    <td>
+-     j, C-n, DOWN
+-    </td>
+-    <td>
+-     Nächster Eintrag
+-    </td>
+-   </tr>
+-      <tr>
+-     <td>BUF:PREV
+-     </td>
+-    <td>
+-     k, C-p, UP
+-    </td>
+-    <td>
+-     Vorheriger Eintrag
+-    </td>
+-   </tr>
+-      <tr>
+-     <td>
+-     BUF:DELETE</td>
+-    <td>
+-     D
+-    </td>
+-    <td>
+-     Lösche Eintrag
+-    </td>
+-   </tr>
+-      <tr>
+-     <td>
+-       BUF:GO
+-     </td>
+-    <td>
+-     SPC, RET, RIGHT
+-    </td>
+-    <td>
+-     Wähle Eintrag aus
+-    </td>
+-   </tr>
++    <tr><td>N/A</td><td>j, C-n, DOWN</td><td>Nächster Eintrag</td></tr>
++    <tr><td>N/A</td><td>k, C-p, UP</td><td>Vorheriger Eintrag</td></tr>
++    <tr><td>N/A</td><td>D</td><td>Lösche Eintrag</td></tr>
++    <tr><td>N/A</td><td>SPC, RET, RIGHT</td><td>Wähle Eintrag aus</td></tr>
+ <!--  </table>-->
+     <tr>
+       <td colspan="3">

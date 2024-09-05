@@ -148,6 +148,7 @@ WIP-save-history.patch
 Use-Ctrl-L-to-insert-next-char-in-search.patch
 Recognize-aria-label-for-buttons.patch
 Add-keybinding-to-insert-current-search-term.patch
+move-tab-menu.patch
 Enable-lto.patch
 # BORKED
 Refactor-regex-library.patch

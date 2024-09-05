@@ -239,7 +239,7 @@
  
      CurrentMenu = menu;
      while (active) {
-@@ -1489,7 +1489,7 @@ smDelBuf(char c)
+@@ -1490,7 +1490,7 @@ smDelBuf(char c)
      CurrentMenu->x = x;
      CurrentMenu->y = y;
  
@@ -248,7 +248,7 @@
  
      CurrentMenu->select = (mselect <= CurrentMenu->nitem - 2) ? mselect
  	: (CurrentMenu->nitem - 2);
-@@ -1525,7 +1525,7 @@ smMovUp(char c)
+@@ -1526,7 +1526,7 @@ smMovUp(char c)
      initSelectMenu();
      CurrentMenu->x = x;
      CurrentMenu->y = y;
@@ -257,7 +257,7 @@
      CurrentMenu->select = --mselect;
      displayBuffer(Currentbuf, B_FORCE_REDRAW);
      draw_all_menu(CurrentMenu);
-@@ -1563,7 +1563,7 @@ smMovDn(char c)
+@@ -1564,7 +1564,7 @@ smMovDn(char c)
      initSelectMenu();
      CurrentMenu->x = x;
      CurrentMenu->y = y;
@@ -266,7 +266,7 @@
      CurrentMenu->select = ++mselect;
      displayBuffer(Currentbuf, B_FORCE_REDRAW);
      draw_all_menu(CurrentMenu);
-@@ -1701,7 +1701,7 @@ smDelTab(char c)
+@@ -1702,7 +1702,7 @@ smDelTab(char c)
      CurrentMenu->x = x;
      CurrentMenu->y = y;
  
