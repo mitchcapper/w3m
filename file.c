@@ -8368,6 +8368,14 @@ doFileSave(URLFile uf, const char *defstr)
     FILE *f;
 #endif
 
+    if (param_dl_dir) {
+	filen = Strnew_charp(expandPath(param_dl_dir));
+	if (Strlastchar(filen) != '/')
+	    Strcat_char(filen, '/');
+	Strcat_charp(filen, defstr);
+	defstr = filen->ptr;
+    }
+
     if (fmInitialized) {
 	p = searchKeyData();
 	if (p == NULL || *p == '\0') {
