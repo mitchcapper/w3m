@@ -1132,6 +1132,7 @@ global int no_rc_dir init(FALSE);
 global char *rc_dir init(NULL);
 global char *tmp_dir;
 global char *param_tmp_dir init(NULL);
+global char *param_dl_dir init(NULL);
 #ifdef HAVE_MKDTEMP
 global char *mkd_tmp_dir init(NULL);
 #endif

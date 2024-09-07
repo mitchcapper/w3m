@@ -4693,6 +4693,7 @@ DEFUN(svBuf, PRINT SAVE_SCREEN, "Save rendered document")
 /* save source */
 DEFUN(svSrc, DOWNLOAD SAVE, "Save document source")
 {
+    Str fn;
     char *file;
 
     if (Currentbuf->sourcefile == NULL)
@@ -4704,6 +4705,15 @@ DEFUN(svSrc, DOWNLOAD SAVE, "Save document source")
 						real_file));
     else
 	file = guess_save_name(Currentbuf, Currentbuf->currentURL.file);
+
+    if (param_dl_dir) {
+	fn = Strnew_charp(expandPath(param_dl_dir));
+	if (Strlastchar(fn) != '/')
+	    Strcat_char(fn, '/');
+	Strcat_charp(fn, file);
+	file = fn->ptr;
+    }
+
     doFileCopy(Currentbuf->sourcefile, file);
     PermitSaveToPipe = FALSE;
     displayBuffer(Currentbuf, B_NORMAL);

@@ -135,6 +135,7 @@ static int OptionEncode = FALSE;
 #define CMT_PDROOT      N_("Directory corresponding to /~user")
 #define CMT_CGIBIN      N_("Directory corresponding to /cgi-bin")
 #define CMT_TMP         N_("Directory for temporary files")
+#define CMT_DL_DIR	N_("Default directory for downloads")
 #define CMT_CONFIRM_QQ  N_("Confirm when calling quit")
 #define CMT_EXIT_ON_LAST  N_("Close w3m/tab if buffer is last when going back")
 #define CMT_CLOSE_TAB_BACK N_("Close tab if buffer is last when going back")
@@ -596,6 +597,7 @@ struct param_ptr params5[] = {
     {"cgi_bin", P_STRING, PI_TEXT, (void *)&cgi_bin, CMT_CGIBIN, NULL},
     {"index_file", P_STRING, PI_TEXT, (void *)&index_file, CMT_IFILE, NULL},
     {"tmp_dir", P_STRING, PI_TEXT, (void *)&param_tmp_dir, CMT_TMP, NULL},
+    {"dl_dir", P_STRING, PI_TEXT, (void *)&param_dl_dir, CMT_DL_DIR, NULL},
     {NULL, 0, 0, NULL, NULL, NULL},
 };
 
