@@ -74,7 +74,7 @@ Patch: patches/Remove-unused-CurrentKeyData.patch
      cmd = searchKeyData();
      if (cmd == NULL || *cmd == '\0') {
  	cmd = inputLineHist("(exec shell)!", "", IN_COMMAND, ShellHist);
-@@ -4566,7 +4558,6 @@ DEFUN(setOpt, SET_OPTION, "Set option")
+@@ -4568,7 +4560,6 @@ DEFUN(setOpt, SET_OPTION, "Set option")
  {
      char *opt;
  
@@ -82,7 +82,7 @@ Patch: patches/Remove-unused-CurrentKeyData.patch
      opt = searchKeyData();
      if (opt == NULL || *opt == '\0' || strchr(opt, '=') == NULL) {
  	if (opt != NULL && *opt != '\0') {
-@@ -4758,7 +4749,6 @@ DEFUN(svHist, SAVE_HISTORY, "Save browsi
+@@ -4760,7 +4751,6 @@ DEFUN(svHist, SAVE_HISTORY, "Save browsi
  /* download HREF link */
  DEFUN(svA, SAVE_LINK, "Save hyperlink target")
  {
@@ -90,7 +90,7 @@ Patch: patches/Remove-unused-CurrentKeyData.patch
      do_download = TRUE;
      followA();
      do_download = FALSE;
-@@ -4767,7 +4757,6 @@ DEFUN(svA, SAVE_LINK, "Save hyperlink ta
+@@ -4769,7 +4759,6 @@ DEFUN(svA, SAVE_LINK, "Save hyperlink ta
  /* download IMG link */
  DEFUN(svI, SAVE_IMAGE, "Save inline image")
  {
@@ -98,7 +98,7 @@ Patch: patches/Remove-unused-CurrentKeyData.patch
      do_download = TRUE;
      followI();
      do_download = FALSE;
-@@ -4780,7 +4769,6 @@ DEFUN(svBuf, PRINT SAVE_SCREEN, "Save re
+@@ -4782,7 +4771,6 @@ DEFUN(svBuf, PRINT SAVE_SCREEN, "Save re
      FILE *f;
      int is_pipe;
  
@@ -106,7 +106,7 @@ Patch: patches/Remove-unused-CurrentKeyData.patch
      file = searchKeyData();
      if (file == NULL || *file == '\0') {
  	qfile = inputLineHist(_("Save buffer to: "), NULL, IN_COMMAND, SaveHist);
-@@ -4827,7 +4815,6 @@ DEFUN(svSrc, DOWNLOAD SAVE, "Save docume
+@@ -4829,7 +4817,6 @@ DEFUN(svSrc, DOWNLOAD SAVE, "Save docume
  
      if (Currentbuf->sourcefile == NULL)
  	return;
@@ -114,7 +114,7 @@ Patch: patches/Remove-unused-CurrentKeyData.patch
      PermitSaveToPipe = TRUE;
      if (Currentbuf->real_scheme == SCM_LOCAL)
  	file = conv_from_system(guess_save_name(NULL,
-@@ -5464,7 +5451,6 @@ invoke_browser(const char *url)
+@@ -5466,7 +5453,6 @@ invoke_browser(const char *url)
      const char *browser = NULL;
      int bg = 0, len;
  
@@ -122,7 +122,7 @@ Patch: patches/Remove-unused-CurrentKeyData.patch
      browser = searchKeyData();
      if (browser == NULL || *browser == '\0') {
  	switch (prec_num) {
-@@ -5716,7 +5702,6 @@ do_mouse_action(int btn, int x, int y)
+@@ -5718,7 +5704,6 @@ do_mouse_action(int btn, int x, int y)
  	mouse_action.cursorX = x;
  	mouse_action.cursorY = y;
  	CurrentKey = -1;
@@ -130,7 +130,7 @@ Patch: patches/Remove-unused-CurrentKeyData.patch
  	CurrentCmdData = map->data;
  	(*map->func) ();
  	CurrentCmdData = NULL;
-@@ -6224,13 +6209,10 @@ searchKeyData(void)
+@@ -6226,13 +6211,10 @@ searchKeyData(void)
  {
      char *data = NULL;
  
@@ -145,7 +145,7 @@ Patch: patches/Remove-unused-CurrentKeyData.patch
      CurrentCmdData = NULL;
      if (data == NULL || *data == '\0')
  	return NULL;
-@@ -6319,7 +6301,6 @@ DEFUN(execCmd, COMMAND, "Invoke w3m func
+@@ -6321,7 +6303,6 @@ DEFUN(execCmd, COMMAND, "Invoke w3m func
      char *data, *p;
      int cmd;
  
@@ -153,7 +153,7 @@ Patch: patches/Remove-unused-CurrentKeyData.patch
      data = searchKeyData();
      if (data == NULL || *data == '\0') {
  	data = inputStrHist("command [; ...]: ", "", TextHist);
-@@ -6344,7 +6325,6 @@ DEFUN(execCmd, COMMAND, "Invoke w3m func
+@@ -6346,7 +6327,6 @@ DEFUN(execCmd, COMMAND, "Invoke w3m func
  	}
  	p = getQWord(&data);
  	CurrentKey = -1;
@@ -161,7 +161,7 @@ Patch: patches/Remove-unused-CurrentKeyData.patch
  	CurrentCmdData = *p ? p : NULL;
  #ifdef USE_MOUSE
  	if (use_mouse)
-@@ -6368,7 +6348,6 @@ SigAlarm(SIGNAL_ARG)
+@@ -6370,7 +6350,6 @@ SigAlarm(SIGNAL_ARG)
  
      if (CurrentAlarm->sec > 0) {
  	CurrentKey = -1;
@@ -169,7 +169,7 @@ Patch: patches/Remove-unused-CurrentKeyData.patch
  	CurrentCmdData = data = (char *)CurrentAlarm->data;
  #ifdef USE_MOUSE
  	if (use_mouse)
-@@ -6405,7 +6384,6 @@ DEFUN(setAlarm, ALARM, "Set alarm")
+@@ -6407,7 +6386,6 @@ DEFUN(setAlarm, ALARM, "Set alarm")
      char *data;
      int sec = 0, cmd = -1;
  
@@ -177,7 +177,7 @@ Patch: patches/Remove-unused-CurrentKeyData.patch
      data = searchKeyData();
      if (data == NULL || *data == '\0') {
  	data = inputStrHist("(Alarm)sec command: ", "", TextHist);
-@@ -6517,7 +6495,6 @@ DEFUN(defKey, DEFINE_KEY, "Define a bind
+@@ -6519,7 +6497,6 @@ DEFUN(defKey, DEFINE_KEY, "Define a bind
  {
      char *data;
  
@@ -187,7 +187,7 @@ Patch: patches/Remove-unused-CurrentKeyData.patch
  	data = inputStrHist("Key definition: ", "", TextHist);
 --- a/menu.c
 +++ b/menu.c
-@@ -591,7 +591,6 @@ action_menu(Menu *menu)
+@@ -593,7 +593,6 @@ action_menu(Menu *menu)
  	    *item.variable = item.value;
  	if (item.type & MENU_FUNC) {
  	    CurrentKey = -1;

@@ -308,7 +308,7 @@ Subject: Replace deprecated bcopy
  		    if (!seen_dnsname)
 --- a/main.c
 +++ b/main.c
-@@ -4734,7 +4734,7 @@ _peekURL(int only_img)
+@@ -4735,7 +4735,7 @@ _peekURL(int only_img)
  #ifdef USE_M17N
      s = checkType(s, &pp, NULL);
      p = NewAtom_N(Lineprop, s->length);
@@ -317,7 +317,7 @@ Subject: Replace deprecated bcopy
  #endif
    disp:
      n = searchKeyNum();
-@@ -4793,7 +4793,7 @@ DEFUN(curURL, PEEK, "Show current addres
+@@ -4794,7 +4794,7 @@ DEFUN(curURL, PEEK, "Show current addres
  #ifdef USE_M17N
  	s = checkType(s, &pp, NULL);
  	p = NewAtom_N(Lineprop, s->length);

@@ -221,7 +221,7 @@
      Str tmp;
 --- a/menu.c
 +++ b/menu.c
-@@ -346,7 +346,7 @@ new_menu(Menu *menu, MenuItem *item)
+@@ -348,7 +348,7 @@ new_menu(Menu *menu, MenuItem *item)
  }
  
  void
@@ -230,7 +230,7 @@
  {
      int win_x, win_y, win_w, win_h;
  
-@@ -631,7 +631,7 @@ popup_menu(Menu *parent, Menu *menu)
+@@ -633,7 +633,7 @@ popup_menu(Menu *parent, Menu *menu)
  	menu->cursorY = parent->cursorY;
  	guess_menu_xy(parent, menu->width, &menu->x, &menu->y);
      }
@@ -239,7 +239,7 @@
  
      CurrentMenu = menu;
      while (active) {
-@@ -1490,7 +1490,7 @@ smDelBuf(char c)
+@@ -1492,7 +1492,7 @@ smDelBuf(char c)
      CurrentMenu->x = x;
      CurrentMenu->y = y;
  
@@ -248,7 +248,7 @@
  
      CurrentMenu->select = (mselect <= CurrentMenu->nitem - 2) ? mselect
  	: (CurrentMenu->nitem - 2);
-@@ -1526,7 +1526,7 @@ smMovUp(char c)
+@@ -1528,7 +1528,7 @@ smUpBuf(char c)
      initSelectMenu();
      CurrentMenu->x = x;
      CurrentMenu->y = y;
@@ -257,7 +257,7 @@
      CurrentMenu->select = --mselect;
      displayBuffer(Currentbuf, B_FORCE_REDRAW);
      draw_all_menu(CurrentMenu);
-@@ -1564,7 +1564,7 @@ smMovDn(char c)
+@@ -1566,7 +1566,7 @@ smDnBuf(char c)
      initSelectMenu();
      CurrentMenu->x = x;
      CurrentMenu->y = y;
@@ -266,7 +266,7 @@
      CurrentMenu->select = ++mselect;
      displayBuffer(Currentbuf, B_FORCE_REDRAW);
      draw_all_menu(CurrentMenu);
-@@ -1702,7 +1702,7 @@ smDelTab(char c)
+@@ -1706,7 +1706,7 @@ smDelTab(char c)
      CurrentMenu->x = x;
      CurrentMenu->y = y;
  

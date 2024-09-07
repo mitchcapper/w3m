@@ -602,7 +602,7 @@ w3m-0.5.3+git20230121.
  }
  
  /* Quit */
-@@ -4819,6 +4876,13 @@ DEFUN(vwSrc, SOURCE VIEW, "Toggle betwee
+@@ -4820,6 +4877,13 @@ DEFUN(vwSrc, SOURCE VIEW, "Toggle betwee
  	displayBuffer(Currentbuf, B_NORMAL);
  	return;
      }
@@ -616,7 +616,7 @@ w3m-0.5.3+git20230121.
      if (Currentbuf->sourcefile == NULL) {
  	if (Currentbuf->pagerSource &&
  	    !strcasecmp(Currentbuf->type, "text/plain")) {
-@@ -4904,6 +4968,93 @@ DEFUN(foldPre, FOLD_PRE, "Fold long line
+@@ -4905,6 +4969,93 @@ DEFUN(foldPre, FOLD_PRE, "Fold long line
      fold_pre = FoldPre;
  }
  
@@ -710,7 +710,7 @@ w3m-0.5.3+git20230121.
  /* reload */
  DEFUN(reload, RELOAD, "Load current document anew")
  {
-@@ -5130,6 +5281,7 @@ chkURLBuffer(Buffer *buf)
+@@ -5131,6 +5282,7 @@ chkURLBuffer(Buffer *buf)
  	"https?://[a-zA-Z0-9:%\\-\\./_@]*\\[[a-fA-F0-9:][a-fA-F0-9:\\.]*\\][a-zA-Z0-9:%\\-\\./?=~_\\&+@#,\\$;]*",
  	"ftp://[a-zA-Z0-9:%\\-\\./_@]*\\[[a-fA-F0-9:][a-fA-F0-9:\\.]*\\][a-zA-Z0-9:%\\-\\./=_+@#,\\$]*",
  #endif				/* INET6 */
@@ -980,7 +980,7 @@ w3m-0.5.3+git20230121.
  #define P_INT      0
  #define P_SHORT    1
  #define P_CHARINT  2
-@@ -213,6 +215,7 @@ static int OptionEncode = FALSE;
+@@ -214,6 +216,7 @@ static int OptionEncode = FALSE;
  #define CMT_SSL_CA_PATH N_("Path to directory for PEM encoded certificates of CAs")
  #define CMT_SSL_CA_FILE N_("File consisting of PEM encoded certificates of CAs")
  #define CMT_SSL_CA_DEFAULT N_("Use default locations for PEM encoded certificates of CAs")
@@ -988,7 +988,7 @@ w3m-0.5.3+git20230121.
  #endif				/* USE_SSL_VERIFY */
  #define CMT_SSL_FORBID_METHOD N_("List of forbidden SSL methods (2: SSLv2, 3: SSLv3, t: TLSv1.0, 5: TLSv1.1, 6: TLSv1.2, 7: TLSv1.3)")
  #ifdef SSL_CTX_set_min_proto_version
-@@ -646,6 +649,8 @@ struct param_ptr params7[] = {
+@@ -649,6 +652,8 @@ struct param_ptr params7[] = {
       NULL},
      {"ssl_ca_default", P_INT, PI_ONOFF, (void *)&ssl_ca_default,
       CMT_SSL_CA_DEFAULT, NULL},

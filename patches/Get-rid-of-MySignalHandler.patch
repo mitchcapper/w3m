@@ -251,7 +251,7 @@ No need for this as POSIX says it is void.
      char *cmd;
  
      CurrentKeyData = NULL;	/* not allowed in w3m-control: */
-@@ -6196,7 +6193,7 @@ DEFUN(execCmd, COMMAND, "Invoke w3m func
+@@ -6197,7 +6194,7 @@ DEFUN(execCmd, COMMAND, "Invoke w3m func
  }
  
  #ifdef USE_ALARM
@@ -260,7 +260,7 @@ No need for this as POSIX says it is void.
  SigAlarm(SIGNAL_ARG)
  {
      char *data;
-@@ -6232,7 +6229,6 @@ SigAlarm(SIGNAL_ARG)
+@@ -6233,7 +6230,6 @@ SigAlarm(SIGNAL_ARG)
  	    alarm(CurrentAlarm->sec);
  	}
      }

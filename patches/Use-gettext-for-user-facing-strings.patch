@@ -1,17 +1,17 @@
 ---
  buffer.c       |   18 +++------
  display.c      |    6 +--
- file.c         |   55 +++++++++-------------------
+ file.c         |   55 ++++++++++-------------------
  form.c         |    6 +--
  frame.c        |    9 +---
  func.c         |   12 ++----
  history.c      |    5 +-
- istream.c      |   27 ++++---------
+ istream.c      |   27 ++++----------
  linein.c       |    9 +---
- main.c         |  111 +++++++++++++++++++--------------------------------------
- po/POTFILES.in |   23 ++++++++++-
+ main.c         |  108 +++++++++++++++++++--------------------------------------
+ po/POTFILES.in |   23 ++++++++++--
  url.c          |    6 +--
- 12 files changed, 109 insertions(+), 178 deletions(-)
+ 12 files changed, 108 insertions(+), 176 deletions(-)
 
 --- a/buffer.c
 +++ b/buffer.c
@@ -709,17 +709,7 @@
  		      IN_PASSWORD);
  	if (p == NULL)
  	    break;
-@@ -4295,8 +4272,7 @@ DEFUN(backBf, BACK, "Close current buffe
- 	    displayBuffer(Currentbuf, B_FORCE_REDRAW);
- 	}
- 	else
--	    /* FIXME: gettextize? */
--	    disp_message("Can't go back...", TRUE);
-+	    disp_message(_("Can't go back..."), TRUE);
- 	return;
-     }
- 
-@@ -4352,8 +4328,7 @@ cmd_loadURL(char *url, ParsedURL *curren
+@@ -4353,8 +4330,7 @@ cmd_loadURL(char *url, ParsedURL *curren
      refresh();
      buf = loadGeneralFile(url, current, referer, 0, request);
      if (buf == NULL) {
@@ -729,7 +719,7 @@
  	disp_err_message(emsg, FALSE);
      }
      else if (buf != NO_BUFFER) {
-@@ -4808,8 +4783,7 @@ DEFUN(svBuf, PRINT SAVE_SCREEN, "Save re
+@@ -4809,8 +4785,7 @@ DEFUN(svBuf, PRINT SAVE_SCREEN, "Save re
      CurrentKeyData = NULL;	/* not allowed in w3m-control: */
      file = searchKeyData();
      if (file == NULL || *file == '\0') {
@@ -739,7 +729,7 @@
  	if (qfile == NULL || *qfile == '\0') {
  	    displayBuffer(Currentbuf, B_NORMAL);
  	    return;
-@@ -4834,8 +4808,7 @@ DEFUN(svBuf, PRINT SAVE_SCREEN, "Save re
+@@ -4835,8 +4810,7 @@ DEFUN(svBuf, PRINT SAVE_SCREEN, "Save re
  	is_pipe = FALSE;
      }
      if (f == NULL) {
@@ -749,7 +739,7 @@
  	disp_err_message(emsg, TRUE);
  	return;
      }
-@@ -5193,15 +5166,13 @@ DEFUN(reload, RELOAD, "Load current docu
+@@ -5194,15 +5168,13 @@ DEFUN(reload, RELOAD, "Load current docu
  	    ldDL();
  	    return;
  	}
@@ -767,7 +757,7 @@
  	return;
      }
      fold_pre = FoldPre;
-@@ -5254,8 +5225,7 @@ DEFUN(reload, RELOAD, "Load current docu
+@@ -5255,8 +5227,7 @@ DEFUN(reload, RELOAD, "Load current docu
  	request = NULL;
      }
      url = parsedURL2Str(&Currentbuf->currentURL);
@@ -777,7 +767,7 @@
      refresh();
  #ifdef USE_M17N
      old_charset = DocumentCharset;
-@@ -5274,8 +5244,7 @@ DEFUN(reload, RELOAD, "Load current docu
+@@ -5275,8 +5246,7 @@ DEFUN(reload, RELOAD, "Load current docu
      if (multipart)
  	unlink(request->body);
      if (buf == NULL) {
@@ -787,7 +777,7 @@
  	return;
      }
      else if (buf == NO_BUFFER) {
-@@ -5353,8 +5322,7 @@ DEFUN(docCSet, CHARSET, "Change the char
+@@ -5354,8 +5324,7 @@ DEFUN(docCSet, CHARSET, "Change the char
  
      cs = searchKeyData();
      if (cs == NULL || *cs == '\0')
@@ -797,7 +787,7 @@
  		      wc_ces_to_charset(Currentbuf->document_charset));
      charset = wc_guess_charset_short(cs, 0);
      if (charset == 0) {
-@@ -5371,8 +5339,7 @@ DEFUN(defCSet, DEFAULT_CHARSET, "Change
+@@ -5372,8 +5341,7 @@ DEFUN(defCSet, DEFAULT_CHARSET, "Change
  
      cs = searchKeyData();
      if (cs == NULL || *cs == '\0')
@@ -807,7 +797,7 @@
  		      wc_ces_to_charset(DocumentCharset));
      charset = wc_guess_charset_short(cs, 0);
      if (charset != 0)
-@@ -5560,15 +5527,13 @@ invoke_browser(const char *url)
+@@ -5561,15 +5529,13 @@ invoke_browser(const char *url)
  DEFUN(extbrz, EXTERN, "Display using an external browser")
  {
      if (Currentbuf->bufferprop & BP_INTERNAL) {
@@ -825,7 +815,7 @@
  	return;
      }
      invoke_browser(parsedURL2Str(&Currentbuf->currentURL)->ptr);
-@@ -6093,13 +6058,11 @@ DEFUN(wrapToggle, WRAP_TOGGLE, "Toggle w
+@@ -6094,13 +6060,11 @@ DEFUN(wrapToggle, WRAP_TOGGLE, "Toggle w
  {
      if (WrapSearch) {
  	WrapSearch = FALSE;

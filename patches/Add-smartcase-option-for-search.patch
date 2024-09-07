@@ -11,7 +11,7 @@ Patch: patches/Add-smartcase-option-for-search.patch
 
 --- a/fm.h
 +++ b/fm.h
-@@ -988,6 +988,7 @@ global char *AcceptEncoding init(NULL);
+@@ -989,6 +989,7 @@ global char *AcceptEncoding init(NULL);
  global char *AcceptMedia init(NULL);
  global int WrapDefault init(FALSE);
  global int IgnoreCase init(TRUE);
@@ -21,7 +21,7 @@ Patch: patches/Add-smartcase-option-for-search.patch
  global char *BookmarkFile init(NULL);
 --- a/rc.c
 +++ b/rc.c
-@@ -215,6 +215,7 @@ static int OptionEncode = FALSE;
+@@ -216,6 +216,7 @@ static int OptionEncode = FALSE;
  #define CMT_NOSENDREFERER N_("Suppress `Referer:' header")
  #define CMT_CROSSORIGINREFERER N_("Exclude pathname and query string from `Referer:' header when cross domain communication")
  #define CMT_IGNORE_CASE N_("Search case-insensitively")
@@ -29,7 +29,7 @@ Patch: patches/Add-smartcase-option-for-search.patch
  #define CMT_USE_LESSOPEN N_("Use LESSOPEN")
  #ifdef USE_SSL
  #ifdef USE_SSL_VERIFY
-@@ -539,6 +540,8 @@ struct param_ptr params3[] = {
+@@ -542,6 +543,8 @@ struct param_ptr params3[] = {
      {"wrap_search", P_INT, PI_ONOFF, (void *)&WrapDefault, CMT_WRAP, NULL},
      {"ignorecase_search", P_INT, PI_ONOFF, (void *)&IgnoreCase,
       CMT_IGNORE_CASE, NULL},

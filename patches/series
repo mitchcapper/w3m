@@ -1,3 +1,4 @@
+Add-option-exit_on_last.patch
 Remove-left-over-FORMAT_NICE-code.patch
 Get-rid-of-MySignalHandler.patch
 Remove-config.h.dist.patch
@@ -148,8 +149,9 @@ WIP-save-history.patch
 Use-Ctrl-L-to-insert-next-char-in-search.patch
 Recognize-aria-label-for-buttons.patch
 Add-keybinding-to-insert-current-search-term.patch
-move-tab-menu.patch
-Enable-lto.patch
+Fix-select-menu-setup.patch
+Add-default-download-directory.patch
+lto.patch
 # BORKED
 Refactor-regex-library.patch
 Enable-command-completion.patch

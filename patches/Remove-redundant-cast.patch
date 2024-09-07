@@ -9,7 +9,7 @@ Patch: patches/Remove-redundant-cast.patch
 
 --- a/rc.c
 +++ b/rc.c
-@@ -1885,7 +1885,7 @@ querySiteconf(ParsedURL *query_pu, int f
+@@ -1888,7 +1888,7 @@ querySiteconf(ParsedURL *query_pu, int f
  	return NULL;
      if (!query_pu || IS_EMPTY_PARSED_URL(query_pu))
  	return NULL;

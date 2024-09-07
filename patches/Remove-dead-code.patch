@@ -577,7 +577,7 @@ Subject: [PATCH 014/172] Remove dead code
      url = a->url;
  #ifdef USE_IMAGE
      if (map)
-@@ -4292,14 +4255,6 @@ cmd_loadURL(char *url, ParsedURL *curren
+@@ -4293,14 +4256,6 @@ cmd_loadURL(char *url, ParsedURL *curren
  
      if (handleMailto(url))
  	return;
@@ -592,7 +592,7 @@ Subject: [PATCH 014/172] Remove dead code
  
      refresh();
      buf = loadGeneralFile(url, current, referer, 0, request);
-@@ -5416,10 +5371,6 @@ DEFUN(dispI, DISPLAY_IMAGE, "Restart loa
+@@ -5417,10 +5372,6 @@ DEFUN(dispI, DISPLAY_IMAGE, "Restart loa
      if (!activeImage)
  	return;
      displayImage = TRUE;
@@ -603,7 +603,7 @@ Subject: [PATCH 014/172] Remove dead code
      Currentbuf->image_flag = IMG_FLAG_AUTO;
      Currentbuf->need_reshape = TRUE;
      displayBuffer(Currentbuf, B_REDRAW_IMAGE);
-@@ -5429,10 +5380,6 @@ DEFUN(stopI, STOP_IMAGE, "Stop loading a
+@@ -5430,10 +5381,6 @@ DEFUN(stopI, STOP_IMAGE, "Stop loading a
  {
      if (!activeImage)
  	return;
@@ -614,7 +614,7 @@ Subject: [PATCH 014/172] Remove dead code
      Currentbuf->image_flag = IMG_FLAG_SKIP;
      displayBuffer(Currentbuf, B_REDRAW_IMAGE);
  }
-@@ -6428,11 +6375,7 @@ void
+@@ -6429,11 +6376,7 @@ void
  calcTabPos(void)
  {
      TabBuffer *tab;
@@ -651,7 +651,7 @@ Subject: [PATCH 014/172] Remove dead code
  {
 --- a/menu.c
 +++ b/menu.c
-@@ -479,8 +479,6 @@ select_menu(Menu *menu, int mselect)
+@@ -481,8 +481,6 @@ select_menu(Menu *menu, int mselect)
      standout();
      draw_menu_item(menu, menu->select);
      standend();
@@ -660,7 +660,7 @@ Subject: [PATCH 014/172] Remove dead code
      move(menu->y + mselect - menu->offset, menu->x);
      toggle_stand();
      refresh();
-@@ -1200,8 +1198,6 @@ mMouse(char c)
+@@ -1202,8 +1200,6 @@ mMouse(char c)
      if (y < 0)
  	y += 0x100;
  
@@ -671,7 +671,7 @@ Subject: [PATCH 014/172] Remove dead code
  
 --- a/rc.c
 +++ b/rc.c
-@@ -294,17 +294,8 @@ static struct sel_c colorstr[] = {
+@@ -295,17 +295,8 @@ static struct sel_c colorstr[] = {
  };
  #endif				/* USE_COLOR */
  
@@ -689,7 +689,7 @@ Subject: [PATCH 014/172] Remove dead code
  
  
  static struct sel_c defaulturls[] = {
-@@ -343,9 +334,6 @@ static struct sel_c dnsorders[] = {
+@@ -344,9 +335,6 @@ static struct sel_c dnsorders[] = {
  #ifdef USE_COOKIE
  static struct sel_c badcookiestr[] = {
      {N_S(ACCEPT_BAD_COOKIE_DISCARD), N_("discard")},
@@ -699,7 +699,7 @@ Subject: [PATCH 014/172] Remove dead code
      {N_S(ACCEPT_BAD_COOKIE_ASK), N_("ask")},
      {0, NULL, NULL}
  };
-@@ -1695,14 +1683,6 @@ auxbinFile(char *base)
+@@ -1698,14 +1686,6 @@ auxbinFile(char *base)
      return expandPath(Strnew_m_charp(w3m_auxbin_dir(), "/", base, NULL)->ptr);
  }
  

@@ -304,7 +304,7 @@ Next step: use 'flags' parameter for all options, include do_download.
      if (buf == NULL) {
  	char *emsg = Sprintf(_("Can't load %s"), a->url)->ptr;
  	disp_err_message(emsg, FALSE);
-@@ -4328,7 +4332,7 @@ cmd_loadURL(char *url, ParsedURL *curren
+@@ -4330,7 +4334,7 @@ cmd_loadURL(char *url, ParsedURL *curren
  	return;
  
      refresh();
@@ -313,7 +313,7 @@ Next step: use 'flags' parameter for all options, include do_download.
      if (buf == NULL) {
  	char *emsg = Sprintf(_("Can't load %s"), conv_from_system(url))->ptr;
  	disp_err_message(emsg, FALSE);
-@@ -5231,7 +5235,8 @@ DEFUN(reload, RELOAD, "Load current docu
+@@ -5233,7 +5237,8 @@ DEFUN(reload, RELOAD, "Load current docu
  #endif
      SearchHeader = Currentbuf->search_header;
      DefaultType = Currentbuf->real_type;
@@ -323,7 +323,7 @@ Next step: use 'flags' parameter for all options, include do_download.
  #ifdef USE_M17N
      DocumentCharset = old_charset;
  #endif
-@@ -6123,7 +6128,7 @@ execdict(const char *word)
+@@ -6125,7 +6130,7 @@ execdict(const char *word)
      }
      dictcmd = Sprintf("%s?%s", DictCommand,
  		      Str_form_quote(Strnew_charp(w))->ptr)->ptr;
