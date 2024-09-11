@@ -21,7 +21,7 @@ Subject: [PATCH] Add option to change the dictionary prompt
  #define DISPLAY_INS_DEL_SIMPLE	0
 --- a/main.c
 +++ b/main.c
-@@ -6178,7 +6178,7 @@ execdict(const char *word)
+@@ -6181,7 +6181,7 @@ execdict(const char *word)
  
  DEFUN(dictword, DICT_WORD, "Execute dictionary command (see README.dict)")
  {

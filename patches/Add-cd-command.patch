@@ -10,7 +10,7 @@ Patch: patches/Add-cd-command.patch
 
 --- a/main.c
 +++ b/main.c
-@@ -2121,6 +2121,16 @@ DEFUN(col1L, LEFT, "Shift screen one col
+@@ -2124,6 +2124,16 @@ DEFUN(col1L, LEFT, "Shift screen one col
      displayBuffer(Currentbuf, B_NORMAL);
  }
  

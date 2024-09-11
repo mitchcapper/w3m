@@ -4,11 +4,11 @@
  doc/README.func        |    1 
  doc/w3m.1              |   20 ++++++++
  fm.h                   |    2 
- main.c                 |  119 ++++++++++++++++++++++++++++++++++++++++++++++++-
+ main.c                 |  122 ++++++++++++++++++++++++++++++++++++++++++++++++-
  proto.h                |    1 
  rc.c                   |    4 +
  scripts/w3mhelp.cgi.in |    3 -
- 9 files changed, 149 insertions(+), 3 deletions(-)
+ 9 files changed, 152 insertions(+), 3 deletions(-)
 
 --- a/config.h.in
 +++ b/config.h.in
@@ -70,7 +70,7 @@
  	    else if (!strcmp("-F", argv[i]))
  		RenderFrame = TRUE;
  	    else if (!strcmp("-W", argv[i])) {
-@@ -909,8 +923,43 @@ main(int argc, char **argv)
+@@ -909,8 +923,46 @@ main(int argc, char **argv)
      if (ssl_known_hosts)
  	known_hosts = load_known_hosts();
  
@@ -86,7 +86,10 @@
 +	sf = session_file ? session_file : rcFile(SESSION_FILE);
 +	session = New_N(char *, max);
 +	if (!(fp = fopen(sf, "r"))) {
-+	    disp_err_message(strerror(errno), FALSE);
++	    Str err = Sprintf("Cannot restore session %s - %s", sf,
++			      strerror(errno));
++	    disp_err_message(err->ptr, FALSE);
++	    fmTerm();
 +	    return 1;
 +	}
 +
@@ -116,7 +119,7 @@
  
      if (w3m_backend)
  	backend();
-@@ -2604,6 +2653,10 @@ _quitfm(int confirm)
+@@ -2604,6 +2656,10 @@ _quitfm(int confirm)
  #endif				/* USE_HISTORY */
      if ((err = save_known_hosts()))
  	perror(NULL);
@@ -127,7 +130,7 @@
      w3m_exit(err);
  }
  
-@@ -4466,6 +4519,68 @@ DEFUN(adBmark, ADD_BOOKMARK, "Add curren
+@@ -4466,6 +4522,68 @@ DEFUN(adBmark, ADD_BOOKMARK, "Add curren
  		request);
  }
  
