@@ -196,7 +196,7 @@ because it's no big deal nowadays.
 +    initSelTabMenu();
 +    CurrentMenu->x = x;
 +    CurrentMenu->y = y;
-+    geom_menu(CurrentMenu, 0);
++    geom_menu(CurrentMenu, 0, 0, 0);
 +    CurrentMenu->select = --mselect;
 +    displayBuffer(Currentbuf, B_FORCE_REDRAW);
 +    draw_all_menu(CurrentMenu);
@@ -244,7 +244,7 @@ because it's no big deal nowadays.
 +    initSelTabMenu();
 +    CurrentMenu->x = x;
 +    CurrentMenu->y = y;
-+    geom_menu(CurrentMenu, 0);
++    geom_menu(CurrentMenu, 0, 0, 0);
 +    CurrentMenu->select = ++mselect;
 +    displayBuffer(Currentbuf, B_FORCE_REDRAW);
 +    draw_all_menu(CurrentMenu);

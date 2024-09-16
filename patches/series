@@ -144,6 +144,8 @@ Add-smartcase-option-for-search.patch
 Make-CTRL-Y-insert-deleted-text.patch
 Show-all-link-numbers.patch
 scan-build-issues.patch
+Refactor-checkOverwrite.patch
+Refactor-inputAnswer.patch
 Add-password-manager-integration.patch
 WIP-save-history.patch
 Use-Ctrl-L-to-insert-next-char-in-search.patch

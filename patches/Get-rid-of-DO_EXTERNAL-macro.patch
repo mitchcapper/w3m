@@ -12,8 +12,8 @@ proc.^U
 
 While there, remove a redundant assignment.
 ---
- file.c |    6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ file.c |   10 ++--------
+ 1 file changed, 2 insertions(+), 8 deletions(-)
 
 --- a/file.c
 +++ b/file.c
@@ -33,7 +33,16 @@ While there, remove a redundant assignment.
  
      current_content_length = 0;
      if ((p = checkHeader(t_buf, "Content-Length:")) != NULL)
-@@ -2240,7 +2238,7 @@ loadGeneralFile(char *path, ParsedURL *v
+@@ -2226,8 +2224,6 @@ loadGeneralFile(char *path, ParsedURL *v
+ 
+     if (is_html_type(t))
+ 	proc = loadHTMLBuffer;
+-    else if (is_plain_text_type(t))
+-	proc = loadBuffer;
+ #ifdef USE_IMAGE
+     else if (activeImage && displayImage && !useExtImageViewer &&
+ 	     !(w3m_dump & ~DUMP_FRAME) && !strncasecmp(t, "image/", 6))
+@@ -2240,7 +2236,7 @@ loadGeneralFile(char *path, ParsedURL *v
  		!gopher_download &&
  #endif
  		searchExtViewer(t) != NULL) {
@@ -42,7 +51,16 @@ While there, remove a redundant assignment.
  	}
  	else {
  	    TRAP_OFF;
-@@ -2278,7 +2276,7 @@ loadGeneralFile(char *path, ParsedURL *v
+@@ -2263,8 +2259,6 @@ loadGeneralFile(char *path, ParsedURL *v
+     }
+     else if (w3m_dump & DUMP_FRAME)
+ 	return NULL;
+-    else
+-	proc = NULL;
+ 
+     if (t_buf == NULL)
+ 	t_buf = newBuffer(INIT_BUFFER_WIDTH);
+@@ -2278,7 +2272,7 @@ loadGeneralFile(char *path, ParsedURL *v
      t_buf->ssl_certificate = f.ssl_certificate;
  #endif
      frame_source = flag & RG_FRAME_SRC;
