@@ -8,13 +8,16 @@ This package <https://sr.ht/~rkta/w3m> is forked from the Debian version
 <https://github.com/tats/w3m>, which was forked from the original version
 <https://sourceforge.net/projects/w3m/>.
 
-There are three stable branches: master, next and oldstable. Branch
-master is the current stable version where the next release will be made
-from. Branch next serves as a release candidate for branch master. It
-contains new features and other patches that are staged to get merged
-into branch master after some time of testing in day to day usage.
-Branch oldstable contains a very conservative set of bug fixes to the
-last release of tats/w3m.
+There are three important branches: master, next and oldstable. Branch master
+is the current stable version where the next release will be made from. Branch
+next serves as a release candidate for branch master. It contains new features
+and other patches that are staged to get merged into branch master after some
+time of testing in day to day usage. Branch next will be rebased and force
+pushed regularly. Branch oldstable contains a very conservative set of bug
+fixes to the last release of tats/w3m.
+
+Additionally there is a branch gemini which is just branch master but with a
+patch to add support for the gemini protocol and hypertext format.
 
 For historical reason most active development happens using quilt. The
 quilt patch series is regularly pushed to branch patches.
