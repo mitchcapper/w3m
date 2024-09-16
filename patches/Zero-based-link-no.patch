@@ -36,7 +36,7 @@
  }
  
  /* 
-@@ -7716,7 +7716,7 @@ loadGeminiBuffer(URLFile *uf, Buffer *vo
+@@ -7705,7 +7705,7 @@ loadGeminiBuffer(URLFile *uf, Buffer *vo
  	    buf->hmarklist = putHmarker(buf->hmarklist, currentLn(buf),
  					0, hseq);
  	    if (displayLinkNumber)

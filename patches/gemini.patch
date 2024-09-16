@@ -221,16 +221,16 @@ w3m-0.5.3+git20230121.
      else if (searchHeader) {
  	searchHeader = SearchHeader = FALSE;
  	if (t_buf == NULL)
-@@ -2193,6 +2355,8 @@ loadGeneralFile(char *path, ParsedURL *v
+@@ -2186,6 +2348,8 @@ loadGeneralFile(char *path, ParsedURL *v
  
      if (is_html_type(t))
  	proc = loadHTMLBuffer;
 +    else if (!strcmp(t, "text/gemini"))
 +	proc = loadGeminiBuffer;
-     else if (is_plain_text_type(t))
- 	proc = loadBuffer;
  #ifdef USE_IMAGE
-@@ -2449,7 +2613,6 @@ is_boundary(unsigned char *ch1, unsigned
+     else if (activeImage && displayImage && !useExtImageViewer &&
+ 	     !(w3m_dump & ~DUMP_FRAME) && !strncasecmp(t, "image/", 6))
+@@ -2438,7 +2602,6 @@ is_boundary(unsigned char *ch1, unsigned
      return 1;
  }
  
@@ -238,7 +238,7 @@ w3m-0.5.3+git20230121.
  static void
  set_breakpoint(struct readbuffer *obuf, int tag_length)
  {
-@@ -7482,6 +7645,130 @@ loadGopherSearch0(ParsedURL *pu)
+@@ -7471,6 +7634,130 @@ loadGopherSearch0(ParsedURL *pu)
  }
  #endif				/* USE_GOPHER */
  

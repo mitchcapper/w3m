@@ -1,12 +1,5 @@
 Add-option-exit_on_last.patch
-Remove-left-over-FORMAT_NICE-code.patch
-Get-rid-of-MySignalHandler.patch
 Remove-config.h.dist.patch
-Drop-wait3-support.patch
-Drop-support-for-old-ss-family.patch
-Remove-obsolete-checks-in-configure.patch
-Replace-AC_TRY_CPP.patch
-Run-autoupdate.patch
 # modernC
 Label-endif-else-that-is-far-away-from-ifdef.patch
 # PENDING

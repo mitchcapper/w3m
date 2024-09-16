@@ -6,7 +6,7 @@
 
 --- a/file.c
 +++ b/file.c
-@@ -8032,7 +8032,7 @@ static Buffer *
+@@ -8021,7 +8021,7 @@ static Buffer *
  loadcmdout(char *cmd,
  	   Buffer *(*loadproc) (URLFile *, Buffer *), Buffer *defaultbuf)
  {
@@ -15,7 +15,7 @@
      Buffer *buf;
      URLFile uf;
  
-@@ -8070,7 +8070,7 @@ getshell(char *cmd)
+@@ -8059,7 +8059,7 @@ getshell(char *cmd)
  Buffer *
  getpipe(char *cmd)
  {

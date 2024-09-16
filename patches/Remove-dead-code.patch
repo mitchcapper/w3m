@@ -147,7 +147,7 @@ Subject: [PATCH 014/172] Remove dead code
      }
      else if (pu.scheme == SCM_DATA) {
  	t = f.guess_type;
-@@ -2723,26 +2692,6 @@ passthrough(struct readbuffer *obuf, cha
+@@ -2712,26 +2681,6 @@ passthrough(struct readbuffer *obuf, cha
      }
  }
  
@@ -174,7 +174,7 @@ Subject: [PATCH 014/172] Remove dead code
  static void
  fillline(struct readbuffer *obuf, int indent)
  {
-@@ -6352,7 +6301,6 @@ need_flushline(struct html_feed_environ
+@@ -6341,7 +6290,6 @@ need_flushline(struct html_feed_environ
      }
  
      ch = Strlastchar(obuf->line);
@@ -182,7 +182,7 @@ Subject: [PATCH 014/172] Remove dead code
      if (ch == ' ')
  	return 0;
  
-@@ -6973,7 +6921,6 @@ showProgress(clen_t * linelen, clen_t *
+@@ -6962,7 +6910,6 @@ showProgress(clen_t * linelen, clen_t *
  	for (j = pos + 1; j <= i; j++)
  	    addch('|');
  	standend();
@@ -190,7 +190,7 @@ Subject: [PATCH 014/172] Remove dead code
  	refresh();
      }
      else {
-@@ -7129,32 +7076,6 @@ print_internal_information(struct html_f
+@@ -7118,32 +7065,6 @@ print_internal_information(struct html_f
  			   html_quote(henv->title), "\">", NULL);
  	pushTextLine(tl, newTextLine(s, 0));
      }
@@ -223,7 +223,7 @@ Subject: [PATCH 014/172] Remove dead code
  #ifdef MENU_SELECT
      if (n_select > 0) {
  	FormSelectOptionItem *ip;
-@@ -7296,10 +7217,6 @@ loadHTMLstream(URLFile *f, Buffer *newBu
+@@ -7285,10 +7206,6 @@ loadHTMLstream(URLFile *f, Buffer *newBu
  	doc_charset = WC_CES_UTF_8;
      meta_charset = 0;
  #endif
@@ -234,7 +234,7 @@ Subject: [PATCH 014/172] Remove dead code
      if (IStype(f->stream) != IST_ENCODED)
  	f->stream = newEncodedStream(f->stream, f->encoding);
      while ((lineBuf2 = StrmyUFgets(f)) && lineBuf2->length) {
-@@ -7308,9 +7225,6 @@ loadHTMLstream(URLFile *f, Buffer *newBu
+@@ -7297,9 +7214,6 @@ loadHTMLstream(URLFile *f, Buffer *newBu
  	    Strshrinkfirst(lineBuf2, 1);
  	    if (lineBuf2->ptr[0] == '\n' || lineBuf2->ptr[0] == '\r' ||
  		lineBuf2->ptr[0] == '\0') {
@@ -244,7 +244,7 @@ Subject: [PATCH 014/172] Remove dead code
  		break;
  	    }
  	}
-@@ -7323,10 +7237,6 @@ loadHTMLstream(URLFile *f, Buffer *newBu
+@@ -7312,10 +7226,6 @@ loadHTMLstream(URLFile *f, Buffer *newBu
  	if (w3m_dump & DUMP_SOURCE)
  	    continue;
  	showProgress(&linelen, &trbyte);
@@ -255,7 +255,7 @@ Subject: [PATCH 014/172] Remove dead code
  #ifdef USE_M17N
  	if (meta_charset) {	/* <META> */
  	    if (content_charset == 0 && UseContentCharset) {
-@@ -8492,12 +8402,6 @@ doFileSave(URLFile uf, char *defstr)
+@@ -8481,12 +8391,6 @@ doFileSave(URLFile uf, char *defstr)
  	    disp_err_message(msg->ptr, FALSE);
  	    return -1;
  	}
@@ -268,7 +268,7 @@ Subject: [PATCH 014/172] Remove dead code
  	lock = tmpfname(TMPF_DFL, ".lock")->ptr;
  #if defined(HAVE_SYMLINK) && defined(HAVE_LSTAT)
  	symlink(p, lock);
-@@ -8778,40 +8682,6 @@ lessopen_stream(char *path)
+@@ -8767,40 +8671,6 @@ lessopen_stream(char *path)
      return fp;
  }
  
