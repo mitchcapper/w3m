@@ -242,6 +242,8 @@ static int SelectV = 0;
 static void initSelectMenu(void);
 static void smChBuf(void);
 static int smDelBuf(char c);
+static int smDnBuf(char c);
+static int smUpBuf(char c);
 
 /* --- SelectMenu (END) --- */
 
@@ -252,6 +254,8 @@ static int SelTabV = 0;
 static void initSelTabMenu(void);
 static void smChTab(void);
 static int smDelTab(char c);
+static int smDnTab(char c);
+static int smUpTab(char c);
 
 /* --- SelTabMenu (END) --- */
 
@@ -1387,7 +1391,8 @@ initSelectMenu(void)
     Str str;
     char **label;
     char *p;
-    static char *comment = " SPC for select / D for delete buffer ";
+    static const char *comment =
+	    " SPC: select | D: delete | </>: move down/up ";
 
     SelectV = -1;
     for (i = 0, buf = Firstbuf; buf != NULL; i++, buf = buf->nextBuffer) {
@@ -1442,6 +1447,8 @@ initSelectMenu(void)
     SelectMenu.cursorX = Currentbuf->cursorX + Currentbuf->rootX;
     SelectMenu.cursorY = Currentbuf->cursorY + Currentbuf->rootY;
     SelectMenu.keymap['D'] = smDelBuf;
+    SelectMenu.keymap['>'] = smUpBuf;
+    SelectMenu.keymap['<'] = smDnBuf;
     SelectMenu.item[nitem].type = MENU_NOP;
 }
 
@@ -1504,6 +1511,77 @@ smDelBuf(char c)
     draw_all_menu(CurrentMenu);
     select_menu(CurrentMenu, CurrentMenu->select);
     return (MENU_NOTHING);
+}
+
+static int
+smUpBuf(char c)
+{
+    Buffer *cur, *prev, *pprev;
+    int i, mselect, x, y;
+
+    if (!CurrentMenu->select) /* Top of menu */
+	return MENU_NOTHING;
+    for (i = 0, cur = Firstbuf; i < CurrentMenu->select;
+	 i++, cur = cur->nextBuffer) ;
+    prev = prevBuffer(Firstbuf, cur);
+    if ((pprev = prevBuffer(Firstbuf, prev)))
+	pprev->nextBuffer = cur;
+    prev->nextBuffer = cur->nextBuffer;
+    cur->nextBuffer = prev;
+    if (prev == Firstbuf)
+	Firstbuf = cur;
+
+    x = CurrentMenu->x;
+    y = CurrentMenu->y;
+    mselect = CurrentMenu->select;
+
+    initSelectMenu();
+    CurrentMenu->x = x;
+    CurrentMenu->y = y;
+    geom_menu(CurrentMenu, 0);
+    CurrentMenu->select = --mselect;
+    displayBuffer(Currentbuf, B_FORCE_REDRAW);
+    draw_all_menu(CurrentMenu);
+    select_menu(CurrentMenu, CurrentMenu->select);
+    return MENU_NOTHING;
+}
+
+static int
+smDnBuf(char c)
+{
+    Buffer *cur, *next, *prev;
+    int i, mselect, x, y;
+
+    /* Get selected buffer */
+    for (i = 0, cur = Firstbuf; i < CurrentMenu->select;
+	 i++, cur = cur->nextBuffer) ;
+
+    if (!cur->nextBuffer) /* Bottom of menu */
+	return MENU_NOTHING;
+
+    prev = prevBuffer(Firstbuf, cur);
+    next = cur->nextBuffer;
+
+    if (cur == Firstbuf)
+	Firstbuf = cur->nextBuffer;
+    else
+	prev->nextBuffer = next;
+    cur->nextBuffer = next->nextBuffer;
+    next->nextBuffer = cur;
+
+    x = CurrentMenu->x;
+    y = CurrentMenu->y;
+    mselect = CurrentMenu->select;
+
+    initSelectMenu();
+    CurrentMenu->x = x;
+    CurrentMenu->y = y;
+    geom_menu(CurrentMenu, 0);
+    CurrentMenu->select = ++mselect;
+    displayBuffer(Currentbuf, B_FORCE_REDRAW);
+    draw_all_menu(CurrentMenu);
+    select_menu(CurrentMenu, CurrentMenu->select);
+    return MENU_NOTHING;
 }
 
 /* --- SelectMenu (END) --- */
@@ -1588,6 +1666,8 @@ initSelTabMenu(void)
     SelTabMenu.cursorX = Currentbuf->cursorX + Currentbuf->rootX;
     SelTabMenu.cursorY = Currentbuf->cursorY + Currentbuf->rootY;
     SelTabMenu.keymap['D'] = smDelTab;
+    SelTabMenu.keymap['>'] = smUpTab;
+    SelTabMenu.keymap['<'] = smDnTab;
     SelTabMenu.item[nitem].type = MENU_NOP;
 }
 
@@ -1646,6 +1726,101 @@ smDelTab(char c)
     select_menu(CurrentMenu, CurrentMenu->select);
     return (MENU_NOTHING);
 }
+
+static int
+smUpTab(char c)
+{
+    int i, x, y, mselect;
+    TabBuffer *cur, *next, *nnext, *prev;
+
+    if (!CurrentMenu->select) /* Top of menu */
+	return MENU_NOTHING;
+    for (i = 0, cur = LastTab; i < CurrentMenu->select;
+	 i++, cur = cur->prevTab) ;
+
+    prev = cur->prevTab;
+    next = cur->nextTab;
+    nnext = next->nextTab;
+
+    if (nnext)
+	nnext->prevTab = cur;
+    next->prevTab = prev;
+    next->nextTab = cur;
+
+    if (prev)
+	prev->nextTab = next;
+    else
+	FirstTab = next;
+
+    cur->prevTab = next;
+    cur->nextTab = nnext;
+
+    if (next == LastTab)
+	LastTab = cur;
+
+    x = CurrentMenu->x;
+    y = CurrentMenu->y;
+    mselect = CurrentMenu->select;
+
+    initSelTabMenu();
+    CurrentMenu->x = x;
+    CurrentMenu->y = y;
+    geom_menu(CurrentMenu, 0);
+    CurrentMenu->select = --mselect;
+    displayBuffer(Currentbuf, B_FORCE_REDRAW);
+    draw_all_menu(CurrentMenu);
+    select_menu(CurrentMenu, CurrentMenu->select);
+    return (MENU_NOTHING);
+}
+
+static int
+smDnTab(char c)
+{
+    TabBuffer *cur, *next, *prev, *pprev;
+    int i, mselect, x, y;
+
+    /* Get selected tab */
+    for (i = 0, cur = LastTab; i < CurrentMenu->select;
+	 i++, cur = cur->prevTab) ;
+
+    if (!cur->prevTab) /* Bottom of menu */
+	return MENU_NOTHING;
+
+    prev = cur->prevTab;
+    pprev = prev->prevTab;
+    next = cur->nextTab;
+
+
+    if (pprev)
+	pprev->nextTab = cur;
+    prev->prevTab = cur;
+    prev->nextTab = next;
+    if (next)
+	next->prevTab = prev;
+
+    cur->prevTab = pprev;
+    cur->nextTab = prev;
+
+    if (prev == FirstTab)
+	FirstTab = cur;
+    if (cur == LastTab)
+	LastTab = prev;
+
+    x = CurrentMenu->x;
+    y = CurrentMenu->y;
+    mselect = CurrentMenu->select;
+
+    initSelTabMenu();
+    CurrentMenu->x = x;
+    CurrentMenu->y = y;
+    geom_menu(CurrentMenu, 0);
+    CurrentMenu->select = ++mselect;
+    displayBuffer(Currentbuf, B_FORCE_REDRAW);
+    draw_all_menu(CurrentMenu);
+    select_menu(CurrentMenu, CurrentMenu->select);
+    return MENU_NOTHING;
+}
+
 
 /* --- SelectMenu (END) --- */
 
