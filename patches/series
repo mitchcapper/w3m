@@ -156,7 +156,6 @@ Refactor-Strcat-functions.patch
 Let-Strfree-take-a-NULL.patch
 Refactor-Strcat_char.patch
 Get-rid-of-xfree.patch
-Get-rid-of-xrealloc.patch
 Strinsert_charp_n.patch
 lto.patch
 # BORKED
