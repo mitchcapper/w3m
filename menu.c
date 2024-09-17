@@ -347,8 +347,8 @@ new_menu(Menu *menu, MenuItem *item)
     }
 }
 
-void
-geom_menu(Menu *menu, int x, int y, int mselect)
+static void
+geom_menu(Menu *menu, int mselect)
 {
     int win_x, win_y, win_w, win_h;
 
@@ -635,7 +635,7 @@ popup_menu(Menu *parent, Menu *menu)
 	menu->cursorY = parent->cursorY;
 	guess_menu_xy(parent, menu->width, &menu->x, &menu->y);
     }
-    geom_menu(menu, menu->x, menu->y, menu->select);
+    geom_menu(menu, menu->select);
 
     CurrentMenu = menu;
     while (active) {
@@ -1502,7 +1502,7 @@ smDelBuf(char c)
     CurrentMenu->x = x;
     CurrentMenu->y = y;
 
-    geom_menu(CurrentMenu, x, y, 0);
+    geom_menu(CurrentMenu, 0);
 
     CurrentMenu->select = (mselect <= CurrentMenu->nitem - 2) ? mselect
 	: (CurrentMenu->nitem - 2);
@@ -1716,7 +1716,7 @@ smDelTab(char c)
     CurrentMenu->x = x;
     CurrentMenu->y = y;
 
-    geom_menu(CurrentMenu, x, y, 0);
+    geom_menu(CurrentMenu, 0);
 
     CurrentMenu->select = (mselect <= CurrentMenu->nitem - 2) ? mselect
 	: (CurrentMenu->nitem - 2);
