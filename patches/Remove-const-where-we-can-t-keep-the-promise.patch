@@ -181,7 +181,7 @@ cast away and there was no easy way to keep the const.
  
 --- a/Str.c
 +++ b/Str.c
-@@ -169,7 +169,7 @@ Strcopy(Str x, Str y)
+@@ -159,7 +159,7 @@ Strcopy(Str x, Str y)
  	    exit(1);
  	x->area_size = y->length + 1;
      }

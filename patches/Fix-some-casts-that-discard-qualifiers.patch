@@ -26,7 +26,7 @@ Found with -Wcast-qual.
  {
      struct auth_pass *ent;
  
-@@ -2112,7 +2112,7 @@ base64_encode(const char *src, size_t le
+@@ -2111,7 +2111,7 @@ base64_encode(const char *src, size_t le
      unsigned long j;
      size_t k;
  
@@ -115,7 +115,7 @@ Found with -Wcast-qual.
  static void
 --- a/Str.c
 +++ b/Str.c
-@@ -89,7 +89,7 @@ Strnew_charp(const char *p)
+@@ -82,7 +82,7 @@ Strnew_charp(const char *p)
  	exit(1);
      x->area_size = n;
      x->length = len;
@@ -124,7 +124,7 @@ Found with -Wcast-qual.
      x->ptr[x->length] = '\0';
      return x;
  }
-@@ -130,7 +130,7 @@ Strnew_charp_n(const char *p, int n)
+@@ -123,7 +123,7 @@ Strnew_charp_n(const char *p, int n)
  	exit(1);
      x->area_size = n + 1;
      x->length = len;
@@ -133,7 +133,7 @@ Found with -Wcast-qual.
      x->ptr[x->length] = '\0';
      return x;
  }
-@@ -193,7 +193,7 @@ Strcopy_charp(Str x, const char *y)
+@@ -182,7 +182,7 @@ Strcopy_charp(Str x, const char *y)
  	    exit(1);
  	x->area_size = len + 1;
      }
@@ -142,7 +142,7 @@ Found with -Wcast-qual.
      x->ptr[len] = '\0';
      x->length = len;
  }
-@@ -217,7 +217,7 @@ Strcopy_charp_n(Str x, const char *y, in
+@@ -205,7 +205,7 @@ Strcopy_charp_n(Str x, const char *y, in
  	    exit(1);
  	x->area_size = len + 1;
      }
@@ -151,7 +151,7 @@ Found with -Wcast-qual.
      x->ptr[len] = '\0';
      x->length = len;
  }
-@@ -248,7 +248,7 @@ Strcat_charp_n(Str x, const char *y, int
+@@ -235,7 +235,7 @@ Strcat_charp_n(Str x, const char *y, int
  	    exit(1);
  	x->area_size = newlen;
      }

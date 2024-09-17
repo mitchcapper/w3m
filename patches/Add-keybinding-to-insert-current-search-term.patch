@@ -10,25 +10,25 @@ Patch: patches/Add-keybinding-to-insert-current-search-term.patch
 
 --- a/linein.c
 +++ b/linein.c
-@@ -34,7 +34,7 @@ static char **CFileBuf = NULL;
+@@ -33,7 +33,7 @@ static char **CFileBuf = NULL;
  static int NCFileBuf;
  static int NCFileOffset;
  
--static void _iword(void), _Cy(void), _paste(void),
-+static void _isrch(void), _iword(void), _Cy(void), _paste(void),
+-static void _iword(void), _cy(void), _paste(void),
++static void _isrch(void), _iword(void), _cy(void), _paste(void),
  _mvR(void), _mvL(void), _mvRw(void), _mvLw(void), delC(void), insC(void),
  _mvB(void), _mvE(void), _enter(void), _quo(void), _bs(void), _bsw(void),
  killn(void), killb(void), _inbrk(void), _esc(void), _editor(void),
-@@ -59,7 +59,7 @@ void (*InputKeymap[32]) (void) = {
+@@ -58,7 +58,7 @@ void (*InputKeymap[32]) (void) = {
  /*  C-p     C-q     C-r     C-s     C-t     C-u     C-v     C-w     */
      _prev,  _quo,   _bsw,   _iword,  _mvLw,  killb,  _quo,   _bsw,
  /*  C-x     C-y     C-z     C-[     C-\     C-]     C-^     C-_     */
--    _tcompl,_Cy,    _iword, _esc,   _iword, _iword, _iword, _iword,
-+    _tcompl,_Cy,    _iword, _esc,   _isrch, _iword, _iword, _iword,
+-    _tcompl,_cy,    _iword, _esc,   _iword, _iword, _iword, _iword,
++    _tcompl,_cy,    _iword, _esc,   _isrch, _iword, _iword, _iword,
  };
  /* *INDENT-ON* */
  
-@@ -623,6 +623,13 @@ _iword(void)
+@@ -621,6 +621,13 @@ _iword(void)
      ins_char(Strnew_charp(GetWord(Currentbuf)));
  }
  

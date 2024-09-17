@@ -76,7 +76,7 @@ Subject: [PATCH 014/172] Remove dead code
  extern char *helpFile(char *base);
  extern const void *querySiteconf(const ParsedURL *query_pu, int field);
  extern Str localCookie(void);
-@@ -809,9 +798,6 @@ extern void dictwordat(void);
+@@ -808,9 +797,6 @@ extern void dictwordat(void);
  #define dictword nulcmd
  #define dictwordat nulcmd
  #endif				/* not USE_DICT */

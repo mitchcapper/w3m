@@ -4,10 +4,10 @@ Subject: Refactor inputAnswer
 Patch: patches/Refactor-inputAnswer.patch
 
 ---
- file.c    |   37 ++++++++++++++++++++++---------------
+ file.c    |   35 ++++++++++++++++++++++-------------
  istream.c |   23 +++++++++++------------
  proto.h   |    3 ++-
- 3 files changed, 35 insertions(+), 28 deletions(-)
+ 3 files changed, 35 insertions(+), 26 deletions(-)
 
 --- a/file.c
 +++ b/file.c
@@ -35,16 +35,20 @@ Patch: patches/Refactor-inputAnswer.patch
  			(err =
  			 add_cookie(pu, name, value, expires, domain, path,
  				    flag | COO_OVERRIDE, comment, version,
-@@ -8746,30 +8745,38 @@ checkOverWrite(const char *path)
+@@ -8743,34 +8742,44 @@ int
+ checkOverWrite(const char *path)
+ {
+     struct stat st;
+-    char *ans;
  
      if (stat(path, &st) < 0)
- 	return -1;
+ 	return 0;
 -    ans = inputAnswer(_("File exists. Overwrite? (y/n)"));
 -    if (ans && TOLOWER(*ans) == 'y')
--	return 1;
--    else
--	return 0;
-+    return confirm(Strnew_charp(_("File exists. Overwrite?")));
++    if (confirm(Strnew_charp(_("File exists. Overwrite?"))))
+ 	return 0;
+     else
+ 	return -1;
  }
  
 -char *

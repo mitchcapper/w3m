@@ -1,0 +1,19 @@
+From: Rene Kita <mail@rkta.de>
+Date: Tue Sep 17 12:37:42 CEST 2024
+Subject: Refactor some Str functions
+Patch: patches/Refactor-some-Str-functions.patch
+
+---
+ Str.h |    1 -
+ 1 file changed, 1 deletion(-)
+
+--- a/Str.h
++++ b/Str.h
+@@ -38,7 +38,6 @@ Str Strdup(Str);
+ void Strclear(Str);
+ void Strfree(Str);
+ void Strcopy(Str dst, Str src);
+-void Strcopy_charp(Str, const char *);
+ void Strcopy_charp_n(Str, const char *, int);
+ void Strcat_charp_n(Str, const char *, int);
+ void Strcat(Str, Str);

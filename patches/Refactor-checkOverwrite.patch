@@ -4,13 +4,13 @@ Subject: Refactor checkOverwrite
 Patch: patches/Refactor-checkOverwrite.patch
 
 ---
- file.c |   15 +++++++--------
+ file.c |   14 +++++++-------
  main.c |    2 +-
- 2 files changed, 8 insertions(+), 9 deletions(-)
+ 2 files changed, 8 insertions(+), 8 deletions(-)
 
 --- a/file.c
 +++ b/file.c
-@@ -8537,7 +8537,7 @@ _doFileCopy(char *tmpf, char *defstr, in
+@@ -8536,7 +8536,7 @@ _doFileCopy(char *tmpf, char *defstr, in
  		p = conv_to_system(p);
  	    }
  	    p = expandPath(p);
@@ -19,7 +19,7 @@ Patch: patches/Refactor-checkOverwrite.patch
  		return -1;
  	}
  	if (checkCopyFile(tmpf, p) < 0) {
-@@ -8594,7 +8594,7 @@ _doFileCopy(char *tmpf, char *defstr, in
+@@ -8593,7 +8593,7 @@ _doFileCopy(char *tmpf, char *defstr, in
  	    is_pipe = TRUE;
  	else {
  	    p = expandPath(p);
@@ -28,7 +28,7 @@ Patch: patches/Refactor-checkOverwrite.patch
  		return -1;
  	}
  	if (checkCopyFile(tmpf, p) < 0) {
-@@ -8642,7 +8642,7 @@ doFileSave(URLFile uf, const char *defst
+@@ -8641,7 +8641,7 @@ doFileSave(URLFile uf, const char *defst
  		return -1;
  	    p = conv_to_system(p);
  	}
@@ -37,7 +37,7 @@ Patch: patches/Refactor-checkOverwrite.patch
  	    return -1;
  	if (checkSaveFile(uf.stream, p) < 0) {
  	    msg = Sprintf(_("Can't save. Load file and %s are identical."),
-@@ -8691,7 +8691,7 @@ doFileSave(URLFile uf, const char *defst
+@@ -8690,7 +8690,7 @@ doFileSave(URLFile uf, const char *defst
  	if (*q == '\0')
  	    return -1;
  	p = expandPath(q);
@@ -46,17 +46,13 @@ Patch: patches/Refactor-checkOverwrite.patch
  	    return -1;
  	if (checkSaveFile(uf.stream, p) < 0) {
  	    printf(_("Can't save. Load file and %s are identical."), p);
-@@ -8743,15 +8743,14 @@ int
- checkOverWrite(const char *path)
- {
+@@ -8744,11 +8744,11 @@ checkOverWrite(const char *path)
      struct stat st;
--    char *ans;
  
      if (stat(path, &st) < 0)
 -	return 0;
-+	return -1;
-     ans = inputAnswer(_("File exists. Overwrite? (y/n)"));
-     if (ans && TOLOWER(*ans) == 'y')
++	return 1;
+     if (confirm(Strnew_charp(_("File exists. Overwrite?"))))
 -	return 0;
 +	return 1;
      else
@@ -64,7 +60,7 @@ Patch: patches/Refactor-checkOverwrite.patch
 +	return 0;
  }
  
- char *
+ char
 --- a/main.c
 +++ b/main.c
 @@ -4837,7 +4837,7 @@ DEFUN(svBuf, PRINT SAVE_SCREEN, "Save re

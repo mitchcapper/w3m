@@ -1,0 +1,40 @@
+From: Rene Kita <mail@rkta.de>
+Date: Tue Sep 17 17:08:30 CEST 2024
+Subject: Refactor Strcat_char
+Patch: patches/Refactor-Strcat_char.patch
+
+---
+ Str.c |    6 ++----
+ Str.h |    4 ++--
+ 2 files changed, 4 insertions(+), 6 deletions(-)
+
+--- a/Str.c
++++ b/Str.c
+@@ -279,12 +279,10 @@ void
+ Strinsert_char(Str s, int pos, char c)
+ {
+     int i;
+-    if (pos < 0 || s->length < pos)
++    if (pos < 0 || s->length < pos || s->length == STR_LEN_MAX)
+ 	return;
+-    if (s->length + 2 > s->area_size)
++    if (s->length + 1 >= s->area_size)
+ 	Strgrow(s);
+-    if (s->length < pos)
+-	return;
+     for (i = s->length; i > pos; i--)
+ 	s->ptr[i] = s->ptr[i - 1];
+     s->length++;
+--- a/Str.h
++++ b/Str.h
+@@ -67,8 +67,8 @@ Str Strfgetall(FILE *);
+ void Strgrow(Str s);
+ 
+ #define STR_LEN_MAX (INT_MAX / 32 - 1)
+-#define Strcat_char(x,y) (((x)->length>=STR_LEN_MAX)?0:(((x)->length+1>=(x)->area_size)?Strgrow(x),0:0,(x)->ptr[(x)->length++]=(y),(x)->ptr[(x)->length]=0))
+-#define Strnulterm(x) ((x)->ptr[(x)->length]='\0')
++#define Strcat_char(x,y)             Strinsert_char(x,(x)->length,y)
++#define Strnulterm(x)                ((x)->ptr[(x)->length]='\0')
+ #define Strcmp(x,y)                  strcmp((x)->ptr,(y)->ptr)
+ #define Strcmp_charp(x,y)            strcmp((x)->ptr,(y))
+ #define Strcasecmp(x,y)              strcasecmp((x)->ptr,(y)->ptr)

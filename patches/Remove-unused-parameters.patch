@@ -1,9 +1,8 @@
 ---
  file.c  |   56 +++++++++++++++++++++++---------------------------------
- menu.c  |   16 ++++++++--------
- proto.h |   11 +++++------
+ proto.h |    9 ++++-----
  table.c |   16 ++++++++--------
- 4 files changed, 44 insertions(+), 55 deletions(-)
+ 3 files changed, 35 insertions(+), 46 deletions(-)
 
 --- a/file.c
 +++ b/file.c
@@ -219,80 +218,6 @@
  #endif
  {
      Str tmp;
---- a/menu.c
-+++ b/menu.c
-@@ -348,7 +348,7 @@ new_menu(Menu *menu, MenuItem *item)
- }
- 
- void
--geom_menu(Menu *menu, int x, int y, int mselect)
-+geom_menu(Menu *menu, int mselect)
- {
-     int win_x, win_y, win_w, win_h;
- 
-@@ -633,7 +633,7 @@ popup_menu(Menu *parent, Menu *menu)
- 	menu->cursorY = parent->cursorY;
- 	guess_menu_xy(parent, menu->width, &menu->x, &menu->y);
-     }
--    geom_menu(menu, menu->x, menu->y, menu->select);
-+    geom_menu(menu, menu->select);
- 
-     CurrentMenu = menu;
-     while (active) {
-@@ -1492,7 +1492,7 @@ smDelBuf(char c)
-     CurrentMenu->x = x;
-     CurrentMenu->y = y;
- 
--    geom_menu(CurrentMenu, x, y, 0);
-+    geom_menu(CurrentMenu, 0);
- 
-     CurrentMenu->select = (mselect <= CurrentMenu->nitem - 2) ? mselect
- 	: (CurrentMenu->nitem - 2);
-@@ -1528,7 +1528,7 @@ smUpBuf(char c)
-     initSelectMenu();
-     CurrentMenu->x = x;
-     CurrentMenu->y = y;
--    geom_menu(CurrentMenu, 0, 0, 0);
-+    geom_menu(CurrentMenu, 0);
-     CurrentMenu->select = --mselect;
-     displayBuffer(Currentbuf, B_FORCE_REDRAW);
-     draw_all_menu(CurrentMenu);
-@@ -1566,7 +1566,7 @@ smDnBuf(char c)
-     initSelectMenu();
-     CurrentMenu->x = x;
-     CurrentMenu->y = y;
--    geom_menu(CurrentMenu, 0, 0, 0);
-+    geom_menu(CurrentMenu, 0);
-     CurrentMenu->select = ++mselect;
-     displayBuffer(Currentbuf, B_FORCE_REDRAW);
-     draw_all_menu(CurrentMenu);
-@@ -1706,7 +1706,7 @@ smDelTab(char c)
-     CurrentMenu->x = x;
-     CurrentMenu->y = y;
- 
--    geom_menu(CurrentMenu, x, y, 0);
-+    geom_menu(CurrentMenu, 0);
- 
-     CurrentMenu->select = (mselect <= CurrentMenu->nitem - 2) ? mselect
- 	: (CurrentMenu->nitem - 2);
-@@ -1755,7 +1755,7 @@ smUpTab(char c)
-     initSelTabMenu();
-     CurrentMenu->x = x;
-     CurrentMenu->y = y;
--    geom_menu(CurrentMenu, 0, 0, 0);
-+    geom_menu(CurrentMenu, 0);
-     CurrentMenu->select = --mselect;
-     displayBuffer(Currentbuf, B_FORCE_REDRAW);
-     draw_all_menu(CurrentMenu);
-@@ -1803,7 +1803,7 @@ smDnTab(char c)
-     initSelTabMenu();
-     CurrentMenu->x = x;
-     CurrentMenu->y = y;
--    geom_menu(CurrentMenu, 0, 0, 0);
-+    geom_menu(CurrentMenu, 0);
-     CurrentMenu->select = ++mselect;
-     displayBuffer(Currentbuf, B_FORCE_REDRAW);
-     draw_all_menu(CurrentMenu);
 --- a/proto.h
 +++ b/proto.h
 @@ -208,8 +208,7 @@ extern void push_render_image(Str str, i
@@ -321,15 +246,6 @@
  #endif
  #endif				/* USE_GOPHER */
  extern Buffer *loadBuffer(URLFile *uf, Buffer *newBuf);
-@@ -735,7 +734,7 @@ extern void initMouseAction(void);
- 
- #ifdef USE_MENU
- extern void new_menu(Menu *menu, MenuItem *item);
--extern void geom_menu(Menu *menu, int x, int y, int mselect);
-+extern void geom_menu(Menu *menu, int mselect);
- extern void draw_all_menu(Menu *menu);
- extern void draw_menu(Menu *menu);
- extern void draw_menu_item(Menu *menu, int mselect);
 --- a/table.c
 +++ b/table.c
 @@ -754,7 +754,7 @@ do_refill(struct table *tbl, int row, in

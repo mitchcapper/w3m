@@ -1,14 +1,14 @@
 Add-option-exit_on_last.patch
 Remove-config.h.dist.patch
 # modernC
-Label-endif-else-that-is-far-away-from-ifdef.patch
 # PENDING
 #266 reorder
-Replace-reserved-chars-with-HTML-entities.patch
+Make-geom_menu-static.patch
 Move-buffer.patch
 # ?
 Fix-slow-backward-search.patch
 #278 md5
+Get-rid-of-STR_LENGTH_CHECK.patch
 Reduce-scope-of-dangerous-macro.patch
 Fix-potential-null-dereference.patch
 Fix-potential-null-dereference-to_str.patch
@@ -137,8 +137,8 @@ Add-smartcase-option-for-search.patch
 Make-CTRL-Y-insert-deleted-text.patch
 Show-all-link-numbers.patch
 scan-build-issues.patch
-Refactor-checkOverwrite.patch
 Refactor-inputAnswer.patch
+Refactor-checkOverwrite.patch
 Add-password-manager-integration.patch
 WIP-save-history.patch
 Use-Ctrl-L-to-insert-next-char-in-search.patch
@@ -146,6 +146,18 @@ Recognize-aria-label-for-buttons.patch
 Add-keybinding-to-insert-current-search-term.patch
 Fix-select-menu-setup.patch
 Add-default-download-directory.patch
+Use-Strnulterm-everywhere.patch
+Replace-STR_SIZE_MAX-with-STR_LEN_MAX.patch
+Refactor-Strshrink.patch
+Refactor-Strnew-functions.patch
+Add-Strgrow_n-function.patch
+Refactor-Strcopy-functions.patch
+Refactor-Strcat-functions.patch
+Let-Strfree-take-a-NULL.patch
+Refactor-Strcat_char.patch
+Get-rid-of-xfree.patch
+Get-rid-of-xrealloc.patch
+Strinsert_charp_n.patch
 lto.patch
 # BORKED
 Refactor-regex-library.patch

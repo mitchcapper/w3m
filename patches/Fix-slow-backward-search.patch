@@ -1,11 +1,17 @@
 From: Rene Kita <mail@rkta.de>
 Subject: Fix slow backward search in long lines
+Date: Fri, 14 Jul 2023 16:26:09 +0200
+Patch: patches/Fix-slow-backward-search.patch
 
 We need to search the whole line up to the position we are at to find
 the first match from the end. If we have a match we know its end and can
 skip past it. This makes searching very long strings way more efficient.
 
 While there, refactor the whole function.
+
+This fixes Debian BTS #1031413[0].
+
+[0]: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1031413
 ---
  search.c |  105 +++++++++++++++++++++++++++------------------------------------
  1 file changed, 45 insertions(+), 60 deletions(-)

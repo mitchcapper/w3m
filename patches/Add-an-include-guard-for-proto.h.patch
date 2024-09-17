@@ -18,7 +18,7 @@ Subject: [PATCH 083/172] Add an include guard for proto.h
  extern int main(int argc, char **argv);
  extern void nulcmd(void);
  extern void pushEvent(int cmd, void *data);
-@@ -829,3 +831,4 @@ long lrand48(void);
+@@ -828,3 +830,4 @@ long lrand48(void);
  extern Str base64_encode(const char *src, size_t len);
  
  extern void userMessage(void);

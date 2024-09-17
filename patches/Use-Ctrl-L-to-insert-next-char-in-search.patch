@@ -10,7 +10,7 @@ Patch: patches/Use-Ctrl-L-to-insert-next-char-in-search.patch
 
 --- a/linein.c
 +++ b/linein.c
-@@ -212,6 +212,10 @@ inputLineHistSearch(const char *prompt,
+@@ -211,6 +211,10 @@ inputLineHistSearch(const char *prompt,
  	    if (incrfunc == NULL
  		|| (c = incrfunc((int)c, strBuf, strProp)) < 0x20)
  		(*InputKeymap[(int)c]) ();
