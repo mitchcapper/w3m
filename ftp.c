@@ -45,11 +45,10 @@ static struct _FTP current_ftp = {
 
 static JMP_BUF AbortLoading;
 
-static MySignalHandler
+static void
 KeyAbort(SIGNAL_ARG)
 {
     LONGJMP(AbortLoading, 1);
-    SIGNAL_RETURN;
 }
 
 static Str
@@ -231,11 +230,7 @@ ftp_pasv(FTP ftp)
     if (getpeername(fileno(ftp->wf),
 		    (struct sockaddr *)&sockaddr, &sockaddrlen) < 0)
 	return -1;
-#ifdef HAVE_OLD_SS_FAMILY
-    family = sockaddr.__ss_family;
-#else
     family = sockaddr.ss_family;
-#endif
 #else
     family = AF_INET;
 #endif
@@ -483,7 +478,7 @@ loadFTPDir0(ParsedURL *pu)
     char *realpathname, *fn, *q;
     char **flist;
     int i, nfile, nfile_max;
-    MySignalHandler(*volatile prevtrap) (SIGNAL_ARG) = NULL;
+    void (*volatile prevtrap) (SIGNAL_ARG) = NULL;
 #ifdef USE_M17N
     wc_ces doc_charset = DocumentCharset;
 

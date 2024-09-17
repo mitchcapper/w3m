@@ -6,7 +6,7 @@
 #include "myctype.h"
 #include <signal.h>
 #include <setjmp.h>
-#if defined(HAVE_WAITPID) || defined(HAVE_WAIT3)
+#if defined(HAVE_WAITPID)
 #include <sys/wait.h>
 #endif
 #include <stdio.h>
@@ -188,11 +188,10 @@ static struct compression_decoder {
 
 #define SAVE_BUF_SIZE 1536
 
-static MySignalHandler
+static void
 KeyAbort(SIGNAL_ARG)
 {
     LONGJMP(AbortLoading, 1);
-    SIGNAL_RETURN;
 }
 
 static void
@@ -1695,7 +1694,7 @@ loadGeneralFile(char *path, ParsedURL *volatile current, char *referer,
     Buffer *volatile t_buf = NULL;
     int volatile searchHeader = SearchHeader;
     int volatile searchHeader_through = TRUE;
-    MySignalHandler(*volatile prevtrap) (SIGNAL_ARG) = NULL;
+    void (*volatile prevtrap) (SIGNAL_ARG) = NULL;
     TextList *extra_header = newTextList();
     volatile Str uname = NULL;
     volatile Str pwd = NULL;
@@ -2188,13 +2187,6 @@ loadGeneralFile(char *path, ParsedURL *volatile current, char *referer,
 	&& !(w3m_dump & DUMP_EXTRA)) {
 	uncompress_stream(&f, &pu.real_file);
     }
-    /*
-     * TODO(rkta): Something wrong here with DUMP_SOURCE and compressed streams
-     * If DUMP_SOURCE is set and the data is compressed, t will be set to the
-     * type of the compressed data which is not handled in the later if-else
-     * block to determine the function to assign to loadproc. loadproc will be
-     * NULL leading to an error when loading the page.
-    */
     else if (f.compression != CMP_NOCOMPRESS) {
 	if (!(w3m_dump & DUMP_SOURCE) &&
 	    (w3m_dump & ~DUMP_FRAME || is_text_type(t)
@@ -2264,8 +2256,6 @@ loadGeneralFile(char *path, ParsedURL *volatile current, char *referer,
     }
     else if (w3m_dump & DUMP_FRAME)
 	return NULL;
-    else
-	proc = NULL;
 
     if (t_buf == NULL)
 	t_buf = newBuffer(INIT_BUFFER_WIDTH);
@@ -2491,9 +2481,6 @@ set_breakpoint(struct readbuffer *obuf, int tag_length)
     obuf->bp.pos = obuf->pos;
     obuf->bp.tlen = tag_length;
     obuf->bp.flag = obuf->flag;
-#ifdef FORMAT_NICE
-    obuf->bp.flag &= ~RB_FILL;
-#endif				/* FORMAT_NICE */
     obuf->bp.top_margin = obuf->top_margin;
     obuf->bp.bottom_margin = obuf->bottom_margin;
 
@@ -2898,47 +2885,6 @@ flushline(struct html_feed_environ *h_env, struct readbuffer *obuf, int indent,
 	else if (RB_GET_ALIGN(obuf) == RB_LEFT && obuf->flag & RB_INTABLE) {
 	    align(lbuf, width, ALIGN_LEFT);
 	}
-#ifdef FORMAT_NICE
-	else if (obuf->flag & RB_FILL) {
-	    char *p;
-	    int rest, rrest;
-	    int nspace, d, i;
-
-	    rest = width - get_Str_strwidth(line);
-	    if (rest > 1) {
-		nspace = 0;
-		for (p = line->ptr + indent; *p; p++) {
-		    if (*p == ' ')
-			nspace++;
-		}
-		if (nspace > 0) {
-		    int indent_here = 0;
-		    d = rest / nspace;
-		    p = line->ptr;
-		    while (IS_SPACE(*p)) {
-			p++;
-			indent_here++;
-		    }
-		    rrest = rest - d * nspace;
-		    line = Strnew_size(width + 1);
-		    for (i = 0; i < indent_here; i++)
-			Strcat_char(line, ' ');
-		    for (; *p; p++) {
-			Strcat_char(line, *p);
-			if (*p == ' ') {
-			    for (i = 0; i < d; i++)
-				Strcat_char(line, ' ');
-			    if (rrest > 0) {
-				Strcat_char(line, ' ');
-				rrest--;
-			    }
-			}
-		    }
-		    lbuf = newTextLine(line, width);
-		}
-	    }
-	}
-#endif				/* FORMAT_NICE */
 #ifdef TABLE_DEBUG
 	if (w3m_debug) {
 	    FILE *f = fopen("zzzproc1", "a");
@@ -6757,15 +6703,8 @@ HTMLlineproc0(char *line, struct html_feed_environ *h_env, int internal)
 		    bp = obuf->line->ptr + obuf->bp.len;
 		    line = Strnew_charp(bp);
 		    Strshrink(obuf->line, obuf->line->length - obuf->bp.len);
-#ifdef FORMAT_NICE
-		    if (obuf->pos - i > h_env->limit)
-			obuf->flag |= RB_FILL;
-#endif				/* FORMAT_NICE */
 		    back_to_breakpoint(obuf);
 		    flushline(h_env, obuf, indent, 0, h_env->limit);
-#ifdef FORMAT_NICE
-		    obuf->flag &= ~RB_FILL;
-#endif				/* FORMAT_NICE */
 		    HTMLlineproc1(line->ptr, h_env);
 		}
 	    }
@@ -6786,13 +6725,7 @@ HTMLlineproc0(char *line, struct html_feed_environ *h_env, int internal)
 	    i = 1;
 	indent = h_env->envs[h_env->envc].indent;
 	if (obuf->pos - i > h_env->limit) {
-#ifdef FORMAT_NICE
-	    obuf->flag |= RB_FILL;
-#endif				/* FORMAT_NICE */
 	    flushline(h_env, obuf, indent, 0, h_env->limit);
-#ifdef FORMAT_NICE
-	    obuf->flag &= ~RB_FILL;
-#endif				/* FORMAT_NICE */
 	}
     }
 }
@@ -7271,7 +7204,7 @@ loadHTMLstream(URLFile *f, Buffer *newBuf, FILE * src, int internal)
 #ifdef USE_IMAGE
     int volatile image_flag;
 #endif
-    MySignalHandler(*volatile prevtrap) (SIGNAL_ARG) = NULL;
+    void (*volatile prevtrap) (SIGNAL_ARG) = NULL;
 
 #ifdef USE_M17N
     if (fmInitialized && graph_ok()) {
@@ -7447,7 +7380,7 @@ Buffer *
 loadHTMLString(Str page)
 {
     URLFile f;
-    MySignalHandler(*volatile prevtrap) (SIGNAL_ARG) = NULL;
+    void (*volatile prevtrap) (SIGNAL_ARG) = NULL;
     Buffer *newBuf;
 
     init_stream(&f, SCM_LOCAL, newStrStream(page));
@@ -7498,7 +7431,7 @@ loadGopherDir0(URLFile *uf, ParsedURL *pu)
     Str lbuf, name, file, host, port, type;
     char *volatile p, *volatile q;
     int link, pre;
-    MySignalHandler(*volatile prevtrap) (SIGNAL_ARG) = NULL;
+    void (*volatile prevtrap) (SIGNAL_ARG) = NULL;
 #ifdef USE_M17N
     wc_ces doc_charset = DocumentCharset;
 #endif
@@ -7662,7 +7595,7 @@ loadBuffer(URLFile *uf, Buffer *volatile newBuf)
 #ifdef USE_ANSI_COLOR
     Linecolor *colorBuffer = NULL;
 #endif
-    MySignalHandler(*volatile prevtrap) (SIGNAL_ARG) = NULL;
+    void (*volatile prevtrap) (SIGNAL_ARG) = NULL;
 
     if (newBuf == NULL)
 	newBuf = newBuffer(INIT_BUFFER_WIDTH);
@@ -7751,7 +7684,7 @@ loadImageBuffer(URLFile *uf, Buffer *newBuf)
     Str tmp, tmpf;
     FILE *src = NULL;
     URLFile f;
-    MySignalHandler(*volatile prevtrap) (SIGNAL_ARG) = NULL;
+    void (*volatile prevtrap) (SIGNAL_ARG) = NULL;
     struct stat st;
     const ParsedURL *pu = newBuf ? &newBuf->currentURL : NULL;
 
@@ -8080,7 +8013,7 @@ getNextPage(Buffer *buf, int plen)
 #ifdef USE_ANSI_COLOR
     Linecolor *colorBuffer = NULL;
 #endif
-    MySignalHandler(*volatile prevtrap) (SIGNAL_ARG) = NULL;
+    void (*volatile prevtrap) (SIGNAL_ARG) = NULL;
 
     if (buf->pagerSource == NULL)
 	return NULL;
@@ -8189,7 +8122,7 @@ save2tmp(URLFile uf, char *tmpf)
 {
     FILE *ff;
     clen_t linelen = 0, trbyte = 0;
-    MySignalHandler(*volatile prevtrap) (SIGNAL_ARG) = NULL;
+    void (*volatile prevtrap) (SIGNAL_ARG) = NULL;
     static JMP_BUF env_bak;
     volatile int retval = 0;
     unsigned char *volatile buf = NULL;

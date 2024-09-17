@@ -8,7 +8,7 @@
 static JMP_BUF AbortLoading;
 struct frameset *renderFrameSet = NULL;
 
-static MySignalHandler
+static void
 KeyAbort(SIGNAL_ARG)
 {
     LONGJMP(AbortLoading, 1);
@@ -410,7 +410,7 @@ createFrameFile(struct frameset *f, FILE * f1, Buffer *current, int level,
 #endif
     char *d_target, *p_target, *s_target, *t_target;
     ParsedURL *currentURL, base;
-    MySignalHandler(*volatile prevtrap) (SIGNAL_ARG) = NULL;
+    void (*volatile prevtrap) (SIGNAL_ARG) = NULL;
     int flag;
 
     if (f == NULL)

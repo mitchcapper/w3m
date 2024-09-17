@@ -8,7 +8,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <fcntl.h>
-#if defined(HAVE_WAITPID) || defined(HAVE_WAIT3)
+#if defined(HAVE_WAITPID)
 #include <sys/wait.h>
 #endif
 #include <time.h>
@@ -66,17 +66,17 @@ static AlarmEvent DefaultAlarm = {
     0, AL_UNSET, FUNCNAME_nulcmd, NULL
 };
 static AlarmEvent *CurrentAlarm = &DefaultAlarm;
-static MySignalHandler SigAlarm(SIGNAL_ARG);
+static void SigAlarm(SIGNAL_ARG);
 #endif
 
 #ifdef SIGWINCH
 static int need_resize_screen = FALSE;
-static MySignalHandler resize_hook(SIGNAL_ARG);
+static void resize_hook(SIGNAL_ARG);
 static void resize_screen(void);
 #endif
 
 #ifdef SIGPIPE
-static MySignalHandler SigPipe(SIGNAL_ARG);
+static void SigPipe(SIGNAL_ARG);
 #endif
 
 #ifdef USE_MARK
@@ -348,8 +348,6 @@ sig_chld(int signo)
 
 #ifdef HAVE_WAITPID
     while ((pid = waitpid(-1, &p_stat, WNOHANG)) > 0)
-#elif HAVE_WAIT3
-    while ((pid = wait3(&p_stat, WNOHANG, NULL)) > 0)
 #else
     if ((pid = wait(&p_stat)) > 0)
 #endif
@@ -1386,7 +1384,7 @@ cmp_anchor_hseq(const void *a, const void *b)
 static void
 do_dump(Buffer *buf)
 {
-    MySignalHandler(*volatile prevtrap) (SIGNAL_ARG) = NULL;
+    void (*volatile prevtrap) (SIGNAL_ARG) = NULL;
 
     prevtrap = mySignal(SIGINT, intTrap);
     if (SETJMP(IntReturn) != 0) {
@@ -1586,20 +1584,18 @@ repBuffer(Buffer *oldbuf, Buffer *buf)
 }
 
 
-MySignalHandler
+void
 intTrap(SIGNAL_ARG)
 {				/* Interrupt catcher */
     LONGJMP(IntReturn, 0);
-    SIGNAL_RETURN;
 }
 
 #ifdef SIGWINCH
-static MySignalHandler
+static void
 resize_hook(SIGNAL_ARG)
 {
     need_resize_screen = TRUE;
     mySignal(SIGWINCH, resize_hook);
-    SIGNAL_RETURN;
 }
 
 static void
@@ -1614,14 +1610,13 @@ resize_screen(void)
 #endif				/* SIGWINCH */
 
 #ifdef SIGPIPE
-static MySignalHandler
+static void
 SigPipe(SIGNAL_ARG)
 {
 #ifdef USE_MIGEMO
     init_migemo();
 #endif
     mySignal(SIGPIPE, SigPipe);
-    SIGNAL_RETURN;
 }
 #endif
 
@@ -1785,7 +1780,7 @@ clear_mark(Line *l)
 static int
 srchcore(char *volatile str, int (*func) (Buffer *, char *))
 {
-    MySignalHandler(*prevtrap) (SIGNAL_ARG);
+    void (*prevtrap) (SIGNAL_ARG);
     volatile int i, result = SR_NOTFOUND;
 
     if (str != NULL && str != SearchString)
@@ -2190,7 +2185,7 @@ DEFUN(pipesh, PIPE_SHELL, "Execute shell command and display output")
 DEFUN(readsh, READ_SHELL, "Execute shell command and display output")
 {
     Buffer *buf;
-    MySignalHandler(*prevtrap) (SIGNAL_ARG);
+    void (*prevtrap) (SIGNAL_ARG);
     char *cmd;
 
     CurrentKeyData = NULL;	/* not allowed in w3m-control: */
@@ -6196,7 +6191,7 @@ DEFUN(execCmd, COMMAND, "Invoke w3m function(s)")
 }
 
 #ifdef USE_ALARM
-static MySignalHandler
+static void
 SigAlarm(SIGNAL_ARG)
 {
     char *data;
@@ -6232,7 +6227,6 @@ SigAlarm(SIGNAL_ARG)
 	    alarm(CurrentAlarm->sec);
 	}
     }
-    SIGNAL_RETURN;
 }
 
 

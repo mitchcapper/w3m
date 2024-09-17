@@ -261,7 +261,7 @@ check_cygwin_console(void)
 #endif				/* __CYGWIN__ */
 
 char *getenv(const char *);
-MySignalHandler reset_exit(SIGNAL_ARG), reset_error_exit(SIGNAL_ARG), error_dump(SIGNAL_ARG);
+void reset_exit(SIGNAL_ARG), reset_error_exit(SIGNAL_ARG), error_dump(SIGNAL_ARG);
 void setlinescols(void);
 void flush_tty(void);
 
@@ -553,9 +553,9 @@ put_image_kitty(char *url, int x, int y, int w, int h, int sx, int sy, int sw,
     int c, i, j, m, t, is_anim;
     struct stat st;
     pid_t pid;
-    MySignalHandler(*volatile previntr) (SIGNAL_ARG);
-    MySignalHandler(*volatile prevquit) (SIGNAL_ARG);
-    MySignalHandler(*volatile prevstop) (SIGNAL_ARG);
+    void (*volatile previntr) (SIGNAL_ARG);
+    void (*volatile prevquit) (SIGNAL_ARG);
+    void (*volatile prevstop) (SIGNAL_ARG);
 
     if (!url)
 	return;
@@ -771,9 +771,9 @@ put_image_sixel(char *url, int x, int y, int w, int h, int sx, int sy, int sw, i
 {
     pid_t pid;
     int do_anim;
-    MySignalHandler(*volatile previntr) (SIGNAL_ARG);
-    MySignalHandler(*volatile prevquit) (SIGNAL_ARG);
-    MySignalHandler(*volatile prevstop) (SIGNAL_ARG);
+    void (*volatile previntr) (SIGNAL_ARG);
+    void (*volatile prevquit) (SIGNAL_ARG);
+    void (*volatile prevstop) (SIGNAL_ARG);
 
     MOVE(y,x);
     flush_tty();
@@ -1085,7 +1085,7 @@ reset_tty(void)
         close_tty();
 }
 
-static MySignalHandler
+static void
 reset_exit_with_value(SIGNAL_ARG, int rval)
 {
 #ifdef USE_MOUSE
@@ -1094,28 +1094,26 @@ reset_exit_with_value(SIGNAL_ARG, int rval)
 #endif				/* USE_MOUSE */
     reset_tty();
     w3m_exit(rval);
-    SIGNAL_RETURN;
 }
 
-MySignalHandler
+void
 reset_error_exit(SIGNAL_ARG)
 {
   reset_exit_with_value(SIGNAL_ARGLIST, 1);
 }
 
-MySignalHandler
+void
 reset_exit(SIGNAL_ARG)
 {
   reset_exit_with_value(SIGNAL_ARGLIST, 0);
 }
 
-MySignalHandler
+void
 error_dump(SIGNAL_ARG)
 {
     mySignal(SIGIOT, SIG_DFL);
     reset_tty();
     abort();
-    SIGNAL_RETURN;
 }
 
 void
@@ -2396,7 +2394,7 @@ do_getch(void)
 	return sysm_getch();
 }
 
-MySignalHandler
+void
 sysmouse(SIGNAL_ARG)
 {
     struct mouse_info mi;

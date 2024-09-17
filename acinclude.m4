@@ -578,12 +578,9 @@ AC_DEFUN([AC_W3M_ALARM],
  [enable_alarm="yes"])
  AC_MSG_RESULT($enable_alarm)
  if test x"$enable_alarm" = xyes; then
-   AC_TRY_COMPILE(
-    [#include <unistd.h>
-#include <signal.h>],
-    [int sa = SIGALRM;
-     void (*a) = alarm;],
-   [AC_DEFINE(USE_ALARM)])
+   AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <unistd.h>
+#include <signal.h>]], [[int sa = SIGALRM;
+     void (*a) = alarm;]])],[AC_DEFINE(USE_ALARM)],[])
  fi])
 #
 # ----------------------------------------------------------------
@@ -869,28 +866,15 @@ if test x"$enable_ipv6" = xyes; then
  if test x"$enable_ipv6" = xyes; then
     AC_SUBST(HAVE_OLD_SS_FAMILY)
     AC_MSG_CHECKING(if struct sockaddr_storage has an ss_family member)
-    AC_TRY_COMPILE([
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
 #include <sys/types.h>
 #include <sys/socket.h>
-      ], [
+      ]], [[
 	struct sockaddr_storage ss;
 	int i = ss.ss_family;
-      ],
-      [AC_MSG_RESULT(yes)],
-      [AC_TRY_COMPILE([
-#include <sys/types.h>
-#include <sys/socket.h>
-	],
-	[
-	struct sockaddr_storage ss;
-	int i = ss.__ss_family;
-	],
-	[AC_MSG_RESULT(no, but __ss_family exists)
-	 AC_DEFINE(HAVE_OLD_SS_FAMILY)],
-	[AC_MSG_RESULT(no)
-	 AC_MSG_WARN(IPv6 support is disabled)
-	 enable_ipv6="no"])
-      ])
+      ]])],[AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no)
+      AC_MSG_WARN(IPv6 support is disabled)
+      enable_ipv6="no"])
  fi
  if test x"$enable_ipv6" = xyes; then
     AC_DEFINE(INET6)
@@ -903,24 +887,7 @@ fi])
 AC_DEFUN([AC_W3M_SIGSETJMP],
 [AC_SUBST(HAVE_SIGSETJMP)
 AC_MSG_CHECKING(for sigsetjmp)
-AC_TRY_COMPILE(
-[#include <setjmp.h>
- #include <stdlib.h>],
-[ jmp_buf env;
-   if (sigsetjmp(env, 1) != 0) { exit(0); } siglongjmp(env, 1);],
-[have_sigsetjmp="yes"; AC_DEFINE(HAVE_SIGSETJMP)],
-[have_sigsetjmp="no"])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <setjmp.h>
+ #include <stdlib.h>]], [[ jmp_buf env;
+   if (sigsetjmp(env, 1) != 0) { exit(0); } siglongjmp(env, 1);]])],[have_sigsetjmp="yes"; AC_DEFINE(HAVE_SIGSETJMP)],[have_sigsetjmp="no"])
 AC_MSG_RESULT($have_sigsetjmp)])
-#
-# ----------------------------------------------------------------
-# AC_W3M_SIGNAL_RETURN
-# ----------------------------------------------------------------
-AC_DEFUN([AC_W3M_SIGNAL],
-[AC_TYPE_SIGNAL
- AC_SUBST(RETSIGTYPE)
- AC_SUBST(SIGNAL_RETURN)
- if test x"$ac_cv_type_signal" = xvoid; then
-  AC_DEFINE(SIGNAL_RETURN,return)
- else
-  AC_DEFINE(SIGNAL_RETURN,return 0)
- fi])

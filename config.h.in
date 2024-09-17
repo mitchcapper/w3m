@@ -81,12 +81,10 @@
 #undef USE_XFACE
 #undef USE_DICT
 #undef USE_HISTORY
-#undef FORMAT_NICE
 #define ID_EXT
 #undef CLEAR_BUF
 #undef INET6
 #undef HAVE_SOCKLEN_T
-#undef HAVE_OLD_SS_FAMILY
 #undef USE_EGD
 #define ENABLE_REMOVE_TRAILINGSPACES
 #undef MENU_THIN_FRAME
@@ -131,7 +129,6 @@ typedef long clen_t;
 #undef HAVE_STRERROR
 #undef HAVE_BCOPY
 #undef HAVE_WAITPID
-#undef HAVE_WAIT3
 #undef HAVE_STRFTIME
 #undef HAVE_GETCWD
 #undef HAVE_GETWD
@@ -165,11 +162,8 @@ typedef long clen_t;
 
 #undef HAVE_SIGSETJMP
 
-#define RETSIGTYPE @RETSIGTYPE@
-typedef RETSIGTYPE MySignalHandler;
 #define SIGNAL_ARG int _dummy	/* XXX */
 #define SIGNAL_ARGLIST 0	/* XXX */
-#define SIGNAL_RETURN @SIGNAL_RETURN@
 
 #ifdef HAVE_SIGSETJMP
 #ifdef __MINGW32_VERSION
