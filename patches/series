@@ -1,5 +1,4 @@
 Add-option-exit_on_last.patch
-Remove-config.h.dist.patch
 # modernC
 # PENDING
 #266 reorder
