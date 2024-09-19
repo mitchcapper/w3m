@@ -35,7 +35,7 @@ Patch: patches/Refactor-inputAnswer.patch
  			(err =
  			 add_cookie(pu, name, value, expires, domain, path,
  				    flag | COO_OVERRIDE, comment, version,
-@@ -8743,34 +8742,44 @@ int
+@@ -8745,34 +8744,44 @@ int
  checkOverWrite(const char *path)
  {
      struct stat st;
@@ -65,7 +65,7 @@ Patch: patches/Refactor-inputAnswer.patch
  	term_raw();
 -	ans = inputChar(prompt);
 +	if (!(ans = inputChar(prompt)))
-+	    ans = '\0';
++	    ans = "\0";
      }
      else {
  	printf("%s", prompt);

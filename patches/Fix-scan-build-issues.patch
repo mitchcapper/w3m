@@ -42,7 +42,7 @@ Patch: patches/Fix-scan-build-issues.patch
  			SKIP_BLANKS(p);
  			p = extract_auth_param(p, none_auth_param);
  		    }
-@@ -6566,7 +6564,6 @@ HTMLlineproc0(char *line, struct html_fe
+@@ -6568,7 +6566,6 @@ HTMLlineproc0(char *line, struct html_fe
  		    str = Strnew_charp_n(str, p - str)->ptr;
  		    line = Strnew_m_charp(p, line, NULL)->ptr;
  		}
@@ -50,7 +50,7 @@ Patch: patches/Fix-scan-build-issues.patch
  		continue;
  	    }
  	    if (obuf->table_level >= 0)
-@@ -7251,7 +7248,7 @@ loadHTMLstream(URLFile *f, Buffer *newBu
+@@ -7253,7 +7250,7 @@ loadHTMLstream(URLFile *f, Buffer *newBu
      struct environment envs[MAX_ENV_LEVEL];
      clen_t linelen = 0;
      clen_t trbyte = 0;
@@ -59,7 +59,7 @@ Patch: patches/Fix-scan-build-issues.patch
  #ifdef USE_M17N
      wc_ces charset = WC_CES_US_ASCII;
      wc_ces volatile doc_charset = DocumentCharset;
-@@ -7492,11 +7489,11 @@ loadGopherDir0(URLFile *uf, ParsedURL *p
+@@ -7494,11 +7491,11 @@ loadGopherDir0(URLFile *uf, ParsedURL *p
  			 "</title>\n</head>\n<body>\n<h1>Index of ", q,
  			 "</h1>\n<table>\n", NULL);
  

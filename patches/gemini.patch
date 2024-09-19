@@ -13,7 +13,7 @@ w3m-0.5.3+git20230121.
  display.c              |    3 
  doc-de/README.func     |    1 
  doc/README.func        |    1 
- file.c                 |  293 ++++++++++++++++++++++++++++++++++++++++++++++++-
+ file.c                 |  291 ++++++++++++++++++++++++++++++++++++++++++++++++-
  html.h                 |    1 
  istream.c              |  140 ++++++++++++++++++-----
  istream.h              |    5 
@@ -23,7 +23,7 @@ w3m-0.5.3+git20230121.
  rc.h                   |    2 
  scripts/w3mhelp.cgi.in |    5 
  url.c                  |   35 +++++
- 14 files changed, 616 insertions(+), 39 deletions(-)
+ 14 files changed, 615 insertions(+), 38 deletions(-)
 
 --- a/file.c
 +++ b/file.c
@@ -45,15 +45,6 @@ w3m-0.5.3+git20230121.
      return buf;
  }
  
-@@ -1686,7 +1688,7 @@ loadGeneralFile(char *path, ParsedURL *v
-     URLFile f, *volatile of = NULL;
-     ParsedURL pu;
-     Buffer *b = NULL;
--    Buffer *(*volatile proc)(URLFile *, Buffer *) = loadBuffer;
-+    Buffer *(*volatile proc)(URLFile *, Buffer *);
-     char *volatile tpath;
-     char *volatile t = "text/plain", *p, *volatile real_type = NULL;
-     Buffer *volatile t_buf = NULL;
 @@ -2009,6 +2011,166 @@ loadGeneralFile(char *path, ParsedURL *v
      else if (pu.scheme == SCM_DATA) {
  	t = f.guess_type;
@@ -227,10 +218,10 @@ w3m-0.5.3+git20230121.
  	proc = loadHTMLBuffer;
 +    else if (!strcmp(t, "text/gemini"))
 +	proc = loadGeminiBuffer;
+     else if (is_plain_text_type(t))
+ 	proc = loadBuffer;
  #ifdef USE_IMAGE
-     else if (activeImage && displayImage && !useExtImageViewer &&
- 	     !(w3m_dump & ~DUMP_FRAME) && !strncasecmp(t, "image/", 6))
-@@ -2438,7 +2602,6 @@ is_boundary(unsigned char *ch1, unsigned
+@@ -2440,7 +2604,6 @@ is_boundary(unsigned char *ch1, unsigned
      return 1;
  }
  
@@ -238,7 +229,7 @@ w3m-0.5.3+git20230121.
  static void
  set_breakpoint(struct readbuffer *obuf, int tag_length)
  {
-@@ -7471,6 +7634,130 @@ loadGopherSearch0(ParsedURL *pu)
+@@ -7473,6 +7636,130 @@ loadGopherSearch0(ParsedURL *pu)
  }
  #endif				/* USE_GOPHER */
  

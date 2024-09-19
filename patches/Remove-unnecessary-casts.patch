@@ -95,7 +95,7 @@
  Buffer *
 --- a/file.c
 +++ b/file.c
-@@ -6725,7 +6725,7 @@ addnewline(Buffer *buf, char *line, Line
+@@ -6727,7 +6727,7 @@ addnewline(Buffer *buf, char *line, Line
      if (pos > 0) {
  	s = allocStr(line, pos);
  	p = NewAtom_N(Lineprop, pos);
@@ -104,7 +104,7 @@
      }
      else {
  	s = NullLine;
-@@ -6734,7 +6734,7 @@ addnewline(Buffer *buf, char *line, Line
+@@ -6736,7 +6736,7 @@ addnewline(Buffer *buf, char *line, Line
  #ifdef USE_ANSI_COLOR
      if (pos > 0 && color) {
  	c = NewAtom_N(Linecolor, pos);

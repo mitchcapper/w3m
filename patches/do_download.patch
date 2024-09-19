@@ -168,7 +168,7 @@ Next step: use 'flags' parameter for all options, include do_download.
  	/* download only */
  	char *file;
  	TRAP_OFF;
-@@ -2353,11 +2348,7 @@ fail:
+@@ -2355,11 +2350,7 @@ fail:
  #endif
      else if (w3m_backend) ;
      else if (!(w3m_dump & ~DUMP_FRAME) || is_dump_text_type(t)) {

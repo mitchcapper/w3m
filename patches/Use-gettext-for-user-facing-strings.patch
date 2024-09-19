@@ -157,7 +157,7 @@
  		    ptr, 0, 0);
  	    refresh();
  	}
-@@ -8532,8 +8527,7 @@ _doFileCopy(char *tmpf, char *defstr, in
+@@ -8534,8 +8529,7 @@ _doFileCopy(char *tmpf, char *defstr, in
      if (fmInitialized) {
  	p = searchKeyData();
  	if (p == NULL || *p == '\0') {
@@ -167,7 +167,7 @@
  			      defstr, IN_COMMAND, SaveHist);
  	    if (q == NULL || *q == '\0')
  		return FALSE;
-@@ -8551,16 +8545,14 @@ _doFileCopy(char *tmpf, char *defstr, in
+@@ -8553,16 +8547,14 @@ _doFileCopy(char *tmpf, char *defstr, in
  		return -1;
  	}
  	if (checkCopyFile(tmpf, p) < 0) {
@@ -186,7 +186,7 @@
  		disp_err_message(msg->ptr, FALSE);
  	    }
  	    return -1;
-@@ -8590,8 +8582,7 @@ _doFileCopy(char *tmpf, char *defstr, in
+@@ -8592,8 +8584,7 @@ _doFileCopy(char *tmpf, char *defstr, in
      else {
  	q = searchKeyData();
  	if (q == NULL || *q == '\0') {
@@ -196,7 +196,7 @@
  	    fflush(stdout);
  	    filen = Strfgets(stdin);
  	    if (filen->length == 0)
-@@ -8611,13 +8602,11 @@ _doFileCopy(char *tmpf, char *defstr, in
+@@ -8613,13 +8604,11 @@ _doFileCopy(char *tmpf, char *defstr, in
  		return -1;
  	}
  	if (checkCopyFile(tmpf, p) < 0) {
@@ -212,7 +212,7 @@
  	    return -1;
  	}
  	if (PreserveTimestamp && !is_pipe && !stat(tmpf, &st))
-@@ -8651,8 +8640,7 @@ doFileSave(URLFile uf, const char *defst
+@@ -8653,8 +8642,7 @@ doFileSave(URLFile uf, const char *defst
      if (fmInitialized) {
  	p = searchKeyData();
  	if (p == NULL || *p == '\0') {
@@ -222,7 +222,7 @@
  			      defstr, IN_FILENAME, SaveHist);
  	    if (p == NULL || *p == '\0')
  		return -1;
-@@ -8661,8 +8649,7 @@ doFileSave(URLFile uf, const char *defst
+@@ -8663,8 +8651,7 @@ doFileSave(URLFile uf, const char *defst
  	if (checkOverWrite(p) < 0)
  	    return -1;
  	if (checkSaveFile(uf.stream, p) < 0) {
@@ -232,7 +232,7 @@
  			  conv_from_system(p));
  	    disp_err_message(msg->ptr, FALSE);
  	    return -1;
-@@ -8696,8 +8683,7 @@ doFileSave(URLFile uf, const char *defst
+@@ -8698,8 +8685,7 @@ doFileSave(URLFile uf, const char *defst
      else {
  	q = searchKeyData();
  	if (q == NULL || *q == '\0') {
@@ -242,7 +242,7 @@
  	    fflush(stdout);
  	    filen = Strfgets(stdin);
  	    if (filen->length == 0)
-@@ -8712,15 +8698,13 @@ doFileSave(URLFile uf, const char *defst
+@@ -8714,15 +8700,13 @@ doFileSave(URLFile uf, const char *defst
  	if (checkOverWrite(p) < 0)
  	    return -1;
  	if (checkSaveFile(uf.stream, p) < 0) {
@@ -260,7 +260,7 @@
  	    return -1;
  	}
  	if (PreserveTimestamp && uf.modtime != -1)
-@@ -8767,8 +8751,7 @@ checkOverWrite(const char *path)
+@@ -8769,8 +8753,7 @@ checkOverWrite(const char *path)
  
      if (stat(path, &st) < 0)
  	return 0;

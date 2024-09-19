@@ -12,8 +12,8 @@ proc.^U
 
 While there, remove a redundant assignment.
 ---
- file.c |    8 ++------
- 1 file changed, 2 insertions(+), 6 deletions(-)
+ file.c |    8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
 
 --- a/file.c
 +++ b/file.c
@@ -25,6 +25,15 @@ While there, remove a redundant assignment.
  Buffer *
  loadGeneralFile(char *path, ParsedURL *volatile current, char *referer,
  		int flag, FormList *volatile request)
+@@ -1688,7 +1687,7 @@ loadGeneralFile(char *path, ParsedURL *v
+     URLFile f, *volatile of = NULL;
+     ParsedURL pu;
+     Buffer *b = NULL;
+-    Buffer *(*volatile proc)(URLFile *, Buffer *) = loadBuffer;
++    Buffer *(*volatile proc)(URLFile *, Buffer *);
+     char *volatile tpath;
+     char *volatile t = "text/plain", *p, *volatile real_type = NULL;
+     Buffer *volatile t_buf = NULL;
 @@ -2153,7 +2152,6 @@ loadGeneralFile(char *path, ParsedURL *v
  
      if (real_type == NULL)
@@ -33,16 +42,7 @@ While there, remove a redundant assignment.
  
      current_content_length = 0;
      if ((p = checkHeader(t_buf, "Content-Length:")) != NULL)
-@@ -2219,8 +2217,6 @@ loadGeneralFile(char *path, ParsedURL *v
- 
-     if (is_html_type(t))
- 	proc = loadHTMLBuffer;
--    else if (is_plain_text_type(t))
--	proc = loadBuffer;
- #ifdef USE_IMAGE
-     else if (activeImage && displayImage && !useExtImageViewer &&
- 	     !(w3m_dump & ~DUMP_FRAME) && !strncasecmp(t, "image/", 6))
-@@ -2233,7 +2229,7 @@ loadGeneralFile(char *path, ParsedURL *v
+@@ -2233,7 +2231,7 @@ loadGeneralFile(char *path, ParsedURL *v
  		!gopher_download &&
  #endif
  		searchExtViewer(t) != NULL) {
@@ -51,7 +51,7 @@ While there, remove a redundant assignment.
  	}
  	else {
  	    TRAP_OFF;
-@@ -2269,7 +2265,7 @@ loadGeneralFile(char *path, ParsedURL *v
+@@ -2269,7 +2267,7 @@ loadGeneralFile(char *path, ParsedURL *v
      t_buf->ssl_certificate = f.ssl_certificate;
  #endif
      frame_source = flag & RG_FRAME_SRC;
