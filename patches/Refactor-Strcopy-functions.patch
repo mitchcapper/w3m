@@ -10,7 +10,7 @@ Patch: patches/Refactor-Strcopy-functions.patch
 
 --- a/Str.c
 +++ b/Str.c
-@@ -112,12 +112,9 @@ Strfree(Str x)
+@@ -117,12 +117,9 @@ Strfree(Str x)
  }
  
  void
@@ -25,7 +25,7 @@ Patch: patches/Refactor-Strcopy-functions.patch
  }
  
  void
-@@ -125,37 +122,29 @@ Strcopy_charp(Str x, const char *y)
+@@ -130,37 +127,29 @@ Strcopy_charp(Str x, const char *y)
  {
      int len;
  

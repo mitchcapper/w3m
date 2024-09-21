@@ -9,7 +9,7 @@ Patch: patches/Refactor-Strcat-functions.patch
 
 --- a/Str.c
 +++ b/Str.c
-@@ -153,23 +153,20 @@ Strcat_charp_n(Str x, const char *y, int
+@@ -158,23 +158,20 @@ Strcat_charp_n(Str x, const char *y, int
  {
      int newlen;
  
@@ -41,7 +41,7 @@ Patch: patches/Refactor-Strcat-functions.patch
      memmove(&x->ptr[x->length], y, n);
      x->length += n;
      Strnulterm(x);
-@@ -184,7 +181,7 @@ Strcat(Str x, Str y)
+@@ -189,7 +186,7 @@ Strcat(Str x, Str y)
  void
  Strcat_charp(Str x, const char *y)
  {

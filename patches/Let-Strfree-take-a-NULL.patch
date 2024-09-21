@@ -9,7 +9,7 @@ Patch: patches/Let-Strfree-take-a-NULL.patch
 
 --- a/Str.c
 +++ b/Str.c
-@@ -107,6 +107,7 @@ Strclear(Str s)
+@@ -112,6 +112,7 @@ Strclear(Str s)
  void
  Strfree(Str x)
  {

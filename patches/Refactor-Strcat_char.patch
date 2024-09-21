@@ -5,12 +5,12 @@ Patch: patches/Refactor-Strcat_char.patch
 
 ---
  Str.c |    6 ++----
- Str.h |    4 ++--
- 2 files changed, 4 insertions(+), 6 deletions(-)
+ Str.h |    2 +-
+ 2 files changed, 3 insertions(+), 5 deletions(-)
 
 --- a/Str.c
 +++ b/Str.c
-@@ -279,12 +279,10 @@ void
+@@ -284,12 +284,10 @@ void
  Strinsert_char(Str s, int pos, char c)
  {
      int i;
@@ -27,14 +27,12 @@ Patch: patches/Refactor-Strcat_char.patch
      s->length++;
 --- a/Str.h
 +++ b/Str.h
-@@ -67,8 +67,8 @@ Str Strfgetall(FILE *);
+@@ -67,7 +67,7 @@ Str Strfgetall(FILE *);
  void Strgrow(Str s);
  
  #define STR_LEN_MAX (INT_MAX / 32 - 1)
 -#define Strcat_char(x,y) (((x)->length>=STR_LEN_MAX)?0:(((x)->length+1>=(x)->area_size)?Strgrow(x),0:0,(x)->ptr[(x)->length++]=(y),(x)->ptr[(x)->length]=0))
--#define Strnulterm(x) ((x)->ptr[(x)->length]='\0')
 +#define Strcat_char(x,y)             Strinsert_char(x,(x)->length,y)
-+#define Strnulterm(x)                ((x)->ptr[(x)->length]='\0')
  #define Strcmp(x,y)                  strcmp((x)->ptr,(y)->ptr)
  #define Strcmp_charp(x,y)            strcmp((x)->ptr,(y))
  #define Strcasecmp(x,y)              strcasecmp((x)->ptr,(y)->ptr)

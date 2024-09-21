@@ -145,6 +145,7 @@ Recognize-aria-label-for-buttons.patch
 Add-keybinding-to-insert-current-search-term.patch
 Fix-select-menu-setup.patch
 Add-default-download-directory.patch
+Add-test-for-Str.patch
 Use-Strnulterm-everywhere.patch
 Replace-STR_SIZE_MAX-with-STR_LEN_MAX.patch
 Refactor-Strshrink.patch
@@ -156,6 +157,8 @@ Let-Strfree-take-a-NULL.patch
 Refactor-Strcat_char.patch
 Get-rid-of-xfree.patch
 Strinsert_charp_n.patch
+Let-Str-functions-return-a-Str.patch
+Get-rid-of-Strnulterm.patch
 lto.patch
 # BORKED
 Refactor-regex-library.patch

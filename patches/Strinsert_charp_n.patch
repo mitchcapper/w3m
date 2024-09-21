@@ -43,7 +43,7 @@ Patch: patches/Strinsert_charp_n.patch
  void Strlower(Str);
 --- a/Str.c
 +++ b/Str.c
-@@ -291,6 +291,13 @@ Strinsert_char(Str s, int pos, char c)
+@@ -296,6 +296,13 @@ Strinsert_char(Str s, int pos, char c)
  }
  
  void

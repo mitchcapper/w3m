@@ -24,9 +24,9 @@ Use a STR_LEN_MAX to avoid dealing with of by errors.
  #define INITIAL_STR_SIZE 32
 +#define STR_SIZE_MAX (STR_LEN_MAX + 1)
  
- Str
- Strnew(void)
-@@ -47,8 +48,8 @@ Strnew_size(int n)
+ static Str
+ Strnulterm(Str x)
+@@ -54,8 +55,8 @@ Strnew_size(int n)
      Str x = GC_MALLOC(sizeof(struct _Str));
      if (x == NULL)
  	exit(1);
@@ -37,7 +37,7 @@ Use a STR_LEN_MAX to avoid dealing with of by errors.
      else if (n + 1 < INITIAL_STR_SIZE)
  	n = INITIAL_STR_SIZE - 1;
      x->ptr = GC_MALLOC_ATOMIC(n + 1);
-@@ -174,8 +175,8 @@ Strcopy_charp(Str x, const char *y)
+@@ -181,8 +182,8 @@ Strcopy_charp(Str x, const char *y)
  	return;
      }
      len = strlen(y);
@@ -48,7 +48,7 @@ Use a STR_LEN_MAX to avoid dealing with of by errors.
      if (x->area_size < len + 1) {
  	x->ptr = GC_REALLOC(x->ptr, len + 1);
  	if (x->ptr == NULL)
-@@ -197,8 +198,8 @@ Strcopy_charp_n(Str x, const char *y, in
+@@ -204,8 +205,8 @@ Strcopy_charp_n(Str x, const char *y, in
  	Strnulterm(x);
  	return;
      }
@@ -59,7 +59,7 @@ Use a STR_LEN_MAX to avoid dealing with of by errors.
      if (x->area_size < len + 1) {
  	x->ptr = GC_REALLOC(x->ptr, len + 1);
  	if (x->ptr == NULL)
-@@ -218,7 +219,7 @@ Strcat_charp_n(Str x, const char *y, int
+@@ -225,7 +226,7 @@ Strcat_charp_n(Str x, const char *y, int
      if (y == NULL || n == 0)
  	return;
      if (n < 0)
@@ -68,7 +68,7 @@ Use a STR_LEN_MAX to avoid dealing with of by errors.
      newlen = x->length + n + 1;
      if (newlen <= 0 || newlen > STR_SIZE_MAX) {
  	newlen = STR_SIZE_MAX;
-@@ -363,7 +364,7 @@ Strdelete(Str s, int pos, int n)
+@@ -370,7 +371,7 @@ Strdelete(Str s, int pos, int n)
      if (pos < 0 || s->length < pos)
  	return;
      if (n < 0)
@@ -87,9 +87,9 @@ Use a STR_LEN_MAX to avoid dealing with of by errors.
 -#define Strcat_char(x,y) (((x)->length+1>=STR_SIZE_MAX)?0:(((x)->length+1>=(x)->area_size)?Strgrow(x),0:0,(x)->ptr[(x)->length++]=(y),(x)->ptr[(x)->length]=0))
 +#define STR_LEN_MAX (INT_MAX / 32 - 1)
 +#define Strcat_char(x,y) (((x)->length>=STR_LEN_MAX)?0:(((x)->length+1>=(x)->area_size)?Strgrow(x),0:0,(x)->ptr[(x)->length++]=(y),(x)->ptr[(x)->length]=0))
- #define Strnulterm(x) ((x)->ptr[(x)->length]='\0')
  #define Strcmp(x,y)                  strcmp((x)->ptr,(y)->ptr)
  #define Strcmp_charp(x,y)            strcmp((x)->ptr,(y))
+ #define Strcasecmp(x,y)              strcasecmp((x)->ptr,(y)->ptr)
 --- a/linein.c
 +++ b/linein.c
 @@ -506,7 +506,7 @@ delC(void)

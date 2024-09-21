@@ -4,12 +4,12 @@ Subject: Refactor Strnew functions
 Patch: patches/Refactor-Strnew-functions.patch
 
 ---
- Str.c |   72 +++++++++++++-----------------------------------------------------
- 1 file changed, 15 insertions(+), 57 deletions(-)
+ Str.c |   72 ++++++++++++------------------------------------------------------
+ 1 file changed, 14 insertions(+), 58 deletions(-)
 
 --- a/Str.c
 +++ b/Str.c
-@@ -30,32 +30,24 @@
+@@ -37,32 +37,24 @@ Strnulterm(Str x)
  Str
  Strnew(void)
  {
@@ -52,7 +52,7 @@ Patch: patches/Refactor-Strnew-functions.patch
      x->length = 0;
      Strnulterm(x);
      return x;
-@@ -64,28 +56,7 @@ Strnew_size(int n)
+@@ -71,28 +63,7 @@ Strnew_size(int n)
  Str
  Strnew_charp(const char *p)
  {
@@ -82,15 +82,14 @@ Patch: patches/Refactor-Strnew-functions.patch
  }
  
  Str
-@@ -107,25 +78,12 @@ Str
+@@ -114,25 +85,10 @@ Str
  Strnew_charp_n(const char *p, int n)
  {
      Str x;
 -    int len;
  
 -    if (p == NULL)
-+    if (!p)
- 	return Strnew_size(n);
+-	return Strnew_size(n);
 -    x = GC_MALLOC(sizeof(struct _Str));
 -    if (x == NULL)
 -	exit(1);
@@ -106,9 +105,9 @@ Patch: patches/Refactor-Strnew-functions.patch
 -    x->length = len;
 -    memmove(x->ptr, p, len);
 -    Strnulterm(x);
-+
 +    x = Strnew_size(n);
-+    Strcopy_charp_n(x, p, n);
++    if (p)
++	Strcopy_charp_n(x, p, n);
      return x;
  }
  

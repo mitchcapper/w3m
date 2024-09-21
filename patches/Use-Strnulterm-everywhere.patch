@@ -7,17 +7,29 @@ Use a macro to nul-terminated Str. Macro exists but is mostly unused.
 
 While at it, refactor Strshrink.
 ---
- Str.c      |   39 ++++++++++++++++++++-------------------
- Str.h      |    2 +-
- file.c     |    2 +-
- indep.c    |    2 +-
- istream.c  |    2 +-
- mimehead.c |    2 +-
- 6 files changed, 25 insertions(+), 24 deletions(-)
+ Str.c  |   46 +++++++++++++++++++++++++++-------------------
+ Str.h  |    1 -
+ etc.c  |    2 +-
+ file.c |    3 +--
+ 4 files changed, 29 insertions(+), 23 deletions(-)
 
 --- a/Str.c
 +++ b/Str.c
-@@ -35,9 +35,9 @@ Strnew(void)
+@@ -26,6 +26,13 @@
+ 
+ #define INITIAL_STR_SIZE 32
+ 
++static Str
++Strnulterm(Str x)
++{
++    x->ptr[x->length] = '\0';
++    return x;
++}
++
+ Str
+ Strnew(void)
+ {
+@@ -35,9 +42,9 @@ Strnew(void)
      x->ptr = GC_MALLOC_ATOMIC(INITIAL_STR_SIZE);
      if (x->ptr == NULL)
  	exit(1);
@@ -28,7 +40,7 @@ While at it, refactor Strshrink.
      return x;
  }
  
-@@ -54,9 +54,9 @@ Strnew_size(int n)
+@@ -54,9 +61,9 @@ Strnew_size(int n)
      x->ptr = GC_MALLOC_ATOMIC(n + 1);
      if (x->ptr == NULL)
  	exit(1);
@@ -39,7 +51,7 @@ While at it, refactor Strshrink.
      return x;
  }
  
-@@ -83,7 +83,7 @@ Strnew_charp(const char *p)
+@@ -83,7 +90,7 @@ Strnew_charp(const char *p)
      x->area_size = n;
      x->length = len;
      memmove(x->ptr, p, len);
@@ -48,7 +60,7 @@ While at it, refactor Strshrink.
      return x;
  }
  
-@@ -124,7 +124,7 @@ Strnew_charp_n(const char *p, int n)
+@@ -124,7 +131,7 @@ Strnew_charp_n(const char *p, int n)
      x->area_size = n + 1;
      x->length = len;
      memmove(x->ptr, p, len);
@@ -57,7 +69,7 @@ While at it, refactor Strshrink.
      return x;
  }
  
-@@ -140,7 +140,7 @@ void
+@@ -140,7 +147,7 @@ void
  Strclear(Str s)
  {
      s->length = 0;
@@ -66,7 +78,7 @@ While at it, refactor Strshrink.
  }
  
  void
-@@ -170,7 +170,7 @@ Strcopy_charp(Str x, const char *y)
+@@ -170,7 +177,7 @@ Strcopy_charp(Str x, const char *y)
  
      if (y == NULL) {
  	x->length = 0;
@@ -75,7 +87,7 @@ While at it, refactor Strshrink.
  	return;
      }
      len = strlen(y);
-@@ -183,8 +183,8 @@ Strcopy_charp(Str x, const char *y)
+@@ -183,8 +190,8 @@ Strcopy_charp(Str x, const char *y)
  	x->area_size = len + 1;
      }
      memmove(x->ptr, y, len);
@@ -85,7 +97,7 @@ While at it, refactor Strshrink.
  }
  
  void
-@@ -194,7 +194,7 @@ Strcopy_charp_n(Str x, const char *y, in
+@@ -194,7 +201,7 @@ Strcopy_charp_n(Str x, const char *y, in
  
      if (y == NULL) {
  	x->length = 0;
@@ -94,7 +106,7 @@ While at it, refactor Strshrink.
  	return;
      }
      if (len < 0 || len >= STR_SIZE_MAX)
-@@ -206,8 +206,8 @@ Strcopy_charp_n(Str x, const char *y, in
+@@ -206,8 +213,8 @@ Strcopy_charp_n(Str x, const char *y, in
  	x->area_size = len + 1;
      }
      memmove(x->ptr, y, len);
@@ -104,7 +116,7 @@ While at it, refactor Strshrink.
  }
  
  void
-@@ -237,7 +237,7 @@ Strcat_charp_n(Str x, const char *y, int
+@@ -237,7 +244,7 @@ Strcat_charp_n(Str x, const char *y, int
      }
      memmove(&x->ptr[x->length], y, n);
      x->length += n;
@@ -113,7 +125,7 @@ While at it, refactor Strshrink.
  }
  
  void
-@@ -289,7 +289,7 @@ Strgrow(Str x)
+@@ -289,7 +296,7 @@ Strgrow(Str x)
  	    exit(1);
  	x->area_size = newlen;
      }
@@ -122,7 +134,7 @@ While at it, refactor Strshrink.
  }
  
  Str
-@@ -329,7 +329,7 @@ Strchop(Str s)
+@@ -329,7 +336,7 @@ Strchop(Str s)
  	   (s->ptr[s->length - 1] == '\n' || s->ptr[s->length - 1] == '\r')) {
  	s->length--;
      }
@@ -131,7 +143,7 @@ While at it, refactor Strshrink.
  }
  
  void
-@@ -344,7 +344,8 @@ Strinsert_char(Str s, int pos, char c)
+@@ -344,7 +351,8 @@ Strinsert_char(Str s, int pos, char c)
  	return;
      for (i = s->length; i > pos; i--)
  	s->ptr[i] = s->ptr[i - 1];
@@ -141,7 +153,7 @@ While at it, refactor Strshrink.
      s->ptr[pos] = c;
  }
  
-@@ -364,14 +365,14 @@ Strdelete(Str s, int pos, int n)
+@@ -364,14 +372,14 @@ Strdelete(Str s, int pos, int n)
      if (n < 0)
  	n = STR_SIZE_MAX - pos - 1;
      if (s->length <= pos + n) {
@@ -158,7 +170,7 @@ While at it, refactor Strshrink.
  }
  
  void
-@@ -379,8 +380,8 @@ Strtruncate(Str s, int pos)
+@@ -379,8 +387,8 @@ Strtruncate(Str s, int pos)
  {
      if (pos < 0 || s->length < pos)
  	return;
@@ -168,7 +180,7 @@ While at it, refactor Strshrink.
  }
  
  void
-@@ -388,11 +389,11 @@ Strshrink(Str s, int n)
+@@ -388,11 +396,11 @@ Strshrink(Str s, int n)
  {
      if (n >= s->length) {
  	s->length = 0;
@@ -182,7 +194,7 @@ While at it, refactor Strshrink.
      }
  }
  
-@@ -414,7 +415,7 @@ Strremovetrailingspaces(Str s)
+@@ -414,7 +422,7 @@ Strremovetrailingspaces(Str s)
  
      for (i = s->length - 1; i >= 0 && IS_SPACE(s->ptr[i]); i--) ;
      s->length = i + 1;
@@ -193,56 +205,34 @@ While at it, refactor Strshrink.
  Str
 --- a/file.c
 +++ b/file.c
-@@ -4509,7 +4509,7 @@ getMetaRefreshParam(const char *q, Str *
+@@ -4508,8 +4508,7 @@ getMetaRefreshParam(const char *q, Str *
+ 	    if (s_tmp->length > 0 &&
  	        (s_tmp->ptr[s_tmp->length - 1] == '\"' ||	/* " */
  		 s_tmp->ptr[s_tmp->length - 1] == '\'')) {	/* ' */
- 		s_tmp->length--;
+-		s_tmp->length--;
 -		s_tmp->ptr[s_tmp->length] = '\0';
-+		Strnulterm(s_tmp);
++		Strshrink(s_tmp, 1);
  	    }
  	    q = r;
  	}
---- a/indep.c
-+++ b/indep.c
-@@ -724,7 +724,7 @@ growbuf_to_Str(struct growbuf *gb)
- 
-     if (gb->free_proc == &w3m_GC_free) {
- 	growbuf_reserve(gb, gb->length + 1);
--	gb->ptr[gb->length] = '\0';
-+	Strnulterm(gb);
- 	s = New(struct _Str);
- 	s->ptr = gb->ptr;
- 	s->length = gb->length;
---- a/istream.c
-+++ b/istream.c
-@@ -268,7 +268,7 @@ ISgets_to_growbuf(InputStream stream, st
-     }
- 
-     growbuf_reserve(gb, gb->length + 1);
--    gb->ptr[gb->length] = '\0';
-+    Strnulterm(gb);
-     return;
- }
- 
---- a/mimehead.c
-+++ b/mimehead.c
-@@ -146,7 +146,7 @@ decodeU_to_growbuf(struct growbuf *gb, c
- 	    i += 2;
- 	}
-     }
--    gb->ptr[gb->length] = '\0';
-+    Strnulterm(gb);
-     return;
- }
- 
 --- a/Str.h
 +++ b/Str.h
-@@ -68,7 +68,7 @@ void Strgrow(Str s);
+@@ -68,7 +68,6 @@ void Strgrow(Str s);
  
  #define STR_SIZE_MAX (INT_MAX / 32)
  #define Strcat_char(x,y) (((x)->length+1>=STR_SIZE_MAX)?0:(((x)->length+1>=(x)->area_size)?Strgrow(x),0:0,(x)->ptr[(x)->length++]=(y),(x)->ptr[(x)->length]=0))
 -#define Strnulterm(x) ((x)->ptr[(x)->length]=0)
-+#define Strnulterm(x) ((x)->ptr[(x)->length]='\0')
  #define Strcmp(x,y)                  strcmp((x)->ptr,(y)->ptr)
  #define Strcmp_charp(x,y)            strcmp((x)->ptr,(y))
  #define Strcasecmp(x,y)              strcasecmp((x)->ptr,(y)->ptr)
+--- a/etc.c
++++ b/etc.c
+@@ -2159,7 +2159,7 @@ base64_encode(const char *src, size_t le
+ 	}
+ 	Strcatc(dest, '=');
+     }
+-    Strnulterm(dest);
++    dest->ptr[dest->length]='\0';
+     return dest;
+ #undef Strcatc
+ }
