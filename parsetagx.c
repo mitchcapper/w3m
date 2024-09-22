@@ -35,7 +35,8 @@ static int (*toValFunc[]) (char *, void *) = {
 static int
 noConv(char *oval, void *str)
 {
-    *(char **)str = oval;
+    if (str)
+	*(char **)str = oval;
     return 1;
 }
 
@@ -139,8 +140,7 @@ parse_tag(char **s, int internal)
 
     tag_id = getHash_si(&tagtable, tagname, HTML_UNKNOWN);
 
-    if (tag_id == HTML_UNKNOWN ||
-	(!internal && TagMAP[tag_id].flag & TFLG_INT))
+    if (!internal && TagMAP[tag_id].flag & TFLG_INT)
 	goto skip_parse_tagarg;
 
     tag = New(struct parsed_tag);
@@ -267,6 +267,10 @@ parse_tag(char **s, int internal)
     if (*q == '>')
 	q++;
     *s = q;
+    if (!tag
+	|| (tag->tagid == HTML_UNKNOWN
+	    && !parsedtag_get_value(tag, ATTR_ID, NULL)))
+	return NULL;
     return tag;
 }
 

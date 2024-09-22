@@ -88,7 +88,7 @@ unsigned char ALST_IMG_ALT[] =
 unsigned char ALST_NOP[] = { ATTR_CORE };
 
 TagInfo TagMAP[MAX_HTMLTAG] = {
-    {NULL, NULL, 0, 0},						/*   0 HTML_UNKNOWN    */
+    {NULL, ALST_ID, ARR_SZ(ALST_ID), 0},						/*   0 HTML_UNKNOWN    */
     {"a", ALST_A, ARR_SZ(ALST_A), 0},				/*   1 HTML_A          */
     {"/a", NULL, 0, TFLG_END},					/*   2 HTML_N_A        */
     {"h", ALST_P, ARR_SZ(ALST_P), 0},				/*   3 HTML_H          */
