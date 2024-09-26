@@ -130,6 +130,7 @@ static int searchKeyNum(void);
 int enable_inline_image;
 extern int opt_cols;
 int fold_pre;
+static int deprecated;
 
 static void
 fversion(FILE * f)
@@ -225,7 +226,8 @@ fusage(FILE * f, int err)
     fprintf(f, "    -v               visual startup mode\n");
 #ifdef USE_COLOR
     fprintf(f, "    -M               monochrome display\n");
-    fprintf(f, "    -H               use high-intensity colors\n");
+    fprintf(f,
+	    "    -H Deprecated! Do not use! Use -o high-intensity=true instead");
 #endif				/* USE_COLOR */
     fprintf(f,
 	    "    -N               open URL of command line on each new tab\n");
@@ -635,8 +637,10 @@ main(int argc, char **argv)
 #ifdef USE_COLOR
 	    else if (!strcmp("-M", argv[i]))
 		useColor = FALSE;
-	    else if (!strcmp("-H", argv[i]))
+	    else if (!strcmp("-H", argv[i])) {
+		deprecated = TRUE;
 		highIntensityColors = TRUE;
+	    }
 #endif				/* USE_COLOR */
 	    else if (!strcmp("-B", argv[i]))
 		load_bookmark = TRUE;
@@ -2577,6 +2581,11 @@ _quitfm(int confirm)
     if (UseHistory && SaveURLHist)
 	saveHistory(URLHist, URLHistSize);
 #endif				/* USE_HISTORY */
+    if (deprecated)
+	fprintf(stderr, "%s\n%s\n%s\n",
+		"DEPRECATION WARNING",
+		"-H is deprecated and will be removed in the future.",
+		"Use -o highIntensityColors=true instead.");
     w3m_exit(0);
 }
 
