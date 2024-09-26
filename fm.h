@@ -971,6 +971,7 @@ global int useVisitedColor init(FALSE);
 global int visited_color init(5);	/* magenta  */
 #endif				/* USE_COLOR */
 global int confirm_on_quit init(TRUE);
+global int exit_on_last init(FALSE);
 #ifdef USE_MARK
 global int use_mark init(FALSE);
 #endif

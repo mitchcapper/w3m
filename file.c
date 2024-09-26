@@ -1680,7 +1680,6 @@ getLinkNumberStr(int correction)
 /* 
  * loadGeneralFile: load file to buffer
  */
-#define DO_EXTERNAL ((Buffer *(*)(URLFile *, Buffer *))doExternal)
 Buffer *
 loadGeneralFile(char *path, ParsedURL *volatile current, char *referer,
 		int flag, FormList *volatile request)
@@ -1688,7 +1687,7 @@ loadGeneralFile(char *path, ParsedURL *volatile current, char *referer,
     URLFile f, *volatile of = NULL;
     ParsedURL pu;
     Buffer *b = NULL;
-    Buffer *(*volatile proc)(URLFile *, Buffer *) = loadBuffer;
+    Buffer *(*volatile proc)(URLFile *, Buffer *);
     char *volatile tpath;
     char *volatile t = "text/plain", *p, *volatile real_type = NULL;
     Buffer *volatile t_buf = NULL;
@@ -2153,7 +2152,6 @@ loadGeneralFile(char *path, ParsedURL *volatile current, char *referer,
 
     if (real_type == NULL)
 	real_type = t;
-    proc = loadBuffer;
 
     current_content_length = 0;
     if ((p = checkHeader(t_buf, "Content-Length:")) != NULL)
@@ -2233,7 +2231,7 @@ loadGeneralFile(char *path, ParsedURL *volatile current, char *referer,
 		!gopher_download &&
 #endif
 		searchExtViewer(t) != NULL) {
-	    proc = DO_EXTERNAL;
+	    proc = NULL;
 	}
 	else {
 	    TRAP_OFF;
@@ -2269,7 +2267,7 @@ loadGeneralFile(char *path, ParsedURL *volatile current, char *referer,
     t_buf->ssl_certificate = f.ssl_certificate;
 #endif
     frame_source = flag & RG_FRAME_SRC;
-    if (proc == DO_EXTERNAL) {
+    if (proc == NULL) {
 	b = doExternal(f, t, t_buf);
     } else {
 	b = loadSomething(&f, proc, t_buf);
@@ -6306,7 +6304,7 @@ proc_escape(struct readbuffer *obuf, char **str_return)
     char *str = *str_return, *estr;
     int ech = getescapechar(str_return);
     int width, n_add = *str_return - str;
-    Lineprop mode = PC_ASCII;
+    Lineprop mode;
 
     if (ech < 0) {
 	*str_return = str;
@@ -8190,7 +8188,7 @@ doExternal(URLFile uf, char *type, Buffer *defaultbuf)
 {
     Str tmpf, command;
     struct mailcap *mcap;
-    int mc_stat;
+    int err, mc_stat;
     Buffer *buf = NULL;
     char *header, *src = NULL, *ext = uf.ext;
 
@@ -8266,8 +8264,11 @@ doExternal(URLFile uf, char *type, Buffer *defaultbuf)
     else {
 	if (mcap->flags & MAILCAP_NEEDSTERMINAL || !BackgroundExtViewer) {
 	    fmTerm();
-	    mySystem(command->ptr, 0);
+	    err = mySystem(command->ptr, 0);
 	    fmInit();
+	    if (err)
+		disp_err_message(Sprintf("%s returned %d", command->ptr, err)->ptr,
+				 FALSE);
 	    if (CurrentTab && Currentbuf)
 		displayBuffer(Currentbuf, B_FORCE_REDRAW);
 	}

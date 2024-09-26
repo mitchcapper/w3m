@@ -220,7 +220,7 @@ backwardSearch(Buffer *buf, char *str)
 	while (l->bpos && l->prev)
 	    l = l->prev;
     }
-    begin = l;
+
     if (pos > 0) {
 	pos--;
 #ifdef USE_M17N
@@ -228,80 +228,65 @@ backwardSearch(Buffer *buf, char *str)
 	    pos--;
 #endif
 	p = &l->lineBuf[pos];
-	found = NULL;
-	found_last = NULL;
+    }
+    else {
+	if (!(l = l->prev)) {
+	    if (!WrapSearch)
+		return SR_NOTFOUND;
+	    l = buf->lastLine;
+	}
+	p = &l->lineBuf[l->size];
+    }
+
+    begin = l;
+    found = NULL;
+    found_last = NULL;
+
+    while (1) {
 	q = l->lineBuf;
+	/*
+	 * Search as long as we have matches on the current line.
+	 * We are searching the line from begin to end. As we are searching
+	 * backwards we want the last match on the line.
+	 */
 	while (regexMatch(q, &l->lineBuf[l->size] - q, q == l->lineBuf) == 1) {
 	    matchedPosition(&first, &last);
 	    if (first <= p) {
 		found = first;
 		found_last = last;
 	    }
-	    if (q - l->lineBuf >= l->size)
-		break;
-	    q++;
+	    q = last;
 #ifdef USE_M17N
 	    while (q - l->lineBuf < l->size
 		   && l->propBuf[q - l->lineBuf] & PC_WCHAR2)
 		q++;
 #endif
-	    if (q > p)
+	    if (q >= p)
 		break;
 	}
-	if (found) {
-	    pos = found - l->lineBuf;
-	    while (pos >= l->len && l->next && l->next->bpos) {
-		pos -= l->len;
-		l = l->next;
-	    }
-	    buf->pos = pos;
-	    if (l != buf->currentLine)
-		gotoLine(buf, l->linenumber);
-	    arrangeCursor(buf);
-	    set_mark(l, pos, pos + found_last - found);
-	    return SR_FOUND;
-	}
-    }
-    for (l = l->prev;; l = l->prev) {
-	if (l == NULL) {
-	    if (WrapSearch) {
-		l = buf->lastLine;
-		wrapped = TRUE;
-	    }
-	    else {
-		break;
-	    }
-	}
-	found = NULL;
-	found_last = NULL;
-	q = l->lineBuf;
-	while (regexMatch(q, &l->lineBuf[l->size] - q, q == l->lineBuf) == 1) {
-	    matchedPosition(&first, &last);
-	    found = first;
-	    found_last = last;
-	    if (q - l->lineBuf >= l->size)
-		break;
-	    q++;
-#ifdef USE_M17N
-	    while (q - l->lineBuf < l->size
-		   && l->propBuf[q - l->lineBuf] & PC_WCHAR2)
-		q++;
-#endif
-	}
-	if (found) {
-	    pos = found - l->lineBuf;
-	    while (pos >= l->len && l->next && l->next->bpos) {
-		pos -= l->len;
-		l = l->next;
-	    }
-	    buf->pos = pos;
-	    gotoLine(buf, l->linenumber);
-	    arrangeCursor(buf);
-	    set_mark(l, pos, pos + found_last - found);
-	    return SR_FOUND | (wrapped ? SR_WRAPPED : 0);
-	}
-	if (wrapped && l == begin)	/* no match */
+
+	if (found)
 	    break;
+
+	if (!(l = l->prev)) {
+	    if (!WrapSearch)
+		return SR_NOTFOUND;
+	    l = buf->lastLine;
+	}
+	if (l == begin)	/* no match */
+	    return SR_NOTFOUND;;
+	p = &l->lineBuf[l->size];
     }
-    return SR_NOTFOUND;
+
+    pos = found - l->lineBuf;
+    while (pos >= l->len && l->next && l->next->bpos) {
+	pos -= l->len;
+	l = l->next;
+    }
+    buf->pos = pos;
+    if (l != buf->currentLine)
+	gotoLine(buf, l->linenumber);
+    arrangeCursor(buf);
+    set_mark(l, pos, pos + found_last - found);
+    return SR_FOUND | (wrapped ? SR_WRAPPED : 0);
 }

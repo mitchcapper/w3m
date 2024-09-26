@@ -5,6 +5,8 @@
  *
  *   Created: Wed Feb 10 12:47:03 1999
  */
+#ifndef W3M_PROTO_H__
+#define W3M_PROTO_H__
 extern int main(int argc, char **argv);
 extern void nulcmd(void);
 extern void pushEvent(int cmd, void *data);
@@ -664,7 +666,7 @@ extern Str romanNumeral(int n);
 extern Str romanAlphabet(int n);
 extern void setup_child(int child, int i, int f);
 extern void myExec(char *command);
-extern void mySystem(char *command, int background);
+extern int mySystem(char *command, int background);
 extern Str myExtCommand(char *cmd, char *arg, int redirect);
 extern Str myEditor(char *cmd, char *file, int line);
 extern int is_localhost(const char *host);
@@ -768,7 +770,6 @@ extern void initMouseAction(void);
 
 #ifdef USE_MENU
 extern void new_menu(Menu *menu, MenuItem *item);
-extern void geom_menu(Menu *menu, int x, int y, int mselect);
 extern void draw_all_menu(Menu *menu);
 extern void draw_menu(Menu *menu);
 extern void draw_menu_item(Menu *menu, int mselect);
@@ -829,3 +830,4 @@ long lrand48(void);
 extern Str base64_encode(const char *src, size_t len);
 
 extern void userMessage(void);
+#endif

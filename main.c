@@ -4234,13 +4234,14 @@ DEFUN(backBf, BACK, "Close current buffer and return to the one below in stack")
     Buffer *buf = Currentbuf->linkBuffer[LB_N_FRAME];
 
     if (!checkBackBuffer(Currentbuf)) {
-	if (close_tab_back && nTab >= 1) {
+	if (exit_on_last && nTab == 1)
+	    _quitfm(FALSE);
+	else if (close_tab_back || exit_on_last) {
 	    deleteTab(CurrentTab);
 	    displayBuffer(Currentbuf, B_FORCE_REDRAW);
 	}
 	else
-	    /* FIXME: gettextize? */
-	    disp_message("Can't go back...", TRUE);
+	    disp_message(_("Can't go back..."), TRUE);
 	return;
     }
 
@@ -4953,7 +4954,6 @@ DEFUN(vwSrc, SOURCE VIEW, "Toggle between HTML shown or processed")
     buf->clone = Currentbuf->clone;
     (*buf->clone)++;
 
-    buf->need_reshape = TRUE;
     reshapeBuffer(buf);
     pushBuffer(buf);
     displayBuffer(Currentbuf, B_NORMAL);
@@ -5097,7 +5097,6 @@ DEFUN(reload, RELOAD, "Load current document anew")
 /* reshape */
 DEFUN(reshape, RESHAPE, "Re-render document")
 {
-    Currentbuf->need_reshape = TRUE;
     reshapeBuffer(Currentbuf);
     displayBuffer(Currentbuf, B_FORCE_REDRAW);
 }
