@@ -12,7 +12,7 @@ Patch: patches/Get-rid-of-xfree.patch
 
 --- a/file.c
 +++ b/file.c
-@@ -8356,7 +8356,7 @@ save2tmp(URLFile uf, const char *tmpf)
+@@ -8357,7 +8357,7 @@ save2tmp(URLFile uf, const char *tmpf)
    _end:
      memmove(AbortLoading, env_bak, sizeof(JMP_BUF));
      TRAP_OFF;
@@ -21,7 +21,7 @@ Patch: patches/Get-rid-of-xfree.patch
      fclose(ff);
      current_content_length = 0;
      return retval;
-@@ -8498,7 +8498,7 @@ _MoveFile(const char *path1, const char
+@@ -8499,7 +8499,7 @@ _MoveFile(const char *path1, const char
  	linelen += count;
  	showProgress(&linelen, &trbyte);
      }
@@ -30,7 +30,7 @@ Patch: patches/Get-rid-of-xfree.patch
      ISclose(f1);
      if (is_pipe)
  	pclose(f2);
-@@ -8868,7 +8868,7 @@ uncompress_stream(URLFile *uf, char **sr
+@@ -8869,7 +8869,7 @@ uncompress_stream(URLFile *uf, char **sr
  	    UFclose(uf);
  	    if (f)
  		fclose(f);

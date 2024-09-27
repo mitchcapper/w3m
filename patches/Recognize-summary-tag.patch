@@ -1,0 +1,44 @@
+From: Rene Kita <mail@rkta.de>
+Date: Sun Sep 22 10:02:41 CEST 2024
+Subject: Recognize summary tag
+Patch: patches/Recognize-summary-tag.patch
+
+---
+ html.c       |    4 ++--
+ html.h       |    2 ++
+ tagtable.tab |    2 ++
+ 3 files changed, 6 insertions(+), 2 deletions(-)
+
+--- a/html.c
++++ b/html.c
+@@ -242,9 +242,9 @@ TagInfo TagMAP[MAX_HTMLTAG] = {
+     {"/dfn", NULL, 0, TFLG_END},				/* 150 HTML_N_DFN */
+     {"main", ALST_ID, ARR_SZ(ALST_ID), 0},			/* 151 HTML_MAIN */
+     {"/main", NULL, 0, TFLG_END},				/* 152 HTML_N_MAIN */
++    {"summary", ALST_ID, ARR_SZ(ALST_ID), 0},			/* 153 HTML_DFN */
++    {"/summary", NULL, 0, TFLG_END},				/* 154 HTML_N_DFN */
+ 
+-    {NULL, NULL, 0, 0},						/* 153 Undefined */
+-    {NULL, NULL, 0, 0},						/* 154 Undefined */
+     {NULL, NULL, 0, 0},						/* 155 Undefined */
+     {NULL, NULL, 0, 0},						/* 156 Undefined */
+     {NULL, NULL, 0, 0},						/* 157 Undefined */
+--- a/html.h
++++ b/html.h
+@@ -244,6 +244,8 @@ typedef struct {
+ #define HTML_N_DFN      150
+ #define HTML_MAIN	151
+ #define HTML_N_MAIN	152
++#define HTML_SUMMARY	153
++#define HTML_N_SUMMARY	154
+ 
+    /* pseudo tag */
+ #define HTML_SELECT_INT     160
+--- a/tagtable.tab
++++ b/tagtable.tab
+@@ -214,3 +214,5 @@ pre_plain	HTML_PRE_PLAIN
+ div_int		HTML_DIV_INT
+ /div_int	HTML_N_DIV_INT
+ main		HTML_MAIN
++summary		HTML_SUMMARY
++/summary	HTML_N_SUMMARY

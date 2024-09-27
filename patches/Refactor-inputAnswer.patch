@@ -35,7 +35,7 @@ Patch: patches/Refactor-inputAnswer.patch
  			(err =
  			 add_cookie(pu, name, value, expires, domain, path,
  				    flag | COO_OVERRIDE, comment, version,
-@@ -8745,34 +8744,44 @@ int
+@@ -8746,34 +8745,44 @@ int
  checkOverWrite(const char *path)
  {
      struct stat st;

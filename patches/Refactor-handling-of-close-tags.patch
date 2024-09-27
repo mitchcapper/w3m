@@ -1,0 +1,2056 @@
+From: Rene Kita <mail@rkta.de>
+Date: Sun Sep 22 14:00:08 CEST 2024
+Subject: Refactor handling of close tags
+Patch: patches/Refactor-handling-of-close-tags.patch
+
+---
+ file.c       |  195 ++++++++++++++++++-------------------
+ frame.c      |   40 +++----
+ html.c       |  306 +++++++++++++++++++++++------------------------------------
+ html.h       |  280 +++++++++++++++++++----------------------------------
+ parsetagx.c  |   21 ++--
+ table.c      |  126 ++++++++++++------------
+ tagtable.tab |  108 +-------------------
+ 7 files changed, 428 insertions(+), 648 deletions(-)
+
+--- a/file.c
++++ b/file.c
+@@ -3228,7 +3228,7 @@ close_anchor(struct html_feed_environ *h
+ 	    obuf->pos++;
+ 	}
+ 
+-	push_tag(obuf, "</a>", HTML_N_A);
++	push_tag(obuf, "</a>", HTML_A | HTML_N);
+     }
+     bzero((void *)&obuf->anchor, sizeof(obuf->anchor));
+ }
+@@ -3242,15 +3242,15 @@ save_fonteffect(struct html_feed_environ
+     if (obuf->fontstat_sp < INT_MAX)
+ 	obuf->fontstat_sp++;
+     if (obuf->in_bold)
+-	push_tag(obuf, "</b>", HTML_N_B);
++	push_tag(obuf, "</b>", HTML_B | HTML_N);
+     if (obuf->in_italic)
+-	push_tag(obuf, "</i>", HTML_N_I);
++	push_tag(obuf, "</i>", HTML_I | HTML_N);
+     if (obuf->in_under)
+-	push_tag(obuf, "</u>", HTML_N_U);
++	push_tag(obuf, "</u>", HTML_U | HTML_N);
+     if (obuf->in_strike)
+-	push_tag(obuf, "</s>", HTML_N_S);
++	push_tag(obuf, "</s>", HTML_S | HTML_N);
+     if (obuf->in_ins)
+-	push_tag(obuf, "</ins>", HTML_N_INS);
++	push_tag(obuf, "</ins>", HTML_INS | HTML_N);
+     bzero(obuf->fontstat, FONTSTAT_SIZE);
+ }
+ 
+@@ -4021,7 +4021,7 @@ feed_select(char *str)
+ 		cur_option_selected = parsedtag_exists(tag, ATTR_SELECTED);
+ 		prev_spaces = -1;
+ 		break;
+-	    case HTML_N_OPTION:
++	    case HTML_OPTION | HTML_N:
+ 		/* do nothing */
+ 		break;
+ 	    default:
+@@ -4540,11 +4540,9 @@ HTMLtagproc1(struct parsed_tag *tag, str
+     cmd = tag->tagid;
+ 
+     if (obuf->flag & RB_PRE) {
+-	switch (cmd) {
++	switch (cmd & ~HTML_N) {
+ 	case HTML_NOBR:
+-	case HTML_N_NOBR:
+ 	case HTML_PRE_INT:
+-	case HTML_N_PRE_INT:
+ 	    return 1;
+ 	}
+     }
+@@ -4556,7 +4554,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+ 	if (obuf->in_bold > 1)
+ 	    return 1;
+ 	return 0;
+-    case HTML_N_B:
++    case HTML_B | HTML_N:
+ 	if (obuf->in_bold == 1 && close_effect0(obuf, HTML_B))
+ 	    obuf->in_bold = 0;
+ 	if (obuf->in_bold > 0) {
+@@ -4571,7 +4569,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+ 	if (obuf->in_italic > 1)
+ 	    return 1;
+ 	return 0;
+-    case HTML_N_I:
++    case HTML_I | HTML_N:
+ 	if (obuf->in_italic == 1 && close_effect0(obuf, HTML_I))
+ 	    obuf->in_italic = 0;
+ 	if (obuf->in_italic > 0) {
+@@ -4586,7 +4584,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+ 	if (obuf->in_under > 1)
+ 	    return 1;
+ 	return 0;
+-    case HTML_N_U:
++    case HTML_U | HTML_N:
+ 	if (obuf->in_under == 1 && close_effect0(obuf, HTML_U))
+ 	    obuf->in_under = 0;
+ 	if (obuf->in_under > 0) {
+@@ -4598,13 +4596,13 @@ HTMLtagproc1(struct parsed_tag *tag, str
+     case HTML_EM:
+ 	HTMLlineproc1("<i>", h_env);
+ 	return 1;
+-    case HTML_N_EM:
++    case HTML_EM | HTML_N:
+ 	HTMLlineproc1("</i>", h_env);
+ 	return 1;
+     case HTML_STRONG:
+ 	HTMLlineproc1("<b>", h_env);
+ 	return 1;
+-    case HTML_N_STRONG:
++    case HTML_STRONG | HTML_N:
+ 	HTMLlineproc1("</b>", h_env);
+ 	return 1;
+     case HTML_Q:
+@@ -4619,7 +4617,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+ #endif
+ 	HTMLlineproc1("`", h_env);
+ 	return 1;
+-    case HTML_N_Q:
++    case HTML_Q | HTML_N:
+ #ifdef USE_M17N
+ #ifdef USE_UNICODE
+ 	if (DisplayCharset != WC_CES_US_ASCII) {
+@@ -4632,9 +4630,9 @@ HTMLtagproc1(struct parsed_tag *tag, str
+ 	HTMLlineproc1("'", h_env);
+ 	return 1;
+     case HTML_FIGURE:
+-    case HTML_N_FIGURE:
++    case HTML_FIGURE | HTML_N:
+     case HTML_P:
+-    case HTML_N_P:
++    case HTML_P | HTML_N:
+ 	CLOSE_A;
+ 	if (!(obuf->flag & RB_IGNORE_P)) {
+ 	    flushline(h_env, obuf, envs[h_env->envc].indent, 1, h_env->limit);
+@@ -4647,7 +4645,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+ 	}
+ 	return 1;
+     case HTML_FIGCAPTION:
+-    case HTML_N_FIGCAPTION:
++    case HTML_FIGCAPTION | HTML_N:
+     case HTML_BR:
+ 	flushline(h_env, obuf, envs[h_env->envc].indent, 1, h_env->limit);
+ 	h_env->blank_lines = 0;
+@@ -4660,7 +4658,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+ 	HTMLlineproc1("<b>", h_env);
+ 	set_alignment(obuf, tag);
+ 	return 1;
+-    case HTML_N_H:
++    case HTML_H | HTML_N:
+ 	HTMLlineproc1("</b>", h_env);
+ 	if (!(obuf->flag & RB_PREMODE)) {
+ 	    flushline(h_env, obuf, envs[h_env->envc].indent, 0, h_env->limit);
+@@ -4696,11 +4694,11 @@ HTMLtagproc1(struct parsed_tag *tag, str
+ 	    envs[h_env->envc].type = ul_type(tag, 0);
+ 	flushline(h_env, obuf, envs[h_env->envc].indent, 0, h_env->limit);
+ 	return 1;
+-    case HTML_N_UL:
+-    case HTML_N_OL:
+-    case HTML_N_DL:
+-    case HTML_N_BLQ:
+-    case HTML_N_DD:
++    case HTML_UL | HTML_N:
++    case HTML_OL | HTML_N:
++    case HTML_DL | HTML_N:
++    case HTML_BLQ | HTML_N:
++    case HTML_DD | HTML_N:
+ 	CLOSE_DT;
+ 	CLOSE_A;
+ 	if (h_env->envc > 0) {
+@@ -4708,7 +4706,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+ 		      h_env->limit);
+ 	    POP_ENV;
+ 	    if (!(obuf->flag & RB_PREMODE) &&
+-		(h_env->envc == 0 || cmd == HTML_N_BLQ)) {
++		(h_env->envc == 0 || cmd == (HTML_BLQ | HTML_N))) {
+ 		do_blankline(h_env, obuf,
+ 			     envs[h_env->envc].indent, h_env->limit);
+ 		obuf->flag |= RB_IGNORE_P;
+@@ -4816,6 +4814,8 @@ HTMLtagproc1(struct parsed_tag *tag, str
+ 	}
+ 	obuf->flag |= RB_IGNORE_P;
+ 	return 1;
++    case HTML_LI | HTML_N:
++	return 1;
+     case HTML_DT:
+ 	CLOSE_A;
+ 	if (h_env->envc == 0 ||
+@@ -4834,7 +4834,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+ 	}
+ 	obuf->flag |= RB_IGNORE_P;
+ 	return 1;
+-    case HTML_N_DT:
++    case HTML_DT | HTML_N:
+ 	if (!(obuf->flag & RB_IN_DT)) {
+ 	    return 1;
+ 	}
+@@ -4867,9 +4867,9 @@ HTMLtagproc1(struct parsed_tag *tag, str
+ 	close_anchor(h_env, obuf);
+ 	process_title(tag);
+ 	obuf->flag |= RB_TITLE;
+-	obuf->end_tag = HTML_N_TITLE;
++	obuf->end_tag = HTML_TITLE | HTML_N;
+ 	return 1;
+-    case HTML_N_TITLE:
++    case HTML_TITLE | HTML_N:
+ 	if (!(obuf->flag & RB_TITLE))
+ 	    return 1;
+ 	obuf->flag &= ~RB_TITLE;
+@@ -4887,7 +4887,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+ 	push_charp(obuf, 9, "--FRAME--", PC_ASCII);
+ 	flushline(h_env, obuf, envs[h_env->envc].indent, 0, h_env->limit);
+ 	return 0;
+-    case HTML_N_FRAMESET:
++    case HTML_FRAMESET | HTML_N:
+ 	if (h_env->envc > 0) {
+ 	    POP_ENV;
+ 	    flushline(h_env, obuf, envs[h_env->envc].indent, 0, h_env->limit);
+@@ -4899,7 +4899,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+ 	obuf->flag |= (RB_NOFRAMES | RB_IGNORE_P);
+ 	/* istr = str; */
+ 	return 1;
+-    case HTML_N_NOFRAMES:
++    case HTML_NOFRAMES | HTML_N:
+ 	CLOSE_A;
+ 	flushline(h_env, obuf, envs[h_env->envc].indent, 0, h_env->limit);
+ 	obuf->flag &= ~RB_NOFRAMES;
+@@ -4915,7 +4915,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+ 	    if (r)
+ 		q = html_quote(r);
+ 	    push_charp(obuf, get_strwidth(q), q, PC_ASCII);
+-	    push_tag(obuf, "</a>", HTML_N_A);
++	    push_tag(obuf, "</a>", HTML_A | HTML_N);
+ 	}
+ 	flushline(h_env, obuf, envs[h_env->envc].indent, 0, h_env->limit);
+ 	return 0;
+@@ -4939,7 +4939,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+ 	obuf->flag |= (RB_PRE | RB_IGNORE_P);
+ 	/* istr = str; */
+ 	return 1;
+-    case HTML_N_PRE:
++    case HTML_PRE | HTML_N:
+ 	flushline(h_env, obuf, envs[h_env->envc].indent, 0, h_env->limit);
+ 	if (!(obuf->flag & RB_IGNORE_P)) {
+ 	    do_blankline(h_env, obuf, envs[h_env->envc].indent, h_env->limit);
+@@ -4957,8 +4957,8 @@ HTMLtagproc1(struct parsed_tag *tag, str
+ 	}
+ 	obuf->flag |= RB_PRE_INT;
+ 	return 0;
+-    case HTML_N_PRE_INT:
+-	push_tag(obuf, "</pre_int>", HTML_N_PRE_INT);
++    case HTML_PRE_INT | HTML_N:
++	push_tag(obuf, "</pre_int>", cmd);
+ 	obuf->flag &= ~RB_PRE_INT;
+ 	if (!(obuf->flag & RB_SPECIAL) && obuf->pos > obuf->bp.pos) {
+ 	    set_prevchar(obuf->prevchar, "", 0);
+@@ -4969,7 +4969,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+ 	obuf->flag |= RB_NOBR;
+ 	obuf->nobr_level++;
+ 	return 0;
+-    case HTML_N_NOBR:
++    case HTML_NOBR | HTML_N:
+ 	if (obuf->nobr_level > 0)
+ 	    obuf->nobr_level--;
+ 	if (obuf->nobr_level == 0)
+@@ -4983,7 +4983,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+ 	}
+ 	obuf->flag |= (RB_PRE | RB_IGNORE_P);
+ 	return 1;
+-    case HTML_N_PRE_PLAIN:
++    case HTML_PRE_PLAIN | HTML_N:
+ 	CLOSE_A;
+ 	if (!(obuf->flag & RB_IGNORE_P)) {
+ 	    flushline(h_env, obuf, envs[h_env->envc].indent, 0, h_env->limit);
+@@ -5003,18 +5003,18 @@ HTMLtagproc1(struct parsed_tag *tag, str
+ 	obuf->flag |= (RB_PLAIN | RB_IGNORE_P);
+ 	switch (cmd) {
+ 	case HTML_LISTING:
+-	    obuf->end_tag = HTML_N_LISTING;
++	    obuf->end_tag = HTML_LISTING | HTML_N;
+ 	    break;
+ 	case HTML_XMP:
+-	    obuf->end_tag = HTML_N_XMP;
++	    obuf->end_tag = HTML_XMP | HTML_N;
+ 	    break;
+ 	case HTML_PLAINTEXT:
+ 	    obuf->end_tag = MAX_HTMLTAG;
+ 	    break;
+ 	}
+ 	return 1;
+-    case HTML_N_LISTING:
+-    case HTML_N_XMP:
++    case HTML_LISTING | HTML_N:
++    case HTML_XMP | HTML_N:
+ 	CLOSE_A;
+ 	if (!(obuf->flag & RB_IGNORE_P)) {
+ 	    flushline(h_env, obuf, envs[h_env->envc].indent, 0, h_env->limit);
+@@ -5026,17 +5026,17 @@ HTMLtagproc1(struct parsed_tag *tag, str
+ 	return 1;
+     case HTML_SCRIPT:
+ 	obuf->flag |= RB_SCRIPT;
+-	obuf->end_tag = HTML_N_SCRIPT;
++	obuf->end_tag = HTML_SCRIPT | HTML_N;
+ 	return 1;
+     case HTML_STYLE:
+ 	obuf->flag |= RB_STYLE;
+-	obuf->end_tag = HTML_N_STYLE;
++	obuf->end_tag = HTML_STYLE | HTML_N;
+ 	return 1;
+-    case HTML_N_SCRIPT:
++    case HTML_SCRIPT | HTML_N:
+ 	obuf->flag &= ~RB_SCRIPT;
+ 	obuf->end_tag = 0;
+ 	return 1;
+-    case HTML_N_STYLE:
++    case HTML_STYLE | HTML_N:
+ 	obuf->flag &= ~RB_STYLE;
+ 	obuf->end_tag = 0;
+ 	return 1;
+@@ -5067,7 +5067,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+ 	    return 1;
+ 	}
+ 	return 0;
+-    case HTML_N_A:
++    case HTML_A | HTML_N:
+ 	close_anchor(h_env, obuf);
+ 	return 1;
+     case HTML_IMG:
+@@ -5096,10 +5096,10 @@ HTMLtagproc1(struct parsed_tag *tag, str
+ 	}
+ #endif
+ 	return 0;
+-    case HTML_N_IMG_ALT:
++    case HTML_IMG_ALT | HTML_N:
+ 	if (obuf->img_alt) {
+ 	    if (!close_effect0(obuf, HTML_IMG_ALT))
+-		push_tag(obuf, "</img_alt>", HTML_N_IMG_ALT);
++		push_tag(obuf, "</img_alt>", cmd);
+ 	    obuf->img_alt = NULL;
+ 	}
+ 	return 1;
+@@ -5131,10 +5131,10 @@ HTMLtagproc1(struct parsed_tag *tag, str
+ 	}
+ 	obuf->input_alt.in = 1;
+ 	return 0;
+-    case HTML_N_INPUT_ALT:
++    case HTML_INPUT_ALT | HTML_N:
+ 	if (obuf->input_alt.in) {
+ 	    if (!close_effect0(obuf, HTML_INPUT_ALT))
+-		push_tag(obuf, "</input_alt>", HTML_N_INPUT_ALT);
++		push_tag(obuf, "</input_alt>", HTML_INPUT_ALT | HTML_N);
+ 	    obuf->input_alt.hseq = 0;
+ 	    obuf->input_alt.fid = -1;
+ 	    obuf->input_alt.in = 0;
+@@ -5213,7 +5213,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+ 	tables[obuf->table_level]->total_width = 0;
+ #endif
+ 	return 1;
+-    case HTML_N_TABLE:
++    case HTML_TABLE | HTML_N:
+ 	/* should be processed in HTMLlineproc() */
+ 	return 1;
+     case HTML_CENTER:
+@@ -5226,7 +5226,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+ 	else
+ 	    RB_SET_ALIGN(obuf, RB_CENTER);
+ 	return 1;
+-    case HTML_N_CENTER:
++    case HTML_CENTER | HTML_N:
+ 	CLOSE_A;
+ 	if (!(obuf->flag & RB_PREMODE))
+ 	    flushline(h_env, obuf, envs[h_env->envc].indent, 0, h_env->limit);
+@@ -5238,7 +5238,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+ 	    flushline(h_env, obuf, envs[h_env->envc].indent, 0, h_env->limit);
+ 	set_alignment(obuf, tag);
+ 	return 1;
+-    case HTML_N_DIV:
++    case HTML_DIV | HTML_N:
+ 	CLOSE_A;
+ 	flushline(h_env, obuf, envs[h_env->envc].indent, 0, h_env->limit);
+ 	RB_RESTORE_FLAG(obuf);
+@@ -5249,7 +5249,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+ 	    flushline(h_env, obuf, envs[h_env->envc].indent, 0, h_env->limit);
+ 	set_alignment(obuf, tag);
+ 	return 1;
+-    case HTML_N_DIV_INT:
++    case HTML_DIV_INT | HTML_N:
+ 	CLOSE_P;
+ 	flushline(h_env, obuf, envs[h_env->envc].indent, 0, h_env->limit);
+ 	RB_RESTORE_FLAG(obuf);
+@@ -5262,7 +5262,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+ 	if (tmp)
+ 	    HTMLlineproc1(tmp->ptr, h_env);
+ 	return 1;
+-    case HTML_N_FORM:
++    case HTML_FORM | HTML_N:
+ 	CLOSE_A;
+ 	flushline(h_env, obuf, envs[h_env->envc].indent, 0, h_env->limit);
+ 	obuf->flag |= RB_IGNORE_P;
+@@ -5280,7 +5280,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+ 	if (tmp)
+ 	    HTMLlineproc1(tmp->ptr, h_env);
+ 	return 1;
+-    case HTML_N_BUTTON:
++    case HTML_BUTTON | HTML_N:
+ 	tmp = process_n_button();
+ 	if (tmp)
+ 	    HTMLlineproc1(tmp->ptr, h_env);
+@@ -5291,9 +5291,9 @@ HTMLtagproc1(struct parsed_tag *tag, str
+ 	if (tmp)
+ 	    HTMLlineproc1(tmp->ptr, h_env);
+ 	obuf->flag |= RB_INSELECT;
+-	obuf->end_tag = HTML_N_SELECT;
++	obuf->end_tag = HTML_SELECT | HTML_N;
+ 	return 1;
+-    case HTML_N_SELECT:
++    case HTML_SELECT | HTML_N:
+ 	obuf->flag &= ~RB_INSELECT;
+ 	obuf->end_tag = 0;
+ 	tmp = process_n_select();
+@@ -5309,9 +5309,9 @@ HTMLtagproc1(struct parsed_tag *tag, str
+ 	if (tmp)
+ 	    HTMLlineproc1(tmp->ptr, h_env);
+ 	obuf->flag |= RB_INTXTA;
+-	obuf->end_tag = HTML_N_TEXTAREA;
++	obuf->end_tag = HTML_TEXTAREA | HTML_N;
+ 	return 1;
+-    case HTML_N_TEXTAREA:
++    case HTML_TEXTAREA | HTML_N:
+ 	obuf->flag &= ~RB_INTXTA;
+ 	obuf->end_tag = 0;
+ 	tmp = process_n_textarea();
+@@ -5392,7 +5392,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+ 	}
+ #endif
+     case HTML_MAP:
+-    case HTML_N_MAP:
++    case HTML_MAP | HTML_N:
+     case HTML_AREA:
+ 	return 0;
+     case HTML_DEL:
+@@ -5412,7 +5412,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+ 	    break;
+ 	}
+ 	return 1;
+-    case HTML_N_DEL:
++    case HTML_DEL | HTML_N:
+ 	switch (displayInsDel) {
+ 	case DISPLAY_INS_DEL_SIMPLE:
+ 	    obuf->flag &= ~RB_DEL;
+@@ -5427,7 +5427,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+ 	    if (obuf->in_strike > 0) {
+ 		obuf->in_strike--;
+ 		if (obuf->in_strike == 0) {
+-		    push_tag(obuf, "</s>", HTML_N_S);
++		    push_tag(obuf, "</s>", HTML_S | HTML_N);
+ 		}
+ 	    }
+ 	    break;
+@@ -5450,7 +5450,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+ 	    break;
+ 	}
+ 	return 1;
+-    case HTML_N_S:
++    case HTML_S | HTML_N:
+ 	switch (displayInsDel) {
+ 	case DISPLAY_INS_DEL_SIMPLE:
+ 	    obuf->flag &= ~RB_S;
+@@ -5466,7 +5466,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+ 	    if (obuf->in_strike > 0) {
+ 		obuf->in_strike--;
+ 		if (obuf->in_strike == 0) {
+-		    push_tag(obuf, "</s>", HTML_N_S);
++		    push_tag(obuf, "</s>", HTML_S | HTML_N);
+ 		}
+ 	    }
+ 	}
+@@ -5487,7 +5487,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+ 	    break;
+ 	}
+ 	return 1;
+-    case HTML_N_INS:
++    case HTML_INS | HTML_N:
+ 	switch (displayInsDel) {
+ 	case DISPLAY_INS_DEL_SIMPLE:
+ 	    break;
+@@ -5502,7 +5502,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+ 	    if (obuf->in_ins > 0) {
+ 		obuf->in_ins--;
+ 		if (obuf->in_ins == 0) {
+-		    push_tag(obuf, "</ins>", HTML_N_INS);
++		    push_tag(obuf, "</ins>", HTML_INS | HTML_N);
+ 		}
+ 	    }
+ 	    break;
+@@ -5512,18 +5512,18 @@ HTMLtagproc1(struct parsed_tag *tag, str
+ 	if (!(obuf->flag & (RB_DEL | RB_S)))
+ 	    HTMLlineproc1("^", h_env);
+ 	return 1;
+-    case HTML_N_SUP:
++    case HTML_SUP | HTML_N:
+ 	return 1;
+     case HTML_SUB:
+ 	if (!(obuf->flag & (RB_DEL | RB_S)))
+ 	    HTMLlineproc1("[", h_env);
+ 	return 1;
+-    case HTML_N_SUB:
++    case HTML_SUB | HTML_N:
+ 	if (!(obuf->flag & (RB_DEL | RB_S)))
+ 	    HTMLlineproc1("]", h_env);
+ 	return 1;
+     case HTML_FONT:
+-    case HTML_N_FONT:
++    case HTML_FONT | HTML_N:
+     case HTML_NOP:
+ 	return 1;
+     case HTML_BGSOUND:
+@@ -5566,11 +5566,11 @@ HTMLtagproc1(struct parsed_tag *tag, str
+ 		HTMLlineproc1(s->ptr, h_env);
+ 	    }
+ 	}
+-    case HTML_N_HEAD:
++    case HTML_HEAD | HTML_N:
+ 	if (obuf->flag & RB_TITLE)
+ 	    HTMLlineproc1("</title>", h_env);
+     case HTML_HEAD:
+-    case HTML_N_BODY:
++    case HTML_BODY | HTML_N:
+ 	return 1;
+     case HTML_MAIN:
+ 	Strcopy_charp(obuf->line, "<main>");
+@@ -5811,31 +5811,31 @@ HTMLlineproc2body(Buffer *buf, Str (*fee
+ 		case HTML_B:
+ 		    effect |= PE_BOLD;
+ 		    break;
+-		case HTML_N_B:
++		case HTML_B | HTML_N:
+ 		    effect &= ~PE_BOLD;
+ 		    break;
+ 		case HTML_I:
+ 		    ex_effect |= PE_EX_ITALIC;
+ 		    break;
+-		case HTML_N_I:
++		case HTML_I | HTML_N:
+ 		    ex_effect &= ~PE_EX_ITALIC;
+ 		    break;
+ 		case HTML_INS:
+ 		    ex_effect |= PE_EX_INSERT;
+ 		    break;
+-		case HTML_N_INS:
++		case HTML_INS | HTML_N:
+ 		    ex_effect &= ~PE_EX_INSERT;
+ 		    break;
+ 		case HTML_U:
+ 		    effect |= PE_UNDER;
+ 		    break;
+-		case HTML_N_U:
++		case HTML_U | HTML_N:
+ 		    effect &= ~PE_UNDER;
+ 		    break;
+ 		case HTML_S:
+ 		    ex_effect |= PE_EX_STRIKE;
+ 		    break;
+-		case HTML_N_S:
++		case HTML_S | HTML_N:
+ 		    ex_effect &= ~PE_EX_STRIKE;
+ 		    break;
+ 		case HTML_A:
+@@ -5896,7 +5896,7 @@ HTMLlineproc2body(Buffer *buf, Str (*fee
+ 			a_href->slave = (hseq > 0) ? FALSE : TRUE;
+ 		    }
+ 		    break;
+-		case HTML_N_A:
++		case HTML_A | HTML_N:
+ 		    effect &= ~PE_ANCHOR;
+ 		    if (a_href) {
+ 			a_href->end.line = currentLn(buf);
+@@ -5987,7 +5987,7 @@ HTMLlineproc2body(Buffer *buf, Str (*fee
+ 		    }
+ 		    effect |= PE_IMAGE;
+ 		    break;
+-		case HTML_N_IMG_ALT:
++		case HTML_IMG_ALT | HTML_N:
+ 		    effect &= ~PE_IMAGE;
+ 		    if (a_img) {
+ 			a_img->end.line = currentLn(buf);
+@@ -6081,7 +6081,7 @@ HTMLlineproc2body(Buffer *buf, Str (*fee
+ 			    break;
+ 			}
+ 		    }
+-		case HTML_N_INPUT_ALT:
++		case HTML_INPUT_ALT | HTML_N:
+ 		    effect &= ~PE_FORM;
+ 		    if (a_form) {
+ 			a_form->end.line = currentLn(buf);
+@@ -6101,7 +6101,7 @@ HTMLlineproc2body(Buffer *buf, Str (*fee
+ 			buf->maplist = m;
+ 		    }
+ 		    break;
+-		case HTML_N_MAP:
++		case HTML_MAP | HTML_N:
+ 		    /* nothing to do */
+ 		    break;
+ 		case HTML_AREA:
+@@ -6145,7 +6145,7 @@ HTMLlineproc2body(Buffer *buf, Str (*fee
+ 					   *(union frameset_element *)
+ 					   &frameset_s[frameset_sp]);
+ 		    break;
+-		case HTML_N_FRAMESET:
++		case HTML_FRAMESET | HTML_N:
+ 		    if (frameset_sp >= 0)
+ 			frameset_sp--;
+ 		    break;
+@@ -6205,8 +6205,8 @@ HTMLlineproc2body(Buffer *buf, Str (*fee
+ 		case HTML_INTERNAL:
+ 		    internal = HTML_INTERNAL;
+ 		    break;
+-		case HTML_N_INTERNAL:
+-		    internal = HTML_N_INTERNAL;
++		case HTML_INTERNAL | HTML_N:
++		    internal = HTML_INTERNAL | HTML_N;
+ 		    break;
+ 		case HTML_FORM_INT:
+ 		    if (parsedtag_get_value(tag, ATTR_FID, &form_id))
+@@ -6221,7 +6221,7 @@ HTMLlineproc2body(Buffer *buf, Str (*fee
+ 		    else
+ 			n_textarea = -1;
+ 		    break;
+-		case HTML_N_TEXTAREA_INT:
++		case HTML_TEXTAREA_INT | HTML_N:
+ 		    if (a_textarea && n_textarea >= 0) {
+ 			FormItemList *item =
+ 			    (FormItemList *)a_textarea[n_textarea]->url;
+@@ -6239,7 +6239,7 @@ HTMLlineproc2body(Buffer *buf, Str (*fee
+ 		    else
+ 			n_select = -1;
+ 		    break;
+-		case HTML_N_SELECT_INT:
++		case HTML_SELECT_INT | HTML_N:
+ 		    if (a_select && n_select >= 0) {
+ 			FormItemList *item =
+ 			    (FormItemList *)a_select[n_select]->url;
+@@ -6273,7 +6273,7 @@ HTMLlineproc2body(Buffer *buf, Str (*fee
+ 		    if (parsedtag_get_value(tag, ATTR_TYPE, &p))
+ 			symbol = (char)atoi(p);
+ 		    break;
+-		case HTML_N_SYMBOL:
++		case HTML_SYMBOL | HTML_N:
+ 		    effect &= ~PC_SYMBOL;
+ 		    break;
+ 		case HTML_MAIN:
+@@ -6306,7 +6306,7 @@ HTMLlineproc2body(Buffer *buf, Str (*fee
+ 	/* end of processing for one line */
+ 	if (!internal)
+ 	    addnewline(buf, outc, outp, NULL, pos, -1, nlines);
+-	if (internal == HTML_N_INTERNAL)
++	if (internal == (HTML_INTERNAL | HTML_N))
+ 	    internal = 0;
+ 	if (str != endp) {
+ 	    line = Strsubstr(line, str - line->ptr, endp - str);
+@@ -6555,9 +6555,10 @@ HTMLlineproc0(char *line, struct html_fe
+ 		p = str;
+ 		if ((tag = parse_tag(&p, internal))) {
+ 		    if (tag->tagid == end_tag ||
+-			(pre_mode & RB_INSELECT && tag->tagid == HTML_N_FORM)
++			(pre_mode & RB_INSELECT
++			 && tag->tagid == (HTML_FORM | HTML_N))
+ 			|| (pre_mode & RB_TITLE
+-			    && (tag->tagid == HTML_N_HEAD
++			    && (tag->tagid == (HTML_HEAD | HTML_N)
+ 				|| tag->tagid == HTML_BODY)))
+ 			goto proc_normal;
+ 		}
+@@ -7146,11 +7147,11 @@ completeHTMLstream(struct html_feed_envi
+ {
+     close_anchor(h_env, obuf);
+     if (obuf->img_alt) {
+-	push_tag(obuf, "</img_alt>", HTML_N_IMG_ALT);
++	push_tag(obuf, "</img_alt>", HTML_IMG_ALT | HTML_N);
+ 	obuf->img_alt = NULL;
+     }
+     if (obuf->input_alt.in) {
+-	push_tag(obuf, "</input_alt>", HTML_N_INPUT_ALT);
++	push_tag(obuf, "</input_alt>", HTML_INPUT_ALT | HTML_N);
+ 	obuf->input_alt.hseq = 0;
+ 	obuf->input_alt.fid = -1;
+ 	obuf->input_alt.in = 0;
+@@ -7159,23 +7160,23 @@ completeHTMLstream(struct html_feed_envi
+ 	obuf->input_alt.value = NULL;
+     }
+     if (obuf->in_bold) {
+-	push_tag(obuf, "</b>", HTML_N_B);
++	push_tag(obuf, "</b>", HTML_B | HTML_N);
+ 	obuf->in_bold = 0;
+     }
+     if (obuf->in_italic) {
+-	push_tag(obuf, "</i>", HTML_N_I);
++	push_tag(obuf, "</i>", HTML_I | HTML_N);
+ 	obuf->in_italic = 0;
+     }
+     if (obuf->in_under) {
+-	push_tag(obuf, "</u>", HTML_N_U);
++	push_tag(obuf, "</u>", HTML_U | HTML_N);
+ 	obuf->in_under = 0;
+     }
+     if (obuf->in_strike) {
+-	push_tag(obuf, "</s>", HTML_N_S);
++	push_tag(obuf, "</s>", HTML_S | HTML_N);
+ 	obuf->in_strike = 0;
+     }
+     if (obuf->in_ins) {
+-	push_tag(obuf, "</ins>", HTML_N_INS);
++	push_tag(obuf, "</ins>", HTML_INS | HTML_N);
+ 	obuf->in_ins = 0;
+     }
+     if (obuf->flag & RB_INTXTA)
+--- a/html.h
++++ b/html.h
+@@ -91,188 +91,114 @@ typedef struct {
+ #define ENC_QUOTE	2
+ #define ENC_UUENCODE	3
+ 
++#define HTML_N		128
+ #define HTML_UNKNOWN	0
+ #define HTML_A		1
+-#define HTML_N_A	2
+-#define HTML_H		3
+-#define HTML_N_H	4
+-#define HTML_P		5
+-#define HTML_BR		6
+-#define HTML_B		7
+-#define HTML_N_B	8
+-#define HTML_UL		9
+-#define HTML_N_UL	10
+-#define HTML_LI		11
+-#define HTML_OL		12
+-#define HTML_N_OL	13
+-#define HTML_TITLE	14
+-#define HTML_N_TITLE	15
+-#define HTML_HR		16
+-#define HTML_DL		17
+-#define HTML_N_DL	18
+-#define HTML_DT		19
+-#define HTML_DD		20
+-#define HTML_PRE	21
+-#define HTML_N_PRE	22
+-#define HTML_BLQ	23
+-#define HTML_N_BLQ	24
+-#define HTML_IMG	25
+-#define HTML_LISTING	26
+-#define HTML_N_LISTING	27
+-#define HTML_XMP	28
+-#define HTML_N_XMP	29
+-#define HTML_PLAINTEXT	30
+-#define HTML_TABLE      31
+-#define HTML_N_TABLE    32
+-#define HTML_META       33
+-#define HTML_N_P        34
+-#define HTML_FRAME      35
+-#define HTML_FRAMESET   36
+-#define HTML_N_FRAMESET 37
+-#define HTML_CENTER     38
+-#define HTML_N_CENTER   39
+-#define HTML_FONT       40
+-#define HTML_N_FONT     41
+-#define HTML_FORM       42
+-#define HTML_N_FORM     43
+-#define HTML_INPUT      44
+-#define HTML_TEXTAREA   45
+-#define HTML_N_TEXTAREA 46
+-#define HTML_SELECT     47
+-#define HTML_N_SELECT   48
+-#define HTML_OPTION     49
+-#define HTML_NOBR       50
+-#define HTML_N_NOBR     51
+-#define HTML_DIV        52
+-#define HTML_N_DIV      53
+-#define HTML_ISINDEX    54
+-#define HTML_MAP        55
+-#define HTML_N_MAP      56
+-#define HTML_AREA       57
+-#define HTML_SCRIPT     58
+-#define HTML_N_SCRIPT   59
+-#define HTML_BASE       60
+-#define HTML_DEL        61
+-#define HTML_N_DEL      62
+-#define HTML_INS        63
+-#define HTML_N_INS      64
+-#define HTML_U          65
+-#define HTML_N_U        66
+-#define HTML_STYLE      67
+-#define HTML_N_STYLE    68
+-#define HTML_WBR        69
+-#define HTML_EM		70
+-#define HTML_N_EM	71
+-#define HTML_BODY	72
+-#define HTML_N_BODY	73
+-#define HTML_TR         74
+-#define HTML_N_TR       75
+-#define HTML_TD         76
+-#define HTML_N_TD       77
+-#define HTML_CAPTION    78
+-#define HTML_N_CAPTION  79
+-#define HTML_TH         80
+-#define HTML_N_TH       81
+-#define HTML_THEAD      82
+-#define HTML_N_THEAD    83
+-#define HTML_TBODY      84
+-#define HTML_N_TBODY    85
+-#define HTML_TFOOT      86
+-#define HTML_N_TFOOT    87
+-#define HTML_COLGROUP   88
+-#define HTML_N_COLGROUP 89
+-#define HTML_COL        90
+-#define HTML_BGSOUND    91
+-#define HTML_APPLET     92
+-#define HTML_EMBED      93
+-#define HTML_N_OPTION   94
+-#define HTML_HEAD       95
+-#define HTML_N_HEAD     96
+-#define HTML_DOCTYPE    97
+-#define HTML_NOFRAMES   98
+-#define HTML_N_NOFRAMES 99
+-#define HTML_SUP	100
+-#define HTML_N_SUP	101
+-#define HTML_SUB	102
+-#define HTML_N_SUB	103
+-#define HTML_LINK       104
+-#define HTML_S          105
+-#define HTML_N_S        106
+-#define HTML_Q		107
+-#define HTML_N_Q	108
+-#define HTML_I		109
+-#define HTML_N_I	110
+-#define HTML_STRONG	111
+-#define HTML_N_STRONG	112
+-#define HTML_SPAN	113
+-#define HTML_N_SPAN	114
+-#define HTML_ABBR       115
+-#define HTML_N_ABBR     116
+-#define HTML_ACRONYM    117
+-#define HTML_N_ACRONYM  118
+-#define HTML_BASEFONT   119
+-#define HTML_BDO        120
+-#define HTML_N_BDO      121
+-#define HTML_BIG        122
+-#define HTML_N_BIG      123
+-#define HTML_BUTTON     124
+-#define HTML_N_BUTTON   125
+-#define HTML_FIELDSET   126
+-#define HTML_N_FIELDSET 127
+-#define HTML_IFRAME     128
+-#define HTML_LABEL      129
+-#define HTML_N_LABEL    130
+-#define HTML_LEGEND     131
+-#define HTML_N_LEGEND   132
+-#define HTML_NOSCRIPT   133
+-#define HTML_N_NOSCRIPT 134
+-#define HTML_OBJECT     135
+-#define HTML_OPTGROUP   136
+-#define HTML_N_OPTGROUP 137
+-#define HTML_PARAM      138
+-#define HTML_SMALL      139
+-#define HTML_N_SMALL    140
+-#define HTML_FIGURE     141
+-#define HTML_N_FIGURE   142
+-#define HTML_FIGCAPTION 143
+-#define HTML_N_FIGCAPTION   144
+-#define HTML_SECTION    145
+-#define HTML_N_SECTION  146
+-#define HTML_N_DT       147
+-#define HTML_N_DD       148
+-#define HTML_DFN        149
+-#define HTML_N_DFN      150
+-#define HTML_MAIN	151
+-#define HTML_N_MAIN	152
++#define HTML_H		2
++#define HTML_P		3
++#define HTML_BR		4
++#define HTML_B		5
++#define HTML_UL		6
++#define HTML_LI		7
++#define HTML_OL		8
++#define HTML_TITLE	9
++#define HTML_HR		10
++#define HTML_DL		11
++#define HTML_DT		12
++#define HTML_DD		13
++#define HTML_PRE	14
++#define HTML_BLQ	15
++#define HTML_IMG	16
++#define HTML_LISTING	17
++#define HTML_XMP	18
++#define HTML_PLAINTEXT	19
++#define HTML_TABLE      20
++#define HTML_META       21
++#define HTML_FRAME      22
++#define HTML_FRAMESET   23
++#define HTML_CENTER     24
++#define HTML_FONT       25
++#define HTML_FORM       26
++#define HTML_INPUT      27
++#define HTML_TEXTAREA   28
++#define HTML_SELECT     29
++#define HTML_OPTION     30
++#define HTML_NOBR       31
++#define HTML_DIV        32
++#define HTML_ISINDEX    33
++#define HTML_MAP        34
++#define HTML_AREA       35
++#define HTML_SCRIPT     36
++#define HTML_BASE       37
++#define HTML_DEL        38
++#define HTML_INS        39
++#define HTML_U          40
++#define HTML_STYLE      41
++#define HTML_WBR        42
++#define HTML_EM		43
++#define HTML_BODY	44
++#define HTML_TR         45
++#define HTML_TD         46
++#define HTML_CAPTION    47
++#define HTML_TH         48
++#define HTML_THEAD      49
++#define HTML_TBODY      50
++#define HTML_TFOOT      51
++#define HTML_COLGROUP   52
++#define HTML_COL        53
++#define HTML_BGSOUND    54
++#define HTML_APPLET     55
++#define HTML_EMBED      56
++#define HTML_HEAD       57
++#define HTML_DOCTYPE    58
++#define HTML_NOFRAMES   59
++#define HTML_SUP	60
++#define HTML_SUB	61
++#define HTML_LINK       62
++#define HTML_S          63
++#define HTML_Q		64
++#define HTML_I		65
++#define HTML_STRONG	66
++#define HTML_SPAN	67
++#define HTML_ABBR       68
++#define HTML_ACRONYM    69
++#define HTML_BASEFONT   70
++#define HTML_BDO        71
++#define HTML_BIG        72
++#define HTML_BUTTON     73
++#define HTML_FIELDSET   74
++#define HTML_IFRAME     75
++#define HTML_LABEL      76
++#define HTML_LEGEND     77
++#define HTML_NOSCRIPT   78
++#define HTML_OBJECT     79
++#define HTML_OPTGROUP   80
++#define HTML_PARAM      81
++#define HTML_SMALL      82
++#define HTML_FIGURE     83
++#define HTML_FIGCAPTION 84
++#define HTML_SECTION    85
++#define HTML_DFN        86
++#define HTML_MAIN	87
+ 
+    /* pseudo tag */
+-#define HTML_SELECT_INT     160
+-#define HTML_N_SELECT_INT   161
+-#define HTML_OPTION_INT     162
+-#define HTML_TEXTAREA_INT   163
+-#define HTML_N_TEXTAREA_INT 164
+-#define HTML_TABLE_ALT      165
+-#define HTML_SYMBOL         166
+-#define HTML_N_SYMBOL       167
+-#define HTML_PRE_INT        168
+-#define HTML_N_PRE_INT      169
+-#define HTML_TITLE_ALT      170
+-#define HTML_FORM_INT       171
+-#define HTML_N_FORM_INT     172
+-#define HTML_DL_COMPACT     173
+-#define HTML_INPUT_ALT      174
+-#define HTML_N_INPUT_ALT    175
+-#define HTML_IMG_ALT        176
+-#define HTML_N_IMG_ALT      177
+-#define HTML_NOP	    178
+-#define HTML_PRE_PLAIN	    179
+-#define HTML_N_PRE_PLAIN    180
+-#define HTML_INTERNAL       181
+-#define HTML_N_INTERNAL     182
+-#define HTML_DIV_INT        183
+-#define HTML_N_DIV_INT      184
++#define HTML_SELECT_INT     110
++#define HTML_OPTION_INT     111
++#define HTML_TEXTAREA_INT   112
++#define HTML_TABLE_ALT      113
++#define HTML_SYMBOL         114
++#define HTML_PRE_INT        115
++#define HTML_TITLE_ALT      116
++#define HTML_FORM_INT       117
++#define HTML_DL_COMPACT     118
++#define HTML_INPUT_ALT      119
++#define HTML_IMG_ALT        120
++#define HTML_NOP	    121
++#define HTML_PRE_PLAIN	    122
++#define HTML_INTERNAL       123
++#define HTML_DIV_INT        124
+ 
+-#define MAX_HTMLTAG	    185
++#define MAX_HTMLTAG	    127
+ 
+ /* Tag attribute */
+ 
+--- a/parsetagx.c
++++ b/parsetagx.c
+@@ -114,7 +114,7 @@ struct parsed_tag *
+ parse_tag(char **s, int internal)
+ {
+     struct parsed_tag *tag = NULL;
+-    int tag_id;
++    int tag_id, tag_N = 0;
+     char tagname[MAX_TAG_LEN], attrname[MAX_TAG_LEN];
+     char *p, *q;
+     int i, attr_id = 0, nattr;
+@@ -124,8 +124,9 @@ parse_tag(char **s, int internal)
+     q = (*s) + 1;
+     p = tagname;
+     if (*q == '/') {
+-	*(p++) = *(q++);
++	q++;
+ 	SKIP_BLANKS(q);
++	tag_N = 1;
+     }
+     while (*q && !IS_SPACE(*q) && !(tagname[0] != '/' && *q == '/') &&
+ 	   *q != '>' && p - tagname < MAX_TAG_LEN - 1) {
+@@ -145,6 +146,10 @@ parse_tag(char **s, int internal)
+ 
+     tag = New(struct parsed_tag);
+     bzero(tag, sizeof(struct parsed_tag));
++    if (tag_N) {
++	tag->tagid = tag_id | HTML_N;
++	goto skip_parse_tagarg;
++    }
+     tag->tagid = tag_id;
+ 
+     if ((nattr = TagMAP[tag_id].max_attribute) > 0) {
+@@ -307,12 +312,12 @@ parsedtag2str(struct parsed_tag *tag)
+     Strcat_char(tagstr, '<');
+     Strcat_charp(tagstr, TagMAP[tag_id].name);
+     for (i = 0; i < nattr; i++) {
+-	if (tag->attrid[i] != ATTR_UNKNOWN) {
+-	    Strcat_char(tagstr, ' ');
+-	    Strcat_charp(tagstr, AttrMAP[tag->attrid[i]].name);
+-	    if (tag->value[i])
+-		Strcat(tagstr, Sprintf("=\"%s\"", html_quote(tag->value[i])));
+-	}
++	if (tag->attrid[i] == ATTR_UNKNOWN)
++	    continue;
++	Strcat_char(tagstr, ' ');
++	Strcat_charp(tagstr, AttrMAP[tag->attrid[i]].name);
++	if (tag->value[i])
++	    Strcat(tagstr, Sprintf("=\"%s\"", html_quote(tag->value[i])));
+     }
+     Strcat_char(tagstr, '>');
+     return tagstr;
+--- a/frame.c
++++ b/frame.c
+@@ -380,19 +380,19 @@ frame_download_source(struct frame_body
+ 
+ #define CASE_TABLE_TAG \
+ 	case HTML_TR:\
+-	case HTML_N_TR:\
++	case HTML_TR | HTML_N:\
+ 	case HTML_TD:\
+-	case HTML_N_TD:\
++	case HTML_TD | HTML_N:\
+ 	case HTML_TH:\
+-	case HTML_N_TH:\
++	case HTML_TH | HTML_N:\
+ 	case HTML_THEAD:\
+-	case HTML_N_THEAD:\
++	case HTML_THEAD | HTML_N:\
+ 	case HTML_TBODY:\
+-	case HTML_N_TBODY:\
++	case HTML_TBODY | HTML_N:\
+ 	case HTML_TFOOT:\
+-	case HTML_N_TFOOT:\
++	case HTML_TFOOT | HTML_N:\
+ 	case HTML_COLGROUP:\
+-	case HTML_N_COLGROUP:\
++	case HTML_COLGROUP | HTML_N:\
+ 	case HTML_COL
+ 
+ static int
+@@ -592,8 +592,8 @@ createFrameFile(struct frameset *f, FILE
+ 			    q = tok->ptr;
+ 			    if ((tag = parse_tag(&q, FALSE))) {
+ 				if ((tag->tagid == end_tag) ||
+-				    (tag->tagid == HTML_N_FORM)) {
+-				    if (tag->tagid == HTML_N_FORM)
++				    (tag->tagid == (HTML_FORM | HTML_N))) {
++				    if (tag->tagid == (HTML_FORM | HTML_N))
+ 					fputs("</SELECT>", f1);
+ 				    pre_mode = 0;
+ 				    end_tag = 0;
+@@ -602,7 +602,7 @@ createFrameFile(struct frameset *f, FILE
+ 				if (t_stack) {
+ 				    switch (tag->tagid) {
+ 				    case HTML_TABLE:
+-				    case HTML_N_TABLE:
++				    case HTML_TABLE | HTML_N:
+ 				      CASE_TABLE_TAG:
+ 					fputs("</SELECT>", f1);
+ 					pre_mode = 0;
+@@ -627,7 +627,7 @@ createFrameFile(struct frameset *f, FILE
+ 			case HTML_TITLE:
+ 			    fputs("<!-- title:", f1);
+ 			    goto token_end;
+-			case HTML_N_TITLE:
++			case HTML_TITLE | HTML_N:
+ 			    fputs("-->", f1);
+ 			    goto token_end;
+ 			case HTML_BASE:
+@@ -685,9 +685,9 @@ createFrameFile(struct frameset *f, FILE
+ #endif
+ 			    /* fall thru, "META" is prohibit tag */
+ 			case HTML_HEAD:
+-			case HTML_N_HEAD:
++			case HTML_HEAD | HTML_N:
+ 			case HTML_BODY:
+-			case HTML_N_BODY:
++			case HTML_BODY | HTML_N:
+ 			case HTML_DOCTYPE:
+ 			    /* prohibit_tags */
+ 			    Strshrinkfirst(tok, 1);
+@@ -697,7 +697,7 @@ createFrameFile(struct frameset *f, FILE
+ 			case HTML_TABLE:
+ 			    t_stack++;
+ 			    break;
+-			case HTML_N_TABLE:
++			case HTML_TABLE | HTML_N:
+ 			    t_stack--;
+ 			    if (t_stack < 0) {
+ 				t_stack = 0;
+@@ -722,28 +722,28 @@ createFrameFile(struct frameset *f, FILE
+ 			    break;
+ 			case HTML_SELECT:
+ 			    pre_mode = RB_INSELECT;
+-			    end_tag = HTML_N_SELECT;
++			    end_tag = HTML_SELECT | HTML_N;
+ 			    break;
+ 			case HTML_TEXTAREA:
+ 			    pre_mode = RB_INTXTA;
+-			    end_tag = HTML_N_TEXTAREA;
++			    end_tag = HTML_TEXTAREA | HTML_N;
+ 			    break;
+ 			case HTML_SCRIPT:
+ 			    pre_mode = RB_SCRIPT;
+-			    end_tag = HTML_N_SCRIPT;
++			    end_tag = HTML_SCRIPT | HTML_N;
+ 			    break;
+ 			case HTML_STYLE:
+ 			    pre_mode = RB_STYLE;
+-			    end_tag = HTML_N_STYLE;
++			    end_tag = HTML_STYLE | HTML_N;
+ 			    break;
+ 			case HTML_LISTING:
+ 			    pre_mode = RB_PLAIN;
+-			    end_tag = HTML_N_LISTING;
++			    end_tag = HTML_LISTING | HTML_N;
+ 			    fputs("<PRE_PLAIN>", f1);
+ 			    goto token_end;
+ 			case HTML_XMP:
+ 			    pre_mode = RB_PLAIN;
+-			    end_tag = HTML_N_XMP;
++			    end_tag = HTML_XMP | HTML_N;
+ 			    fputs("<PRE_PLAIN>", f1);
+ 			    goto token_end;
+ 			case HTML_PLAINTEXT:
+--- a/table.c
++++ b/table.c
+@@ -2460,21 +2460,21 @@ table_close_anchor0(struct table *tbl, s
+ 
+ #define CASE_TABLE_TAG \
+ 	case HTML_TABLE:\
+-	case HTML_N_TABLE:\
++	case HTML_TABLE | HTML_N:\
+ 	case HTML_TR:\
+-	case HTML_N_TR:\
++	case HTML_TR | HTML_N:\
+ 	case HTML_TD:\
+-	case HTML_N_TD:\
++	case HTML_TD | HTML_N:\
+ 	case HTML_TH:\
+-	case HTML_N_TH:\
++	case HTML_TH | HTML_N:\
+ 	case HTML_THEAD:\
+-	case HTML_N_THEAD:\
++	case HTML_THEAD | HTML_N:\
+ 	case HTML_TBODY:\
+-	case HTML_N_TBODY:\
++	case HTML_TBODY | HTML_N:\
+ 	case HTML_TFOOT:\
+-	case HTML_N_TFOOT:\
++	case HTML_TFOOT | HTML_N:\
+ 	case HTML_COLGROUP:\
+-	case HTML_N_COLGROUP:\
++	case HTML_COLGROUP | HTML_N:\
+ 	case HTML_COL
+ 
+ #define ATTR_ROWSPAN_MAX 32766
+@@ -2508,9 +2508,9 @@ feed_table_tag(struct table *tbl, char *
+     if (mode->pre_mode & TBLM_INTXTA) {
+ 	switch (cmd) {
+ 	CASE_TABLE_TAG:
+-	case HTML_N_TEXTAREA:
++	case HTML_TEXTAREA | HTML_N:
+ 	    table_close_textarea(tbl, mode, width);
+-	    if (cmd == HTML_N_TEXTAREA)
++	    if (cmd == (HTML_TEXTAREA | HTML_N))
+ 		return TAG_ACTION_NONE;
+ 	    break;
+ 	default:
+@@ -2537,11 +2537,11 @@ feed_table_tag(struct table *tbl, char *
+      * <select> environment is regarded as the end of <select>. */
+     if (mode->pre_mode & TBLM_INSELECT) {
+ 	switch (cmd) {
+-	  CASE_TABLE_TAG:
+-	case HTML_N_FORM:
+-	case HTML_N_SELECT:	/* mode->end_tag */
++	CASE_TABLE_TAG:
++	case HTML_FORM | HTML_N:
++	case HTML_SELECT | HTML_N:	/* mode->end_tag */
+ 	    table_close_select(tbl, mode, width);
+-	    if (cmd == HTML_N_SELECT)
++	    if (cmd == (HTML_SELECT | HTML_N))
+ 		return TAG_ACTION_NONE;
+ 	    break;
+ 	default:
+@@ -2550,10 +2550,10 @@ feed_table_tag(struct table *tbl, char *
+     }
+     if (mode->caption) {
+ 	switch (cmd) {
+-	  CASE_TABLE_TAG:
+-	case HTML_N_CAPTION:
++	CASE_TABLE_TAG:
++	case HTML_CAPTION | HTML_N:
+ 	    mode->caption = 0;
+-	    if (cmd == HTML_N_CAPTION)
++	    if (cmd == (HTML_CAPTION | HTML_N))
+ 		return TAG_ACTION_NONE;
+ 	    break;
+ 	default:
+@@ -2564,9 +2564,9 @@ feed_table_tag(struct table *tbl, char *
+     if (mode->pre_mode & TBLM_PRE) {
+ 	switch (cmd) {
+ 	case HTML_NOBR:
+-	case HTML_N_NOBR:
++	case HTML_NOBR | HTML_N:
+ 	case HTML_PRE_INT:
+-	case HTML_N_PRE_INT:
++	case HTML_PRE_INT | HTML_N:
+ 	    return TAG_ACTION_NONE;
+ 	}
+     }
+@@ -2575,7 +2575,7 @@ feed_table_tag(struct table *tbl, char *
+     case HTML_TABLE:
+ 	check_rowcol(tbl, mode);
+ 	return TAG_ACTION_TABLE;
+-    case HTML_N_TABLE:
++    case HTML_TABLE | HTML_N:
+ 	if (tbl->suspended_data)
+ 	    check_rowcol(tbl, mode);
+ 	return TAG_ACTION_N_TABLE;
+@@ -2803,13 +2803,13 @@ feed_table_tag(struct table *tbl, char *
+ 	}
+ 	begin_cell(tbl, mode);
+ 	break;
+-    case HTML_N_TR:
++    case HTML_TR | HTML_N:
+ 	setwidth(tbl, mode);
+ 	tbl->col = -1;
+ 	tbl->flag &= ~(TBL_IN_ROW | TBL_IN_COL);
+ 	return TAG_ACTION_NONE;
+-    case HTML_N_TH:
+-    case HTML_N_TD:
++    case HTML_TH | HTML_N:
++    case HTML_TD | HTML_N:
+ 	setwidth(tbl, mode);
+ 	tbl->flag &= ~TBL_IN_COL;
+ #ifdef FEED_TABLE_DEBUG
+@@ -2828,41 +2828,41 @@ feed_table_tag(struct table *tbl, char *
+     case HTML_P:
+     case HTML_BR:
+     case HTML_CENTER:
+-    case HTML_N_CENTER:
++    case HTML_CENTER | HTML_N:
+     case HTML_DIV:
+-    case HTML_N_DIV:
++    case HTML_DIV | HTML_N:
+ 	if (!(tbl->flag & TBL_IN_ROW))
+ 	    break;
+     case HTML_DT:
+     case HTML_DD:
+     case HTML_H:
+-    case HTML_N_H:
++    case HTML_H | HTML_N:
+     case HTML_LI:
+     case HTML_PRE:
+-    case HTML_N_PRE:
++    case HTML_PRE | HTML_N:
+     case HTML_HR:
+     case HTML_LISTING:
+     case HTML_XMP:
+     case HTML_PLAINTEXT:
+     case HTML_PRE_PLAIN:
+-    case HTML_N_PRE_PLAIN:
++    case HTML_PRE_PLAIN | HTML_N:
+ 	feed_table_block_tag(tbl, line, mode, 0, cmd);
+ 	switch (cmd) {
+ 	case HTML_PRE:
+ 	case HTML_PRE_PLAIN:
+ 	    mode->pre_mode |= TBLM_PRE;
+ 	    break;
+-	case HTML_N_PRE:
+-	case HTML_N_PRE_PLAIN:
++	case HTML_PRE | HTML_N:
++	case HTML_PRE_PLAIN | HTML_N:
+ 	    mode->pre_mode &= ~TBLM_PRE;
+ 	    break;
+ 	case HTML_LISTING:
+ 	    mode->pre_mode |= TBLM_PLAIN;
+-	    mode->end_tag = HTML_N_LISTING;
++	    mode->end_tag = HTML_LISTING | HTML_N;
+ 	    break;
+ 	case HTML_XMP:
+ 	    mode->pre_mode |= TBLM_PLAIN;
+-	    mode->end_tag = HTML_N_XMP;
++	    mode->end_tag = HTML_XMP | HTML_N;
+ 	    break;
+ 	case HTML_PLAINTEXT:
+ 	    mode->pre_mode |= TBLM_PLAIN;
+@@ -2876,10 +2876,10 @@ feed_table_tag(struct table *tbl, char *
+     case HTML_UL:
+ 	feed_table_block_tag(tbl, line, mode, 1, cmd);
+ 	break;
+-    case HTML_N_DL:
+-    case HTML_N_BLQ:
+-    case HTML_N_OL:
+-    case HTML_N_UL:
++    case HTML_DL | HTML_N:
++    case HTML_BLQ | HTML_N:
++    case HTML_OL | HTML_N:
++    case HTML_UL | HTML_N:
+ 	feed_table_block_tag(tbl, line, mode, -1, cmd);
+ 	break;
+     case HTML_NOBR:
+@@ -2908,7 +2908,7 @@ feed_table_tag(struct table *tbl, char *
+ 	    tbl->linfo.length = 0;
+ 	}
+ 	break;
+-    case HTML_N_NOBR:
++    case HTML_NOBR | HTML_N:
+ 	if (!(tbl->flag & TBL_IN_ROW))
+ 	    break;
+ 	feed_table_inline_tag(tbl, line, mode, -1);
+@@ -2917,7 +2917,7 @@ feed_table_tag(struct table *tbl, char *
+ 	if (mode->nobr_level == 0)
+ 	    mode->pre_mode &= ~TBLM_NOBR;
+ 	break;
+-    case HTML_N_PRE_INT:
++    case HTML_PRE_INT | HTML_N:
+ 	feed_table_inline_tag(tbl, line, mode, -1);
+ 	mode->pre_mode &= ~TBLM_PRE_INT;
+ 	break;
+@@ -2947,7 +2947,7 @@ feed_table_tag(struct table *tbl, char *
+ 	if (tmp)
+ 	    feed_table1(tbl, tmp, mode, width);
+ 	break;
+-    case HTML_N_FORM:
++    case HTML_FORM | HTML_N:
+ 	feed_table_block_tag(tbl, "", mode, 0, cmd);
+ 	process_n_form();
+ 	break;
+@@ -2959,7 +2959,7 @@ feed_table_tag(struct table *tbl, char *
+        tmp = process_button(tag);
+        feed_table1(tbl, tmp, mode, width);
+        break;
+-    case HTML_N_BUTTON:
++    case HTML_BUTTON | HTML_N:
+        tmp = process_n_button();
+        feed_table1(tbl, tmp, mode, width);
+        break;
+@@ -2968,9 +2968,9 @@ feed_table_tag(struct table *tbl, char *
+ 	if (tmp)
+ 	    feed_table1(tbl, tmp, mode, width);
+ 	mode->pre_mode |= TBLM_INSELECT;
+-	mode->end_tag = HTML_N_SELECT;
++	mode->end_tag = HTML_SELECT | HTML_N;
+ 	break;
+-    case HTML_N_SELECT:
++    case HTML_SELECT | HTML_N:
+     case HTML_OPTION:
+ 	/* nothing */
+ 	break;
+@@ -2990,7 +2990,7 @@ feed_table_tag(struct table *tbl, char *
+ 	if (tmp)
+ 	    feed_table1(tbl, tmp, mode, width);
+ 	mode->pre_mode |= TBLM_INTXTA;
+-	mode->end_tag = HTML_N_TEXTAREA;
++	mode->end_tag = HTML_TEXTAREA | HTML_N;
+ 	break;
+     case HTML_A:
+ 	table_close_anchor0(tbl, mode);
+@@ -3033,7 +3033,7 @@ feed_table_tag(struct table *tbl, char *
+ 	    break;
+ 	}
+ 	break;
+-    case HTML_N_DEL:
++    case HTML_DEL | HTML_N:
+ 	switch (displayInsDel) {
+ 	case DISPLAY_INS_DEL_SIMPLE:
+ 	    mode->pre_mode &= ~TBLM_DEL;
+@@ -3059,7 +3059,7 @@ feed_table_tag(struct table *tbl, char *
+ 	    break;
+ 	}
+ 	break;
+-    case HTML_N_S:
++    case HTML_S | HTML_N:
+ 	switch (displayInsDel) {
+ 	case DISPLAY_INS_DEL_SIMPLE:
+ 	    mode->pre_mode &= ~TBLM_S;
+@@ -3073,7 +3073,7 @@ feed_table_tag(struct table *tbl, char *
+ 	}
+ 	break;
+     case HTML_INS:
+-    case HTML_N_INS:
++    case HTML_INS | HTML_N:
+ 	switch (displayInsDel) {
+ 	case DISPLAY_INS_DEL_SIMPLE:
+ 	    break;
+@@ -3087,11 +3087,11 @@ feed_table_tag(struct table *tbl, char *
+ 	break;
+     case HTML_SUP:
+     case HTML_SUB:
+-    case HTML_N_SUB:
++    case HTML_SUB | HTML_N:
+ 	if (!(mode->pre_mode & (TBLM_DEL | TBLM_S)))
+ 	    feed_table_inline_tag(tbl, line, mode, 1);	/* ^, [, ] */
+ 	break;
+-    case HTML_N_SUP:
++    case HTML_SUP | HTML_N:
+ 	break;
+     case HTML_TABLE_ALT:
+ 	id = -1;
+@@ -3133,46 +3133,46 @@ feed_table_tag(struct table *tbl, char *
+     case HTML_CAPTION:
+ 	mode->caption = 1;
+ 	break;
+-    case HTML_N_CAPTION:
++    case HTML_CAPTION | HTML_N:
+     case HTML_THEAD:
+-    case HTML_N_THEAD:
++    case HTML_THEAD | HTML_N:
+     case HTML_TBODY:
+-    case HTML_N_TBODY:
++    case HTML_TBODY | HTML_N:
+     case HTML_TFOOT:
+-    case HTML_N_TFOOT:
++    case HTML_TFOOT | HTML_N:
+     case HTML_COLGROUP:
+-    case HTML_N_COLGROUP:
++    case HTML_COLGROUP | HTML_N:
+     case HTML_COL:
+ 	break;
+     case HTML_SCRIPT:
+ 	mode->pre_mode |= TBLM_SCRIPT;
+-	mode->end_tag = HTML_N_SCRIPT;
++	mode->end_tag = HTML_SCRIPT | HTML_N;
+ 	break;
+     case HTML_STYLE:
+ 	mode->pre_mode |= TBLM_STYLE;
+-	mode->end_tag = HTML_N_STYLE;
++	mode->end_tag = HTML_STYLE | HTML_N;
+ 	break;
+-    case HTML_N_A:
++    case HTML_A | HTML_N:
+ 	table_close_anchor0(tbl, mode);
+     case HTML_FONT:
+-    case HTML_N_FONT:
++    case HTML_FONT | HTML_N:
+     case HTML_NOP:
+ 	suspend_or_pushdata(tbl, line);
+ 	break;
+     case HTML_INTERNAL:
+-    case HTML_N_INTERNAL:
++    case HTML_INTERNAL | HTML_N:
+     case HTML_FORM_INT:
+-    case HTML_N_FORM_INT:
++    case HTML_FORM_INT | HTML_N:
+     case HTML_INPUT_ALT:
+-    case HTML_N_INPUT_ALT:
++    case HTML_INPUT_ALT | HTML_N:
+     case HTML_SELECT_INT:
+-    case HTML_N_SELECT_INT:
++    case HTML_SELECT_INT | HTML_N:
+     case HTML_OPTION_INT:
+     case HTML_TEXTAREA_INT:
+-    case HTML_N_TEXTAREA_INT:
++    case HTML_TEXTAREA_INT | HTML_N:
+     case HTML_IMG_ALT:
+     case HTML_SYMBOL:
+-    case HTML_N_SYMBOL:
++    case HTML_SYMBOL | HTML_N:
+     default:
+ 	/* unknown tag: put into table */
+ 	return TAG_ACTION_FEED;
+--- a/tagtable.tab
++++ b/tagtable.tab
+@@ -2,7 +2,6 @@
+ #include "html.h"
+ %%
+ a		HTML_A
+-/a		HTML_N_A
+ _id		HTML_NOP
+ hr		HTML_HR
+ h1		HTML_H
+@@ -11,206 +10,115 @@ h3		HTML_H
+ h4		HTML_H
+ h5		HTML_H
+ h6		HTML_H
+-/h1		HTML_N_H
+-/h2		HTML_N_H
+-/h3		HTML_N_H
+-/h4		HTML_N_H
+-/h5		HTML_N_H
+-/h6		HTML_N_H
+ p		HTML_P
+ br		HTML_BR
+ b		HTML_B
+-/b		HTML_N_B
+ i		HTML_I
+-/i		HTML_N_I
+ tt		HTML_NOP
+-/tt		HTML_NOP
+ ul		HTML_UL
+-/ul		HTML_N_UL
+ main		HTML_MAIN
+-/main		HTML_N_MAIN
+ menu		HTML_UL
+-/menu		HTML_N_UL
+ dir		HTML_UL
+-/dir		HTML_N_UL
+ li		HTML_LI
+ ol		HTML_OL
+-/ol		HTML_N_OL
+ title		HTML_TITLE
+-/title		HTML_N_TITLE
+ dl		HTML_DL
+-/dl		HTML_N_DL
+ dt		HTML_DT
+ dd		HTML_DD
+ pre		HTML_PRE
+-/pre		HTML_N_PRE
+ blockquote	HTML_BLQ
+-/blockquote	HTML_N_BLQ
+ q		HTML_Q
+-/q		HTML_N_Q
+ img		HTML_IMG
+ image		HTML_IMG
+ code		HTML_NOP
+-/code		HTML_NOP
+ dfn		HTML_DFN
+-/dfn		HTML_N_DFN
+ em		HTML_EM
+-/em		HTML_N_EM
+ cite		HTML_NOP
+-/cite		HTML_NOP
+ kbd		HTML_NOP
+-/kbd		HTML_NOP
+ samp		HTML_NOP
+-/samp		HTML_NOP
+ span		HTML_SPAN
+-/span		HTML_N_SPAN
+ strong		HTML_STRONG
+-/strong		HTML_N_STRONG
+ var		HTML_NOP
+-/var		HTML_NOP
+ address		HTML_BR
+-/address	HTML_BR
+ xmp		HTML_XMP
+-/xmp		HTML_N_XMP
+ listing		HTML_LISTING
+-/listing	HTML_N_LISTING
+ plaintext	HTML_PLAINTEXT
+ table		HTML_TABLE
+-/table		HTML_N_TABLE
+ meta		HTML_META
+-/p		HTML_N_P
+ frame		HTML_FRAME
+ frameset	HTML_FRAMESET
+-/frameset	HTML_N_FRAMESET
+ noframes	HTML_NOFRAMES
+-/noframes	HTML_N_NOFRAMES
+ center		HTML_CENTER
+-/center		HTML_N_CENTER
+ font		HTML_FONT
+-/font		HTML_N_FONT
+ form		HTML_FORM
+-/form		HTML_N_FORM
+ input		HTML_INPUT
+ textarea	HTML_TEXTAREA
+-/textarea	HTML_N_TEXTAREA
+ select		HTML_SELECT
+-/select		HTML_N_SELECT
+ option		HTML_OPTION
+-/option		HTML_N_OPTION
+ nobr		HTML_NOBR
+-/nobr		HTML_N_NOBR
+ div		HTML_DIV
+-/div		HTML_N_DIV
+ isindex		HTML_ISINDEX
+ map		HTML_MAP
+-/map		HTML_N_MAP
+ area		HTML_AREA
+ script		HTML_SCRIPT
+-/script		HTML_N_SCRIPT
+ base		HTML_BASE
+ del		HTML_DEL
+-/del		HTML_N_DEL
+ strike		HTML_S
+-/strike		HTML_N_S
+ s		HTML_S
+-/s		HTML_N_S
+ ins		HTML_INS
+-/ins		HTML_N_INS
+ u		HTML_U
+-/u		HTML_N_U
+ style		HTML_STYLE
+-/style		HTML_N_STYLE
+ wbr		HTML_WBR
+-head           HTML_HEAD
+-/head          HTML_N_HEAD
+-link           HTML_LINK
++head		HTML_HEAD
++link		HTML_LINK
+ body		HTML_BODY
+-/body		HTML_N_BODY
+ html		HTML_BODY
+-/html		HTML_N_BODY
+-doctype                HTML_DOCTYPE
++doctype		HTML_DOCTYPE
+ tr		HTML_TR
+-/tr		HTML_N_TR
+ td		HTML_TD
+-/td		HTML_N_TD
+ th		HTML_TH
+-/th		HTML_N_TH
+ caption		HTML_CAPTION
+-/caption	HTML_N_CAPTION
+-thead           HTML_THEAD
+-/thead          HTML_N_THEAD
+-tbody           HTML_TBODY
+-/tbody          HTML_N_TBODY
+-tfoot           HTML_TFOOT
+-/tfoot          HTML_N_TFOOT
+-colgroup        HTML_COLGROUP
+-/colgroup       HTML_N_COLGROUP
+-col             HTML_COL
++thead		HTML_THEAD
++tbody		HTML_TBODY
++tfoot		HTML_TFOOT
++colgroup	HTML_COLGROUP
++col		HTML_COL
+ sup		HTML_SUP
+-/sup		HTML_N_SUP
+ sub		HTML_SUB
+-/sub		HTML_N_SUB
+ table_alt	HTML_TABLE_ALT
+ _symbol		HTML_SYMBOL
+-/_symbol	HTML_N_SYMBOL
+ title_alt	HTML_TITLE_ALT
+ form_int	HTML_FORM_INT
+-/form_int	HTML_N_FORM_INT
+ input_alt	HTML_INPUT_ALT
+-/input_alt	HTML_N_INPUT_ALT
+ img_alt		HTML_IMG_ALT
+-/img_alt	HTML_N_IMG_ALT
+ pre_int		HTML_PRE_INT
+-/pre_int	HTML_N_PRE_INT
+ bgsound		HTML_BGSOUND
+ applet		HTML_APPLET
+ embed		HTML_EMBED
+ span		HTML_SPAN
+-/span		HTML_N_SPAN
+ abbr		HTML_ABBR
+-/abbr		HTML_N_ABBR
+ acronym		HTML_ACRONYM
+-/acronym	HTML_N_ACRONYM
+ area		HTML_AREA
+ basefont	HTML_BASEFONT
+ bdo		HTML_BDO
+-/bdo		HTML_N_BDO
+ big		HTML_BIG
+-/big		HTML_N_BIG
+ button		HTML_BUTTON
+-/button		HTML_N_BUTTON
+ fieldset	HTML_FIELDSET
+-/fieldset	HTML_N_FIELDSET
+ iframe		HTML_IFRAME
+ label		HTML_LABEL
+-/label		HTML_N_LABEL
+ legend		HTML_LEGEND
+-/legend		HTML_N_LEGEND
+ noscript	HTML_NOSCRIPT
+-/noscript	HTML_N_NOSCRIPT
+ object		HTML_OBJECT
+ optgroup	HTML_OPTGROUP
+-/optgroup	HTML_N_OPTGROUP
+ param		HTML_PARAM
+ small		HTML_SMALL
+-/small		HTML_N_SMALL
+ figure		HTML_FIGURE
+-/figure		HTML_N_FIGURE
+ figcaption	HTML_FIGCAPTION
+-/figcaption	HTML_N_FIGCAPTION
+ internal	HTML_INTERNAL
+-/internal	HTML_N_INTERNAL
+ select_int	HTML_SELECT_INT
+-/select_int	HTML_N_SELECT_INT
+ option_int	HTML_OPTION_INT
+ section		HTML_SECTION
+-/section	HTML_N_SECTION
+-/dt		HTML_N_DT
+-/dd		HTML_N_DD
+ textarea_int	HTML_TEXTAREA_INT
+-/textarea_int	HTML_N_TEXTAREA_INT
+ pre_plain	HTML_PRE_PLAIN
+-/pre_plain	HTML_N_PRE_PLAIN
+ div_int		HTML_DIV_INT
+-/div_int	HTML_N_DIV_INT
+ main		HTML_MAIN
+--- a/html.c
++++ b/html.c
+@@ -90,193 +90,133 @@ unsigned char ALST_NOP[] = { ATTR_CORE }
+ TagInfo TagMAP[MAX_HTMLTAG] = {
+     {NULL, NULL, 0, 0},						/*   0 HTML_UNKNOWN    */
+     {"a", ALST_A, ARR_SZ(ALST_A), 0},				/*   1 HTML_A          */
+-    {"/a", NULL, 0, TFLG_END},					/*   2 HTML_N_A        */
+-    {"h", ALST_P, ARR_SZ(ALST_P), 0},				/*   3 HTML_H          */
+-    {"/h", NULL, 0, TFLG_END},					/*   4 HTML_N_H        */
+-    {"p", ALST_P, ARR_SZ(ALST_P), 0},				/*   5 HTML_P          */
+-    {"br", ALST_NOP, ARR_SZ(ALST_NOP), 0},			/*   6 HTML_BR         */
+-    {"b", ALST_NOP, ARR_SZ(ALST_NOP), 0},			/*   7 HTML_B          */
+-    {"/b", NULL, 0, TFLG_END},					/*   8 HTML_N_B        */
+-    {"ul", ALST_UL, ARR_SZ(ALST_UL), 0},			/*   9 HTML_UL         */
+-    {"/ul", NULL, 0, TFLG_END},					/*  10 HTML_N_UL       */
+-    {"li", ALST_LI, ARR_SZ(ALST_LI), 0},			/*  11 HTML_LI         */
+-    {"ol", ALST_UL, ARR_SZ(ALST_UL), 0},			/*  12 HTML_OL         */
+-    {"/ol", NULL, 0, TFLG_END},					/*  13 HTML_N_OL       */
+-    {"title", ALST_NOP, ARR_SZ(ALST_NOP), 0},			/*  14 HTML_TITLE      */
+-    {"/title", NULL, 0, TFLG_END},				/*  15 HTML_N_TITLE    */
+-    {"hr", ALST_HR, ARR_SZ(ALST_HR), 0},			/*  16 HTML_HR         */
+-    {"dl", ALST_DL, ARR_SZ(ALST_DL), 0},			/*  17 HTML_DL         */
+-    {"/dl", NULL, 0, TFLG_END},					/*  18 HTML_N_DL       */
+-    {"dt", ALST_NOP, ARR_SZ(ALST_NOP), 0},			/*  19 HTML_DT         */
+-    {"dd", ALST_NOP, ARR_SZ(ALST_NOP), 0},			/*  20 HTML_DD         */
+-    {"pre", ALST_PRE, ARR_SZ(ALST_PRE), 0},			/*  21 HTML_PRE        */
+-    {"/pre", NULL, 0, TFLG_END},				/*  22 HTML_N_PRE      */
+-    {"blockquote", ALST_NOP, ARR_SZ(ALST_NOP), 0},		/*  23 HTML_BLQ        */
+-    {"/blockquote", NULL, 0, TFLG_END},				/*  24 HTML_N_BLQ      */
+-    {"img", ALST_IMG, ARR_SZ(ALST_IMG), 0},			/*  25 HTML_IMG        */
+-    {"listing", ALST_NOP, ARR_SZ(ALST_NOP), 0},			/*  26 HTML_LISTING    */
+-    {"/listing", NULL, 0, TFLG_END},				/*  27 HTML_N_LISTING  */
+-    {"xmp", ALST_NOP, ARR_SZ(ALST_NOP), 0},			/*  28 HTML_XMP        */
+-    {"/xmp", NULL, 0, TFLG_END},				/*  29 HTML_N_XMP      */
+-    {"plaintext", ALST_NOP, ARR_SZ(ALST_NOP), 0},		/*  30 HTML_PLAINTEXT  */
+-    {"table", ALST_TABLE, ARR_SZ(ALST_TABLE), 0},		/*  31 HTML_TABLE      */
+-    {"/table", NULL, 0, TFLG_END},				/*  32 HTML_N_TABLE    */
+-    {"meta", ALST_META, ARR_SZ(ALST_META), 0},			/*  33 HTML_META       */
+-    {"/p", NULL, 0, TFLG_END},					/*  34 HTML_N_P        */
+-    {"frame", ALST_FRAME, ARR_SZ(ALST_FRAME), 0},		/*  35 HTML_FRAME      */
+-    {"frameset", ALST_FRAMESET, ARR_SZ(ALST_FRAMESET), 0},	/*  36 HTML_FRAMESET   */
+-    {"/frameset", NULL, 0, TFLG_END},				/*  37 HTML_N_FRAMESET */
+-    {"center", ALST_NOP, ARR_SZ(ALST_NOP), 0},			/*  38 HTML_CENTER     */
+-    {"/center", NULL, 0, TFLG_END},				/*  39 HTML_N_CENTER   */
+-    {"font", ALST_NOP, ARR_SZ(ALST_NOP), 0},			/*  40 HTML_FONT       */
+-    {"/font", NULL, 0, TFLG_END},				/*  41 HTML_N_FONT     */
+-    {"form", ALST_FORM, ARR_SZ(ALST_FORM), 0},			/*  42 HTML_FORM       */
+-    {"/form", NULL, 0, TFLG_END},				/*  43 HTML_N_FORM     */
+-    {"input", ALST_INPUT, ARR_SZ(ALST_INPUT), 0},		/*  44 HTML_INPUT      */
+-    {"textarea", ALST_TEXTAREA, ARR_SZ(ALST_TEXTAREA), 0},	/*  45 HTML_TEXTAREA   */
+-    {"/textarea", NULL, 0, TFLG_END},				/*  46 HTML_N_TEXTAREA */
+-    {"select", ALST_SELECT, ARR_SZ(ALST_SELECT), 0},		/*  47 HTML_SELECT     */
+-    {"/select", NULL, 0, TFLG_END},				/*  48 HTML_N_SELECT   */
+-    {"option", ALST_OPTION, ARR_SZ(ALST_OPTION), 0},		/*  49 HTML_OPTION     */
+-    {"nobr", ALST_NOP, ARR_SZ(ALST_NOP), 0},			/*  50 HTML_NOBR       */
+-    {"/nobr", NULL, 0, TFLG_END},				/*  51 HTML_N_NOBR     */
+-    {"div", ALST_P, ARR_SZ(ALST_P), 0},				/*  52 HTML_DIV        */
+-    {"/div", NULL, 0, TFLG_END},				/*  53 HTML_N_DIV      */
+-    {"isindex", ALST_ISINDEX, ARR_SZ(ALST_ISINDEX), 0},		/*  54 HTML_ISINDEX    */
+-    {"map", ALST_MAP, ARR_SZ(ALST_MAP), 0},			/*  55 HTML_MAP        */
+-    {"/map", NULL, 0, TFLG_END},				/*  56 HTML_N_MAP      */
+-    {"area", ALST_AREA, ARR_SZ(ALST_AREA), 0},			/*  57 HTML_AREA       */
+-    {"script", ALST_NOP, ARR_SZ(ALST_NOP), 0},			/*  58 HTML_SCRIPT     */
+-    {"/script", NULL, 0, TFLG_END},				/*  59 HTML_N_SCRIPT   */
+-    {"base", ALST_BASE, ARR_SZ(ALST_BASE), 0},			/*  60 HTML_BASE       */
+-    {"del", ALST_NOP, ARR_SZ(ALST_NOP), 0},			/*  61 HTML_DEL        */
+-    {"/del", NULL, 0, TFLG_END},				/*  62 HTML_N_DEL      */
+-    {"ins", ALST_NOP, ARR_SZ(ALST_NOP), 0},			/*  63 HTML_INS        */
+-    {"/ins", NULL, 0, TFLG_END},				/*  64 HTML_N_INS      */
+-    {"u", ALST_NOP, ARR_SZ(ALST_NOP), 0},			/*  65 HTML_U          */
+-    {"/u", NULL, 0, TFLG_END},					/*  66 HTML_N_U        */
+-    {"style", ALST_NOP, ARR_SZ(ALST_NOP), 0},			/*  67 HTML_STYLE      */
+-    {"/style", NULL, 0, TFLG_END},				/*  68 HTML_N_STYLE    */
+-    {"wbr", ALST_NOP, ARR_SZ(ALST_NOP), 0},			/*  69 HTML_WBR        */
+-    {"em", ALST_NOP, ARR_SZ(ALST_NOP), 0},			/*  70 HTML_EM         */
+-    {"/em", NULL, 0, TFLG_END},					/*  71 HTML_N_EM       */
+-    {"body", ALST_BODY, ARR_SZ(ALST_BODY), 0},			/*  72 HTML_BODY       */
+-    {"/body", NULL, 0, TFLG_END},				/*  73 HTML_N_BODY     */
+-    {"tr", ALST_TR, ARR_SZ(ALST_TR), 0},			/*  74 HTML_TR         */
+-    {"/tr", NULL, 0, TFLG_END},					/*  75 HTML_N_TR       */
+-    {"td", ALST_TD, ARR_SZ(ALST_TD), 0},			/*  76 HTML_TD         */
+-    {"/td", NULL, 0, TFLG_END},					/*  77 HTML_N_TD       */
+-    {"caption", ALST_NOP, ARR_SZ(ALST_NOP), 0},			/*  78 HTML_CAPTION    */
+-    {"/caption", NULL, 0, TFLG_END},				/*  79 HTML_N_CAPTION  */
+-    {"th", ALST_TD, ARR_SZ(ALST_TD), 0},			/*  80 HTML_TH         */
+-    {"/th", NULL, 0, TFLG_END},					/*  81 HTML_N_TH       */
+-    {"thead", ALST_NOP, ARR_SZ(ALST_NOP), 0},			/*  82 HTML_THEAD      */
+-    {"/thead", NULL, 0, TFLG_END},				/*  83 HTML_N_THEAD    */
+-    {"tbody", ALST_NOP, ARR_SZ(ALST_NOP), 0},			/*  84 HTML_TBODY      */
+-    {"/tbody", NULL, 0, TFLG_END},				/*  85 HTML_N_TBODY    */
+-    {"tfoot", ALST_NOP, ARR_SZ(ALST_NOP), 0},			/*  86 HTML_TFOOT      */
+-    {"/tfoot", NULL, 0, TFLG_END},				/*  87 HTML_N_TFOOT    */
+-    {"colgroup", ALST_NOP, ARR_SZ(ALST_NOP), 0},		/*  88 HTML_COLGROUP   */
+-    {"/colgroup", NULL, 0, TFLG_END},				/*  89 HTML_N_COLGROUP */
+-    {"col", ALST_NOP, ARR_SZ(ALST_NOP), 0},			/*  90 HTML_COL        */
+-    {"bgsound", ALST_BGSOUND, ARR_SZ(ALST_BGSOUND), 0},		/*  91 HTML_BGSOUND    */
+-    {"applet", ALST_APPLET, ARR_SZ(ALST_APPLET), 0},		/*  92 HTML_APPLET     */
+-    {"embed", ALST_EMBED, ARR_SZ(ALST_EMBED), 0},		/*  93 HTML_EMBED      */
+-    {"/option", NULL, 0, TFLG_END},				/*  94 HTML_N_OPTION   */
+-    {"head", ALST_NOP, ARR_SZ(ALST_NOP), 0},			/*  95 HTML_HEAD       */
+-    {"/head", NULL, 0, TFLG_END},				/*  96 HTML_N_HEAD     */
+-    {"doctype", ALST_DOCTYPE, ARR_SZ(ALST_DOCTYPE), 0},		/*  97 HTML_DOCTYPE    */
+-    {"noframes", ALST_NOFRAMES, ARR_SZ(ALST_NOFRAMES), 0},	/*  98 HTML_NOFRAMES   */
+-    {"/noframes", NULL, 0, TFLG_END},				/*  99 HTML_N_NOFRAMES */
++    {"h", ALST_P, ARR_SZ(ALST_P), 0},				/*   2 HTML_H          */
++    {"p", ALST_P, ARR_SZ(ALST_P), 0},				/*   3 HTML_P          */
++    {"br", ALST_NOP, ARR_SZ(ALST_NOP), 0},			/*   4 HTML_BR         */
++    {"b", ALST_NOP, ARR_SZ(ALST_NOP), 0},			/*   5 HTML_B          */
++    {"ul", ALST_UL, ARR_SZ(ALST_UL), 0},			/*   6 HTML_UL         */
++    {"li", ALST_LI, ARR_SZ(ALST_LI), 0},			/*   7 HTML_LI         */
++    {"ol", ALST_UL, ARR_SZ(ALST_UL), 0},			/*   8 HTML_OL         */
++    {"title", ALST_NOP, ARR_SZ(ALST_NOP), 0},			/*   9 HTML_TITLE      */
++    {"hr", ALST_HR, ARR_SZ(ALST_HR), 0},			/*  10 HTML_HR         */
++    {"dl", ALST_DL, ARR_SZ(ALST_DL), 0},			/*  11 HTML_DL         */
++    {"dt", ALST_NOP, ARR_SZ(ALST_NOP), 0},			/*  12 HTML_DT         */
++    {"dd", ALST_NOP, ARR_SZ(ALST_NOP), 0},			/*  13 HTML_DD         */
++    {"pre", ALST_PRE, ARR_SZ(ALST_PRE), 0},			/*  14 HTML_PRE        */
++    {"blockquote", ALST_NOP, ARR_SZ(ALST_NOP), 0},		/*  15 HTML_BLQ        */
++    {"img", ALST_IMG, ARR_SZ(ALST_IMG), 0},			/*  16 HTML_IMG        */
++    {"listing", ALST_NOP, ARR_SZ(ALST_NOP), 0},			/*  17 HTML_LISTING    */
++    {"xmp", ALST_NOP, ARR_SZ(ALST_NOP), 0},			/*  18 HTML_XMP        */
++    {"plaintext", ALST_NOP, ARR_SZ(ALST_NOP), 0},		/*  19 HTML_PLAINTEXT  */
++    {"table", ALST_TABLE, ARR_SZ(ALST_TABLE), 0},		/*  20 HTML_TABLE      */
++    {"meta", ALST_META, ARR_SZ(ALST_META), 0},			/*  21 HTML_META       */
++    {"frame", ALST_FRAME, ARR_SZ(ALST_FRAME), 0},		/*  22 HTML_FRAME      */
++    {"frameset", ALST_FRAMESET, ARR_SZ(ALST_FRAMESET), 0},	/*  23 HTML_FRAMESET   */
++    {"center", ALST_NOP, ARR_SZ(ALST_NOP), 0},			/*  24 HTML_CENTER     */
++    {"font", ALST_NOP, ARR_SZ(ALST_NOP), 0},			/*  25 HTML_FONT       */
++    {"form", ALST_FORM, ARR_SZ(ALST_FORM), 0},			/*  26 HTML_FORM       */
++    {"input", ALST_INPUT, ARR_SZ(ALST_INPUT), 0},		/*  27 HTML_INPUT      */
++    {"textarea", ALST_TEXTAREA, ARR_SZ(ALST_TEXTAREA), 0},	/*  28 HTML_TEXTAREA   */
++    {"select", ALST_SELECT, ARR_SZ(ALST_SELECT), 0},		/*  29 HTML_SELECT     */
++    {"option", ALST_OPTION, ARR_SZ(ALST_OPTION), 0},		/*  30 HTML_OPTION     */
++    {"nobr", ALST_NOP, ARR_SZ(ALST_NOP), 0},			/*  31 HTML_NOBR       */
++    {"div", ALST_P, ARR_SZ(ALST_P), 0},				/*  32 HTML_DIV        */
++    {"isindex", ALST_ISINDEX, ARR_SZ(ALST_ISINDEX), 0},		/*  33 HTML_ISINDEX    */
++    {"map", ALST_MAP, ARR_SZ(ALST_MAP), 0},			/*  34 HTML_MAP        */
++    {"area", ALST_AREA, ARR_SZ(ALST_AREA), 0},			/*  35 HTML_AREA       */
++    {"script", ALST_NOP, ARR_SZ(ALST_NOP), 0},			/*  36 HTML_SCRIPT     */
++    {"base", ALST_BASE, ARR_SZ(ALST_BASE), 0},			/*  37 HTML_BASE       */
++    {"del", ALST_NOP, ARR_SZ(ALST_NOP), 0},			/*  38 HTML_DEL        */
++    {"ins", ALST_NOP, ARR_SZ(ALST_NOP), 0},			/*  39 HTML_INS        */
++    {"u", ALST_NOP, ARR_SZ(ALST_NOP), 0},			/*  40 HTML_U          */
++    {"style", ALST_NOP, ARR_SZ(ALST_NOP), 0},			/*  41 HTML_STYLE      */
++    {"wbr", ALST_NOP, ARR_SZ(ALST_NOP), 0},			/*  42 HTML_WBR        */
++    {"em", ALST_NOP, ARR_SZ(ALST_NOP), 0},			/*  43 HTML_EM         */
++    {"body", ALST_BODY, ARR_SZ(ALST_BODY), 0},			/*  44 HTML_BODY       */
++    {"tr", ALST_TR, ARR_SZ(ALST_TR), 0},			/*  45 HTML_TR         */
++    {"td", ALST_TD, ARR_SZ(ALST_TD), 0},			/*  46 HTML_TD         */
++    {"caption", ALST_NOP, ARR_SZ(ALST_NOP), 0},			/*  47 HTML_CAPTION    */
++    {"th", ALST_TD, ARR_SZ(ALST_TD), 0},			/*  48 HTML_TH         */
++    {"thead", ALST_NOP, ARR_SZ(ALST_NOP), 0},			/*  49 HTML_THEAD      */
++    {"tbody", ALST_NOP, ARR_SZ(ALST_NOP), 0},			/*  50 HTML_TBODY      */
++    {"tfoot", ALST_NOP, ARR_SZ(ALST_NOP), 0},			/*  51 HTML_TFOOT      */
++    {"colgroup", ALST_NOP, ARR_SZ(ALST_NOP), 0},		/*  52 HTML_COLGROUP   */
++    {"col", ALST_NOP, ARR_SZ(ALST_NOP), 0},			/*  53 HTML_COL        */
++    {"bgsound", ALST_BGSOUND, ARR_SZ(ALST_BGSOUND), 0},		/*  54 HTML_BGSOUND    */
++    {"applet", ALST_APPLET, ARR_SZ(ALST_APPLET), 0},		/*  55 HTML_APPLET     */
++    {"embed", ALST_EMBED, ARR_SZ(ALST_EMBED), 0},		/*  56 HTML_EMBED      */
++    {"head", ALST_NOP, ARR_SZ(ALST_NOP), 0},			/*  57 HTML_HEAD       */
++    {"doctype", ALST_DOCTYPE, ARR_SZ(ALST_DOCTYPE), 0},		/*  58 HTML_DOCTYPE    */
++    {"noframes", ALST_NOFRAMES, ARR_SZ(ALST_NOFRAMES), 0},	/*  59 HTML_NOFRAMES   */
+ 
+-    {"sup", ALST_NOP, ARR_SZ(ALST_NOP), 0},			/* 100 HTML_SUP        */
+-    {"/sup", NULL, 0, TFLG_END},				/* 101 HTML_N_SUP      */
+-    {"sub", ALST_NOP, ARR_SZ(ALST_NOP), 0},			/* 102 HTML_SUB        */
+-    {"/sub", NULL, 0, TFLG_END},				/* 103 HTML_N_SUB      */
+-    {"link", ALST_LINK, ARR_SZ(ALST_LINK), 0},			/* 104 HTML_LINK       */
+-    {"s", ALST_NOP, ARR_SZ(ALST_NOP), 0},			/* 105 HTML_S          */
+-    {"/s", NULL, 0, TFLG_END},					/* 106 HTML_N_S        */
+-    {"q", ALST_NOP, ARR_SZ(ALST_NOP), 0},			/* 107 HTML_Q          */
+-    {"/q", NULL, 0, TFLG_END},					/* 108 HTML_N_Q        */
+-    {"i", ALST_NOP, ARR_SZ(ALST_NOP), 0},			/* 109 HTML_I          */
+-    {"/i", NULL, 0, TFLG_END},					/* 110 HTML_N_I        */
+-    {"strong", ALST_NOP, ARR_SZ(ALST_NOP), 0},			/* 111 HTML_STRONG     */
+-    {"/strong", NULL, 0, TFLG_END},				/* 112 HTML_N_STRONG   */
+-    {"span", ALST_NOP, ARR_SZ(ALST_NOP), 0},			/* 113 HTML_SPAN       */
+-    {"/span", NULL, 0, TFLG_END},				/* 114 HTML_N_SPAN     */
+-    {"abbr", ALST_NOP, ARR_SZ(ALST_NOP), 0},			/* 115 HTML_ABBR       */
+-    {"/abbr", NULL, 0, TFLG_END},				/* 116 HTML_N_ABBR     */
+-    {"acronym", ALST_NOP, ARR_SZ(ALST_NOP), 0},			/* 117 HTML_ACRONYM    */
+-    {"/acronym", NULL, 0, TFLG_END},				/* 118 HTML_N_ACRONYM  */
+-    {"basefont", ALST_NOP, ARR_SZ(ALST_NOP), 0},		/* 119 HTML_BASEFONT   */
+-    {"bdo", ALST_NOP, ARR_SZ(ALST_NOP), 0}, 			/* 120 HTML_BDO        */
+-    {"/bdo", NULL, 0, TFLG_END},				/* 121 HTML_N_BDO      */
+-    {"big", ALST_NOP, ARR_SZ(ALST_NOP), 0},			/* 122 HTML_BIG        */
+-    {"/big", NULL, 0, TFLG_END},				/* 123 HTML_N_BIG      */
+-    {"button", ALST_BUTTON, ARR_SZ(ALST_BUTTON), 0},		/* 124 HTML_BUTTON     */
+-    {"/button", NULL, 0, TFLG_END},				/* 125 HTML_N_BUTTON   */
+-    {"fieldset", ALST_NOP, ARR_SZ(ALST_NOP), 0},		/* 126 HTML_FIELDSET   */
+-    {"/fieldset", NULL, 0, TFLG_END},				/* 127 HTML_N_FIELDSET */
+-    {"iframe", ALST_NOP, ARR_SZ(ALST_NOP), 0},			/* 128 HTML_IFRAME     */
+-    {"label", ALST_NOP, ARR_SZ(ALST_NOP), 0}, 			/* 129 HTML_LABEL      */
+-    {"/label", NULL, 0, TFLG_END},				/* 130 HTML_N_LABEL    */
+-    {"legend", ALST_NOP, ARR_SZ(ALST_NOP), 0},			/* 131 HTML_LEGEND     */
+-    {"/legend", NULL, 0, TFLG_END},				/* 132 HTML_N_LEGEND   */
+-    {"noscript", ALST_NOP, ARR_SZ(ALST_NOP), 0},		/* 133 HTML_NOSCRIPT   */
+-    {"/noscript", NULL, 0, TFLG_END},				/* 134 HTML_N_NOSCRIPT */
+-    {"object", ALST_NOP, ARR_SZ(ALST_NOP), 0},			/* 135 HTML_OBJECT     */
+-    {"optgroup", ALST_NOP, ARR_SZ(ALST_NOP), 0},		/* 136 HTML_OPTGROUP   */
+-    {"/optgroup", NULL, 0, TFLG_END},				/* 137 HTML_N_OPTGROUP */
+-    {"param", ALST_NOP, ARR_SZ(ALST_NOP), 0},			/* 138 HTML_PARAM      */
+-    {"small", ALST_NOP, ARR_SZ(ALST_NOP), 0}, 			/* 139 HTML_SMALL      */
+-    {"/small", NULL, 0, TFLG_END},				/* 140 HTML_N_SMALL    */
+-    {"figure", ALST_P, ARR_SZ(ALST_P), 0},			/* 141 HTML_FIGURE     */
+-    {"/figure", NULL, 0, TFLG_END},				/* 142 HTML_N_FIGURE   */
+-    {"figcaption", ALST_P, ARR_SZ(ALST_P), 0},			/* 143 HTML_FIGCAPTION */
+-    {"/figcaption", NULL, 0, TFLG_END},				/* 144 HTML_N_FIGCAPTION */
+-    {"section", ALST_NOP, ARR_SZ(ALST_NOP), 0},			/* 145 HTML_SECTION    */
+-    {"/section", NULL, 0, TFLG_END},				/* 146 HTML_N_SECTION  */
+-    {"/dt", NULL, 0, TFLG_END},					/* 147 HTML_N_DT       */
+-    {"/dd", NULL, 0, TFLG_END},					/* 148 HTML_N_DD       */
+-    {"dfn", ALST_ID, ARR_SZ(ALST_ID), 0},			/* 149 HTML_DFN */
+-    {"/dfn", NULL, 0, TFLG_END},				/* 150 HTML_N_DFN */
+-    {"main", ALST_ID, ARR_SZ(ALST_ID), 0},			/* 151 HTML_MAIN */
+-    {"/main", NULL, 0, TFLG_END},				/* 152 HTML_N_MAIN */
++    {"sup", ALST_NOP, ARR_SZ(ALST_NOP), 0},			/*  60 HTML_SUP        */
++    {"sub", ALST_NOP, ARR_SZ(ALST_NOP), 0},			/*  61 HTML_SUB        */
++    {"link", ALST_LINK, ARR_SZ(ALST_LINK), 0},			/*  62 HTML_LINK       */
++    {"s", ALST_NOP, ARR_SZ(ALST_NOP), 0},			/*  63 HTML_S          */
++    {"q", ALST_NOP, ARR_SZ(ALST_NOP), 0},			/*  64 HTML_Q          */
++    {"i", ALST_NOP, ARR_SZ(ALST_NOP), 0},			/*  65 HTML_I          */
++    {"strong", ALST_NOP, ARR_SZ(ALST_NOP), 0},			/*  66 HTML_STRONG     */
++    {"span", ALST_NOP, ARR_SZ(ALST_NOP), 0},			/*  67 HTML_SPAN       */
++    {"abbr", ALST_NOP, ARR_SZ(ALST_NOP), 0},			/*  68 HTML_ABBR       */
++    {"acronym", ALST_NOP, ARR_SZ(ALST_NOP), 0},			/*  69 HTML_ACRONYM    */
++    {"basefont", ALST_NOP, ARR_SZ(ALST_NOP), 0},		/*  70 HTML_BASEFONT   */
++    {"bdo", ALST_NOP, ARR_SZ(ALST_NOP), 0}, 			/*  71 HTML_BDO        */
++    {"big", ALST_NOP, ARR_SZ(ALST_NOP), 0},			/*  72 HTML_BIG        */
++    {"button", ALST_BUTTON, ARR_SZ(ALST_BUTTON), 0},		/*  73 HTML_BUTTON     */
++    {"fieldset", ALST_NOP, ARR_SZ(ALST_NOP), 0},		/*  74 HTML_FIELDSET   */
++    {"iframe", ALST_NOP, ARR_SZ(ALST_NOP), 0},			/*  75 HTML_IFRAME     */
++    {"label", ALST_NOP, ARR_SZ(ALST_NOP), 0}, 			/*  76 HTML_LABEL      */
++    {"legend", ALST_NOP, ARR_SZ(ALST_NOP), 0},			/*  77 HTML_LEGEND     */
++    {"noscript", ALST_NOP, ARR_SZ(ALST_NOP), 0},		/*  78 HTML_NOSCRIPT   */
++    {"object", ALST_NOP, ARR_SZ(ALST_NOP), 0},			/*  79 HTML_OBJECT     */
++    {"optgroup", ALST_NOP, ARR_SZ(ALST_NOP), 0},		/*  80 HTML_OPTGROUP   */
++    {"param", ALST_NOP, ARR_SZ(ALST_NOP), 0},			/*  81 HTML_PARAM      */
++    {"small", ALST_NOP, ARR_SZ(ALST_NOP), 0}, 			/*  82 HTML_SMALL      */
++    {"figure", ALST_P, ARR_SZ(ALST_P), 0},			/*  83 HTML_FIGURE     */
++    {"figcaption", ALST_P, ARR_SZ(ALST_P), 0},			/*  84 HTML_FIGCAPTION */
++    {"section", ALST_NOP, ARR_SZ(ALST_NOP), 0},			/*  85 HTML_SECTION    */
++    {"dfn", ALST_ID, ARR_SZ(ALST_ID), 0},			/*  86 HTML_DFN */
++    {"main", ALST_ID, ARR_SZ(ALST_ID), 0},			/*  87 HTML_MAIN */
+ 
+-    {NULL, NULL, 0, 0},						/* 153 Undefined */
+-    {NULL, NULL, 0, 0},						/* 154 Undefined */
+-    {NULL, NULL, 0, 0},						/* 155 Undefined */
+-    {NULL, NULL, 0, 0},						/* 156 Undefined */
+-    {NULL, NULL, 0, 0},						/* 157 Undefined */
+-    {NULL, NULL, 0, 0},						/* 158 Undefined */
+-    {NULL, NULL, 0, 0},						/* 159 Undefined */
++    {NULL, NULL, 0, 0},						/*  88 Undefined */
++    {NULL, NULL, 0, 0},						/*  89 Undefined */
++    {NULL, NULL, 0, 0},						/*  90 Undefined */
++    {NULL, NULL, 0, 0},						/*  91 Undefined */
++    {NULL, NULL, 0, 0},						/*  92 Undefined */
++    {NULL, NULL, 0, 0},						/*  93 Undefined */
++    {NULL, NULL, 0, 0},						/*  94 Undefined */
++    {NULL, NULL, 0, 0},						/*  95 Undefined */
++    {NULL, NULL, 0, 0},						/*  96 Undefined */
++    {NULL, NULL, 0, 0},						/*  97 Undefined */
++    {NULL, NULL, 0, 0},						/*  98 Undefined */
++    {NULL, NULL, 0, 0},						/*  99 Undefined */
++    {NULL, NULL, 0, 0},						/*  100 Undefined */
++    {NULL, NULL, 0, 0},						/*  101 Undefined */
++    {NULL, NULL, 0, 0},						/*  102 Undefined */
++    {NULL, NULL, 0, 0},						/*  103 Undefined */
++    {NULL, NULL, 0, 0},						/*  104 Undefined */
++    {NULL, NULL, 0, 0},						/*  105 Undefined */
++    {NULL, NULL, 0, 0},						/*  106 Undefined */
++    {NULL, NULL, 0, 0},						/*  107 Undefined */
++    {NULL, NULL, 0, 0},						/*  108 Undefined */
++    {NULL, NULL, 0, 0},						/*  109 Undefined */
+ 
+     /* pseudo tag */
+-    {"select_int", ALST_SELECT_INT, ARR_SZ(ALST_SELECT_INT), TFLG_INT},		/* 160 HTML_SELECT_INT     */
+-    {"/select_int", NULL, 0, TFLG_INT | TFLG_END},				/* 161 HTML_N_SELECT_INT   */
+-    {"option_int", ALST_OPTION, ARR_SZ(ALST_OPTION), TFLG_INT},			/* 162 HTML_OPTION_INT     */
+-    {"textarea_int", ALST_TEXTAREA_INT, ARR_SZ(ALST_TEXTAREA_INT), TFLG_INT},	/* 163 HTML_TEXTAREA_INT   */
+-    {"/textarea_int", NULL, 0, TFLG_INT | TFLG_END},				/* 164 HTML_N_TEXTAREA_INT */
+-    {"table_alt", ALST_TABLE_ALT, ARR_SZ(ALST_TABLE_ALT), TFLG_INT},		/* 165 HTML_TABLE_ALT      */
+-    {"symbol", ALST_SYMBOL, ARR_SZ(ALST_SYMBOL), TFLG_INT},			/* 166 HTML_SYMBOL         */
+-    {"/symbol", NULL, 0, TFLG_INT | TFLG_END},					/* 167 HTML_N_SYMBOL       */
+-    {"pre_int", NULL, 0, TFLG_INT},						/* 168 HTML_PRE_INT        */
+-    {"/pre_int", NULL, 0, TFLG_INT | TFLG_END},					/* 169 HTML_N_PRE_INT      */
+-    {"title_alt", ALST_TITLE_ALT, ARR_SZ(ALST_TITLE_ALT), TFLG_INT},		/* 170 HTML_TITLE_ALT      */
+-    {"form_int", ALST_FORM_INT, ARR_SZ(ALST_FORM_INT), TFLG_INT},		/* 171 HTML_FORM_INT       */
+-    {"/form_int", NULL, 0, TFLG_INT | TFLG_END},				/* 172 HTML_N_FORM_INT     */
+-    {"dl_compact", NULL, 0, TFLG_INT},						/* 173 HTML_DL_COMPACT     */
+-    {"input_alt", ALST_INPUT_ALT, ARR_SZ(ALST_INPUT_ALT), TFLG_INT},		/* 174 HTML_INPUT_ALT      */
+-    {"/input_alt", NULL, 0, TFLG_INT | TFLG_END},				/* 175 HTML_N_INPUT_ALT    */
+-    {"img_alt", ALST_IMG_ALT, ARR_SZ(ALST_IMG_ALT), TFLG_INT},			/* 176 HTML_IMG_ALT        */
+-    {"/img_alt", NULL, 0, TFLG_INT | TFLG_END},					/* 177 HTML_N_IMG_ALT      */
+-    {" ", ALST_NOP, ARR_SZ(ALST_NOP), TFLG_INT},				/* 178 HTML_NOP            */
+-    {"pre_plain", NULL, 0, TFLG_INT},						/* 179 HTML_PRE_PLAIN      */
+-    {"/pre_plain", NULL, 0, TFLG_INT | TFLG_END},				/* 180 HTML_N_PRE_PLAIN    */
+-    {"internal", NULL, 0, TFLG_INT},						/* 181 HTML_INTERNAL       */
+-    {"/internal", NULL, 0, TFLG_INT | TFLG_END},				/* 182 HTML_N_INTERNAL     */
+-    {"div_int", ALST_P, ARR_SZ(ALST_P), TFLG_INT},				/* 183 HTML_DIV_INT        */
+-    {"/div_int", NULL, 0, TFLG_INT | TFLG_END},					/* 184 HTML_N_DIV_INT      */
++    {"select_int", ALST_SELECT_INT, ARR_SZ(ALST_SELECT_INT), TFLG_INT},		/* 110 HTML_SELECT_INT     */
++    {"option_int", ALST_OPTION, ARR_SZ(ALST_OPTION), TFLG_INT},			/* 111 HTML_OPTION_INT     */
++    {"textarea_int", ALST_TEXTAREA_INT, ARR_SZ(ALST_TEXTAREA_INT), TFLG_INT},	/* 112 HTML_TEXTAREA_INT   */
++    {"table_alt", ALST_TABLE_ALT, ARR_SZ(ALST_TABLE_ALT), TFLG_INT},		/* 113 HTML_TABLE_ALT      */
++    {"symbol", ALST_SYMBOL, ARR_SZ(ALST_SYMBOL), TFLG_INT},			/* 114 HTML_SYMBOL         */
++    {"pre_int", NULL, 0, TFLG_INT},						/* 115 HTML_PRE_INT        */
++    {"title_alt", ALST_TITLE_ALT, ARR_SZ(ALST_TITLE_ALT), TFLG_INT},		/* 116 HTML_TITLE_ALT      */
++    {"form_int", ALST_FORM_INT, ARR_SZ(ALST_FORM_INT), TFLG_INT},		/* 117 HTML_FORM_INT       */
++    {"dl_compact", NULL, 0, TFLG_INT},						/* 118 HTML_DL_COMPACT     */
++    {"input_alt", ALST_INPUT_ALT, ARR_SZ(ALST_INPUT_ALT), TFLG_INT},		/* 119 HTML_INPUT_ALT      */
++    {"img_alt", ALST_IMG_ALT, ARR_SZ(ALST_IMG_ALT), TFLG_INT},			/* 120 HTML_IMG_ALT        */
++    {" ", ALST_NOP, ARR_SZ(ALST_NOP), TFLG_INT},				/* 121 HTML_NOP            */
++    {"pre_plain", NULL, 0, TFLG_INT},						/* 122 HTML_PRE_PLAIN      */
++    {"internal", NULL, 0, TFLG_INT},						/* 123 HTML_INTERNAL       */
++    {"div_int", ALST_P, ARR_SZ(ALST_P), TFLG_INT},				/* 124 HTML_DIV_INT        */
+ };
+ 
+ TagAttrInfo AttrMAP[MAX_TAGATTR] = {

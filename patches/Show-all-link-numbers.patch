@@ -4,8 +4,8 @@ Subject: Show all link numbers
 Patch: patches/Show-all-link-numbers.patch
 
 ---
- file.c |   20 ++++++++++----------
- 1 file changed, 10 insertions(+), 10 deletions(-)
+ file.c |   21 +++++++++++----------
+ 1 file changed, 11 insertions(+), 10 deletions(-)
 
 --- a/file.c
 +++ b/file.c
@@ -49,12 +49,13 @@ Patch: patches/Show-all-link-numbers.patch
  		str = Strnew_m_charp(getLinkNumberStr(-1)->ptr, str, NULL)->ptr;
  		need_number = 0;
  	    }
-@@ -6666,14 +6670,10 @@ HTMLlineproc0(char *line, struct html_fe
+@@ -6666,14 +6670,11 @@ HTMLlineproc0(char *line, struct html_fe
  #endif				/* ID_EXT */
  	    obuf->bp.init_flag = 1;
  	    clear_ignore_p_flag(cmd, obuf);
-+	    if (displayLinkNumber && need_number == 1)
++	    if (!internal && displayLinkNumber && need_number == 1)
 +		continue;
++	    need_number = 0;
  	    if (cmd == HTML_TABLE)
  		goto table_start;
 -	    else {

@@ -27,7 +27,7 @@ Patch: patches/Add-test-for-Str.patch
 +#define ASSERT_int(x,y) \
 +{\
 +	if (x != y) {\
-+		printf("%ld != %ld\n", (long)x, (long)y);\
++		printf("%d != %d\n", x, y);\
 +		assert(x == y);\
 +	}\
 +}

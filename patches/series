@@ -1,28 +1,8 @@
-Add-option-exit_on_last.patch
 # modernC
 # PENDING
 #266 reorder
-Make-geom_menu-static.patch
-Move-buffer.patch
 # ?
-Fix-slow-backward-search.patch
 #278 md5
-Get-rid-of-STR_LENGTH_CHECK.patch
-Reduce-scope-of-dangerous-macro.patch
-Fix-potential-null-dereference.patch
-Fix-potential-null-dereference-to_str.patch
-Simplify-reshapeBuffer.patch
-Add-an-include-guard-for-proto.h.patch
-Remove-unnecessary-macro.patch
-Get-rid-of-DO_EXTERNAL-macro.patch
-Remove-code-duplication.patch
-Do-not-reshape-all-new-buffers.patch
-Add-a-comment.patch
-Use-correct-format-specifier-for-sprintf.patch
-Check-return-value-of-freopen.patch
-Remove-redundant-initialization.patch
-Remove-assignment-of-unread-value.patch
-Handle-errors-in-mySystem.patch
 # gophers
 refactor-openUrl-scheme-handling.patch
 Add-gophers-support.patch
@@ -159,15 +139,16 @@ Get-rid-of-xfree.patch
 Strinsert_charp_n.patch
 Let-Str-functions-return-a-Str.patch
 Get-rid-of-Strnulterm.patch
-lto.patch
 # BORKED
+Refactor-handling-of-close-tags.patch
+Allow-unknown-tags-to-have-an-id.patch
+lto.patch
 Refactor-regex-library.patch
 Enable-command-completion.patch
 Add-option-to-auto-accept-self-signed.patch
 0036-Move-chkurl-to-own-translation-unit.patch
 0037-Make-MARK_URL-work-with-display_link_numbers.patch
 0038-Do-not-double-check-urls-in-html-files.patch
-0039-Do-not-reshape-all-new-buffers.patch
 0040-Remove-redundant-code.patch
 0041-Toggle-check_url-with-chkURL.patch
 Fix-Wunused-result.patch

@@ -87,7 +87,7 @@ Patch: patches/Add-option-to-provide-cookie-jar.patch
  global TextList *Cookie_avoid_wrong_number_of_dots_domains;
 --- a/doc/MANUAL.html
 +++ b/doc/MANUAL.html
-@@ -439,6 +439,14 @@ Render the body of Usenet messages accor
+@@ -437,6 +437,14 @@ Render the body of Usenet messages accor
      </p>
     </dd>
     <dt>
