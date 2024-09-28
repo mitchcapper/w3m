@@ -467,6 +467,19 @@ writestr(char *s)
 #define MOVE(line,column)       writestr(tgoto(T_cm,column,line));
 
 #ifdef USE_IMAGE
+/*
+ * From the Kitty spec,
+ * <https://sw.kovidgoyal.net/kitty/graphics-protocol/#remote-client>:
+ *
+ * > The pixel data must first be base64 encoded then chunked up into
+ * > chunks no larger than 4096 bytes.
+ *
+ * base64 inflates the size by 4/3, hence we read 3072.
+ *
+ * For simplicity we use the same size everywhere.
+ */
+#define IMG_BUF_SZ 3072
+
 void
 put_image_osc5379(char *url, int x, int y, int w, int h, int sx, int sy, int sw, int sh)
 {
@@ -489,16 +502,15 @@ void
 put_image_iterm2(char *url, int x, int y, int w, int h)
 {
     Str buf;
-    char *cbuf;
+    char cbuf[IMG_BUF_SZ];
     FILE *fp;
-    int c, i;
+    int n;
     struct stat st;
 
     if (stat(url, &st))
 	return;
 
-    fp = fopen(url, "r");
-    if (!fp)
+    if (!(fp = fopen(url, "r")))
 	return;
 
     buf = Sprintf("\x1b]1337;"
@@ -509,31 +521,15 @@ put_image_iterm2(char *url, int x, int y, int w, int h)
       "height=%d;"
       "preserveAspectRatio=0;"
       "inline=1"
-      ":", url, st.st_size, w, h);
+      ":", url, (int)st.st_size, w, h);
 
     MOVE(y,x);
 
     writestr(buf->ptr);
 
-    cbuf = GC_MALLOC_ATOMIC(3072);
-    if (!cbuf)
-	goto cleanup;
-    i = 0;
-    while ((c = fgetc(fp)) != EOF) {
-	cbuf[i++] = c;
-	if (i == 3072) {
-	    buf = base64_encode(cbuf, i);
-	    writestr(buf->ptr);
-	    i = 0;
-	}
-    }
+    while ((n = fread(cbuf, 1, IMG_BUF_SZ, fp)))
+	writestr(base64_encode(cbuf, n)->ptr);
 
-    if (i) {
-	buf = base64_encode(cbuf, i);
-	writestr(buf->ptr);
-    }
-
-cleanup:
     fclose(fp);
     writestr("\a");
     MOVE(Currentbuf->cursorY,Currentbuf->cursorX);
@@ -547,33 +543,25 @@ put_image_kitty(char *url, int x, int y, int w, int h, int sx, int sy, int sw,
     int sh, int cols, int rows)
 {
     Str buf, base64;
-    char *cbuf, *type, *tmpf;
+    char *type, *tmpf;
+    char cbuf[IMG_BUF_SZ];
     char *argv[4];
     FILE *fp;
-    int c, i, j, m, t, is_anim;
+    int n, m, is_anim;
     struct stat st;
     pid_t pid;
     void (*volatile previntr) (SIGNAL_ARG);
     void (*volatile prevquit) (SIGNAL_ARG);
     void (*volatile prevstop) (SIGNAL_ARG);
 
-    if (!url)
-	return;
-
     type = guessContentType(url);
-    t = 100; /* always convert to png for now. */
 
-    if(!(type && !strcasecmp(type, "image/png"))) {
+    /* convert to PNG, so that we transfer as little data as possible. */
+    if (!type || strcasecmp(type, "image/png")) {
 	tmpf = Sprintf("%s/%s.png", tmp_dir, mybasename(url))->ptr;
-
-	if (type && !strcasecmp(type, "image/gif")) {
-	    is_anim = 1;
-	} else {
-	    is_anim = 0;
-	}
+	is_anim = type && !strcasecmp(type, "image/gif");
 
 	/* convert only if png doesn't exist yet. */
-
 	if (stat(tmpf, &st)) {
 	    if (stat(url, &st))
 		return;
@@ -585,30 +573,26 @@ put_image_kitty(char *url, int x, int y, int w, int h, int sx, int sy, int sw,
 	    prevstop = mySignal(SIGTSTP, SIG_IGN);
 
 	    if ((pid = fork()) == 0) {
-		i = 0;
-
 		close(STDERR_FILENO);	/* Don't output error message. */
 		ttymode_set(ISIG, 0);
 
-		if ((cbuf = getenv("W3M_KITTY_TO_PNG")))
-		    argv[i++] = cbuf;
-		else
-		    argv[i++] = "convert";
+		if (!(argv[0] = getenv("W3M_KITTY_TO_PNG")))
+		    argv[0] = "convert";
 
 		if (is_anim) {
 		    buf = Strnew_charp(url);
 		    Strcat_charp(buf, "[0]");
-		    argv[i++] = buf->ptr;
+		    argv[1] = buf->ptr;
 		} else {
-		    argv[i++] = url;
+		    argv[1] = url;
 		}
-		argv[i++] = tmpf;
-		argv[i++] = NULL;
+		argv[2] = tmpf;
+		argv[3] = NULL;
 		execvp(argv[0],argv);
 		exit(0);
 	    }
 	    else if (pid > 0) {
-		waitpid(pid, &i, 0);
+		waitpid(pid, &n, 0);
 		ttymode_reset(ISIG, 0);
 		mySignal(SIGINT, previntr);
 		mySignal(SIGQUIT, prevquit);
@@ -620,58 +604,27 @@ put_image_kitty(char *url, int x, int y, int w, int h, int sx, int sy, int sw,
 	url = tmpf;
     }
 
-    if (stat(url, &st))
-	return;
-
-    fp = fopen(url, "r");
-    if (!fp)
+    if (!(fp = fopen(url, "r")))
 	return;
 
     MOVE(y, x);
 
+    n = fread(cbuf, 1, IMG_BUF_SZ, fp);
+    base64 = base64_encode(cbuf, n);
 
-    cbuf = GC_MALLOC_ATOMIC(3072); /* base64-encoded chunks of 4096 bytes */
-    if (!cbuf)
-	goto cleanup;
-    i = 0;
-
-    while (i < 3072 && (c = fgetc(fp)) != EOF)
-	cbuf[i++] = c;
-
-
-    base64 = base64_encode(cbuf, i);
-
-    if (c == EOF)
-	m = 0;
-    else
-	m = 1;
-    buf = Sprintf("\x1b_Gf=%d,s=%d,v=%d,a=T,m=%d,x=%d,y=%d,w=%d,h=%d,c=%d,r=%d;"
-	  "%s\x1b\\", t, w, h, m, sx, sy, sw, sh, cols, rows, base64->ptr);
+    m = n == IMG_BUF_SZ; /* m=1 -> has more, m=0 -> finished */
+    /* 100 is format = PNG in Kitty */
+    buf = Sprintf("\x1b_Gf=100,a=T,s=%d,v=%d,m=%d,x=%d,y=%d,w=%d,h=%d,c=%d,r=%d"
+	";%s\x1b\\", w, h, m, sx, sy, sw, sh, cols, rows, base64->ptr);
     writestr(buf->ptr);
 
-    if (m) {
-	i = 0;
-	j = 0;
-	while ((c = fgetc(fp)) != EOF) {
-	    if (j) {
-		base64 = base64_encode(cbuf, i);
-		buf = Sprintf("\x1b_Gm=1;%s\x1b\\", base64->ptr);
-		writestr(buf->ptr);
-		i = 0;
-		j = 0;
-	    }
-	    cbuf[i++] = c;
-	    if (i == 3072)
-		j = 1;
-	}
-
-	if (i) {
-	    base64 = base64_encode(cbuf, i);
-	    buf = Sprintf("\x1b_Gm=0;%s\x1b\\", base64->ptr);
-	    writestr(buf->ptr);
-	}
+    while ((n = fread(cbuf, 1, sizeof cbuf, fp))) {
+	m = n == IMG_BUF_SZ;
+	base64 = base64_encode(cbuf, n);
+	buf = Sprintf("\x1b_Gm=%d;%s\x1b\\", m, base64->ptr);
+	writestr(buf->ptr);
     }
-cleanup:
+
     fclose(fp);
     MOVE(Currentbuf->cursorY, Currentbuf->cursorX);
 }
