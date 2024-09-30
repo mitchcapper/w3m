@@ -4022,11 +4022,13 @@ _prevI(void)
     displayBuffer(Currentbuf, B_NORMAL);
 }
 
-DEFUN(nextI, NEXT_IMAGE, "Move to the next image hyperlink") {
+DEFUN(nextI, NEXT_IMAGE, "Move to the next image hyperlink")
+{
     _nextI();
 }
 
-DEFUN(prevI, PREV_IMAGE, "Move to the previous image hyperlink") {
+DEFUN(prevI, PREV_IMAGE, "Move to the previous image hyperlink")
+{
     _prevI();
 }
 
