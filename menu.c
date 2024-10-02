@@ -479,9 +479,11 @@ select_menu(Menu *menu, int mselect)
 	menu->select < menu->offset + menu->height)
 	draw_menu_item(menu, menu->select);
     menu->select = mselect;
-    standout();
-    draw_menu_item(menu, menu->select);
-    standend();
+    if (menu->item[menu->select].type != MENU_NOP) {
+	standout();
+	draw_menu_item(menu, menu->select);
+	standend();
+    }
     move(menu->y + mselect - menu->offset, menu->x);
     toggle_stand();
     refresh();
@@ -614,6 +616,11 @@ popup_menu(Menu *parent, Menu *menu)
 	menu->cursorX = parent->cursorX;
 	menu->cursorY = parent->cursorY;
 	guess_menu_xy(parent, menu->width, &menu->x, &menu->y);
+    }
+    while (menu->item[menu->select].type == MENU_NOP) {
+	if (menu->select >= menu->nitem - 1)
+	    break;
+	menu->select++;
     }
     geom_menu(menu, menu->select);
 
