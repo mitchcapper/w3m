@@ -17,7 +17,7 @@ triggers:
     condition: failure
     to: mail@rkta.de
 environment:
-  OPTS: '-Werror -flto'
+  OPTS: '-Werror -flto -Wno-stringop-overflow'
 tasks:
   - default: |
       cd w3m
