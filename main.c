@@ -1473,7 +1473,15 @@ escKeyProc(int c, int esc, unsigned char *map)
 DEFUN(escmap, ESCMAP, "ESC map")
 {
     char c;
+#ifdef USE_MOUSE
+    if (use_mouse)
+	mouse_active();
+#endif
     c = getch();
+#ifdef USE_MOUSE
+    if (use_mouse)
+	mouse_inactive();
+#endif
     if (IS_ASCII(c))
 	escKeyProc((int)c, K_ESC, EscKeymap);
 }

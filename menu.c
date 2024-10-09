@@ -30,6 +30,7 @@ extern int do_getch(void);
 #endif				/* USE_MOUSE */
 
 #ifdef USE_MENU
+static int menu_dispatch_with_mouse(int (*keymap[128]) (char c));
 
 static char **FRAME;
 static int FRAME_WIDTH;
@@ -109,7 +110,7 @@ static int (*MenuEscKeymap[128]) (char c) = {
     mNull,  mNull,  mNull,  mNull,  mNull,  mNull,  mNull,  mNull,
     mNull,  mNull,  mNull,  mNull,  mNull,  mNull,  mNull,  mNull,
     mNull,  mNull,  mNull,  mNull,  mNull,  mNull,  mNull,  mNull,
-    mNull,  mNull,  mNull,  mNull,  mNull,  mNull,  mNull,  mNull,
+    mNull,  mNull,  mNull,  mEsc,   mNull,  mNull,  mNull,  mNull,
 
     mNull,  mNull,  mNull,  mNull,  mNull,  mNull,  mNull,  mNull,
     mNull,  mNull,  mNull,  mNull,  mNull,  mNull,  mNull,  mNull,
@@ -548,7 +549,6 @@ down_menu(Menu *menu, int n)
 int
 action_menu(Menu *menu)
 {
-    char c;
     int mselect;
     MenuItem item;
 
@@ -561,27 +561,9 @@ action_menu(Menu *menu)
     select_menu(menu, menu->select);
 
     while (1) {
-#ifdef USE_MOUSE
-	if (use_mouse)
-	    mouse_active();
-#endif				/* USE_MOUSE */
-	c = getch();
-#ifdef USE_MOUSE
-	if (use_mouse)
-	    mouse_inactive();
-#if defined(USE_GPM) || defined(USE_SYSMOUSE)
-	if (c == X_MOUSE_SELECTED) {
-	    mselect = X_Mouse_Selection;
-	    if (mselect != MENU_NOTHING)
-		break;
-	}
-#endif				/* defined(USE_GPM) || defined(USE_SYSMOUSE) */
-#endif				/* USE_MOUSE */
-	if (IS_ASCII(c)) {	/* Ascii */
-	    mselect = (*menu->keymap[(int)c]) (c);
-	    if (mselect != MENU_NOTHING)
-		break;
-	}
+	mselect = menu_dispatch_with_mouse(menu->keymap);
+	if (mselect != MENU_NOTHING)
+	    break;
     }
     if (mselect >= 0 && mselect < menu->nitem) {
 	item = menu->item[mselect];
@@ -701,6 +683,31 @@ new_option_menu(Menu *menu, char **label, int *variable, void (*func) (void))
     new_menu(menu, item);
 }
 
+static int
+menu_dispatch_with_mouse(int (*keymap[128]) (char c))
+{
+    char c;
+
+#ifdef USE_MOUSE
+    if (use_mouse)
+	mouse_active();
+#endif			/* USE_MOUSE */
+    c = getch();
+#ifdef USE_MOUSE
+    if (use_mouse)
+	mouse_inactive();
+#if defined(USE_GPM) || defined(USE_SYSMOUSE)
+    if (c == X_MOUSE_SELECTED)
+	return X_Mouse_Selection;
+#endif			/* defined(USE_GPM) || defined(USE_SYSMOUSE) */
+#endif			/* USE_MOUSE */
+
+    if (IS_ASCII(c))	/* menu keymaps have 128 entries, so skip non-ascii */
+	return (*keymap[(int)c]) (c);
+
+    return (MENU_NOTHING);
+}
+
 static void
 set_menu_frame(void)
 {
@@ -730,15 +737,17 @@ static int
 mPc(char c)
 {
     c = getch();
-    return (MenuPcKeymap[(int)c] (c));
+    if (IS_ASCII(c))
+	return (MenuPcKeymap[(int)c] (c));
+    else
+	return (MENU_NOTHING);
 }
 #endif
 
 static int
 mEsc(char c)
 {
-    c = getch();
-    return (MenuEscKeymap[(int)c] (c));
+    return menu_dispatch_with_mouse(MenuEscKeymap);
 }
 
 static int
@@ -747,8 +756,10 @@ mEscB(char c)
     c = getch();
     if (IS_DIGIT(c))
 	return (mEscD(c));
-    else
+    else if (IS_ASCII(c))
 	return (MenuEscBKeymap[(int)c] (c));
+    else
+	return (MENU_NOTHING);
 }
 
 static int
