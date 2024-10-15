@@ -612,9 +612,9 @@ Patch: patches/Add-test-for-Str.patch
 +}
 --- a/t/run
 +++ b/t/run
-@@ -9,6 +9,8 @@ fi
- # We need an executable
- test -x ../w3m || exit 2
+@@ -14,6 +14,8 @@ do
+ 	./$t || exit 1
+ done
  
 +sh ./0001-Str.c || exit 1
 +

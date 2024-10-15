@@ -186,7 +186,7 @@ Subject: add gophers support
  #endif				/* _HTML_H */
 --- a/main.c
 +++ b/main.c
-@@ -5179,7 +5179,7 @@ chkURLBuffer(Buffer *buf)
+@@ -5190,7 +5190,7 @@ chkURLBuffer(Buffer *buf)
  	"https?://[a-zA-Z0-9][a-zA-Z0-9:%\\-\\./?=~_\\&+@#,\\$;]*[a-zA-Z0-9_/=\\-]",
  	"file:/[a-zA-Z0-9:%\\-\\./=_\\+@#,\\$;]*",
  #ifdef USE_GOPHER

@@ -63,7 +63,7 @@ Patch: patches/Refactor-checkOverwrite.patch
  char
 --- a/main.c
 +++ b/main.c
-@@ -4837,7 +4837,7 @@ DEFUN(svBuf, PRINT SAVE_SCREEN, "Save re
+@@ -4848,7 +4848,7 @@ DEFUN(svBuf, PRINT SAVE_SCREEN, "Save re
  	    file = conv_to_system(file);
  	}
  	file = expandPath(file);

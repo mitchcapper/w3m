@@ -103,7 +103,7 @@ Use a STR_LEN_MAX to avoid dealing with of by errors.
  	/* TODO(rkta): Better use Str function, does not exist yet */
 --- a/main.c
 +++ b/main.c
-@@ -497,7 +497,7 @@ main(int argc, char **argv)
+@@ -499,7 +499,7 @@ main(int argc, char **argv)
  	    /* Don't use hostname if it is truncated.  */
  	    hostname[HOST_NAME_MAX + 1] = '\0';
  	    hostname_len = strlen(hostname);

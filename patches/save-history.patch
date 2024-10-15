@@ -18,7 +18,7 @@
  #endif				/* not USE_HISTORY */
 --- a/main.c
 +++ b/main.c
-@@ -4657,6 +4657,13 @@ DEFUN(ldHist, HISTORY, "Show browsing hi
+@@ -4668,6 +4668,13 @@ DEFUN(ldHist, HISTORY, "Show browsing hi
  {
      cmd_loadBuffer(historyBuffer(URLHist), BP_NO_URL, LB_NOLINK);
  }

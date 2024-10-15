@@ -32,7 +32,7 @@ Subject: [PATCH 160/172] Add more const to terms
  extern void term_noecho(void);
 --- a/terms.c
 +++ b/terms.c
-@@ -1342,13 +1342,13 @@ move(int line, int column)
+@@ -1295,13 +1295,13 @@ move(int line, int column)
  
  static int
  #ifdef USE_M17N
@@ -48,7 +48,7 @@ Subject: [PATCH 160/172] Add more const to terms
  {
      if (c1 != c2)
  	return 1;
-@@ -1378,10 +1378,10 @@ addch(char c)
+@@ -1331,10 +1331,10 @@ addch(char c)
  }
  
  void
@@ -61,7 +61,7 @@ Subject: [PATCH 160/172] Add more const to terms
  #endif
  {
      l_prop *pr;
-@@ -2084,7 +2084,7 @@ clrtobotx(void)
+@@ -2037,7 +2037,7 @@ clrtobotx(void)
  }
  
  void
@@ -70,7 +70,7 @@ Subject: [PATCH 160/172] Add more const to terms
  {
  #ifdef USE_M17N
      int len;
-@@ -2101,7 +2101,7 @@ addstr(char *s)
+@@ -2054,7 +2054,7 @@ addstr(char *s)
  }
  
  void

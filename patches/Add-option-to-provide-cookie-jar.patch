@@ -87,7 +87,7 @@ Patch: patches/Add-option-to-provide-cookie-jar.patch
  global TextList *Cookie_avoid_wrong_number_of_dots_domains;
 --- a/doc/MANUAL.html
 +++ b/doc/MANUAL.html
-@@ -437,6 +437,14 @@ Render the body of Usenet messages accor
+@@ -438,6 +438,14 @@ Render the body of Usenet messages accor
      </p>
     </dd>
     <dt>
@@ -104,7 +104,7 @@ Patch: patches/Add-option-to-provide-cookie-jar.patch
     <dd>
 --- a/doc/w3m.1
 +++ b/doc/w3m.1
-@@ -206,6 +206,9 @@ use \fIfile\fR instead of the default bo
+@@ -207,6 +207,9 @@ use \fIfile\fR instead of the default bo
  \fB\-config \fIfile\fR
  use \fIfile\fR instead of the default configuration file
  .TP
@@ -116,7 +116,7 @@ Patch: patches/Add-option-to-provide-cookie-jar.patch
  .TP
 --- a/main.c
 +++ b/main.c
-@@ -264,6 +264,7 @@ fusage(FILE * f, int err)
+@@ -266,6 +266,7 @@ fusage(FILE * f, int err)
  #ifdef USE_COOKIE
      fprintf(f,
  	    "    -cookie          use cookie (-no-cookie: don't use cookie)\n");
@@ -124,7 +124,7 @@ Patch: patches/Add-option-to-provide-cookie-jar.patch
  #endif				/* USE_COOKIE */
      fprintf(f, "    -graph           use DEC special graphics for border of table and menu\n");
      fprintf(f, "    -no-graph        use ASCII character for border of table and menu\n");
-@@ -788,6 +789,18 @@ main(int argc, char **argv)
+@@ -792,6 +793,18 @@ main(int argc, char **argv)
  		use_cookie = TRUE;
  		accept_cookie = TRUE;
  	    }
@@ -143,7 +143,7 @@ Patch: patches/Add-option-to-provide-cookie-jar.patch
  #endif				/* USE_COOKIE */
  	    else if (!strcmp("-s", argv[i]))
  		squeezeBlankLine = TRUE;
-@@ -888,6 +901,10 @@ main(int argc, char **argv)
+@@ -892,6 +905,10 @@ main(int argc, char **argv)
      CurrentKey = -1;
      if (BookmarkFile == NULL)
  	BookmarkFile = rcFile(BOOKMARK);

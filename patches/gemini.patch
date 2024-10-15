@@ -502,7 +502,7 @@ w3m-0.5.3+git20230121.
      UFclose(&f);
 --- a/main.c
 +++ b/main.c
-@@ -396,6 +396,32 @@ die_oom(size_t bytes)
+@@ -398,6 +398,32 @@ die_oom(size_t bytes)
      return NULL;
  }
  
@@ -535,7 +535,7 @@ w3m-0.5.3+git20230121.
  int
  main(int argc, char **argv)
  {
-@@ -879,6 +905,9 @@ main(int argc, char **argv)
+@@ -883,6 +909,9 @@ main(int argc, char **argv)
      if (UseHistory)
  	loadHistory(URLHist);
  #endif				/* not USE_HISTORY */
@@ -545,7 +545,7 @@ w3m-0.5.3+git20230121.
  
  #ifdef USE_M17N
  #endif
-@@ -2517,10 +2546,36 @@ DEFUN(movRW, NEXT_WORD, "Move to the nex
+@@ -2521,10 +2550,36 @@ DEFUN(movRW, NEXT_WORD, "Move to the nex
      displayBuffer(Currentbuf, B_NORMAL);
  }
  
@@ -582,18 +582,23 @@ w3m-0.5.3+git20230121.
  
      if (checkDownloadList())
  	/* FIXME: gettextize? */
-@@ -2547,7 +2602,9 @@ _quitfm(int confirm)
+@@ -2551,12 +2606,14 @@ _quitfm(int confirm)
      if (UseHistory && SaveURLHist)
  	saveHistory(URLHist, URLHistSize);
  #endif				/* USE_HISTORY */
--    w3m_exit(0);
 +    if ((err = save_known_hosts()))
-+	perror(NULL);
++	perror(_("Cannot save known hosts"));
+     if (deprecated)
+ 	fprintf(stderr, "%s\n%s\n%s\n",
+ 		"DEPRECATION WARNING",
+ 		"-H is deprecated and will be removed in the future.",
+ 		"Use -o highIntensityColors=true instead.");
+-    w3m_exit(0);
 +    w3m_exit(err);
  }
  
  /* Quit */
-@@ -4820,6 +4877,13 @@ DEFUN(vwSrc, SOURCE VIEW, "Toggle betwee
+@@ -4831,6 +4888,13 @@ DEFUN(vwSrc, SOURCE VIEW, "Toggle betwee
  	displayBuffer(Currentbuf, B_NORMAL);
  	return;
      }
@@ -607,7 +612,7 @@ w3m-0.5.3+git20230121.
      if (Currentbuf->sourcefile == NULL) {
  	if (Currentbuf->pagerSource &&
  	    !strcasecmp(Currentbuf->type, "text/plain")) {
-@@ -4905,6 +4969,93 @@ DEFUN(foldPre, FOLD_PRE, "Fold long line
+@@ -4916,6 +4980,93 @@ DEFUN(foldPre, FOLD_PRE, "Fold long line
      fold_pre = FoldPre;
  }
  
@@ -701,7 +706,7 @@ w3m-0.5.3+git20230121.
  /* reload */
  DEFUN(reload, RELOAD, "Load current document anew")
  {
-@@ -5131,6 +5282,7 @@ chkURLBuffer(Buffer *buf)
+@@ -5142,6 +5293,7 @@ chkURLBuffer(Buffer *buf)
  	"https?://[a-zA-Z0-9:%\\-\\./_@]*\\[[a-fA-F0-9:][a-fA-F0-9:\\.]*\\][a-zA-Z0-9:%\\-\\./?=~_\\&+@#,\\$;]*",
  	"ftp://[a-zA-Z0-9:%\\-\\./_@]*\\[[a-fA-F0-9:][a-fA-F0-9:\\.]*\\][a-zA-Z0-9:%\\-\\./=_+@#,\\$]*",
  #endif				/* INET6 */

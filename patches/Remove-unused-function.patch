@@ -151,7 +151,7 @@ Subject: [PATCH 018/172] Remove unused function
  extern int non_null(char *s);
 --- a/terms.c
 +++ b/terms.c
-@@ -2082,12 +2082,6 @@ clrtobot_eol(void (*clrtoeol) (void))
+@@ -2035,12 +2035,6 @@ clrtobot_eol(void (*clrtoeol) (void))
  }
  
  void
@@ -164,7 +164,7 @@ Subject: [PATCH 018/172] Remove unused function
  clrtobotx(void)
  {
      clrtobot_eol(clrtoeolx);
-@@ -2175,29 +2169,6 @@ crmode(void)
+@@ -2128,29 +2122,6 @@ crmode(void)
  #endif				/* HAVE_SGTTY_H */
  
  void
@@ -241,7 +241,7 @@ Subject: [PATCH 018/172] Remove unused function
  
 --- a/main.c
 +++ b/main.c
-@@ -3149,15 +3149,6 @@ DEFUN(followA, GOTO_LINK, "Follow curren
+@@ -3158,15 +3158,6 @@ DEFUN(followA, GOTO_LINK, "Follow curren
      displayBuffer(Currentbuf, B_NORMAL);
  }
  
@@ -257,7 +257,7 @@ Subject: [PATCH 018/172] Remove unused function
  /* view inline image */
  DEFUN(followI, VIEW_IMAGE, "Display image in viewer")
  {
-@@ -3405,13 +3396,6 @@ DEFUN(submitForm, SUBMIT, "Submit form")
+@@ -3414,13 +3405,6 @@ DEFUN(submitForm, SUBMIT, "Submit form")
      _followForm(TRUE);
  }
  

@@ -489,7 +489,7 @@ Subject: [PATCH 014/172] Remove dead code
  #else
 --- a/main.c
 +++ b/main.c
-@@ -212,11 +212,6 @@ fusage(FILE * f, int err)
+@@ -213,11 +213,6 @@ fusage(FILE * f, int err)
  #ifdef USE_M17N
      fprintf(f, "    -I charset       document charset\n");
      fprintf(f, "    -O charset       display/output charset\n");
@@ -501,7 +501,7 @@ Subject: [PATCH 014/172] Remove dead code
  #endif
      fprintf(f, "    -B               load bookmark\n");
      fprintf(f, "    -bookmark file   specify bookmark file\n");
-@@ -266,11 +261,7 @@ fusage(FILE * f, int err)
+@@ -268,11 +263,7 @@ fusage(FILE * f, int err)
  #endif				/* USE_COOKIE */
      fprintf(f, "    -graph           use DEC special graphics for border of table and menu\n");
      fprintf(f, "    -no-graph        use ASCII character for border of table and menu\n");
@@ -513,7 +513,7 @@ Subject: [PATCH 014/172] Remove dead code
      fprintf(f, "    -W               toggle search wrap mode\n");
      fprintf(f, "    -X               don't use termcap init/deinit\n");
      fprintf(f,
-@@ -586,14 +577,6 @@ main(int argc, char **argv)
+@@ -588,14 +579,6 @@ main(int argc, char **argv)
  		    PagerMax = atoi(argv[i]);
  	    }
  #ifdef USE_M17N
@@ -528,7 +528,7 @@ Subject: [PATCH 014/172] Remove dead code
  	    else if (!strncmp("-I", argv[i], 2)) {
  		if (argv[i][2] != '\0')
  		    p = argv[i] + 2;
-@@ -766,11 +749,7 @@ main(int argc, char **argv)
+@@ -770,11 +753,7 @@ main(int argc, char **argv)
  		accept_cookie = TRUE;
  	    }
  #endif				/* USE_COOKIE */
@@ -540,7 +540,7 @@ Subject: [PATCH 014/172] Remove dead code
  		squeezeBlankLine = TRUE;
  	    else if (!strcmp("-X", argv[i]))
  		Do_not_use_ti_te = TRUE;
-@@ -903,9 +882,6 @@ main(int argc, char **argv)
+@@ -907,9 +886,6 @@ main(int argc, char **argv)
  #endif				/* not USE_HISTORY */
  
  #ifdef USE_M17N
@@ -550,7 +550,7 @@ Subject: [PATCH 014/172] Remove dead code
  #endif
  
      if (w3m_backend)
-@@ -1733,11 +1709,6 @@ DEFUN(ctrCsrV, CENTER_V, "Center on curs
+@@ -1737,11 +1713,6 @@ DEFUN(ctrCsrV, CENTER_V, "Center on curs
  	return;
      offsety = Currentbuf->LINES / 2 - Currentbuf->cursorY;
      if (offsety != 0) {
@@ -562,7 +562,7 @@ Subject: [PATCH 014/172] Remove dead code
  	Currentbuf->topLine =
  	    lineSkip(Currentbuf, Currentbuf->topLine, -offsety, FALSE);
  	arrangeLine(Currentbuf);
-@@ -3154,14 +3125,6 @@ DEFUN(followA, GOTO_LINK, "Follow curren
+@@ -3163,14 +3134,6 @@ DEFUN(followA, GOTO_LINK, "Follow curren
      }
      if (handleMailto(a->url))
  	return;
@@ -577,7 +577,7 @@ Subject: [PATCH 014/172] Remove dead code
      url = a->url;
  #ifdef USE_IMAGE
      if (map)
-@@ -4293,14 +4256,6 @@ cmd_loadURL(char *url, ParsedURL *curren
+@@ -4304,14 +4267,6 @@ cmd_loadURL(char *url, ParsedURL *curren
  
      if (handleMailto(url))
  	return;
@@ -592,7 +592,7 @@ Subject: [PATCH 014/172] Remove dead code
  
      refresh();
      buf = loadGeneralFile(url, current, referer, 0, request);
-@@ -5417,10 +5372,6 @@ DEFUN(dispI, DISPLAY_IMAGE, "Restart loa
+@@ -5428,10 +5383,6 @@ DEFUN(dispI, DISPLAY_IMAGE, "Restart loa
      if (!activeImage)
  	return;
      displayImage = TRUE;
@@ -603,7 +603,7 @@ Subject: [PATCH 014/172] Remove dead code
      Currentbuf->image_flag = IMG_FLAG_AUTO;
      Currentbuf->need_reshape = TRUE;
      displayBuffer(Currentbuf, B_REDRAW_IMAGE);
-@@ -5430,10 +5381,6 @@ DEFUN(stopI, STOP_IMAGE, "Stop loading a
+@@ -5441,10 +5392,6 @@ DEFUN(stopI, STOP_IMAGE, "Stop loading a
  {
      if (!activeImage)
  	return;
@@ -614,7 +614,7 @@ Subject: [PATCH 014/172] Remove dead code
      Currentbuf->image_flag = IMG_FLAG_SKIP;
      displayBuffer(Currentbuf, B_REDRAW_IMAGE);
  }
-@@ -6429,11 +6376,7 @@ void
+@@ -6440,11 +6387,7 @@ void
  calcTabPos(void)
  {
      TabBuffer *tab;
@@ -751,7 +751,7 @@ Subject: [PATCH 014/172] Remove dead code
  void clrtoeol(void);		/* conflicts with curs_clear(3)? */
  
  static int write1(char);
-@@ -1214,12 +1211,6 @@ getTCstr(void)
+@@ -1167,12 +1164,6 @@ getTCstr(void)
      GETSTR(T_op, "op");		/* set default color pair to its original value */
  #if defined( CYGWIN ) && CYGWIN < 1
      /* for TERM=pcansi on MS-DOS prompt. */
@@ -764,7 +764,7 @@ Subject: [PATCH 014/172] Remove dead code
      T_eA = "";
      T_as = "";
      T_ae = "";
-@@ -2018,24 +2009,6 @@ rscroll(int n)
+@@ -1971,24 +1962,6 @@ rscroll(int n)
  }
  #endif
  
@@ -789,7 +789,7 @@ Subject: [PATCH 014/172] Remove dead code
  /* XXX: conflicts with curses's clrtoeol(3) ? */
  void
  clrtoeol(void)
-@@ -2120,17 +2093,6 @@ clrtobotx(void)
+@@ -2073,17 +2046,6 @@ clrtobotx(void)
      clrtobot_eol(clrtoeolx);
  }
  
