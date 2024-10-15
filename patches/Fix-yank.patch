@@ -4,8 +4,8 @@ Subject: Fix yank
 Patch: patches/Fix-yank.patch
 
 ---
- linein.c |   18 ++++++++++++------
- 1 file changed, 12 insertions(+), 6 deletions(-)
+ linein.c |   33 ++++++++++++++++++++++++++-------
+ 1 file changed, 26 insertions(+), 7 deletions(-)
 
 --- a/linein.c
 +++ b/linein.c
@@ -80,6 +80,78 @@ Patch: patches/Fix-yank.patch
  _paste(void)
  {
      ins_char(ynkBuf);
++    ynkCon = 0;
+ }
+ 
+ static void
+@@ -534,6 +540,7 @@ _mvL(void)
+     while (CPos > 0 && strProp[CPos] & PC_WCHAR2)
+ 	CPos--;
+ #endif
++    ynkCon = 0;
+ }
+ 
+ static void
+@@ -550,6 +557,7 @@ _mvLw(void)
+ 	if (!move_word)
+ 	    break;
+     }
++    ynkCon = 0;
+ }
+ 
+ static void
+@@ -566,6 +574,7 @@ _mvRw(void)
+ 	if (!move_word)
+ 	    break;
+     }
++    ynkCon = 0;
+ }
+ 
+ static void
+@@ -577,13 +586,18 @@ _mvR(void)
+     while (CPos < CLen && strProp[CPos] & PC_WCHAR2)
+ 	CPos++;
+ #endif
++    ynkCon = 0;
+ }
+ 
+ static void
+ _bs(void)
+ {
++    int y;
++
+     if (CPos > 0) {
++	y = ynkCon;
+ 	_mvL();
++	ynkCon = y;
+ 	delC();
+     }
+ }
+@@ -591,9 +605,12 @@ _bs(void)
+ static void
+ _bsw(void)
+ {
+-    int t = 0;
++    int t = 0, y;
++
+     while (CPos > 0 && !t) {
++	y = ynkCon;
+ 	_mvL();
++	ynkCon = y;
+ 	t = (move_word && terminated(strBuf->ptr[CPos - 1]));
+ 	delC();
+     }
+@@ -629,12 +646,14 @@ static void
+ _mvB(void)
+ {
+     CPos = 0;
++    ynkCon = 0;
+ }
+ 
+ static void
+ _mvE(void)
+ {
+     CPos = CLen;
 +    ynkCon = 0;
  }
  
