@@ -142,6 +142,9 @@ Get-rid-of-Strnulterm.patch
 # BORKED
 Refactor-handling-of-close-tags.patch
 Allow-unknown-tags-to-have-an-id.patch
+Remove-config.h.dist.patch
+Remove-islang.c.patch
+Fix-yank.patch
 lto.patch
 Refactor-regex-library.patch
 Enable-command-completion.patch

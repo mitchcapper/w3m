@@ -1,0 +1,86 @@
+From: Rene Kita <mail@rkta.de>
+Date: Tue Oct 15 08:43:40 CEST 2024
+Subject: Fix yank
+Patch: patches/Fix-yank.patch
+
+---
+ linein.c |   18 ++++++++++++------
+ 1 file changed, 12 insertions(+), 6 deletions(-)
+
+--- a/linein.c
++++ b/linein.c
+@@ -23,6 +23,7 @@ extern int do_getch(void);
+ static Str strBuf;
+ static Lineprop strProp[STR_LEN];
+ static Str ynkBuf;
++static int ynkCon;
+ 
+ static Str CompleteBuf;
+ static Str CFileName;
+@@ -211,7 +212,7 @@ inputLineHistSearch(const char *prompt,
+ 	    if (incrfunc == NULL
+ 		|| (c = incrfunc((int)c, strBuf, strProp)) < 0x20)
+ 		(*InputKeymap[(int)c]) ();
+-	    if (c > 0x20) {
++	    if (c != 255 && c > 0x20) {
+ 		tmp = wc_char_conv(c);
+ 		ins_char(tmp);
+ 	    }
+@@ -234,6 +235,7 @@ inputLineHistSearch(const char *prompt,
+ 	    cm_disp_next = -1;
+ 	    if (CLen + tmp->length > STR_LEN || !tmp->length)
+ 		goto next_char;
++	    ynkCon = 0;
+ 	    ins_char(tmp);
+ 	    if (incrfunc)
+ 		incrfunc(-1, strBuf, strProp);
+@@ -245,6 +247,7 @@ inputLineHistSearch(const char *prompt,
+ 	    cm_disp_next = -1;
+ 	    if (CLen >= STR_LEN)
+ 		goto next_char;
++	    ynkCon = 0;
+ 	    insC();
+ 	    strBuf->ptr[CPos] = c;
+ 	    if (!is_passwd && get_mctype(&c) == PC_CTRL)
+@@ -413,8 +416,6 @@ ins_char(Str str)
+ 	    }
+ 	}
+     }
+-    Strfree(ynkBuf);
+-    ynkBuf = NULL;
+ }
+ #endif
+ 
+@@ -495,8 +496,6 @@ delC(void)
+ 
+     if (CLen == CPos)
+ 	return;
+-    if (!ynkBuf)
+-	ynkBuf = Strnew();
+ #ifdef USE_M17N
+     while (CPos + delta < CLen && strProp[CPos + delta] & PC_WCHAR2)
+ 	delta++;
+@@ -504,8 +503,14 @@ delC(void)
+     for (int i = CPos; i < CLen; i++)
+ 	strProp[i] = strProp[i + delta];
+ 
+-    if (!is_passwd)
++    if (!is_passwd) {
++	if (!ynkBuf)
++	    ynkBuf = Strnew();
++	if (!ynkCon)
++	    Strshrink(ynkBuf, ynkBuf->length);
+ 	Strinsert_charp_n(ynkBuf, 0, &strBuf->ptr[CPos], delta);
++	ynkCon = 1;
++    }
+     Strdelete(strBuf, CPos, delta);
+     CLen -= delta;
+ }
+@@ -523,6 +528,7 @@ static void
+ _paste(void)
+ {
+     ins_char(ynkBuf);
++    ynkCon = 0;
+ }
+ 
+ static void
