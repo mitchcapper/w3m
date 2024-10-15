@@ -4,28 +4,130 @@ Inline image support of w3m
                                                               H. Sakamoto
                                                               2002/10/16
                                                               H. Ito
+                                                              2014/11/05
+                                                              K. Araki
+                                                              2024/07/23
+                                                              bptato
 
 Introduction
 
-  This is the extension for w3m to support inline image.
+  This document describes various methods which w3m can use to display
+  images inline, without opening a different application.
 
-Support
+  For information on how to view images with other programs (e.g. feh),
+  see README.mailcap.
 
-  * Display inline images (GIF, PNG, JPEG, etc.) on terminals
-    (xterm, rxvt, etc.) of X11, Linux framebuffer device or
-    terminals of Windows.
+Methods
+
+  w3m supports the following image display methods:
+
+  * external command protocol (w3mimgdisplay)
+  * OSC 5379 (mlterm image output command)
+  * sixels (most widely supported, requires img2sixel)
+  * OSC 1337 (iTerm2 image output command)
+  * APC G / Kitty protocol (Kitty image output command, requires
+    ImageMagick)
+
+  By default, w3m uses w3mimgdisplay. Please adjust this in the option
+  setting panel to your preferred display method.
+
+  Detailed description of the above methods follows.
+
+  External command protocol (w3mimgdisplay)
+
+    This method uses an user-specified external command to display
+    inline images on terminals (xterm, rxvt, etc.) of X11, Linux
+    framebuffer device or terminals of Windows. Normally this command is
+    "w3mimgdisplay", although an alternative program implementing the
+    same protocol "yaimg-sixel" also exists at the following repository:
+
+    https://github.com/uobikiemukot/sdump
+
+    "w3mimgdisplay" does not work on Wayland, or on terminals which
+    refresh too often. It also needs X forwarding to work through ssh.
+
+    "w3mimgdisplay" has the following options, which you can customize
+    to fit your terminal.
+
+    -x <offset_x>
+        The X origin of display of image on terminal. The default
+        value for X11 is 2.
+        If the terminal is "xterm" or "kterm", the width of scroll bar
+        is added.
+        If the terminal is "Eterm", it may be best to specify 5.
+        The default value for Linux framebuffer device is 0.
+    -y <offset_y>
+        The Y origin of display of image on terminal. The default
+        value for X11 is 2.
+        If the terminal is "Eterm", it may be better to specify 5.
+        The default value for Linux framebuffer device is 0.
+    -bg <background>
+        Background color of terminal. The default value for X11 is
+        automatically detected.
+        The default value for Linux framebuffer device is #000000
+        (black).
+        When the color is specified as #RRGGBB, escape '#'.
+    -anim <n>
+        Maximum number of frames for animation. It will run everything
+        if the number is 0. Negative values count backward from the
+        end of the frames. The default value is 100.
+    -margin <n>
+        Margin of an area to clear an image. The default value is 0.
+
+    ex.)
+      w3m -o 'imgdisplay=w3mimgdisplay -x 5 -bg "#cccccc"'
+
+  OSC 5379 / mlterm
+
+    This method uses the OSC 5379 extension's "show_picture" command
+    implemented by mlterm. The current w3m implementation does not seem
+    to work over ssh.
+
+  sixel
+
+    The sixel method calls the 'img2sixel' command provided by the
+    libsixel project.
+
+    (https://github.com/saitoha/libsixel)
+
+    You can specify options of the 'img2sixel' command by "W3M_IMG2SIXEL"
+    environmental variable.
+
+    $ W3M_IMG2SIXEL="img2sixel -d atkinson" w3m http://...
+
+  OSC 1337 / iTerm2
+
+    This method uses the iTerm2 image display protocol, which is rather
+    similar to that of mlterm, except it works over ssh. However, this
+    method has an unfortunate issue where images that do not fit on the
+    screen are squashed into the space available instead of being cropped.
+
+  APC G / kitty
+
+    This method uses the kitty image protocol:
+
+    https://sw.kovidgoyal.net/kitty/graphics-protocol/
+
+    w3m uses ImageMagick to convert images into PNG which are then
+    displayed by kitty, so you need the 'convert' utility to be installed
+    for this to work.
+
+
+Supported features
+
   * Support inline image of <img> tag.
     Support of attributes "width", "height", and "align".
   * Direct display of image file which header is "Content-type: image/*"
   * Support of <map> tag.
-    Support of attributes "shape" and "coords" of <area> tag. 
+    Support of attributes "shape" and "coords" of <area> tag.
   * Support of an attribute "ismap" of <img> tag.
     "w3m" adds coordinate of the cursor as ?<x>,<y> to url, and sends url.
   * Support of an attribute "type=image" of <input> tag.
     "w3m" sends coordinate of the cursor as <name>.x=<x>&<name>.y=<y>.
   * Asynchronous loading of image files.
   * Using cache of image file as pixmap.
-  * Support of GIF animation when use GdkPixbuf.
+  * Support of GIF animation when using sixel, OSC 1337 / iTerm2 or
+    w3mimgdisplay with GdkPixbuf.
 
 
 Key functions
@@ -43,7 +145,7 @@ Key functions
       keymap  C-c  STOP_IMAGE
       keymap  t    SET_OPTION  display_image=toggle
 
-Commandline options
+Command line options
 
   -ppc <pixel>
       # of pixels per character. The default value is automatically
@@ -51,6 +153,9 @@ Commandline options
   -ppl <pixel>
       # of pixels per character. The default value is automatically
       detected. Must fit the height of font of terminal.
+  -ri, -sixel
+      Force-enable mlterm or sixel images.
+      Equivalent to -o inline_img_protocol=1 or 2.
 
 Option panel
 
@@ -74,6 +179,14 @@ Option panel
       The default is ON. If it is OFF, the image is directly displayed.
   image_scale
       Scale of image (%). The default value is 100(%).
+  inline_img_protocol
+      One of the methods described above for displaying images.
+      Accepted values:
+        0: external command (default; see imgdisplay)
+        1: OSC 5379/mlterm
+        2: sixel (using img2sixel)
+        3: OSC 1337/iTerm2
+        4: kitty (using ImageMagick)
   imgdisplay
       External command to display image. The default value is "w3mimgdisplay".
       See "w3mimgdisplay Settings" section
@@ -103,36 +216,6 @@ Required programs
       and 16/24/32 bpp truecolor/directcolor)
 
 
-w3mimgdisplay settings
-
-  "w3mimgdisplay" has the following options. Set options to fit terminal.
-
-  -x <offset_x>
-      The X origin of display of image on terminal. The default value
-      for X11 is 2.
-      If the terminal is "xterm", the width of scroll bar is added.
-      If the terminal is "Eterm", it may be better to specify 5.
-      The default value for Linux framebuffer device is 0.
-  -y <offset_y>
-      The Y origin of display of image on terminal. The default value
-      for X11 is 2.
-      If the terminal is "Eterm", it may be better to specify 5.
-      The default value for Linux framebuffer device is 0.
-  -bg <background>
-      Background color of terminal. The default value for X11 is
-      automatically detected.
-      The default value for Linux framebuffer device is #000000 (black).
-      When the color is specified as #RRGGBB, escape '#'.
-  -anim <n>
-      Maximum number of frames for animation. It will run everything
-      if the number is 0. Negative values count backward from the end
-      of the frames. The default value is 100.
-  -margin <n>
-      Margin of an area to clear an image. The default value is 0.
-
-  ex.)
-    w3m -o 'imgdisplay=w3mimgdisplay -x 5 -bg "#cccccc"'
-
 Notice
     If you want to see GIF animation, please hit a movement key, such
     as 'h', 'l', etc., repeatedly, because a new frame is only requested
@@ -146,6 +229,10 @@ Notice
 
 
 Changelog
+
+2024/07/23
+ * Merged this document with the sixel display documentation, and added
+   information on other methods that had no prior documentation.
 
 2002/02/04
  * Revised this document.

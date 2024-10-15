@@ -4,15 +4,108 @@ w3m でインライン画像を表示
                                                         hsaka@mth.biglobe.ne.jp
                                                          (2002/10/16)  伊東宏之
                                                              ZXB01226@nifty.com
+                                                         (2014/11/05)  K. Araki
+                                                           (2024/07/23)  bptato
 
 はじめに
 
   w3m でインライン画像を表示する拡張です。
 
+  外部プログラム (feh など) を使って画像を見たい方は README.mailcap
+  を参照してください。
+
+表示方式
+
+  w3m は次の表示方式をサポートしています。
+
+  ・外部コマンド (w3mimgdisplay)
+  ・OSC 5379 (mlterm 画像表示コマンド)
+  ・sixel (もっとも幅広くサポートされている方式。img2sixel を利用
+    します)
+  ・APC G / kitty プロトコル (Kitty 画像プロトコル。表示前に
+    ImageMagick で画像を PNG 変換します)
+
+  w3m はデフォルトとして w3mimgdisplay を使いますので他の方式を使って
+  みたい方はオプション設定パネルで好みの方式を選んでください.
+
+  各方式については以下の記述を参照してください。
+
+  外部コマンドプロトコル (w3mimgdisplay)
+
+    X11 上の端末 (xterm,kterm,rxvt,...)、 Linux の framebuffer 上または
+    Windows 端末上に画像(GIF,PNG,JPEG 等)を表示します。
+    デフォルトの外部コマンドは w3mimgdisplay ですが、w3mimgdisplay 以外
+    にもこのプロトコルを実施したプログラム yaimg-sixel がこちらのレポジ
+    トリに存在します：
+
+    https://github.com/uobikiemukot/sdump
+
+    w3mimgdisplay は Wayland 上では動きません。尚、端末のリフレッシュ
+    速度が高すぎた場合、表示されても画像が一瞬で消えることもあります。
+    SSH 上では X フォワーディングが必要となります。
+
+    w3mimgdisplay は以下のオプションを受け付けますので端末に合わせて
+    オプション設定パネルで(または -o オプションで)設定してください。
+
+    -x <offset_x>
+        端末上に画像を表示する X 方向の原点。X11 で利用する場合デフォル
+        トは 2 ですが、xterm や kterm ではスクロールバーの幅を計算して
+        加えようとします。(正しく出来ないかもしれません。)
+        Eterm では 5 にすべきかもしれません。
+        Linux framebuffer で利用する場合デフォルトは 0 です。
+    -y <offset_y>
+        端末上に画像を表示する Y 方向の原点。デフォルトは、X11 では 2、
+        Linux framebuffer では 0。
+        Eterm では 5 にすべきかもしれません。
+    -bg <background>
+        端末の背景色。デフォルトは、X11 では自動設定、Linux framebuffer
+        では #000000 (黒)。
+        #RRGGBB で指定する場合は # をエスケープして設定してください。
+    -anim <n>
+        アニメーションで表示する最大フレーム数を指定。0 の時は制限なし。
+        負の時は最後からのフレーム数と見なします。デフォルトは 100。
+    -margin <n>
+        画像をクリアする領域のマージンを指定します。スクロールしたとき画
+        面にゴミが残ってしまう場合に指定してみてください。
+        デフォルトは 0。
+
+    例)
+      w3m -o 'imgdisplay=w3mimgdisplay -x 5 -bg "#cccccc"'
+
+  OSC 5379 / mlterm
+
+    この方式は mlterm の OSC 5379 と言う格調コードの "show_picture"
+    コマンドを利用します。SSH 上は動かないようです。
+
+  sixel
+
+    sixel 方式は libsixel プロジェクトの 'img2sixel' コマンドを使って
+    画像を sixel フォーマットに変換します。
+
+    (https://github.com/saitoha/libsixel)
+
+    'img2sixel' コマンドにオプションを追加したい方は "W3M_IMG2SIXEL"
+    環境変数をセットしてください。
+
+    $ W3M_IMG2SIXEL="img2sixel -d atkinson" w3m http://...
+
+  OSC 1337 / iTerm2
+
+    OSC 1337 方式は iTerm2 の画像プロトコルをもって画像を表示します。
+    mlterm プロトコルと違って SSH 上でも動きますが、画像をトリミング
+    できないと言う盲点があります。
+
+  APC G / kitty
+
+    kitty グラフィックプロトコルで画像を表示します。
+
+    この方式は ImageMagick の convert コマンドを使って画像フォーマット
+    を PNG へ変換しますので使用前に ImageMagick をインストールしてくだ
+    さい。
+
+
 機能
 
-  ・X11 上の端末(xterm,kterm,rxvt,...)、 Linux の framebuffer 上または
-    Windows 端末上に画像(GIF,PNG,JPEG 等)を表示します。
   ・img タグで指定されたインライン画像を表示できます。
     width,height 属性に応じて必要な領域を確保してレンダリングします。
     align 属性に対応しています。
@@ -50,6 +143,9 @@ w3m でインライン画像を表示
   -ppl <pixel>
       一行あたりの幅(pixel 値)を指定します。デフォルトは自動設定。
       正しく設定されない場合は端末の font の大きさに必ず合わせてください。
+  -ri, -sixel
+      mlterm や sixel 方式をセットできます。
+      -o inline_img_protocol=1 や 2 と同じです.
 
 オプションパネル
 
@@ -73,6 +169,13 @@ w3m でインライン画像を表示
   image_scale
       画像のスケールを指定します。デフォルトは 100(%)。
       小さい font と共に使う場合には値を小さくすると有用。
+  inline_img_protocol
+      方式を指定します。以下の値を指定できます。
+        0: 外部コマンド (デフォルト, imgdisplay を参照)
+        1: OSC 5379/mlterm
+        2: sixel (img2sixel が必要)
+        3: OSC 1337/iTerm2
+        4: kitty (ImageMagick 'convert' が必要)
   imgdisplay
       インライン画像を表示するためのコマンド。デフォルトは w3mimgdisplay。
       下記の "w3mimgdisplay の設定" を参考にしてオプション設定してください。
@@ -108,36 +211,6 @@ w3m でインライン画像を表示
       8bpp PACKED-PIXELS PSEUDO-COLOR framebuffer を利用できる環境
     * GdkPixbuf (0.16 以上推奨) または Imlib2 (1.0.6 以上推奨)
 
-w3mimgdisplay の設定
-
-  w3mimgdisplay は以下のオプションを受け付けますので端末に合わせて
-  オプション設定パネルで(または -o オプションで)設定してください。
-
-  -x <offset_x>
-      端末上に画像を表示する X 方向の原点。X11 で利用する場合デフォルト
-      は 2 ですが、xterm や kterm ではスクロールバーの幅を計算して加え
-      ようとします。(正しく出来ないかもしれません。)
-      Eterm では 5 にすべきかもしれません。
-      Linux framebuffer で利用する場合デフォルトは 0 です。
-  -y <offset_y>
-      端末上に画像を表示する Y 方向の原点。デフォルトは、X11 では 2、
-      Linux framebuffer では 0。
-      Eterm では 5 にすべきかもしれません。
-  -bg <background>
-      端末の背景色。デフォルトは、X11 では自動設定、Linux framebuffer 
-      では #000000 (黒)。
-      #RRGGBB で指定する場合は # をエスケープして設定してください。
-  -anim <n>
-      アニメーションで表示する最大フレーム数を指定。0 の時は制限なし。
-      負の時は最後からのフレーム数と見なします。デフォルトは 100。
-  -margin <n>
-      画像をクリアする領域のマージンを指定します。スクロールしたとき画
-      面にゴミが残ってしまう場合に指定してみてください。
-      デフォルトは 0。
-
-  例)
-    w3m -o 'imgdisplay=w3mimgdisplay -x 5 -bg "#cccccc"'
-  
 その他
   ・GIF animation は  w3m からの再描画要求に応じてフレームを書き換える
     だけなので勝手に動いてはくれません。絵を動かすためには 'h', 'l' 等
@@ -148,6 +221,9 @@ w3mimgdisplay の設定
 
 
 更新記録
+
+2024/07/23
+ * ドキュメントに sixel とその他の方式の情報を追加。
 
 2002/02/04
  * ドキュメント改訂
