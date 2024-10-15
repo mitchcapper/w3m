@@ -4,13 +4,13 @@ Subject: Add test for Str
 Patch: patches/Add-test-for-Str.patch
 
 ---
- t/0001-Str.c |  599 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- t/run        |    2 
- 2 files changed, 601 insertions(+)
+ t/0001-Str.c |  601 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ t/run        |    3 
+ 2 files changed, 604 insertions(+)
 
 --- /dev/null
 +++ b/t/0001-Str.c
-@@ -0,0 +1,599 @@
+@@ -0,0 +1,601 @@
 +#if 0
 +#!/bin/sh
 +#trap 'rm -f ./a.out' EXIT
@@ -23,6 +23,8 @@ Patch: patches/Add-test-for-Str.patch
 +#include <assert.h>
 +#include <ctype.h>
 +#include <string.h>
++
++#define _strlen(x) (int)strlen(x)
 +
 +#define ASSERT_int(x,y) \
 +{\
@@ -76,7 +78,7 @@ Patch: patches/Add-test-for-Str.patch
 +{
 +	Str s;
 +	char *in = "0123456789012345678901234567890123456789";
-+	int len = strlen(in);
++	int len = _strlen(in);
 +
 +	s = Strnew_charp(in);
 +
@@ -93,7 +95,7 @@ Patch: patches/Add-test-for-Str.patch
 +	Str s;
 +	char *in  = "0123456789";
 +	char *exp = "01234567890123456789";
-+	int len = strlen(in);
++	int len = _strlen(in);
 +
 +	s = Strnew_m_charp(in, in, NULL);
 +
@@ -198,7 +200,7 @@ Patch: patches/Add-test-for-Str.patch
 +	assert(s->ptr);
 +	ASSERT_int(s->area_size, INITIAL_STR_SIZE);
 +	ASSERT_charp(s->ptr, exp);
-+	ASSERT_int(s->length, strlen(exp));
++	ASSERT_int(s->length, _strlen(exp));
 +}
 +
 +void
@@ -207,7 +209,7 @@ Patch: patches/Add-test-for-Str.patch
 +	Str s;
 +	char *in  = "0123456789";
 +	char *exp = "012345678901234";
-+	int n = strlen(exp) - strlen(in);
++	int n = _strlen(exp) - _strlen(in);
 +
 +	s = Strdup(t);
 +	Strcat_charp_n(s, in, n);
@@ -215,7 +217,7 @@ Patch: patches/Add-test-for-Str.patch
 +	assert(s);
 +	assert(s->ptr);
 +	ASSERT_int(s->area_size, INITIAL_STR_SIZE);
-+	ASSERT_int(s->length, strlen(exp));
++	ASSERT_int(s->length, _strlen(exp));
 +	ASSERT_charp(s->ptr, exp);
 +}
 +
@@ -232,7 +234,7 @@ Patch: patches/Add-test-for-Str.patch
 +	assert(s);
 +	assert(s->ptr);
 +	ASSERT_int(s->area_size, INITIAL_STR_SIZE);
-+	ASSERT_int(s->length, strlen(exp));
++	ASSERT_int(s->length, _strlen(exp));
 +	ASSERT_charp(s->ptr, exp);
 +}
 +
@@ -250,7 +252,7 @@ Patch: patches/Add-test-for-Str.patch
 +	assert(s->ptr);
 +	ASSERT_int(s->area_size, INITIAL_STR_SIZE);
 +	ASSERT_charp(s->ptr, exp);
-+	ASSERT_int(s->length, strlen(exp));
++	ASSERT_int(s->length, _strlen(exp));
 +}
 +
 +void
@@ -267,7 +269,7 @@ Patch: patches/Add-test-for-Str.patch
 +	assert(s->ptr);
 +	ASSERT_int(s->area_size, INITIAL_STR_SIZE);
 +	ASSERT_charp(s->ptr, exp);
-+	ASSERT_int(s->length, strlen(exp));
++	ASSERT_int(s->length, _strlen(exp));
 +}
 +
 +
@@ -331,7 +333,7 @@ Patch: patches/Add-test-for-Str.patch
 +	assert(s->ptr);
 +	ASSERT_int(s->area_size, INITIAL_STR_SIZE);
 +	ASSERT_charp(s->ptr, exp);
-+	ASSERT_int(s->length, strlen(exp));
++	ASSERT_int(s->length, _strlen(exp));
 +}
 +
 +
@@ -349,7 +351,7 @@ Patch: patches/Add-test-for-Str.patch
 +	assert(s->ptr);
 +	ASSERT_int(s->area_size, INITIAL_STR_SIZE);
 +	ASSERT_charp(s->ptr, exp);
-+	ASSERT_int(s->length, strlen(exp));
++	ASSERT_int(s->length, _strlen(exp));
 +}
 +
 +
@@ -367,7 +369,7 @@ Patch: patches/Add-test-for-Str.patch
 +	assert(s->ptr);
 +	ASSERT_int(s->area_size, INITIAL_STR_SIZE);
 +	ASSERT_charp(s->ptr, exp);
-+	ASSERT_int(s->length, strlen(exp));
++	ASSERT_int(s->length, _strlen(exp));
 +}
 +
 +void
@@ -384,7 +386,7 @@ Patch: patches/Add-test-for-Str.patch
 +
 +	assert(s);
 +	assert(s->ptr);
-+	ASSERT_int(s->length, strlen(exp));
++	ASSERT_int(s->length, _strlen(exp));
 +	ASSERT_int(s->area_size, INITIAL_STR_SIZE);
 +	ASSERT_charp(s->ptr, exp);
 +}
@@ -403,7 +405,7 @@ Patch: patches/Add-test-for-Str.patch
 +
 +	assert(s);
 +	assert(s->ptr);
-+	ASSERT_int(s->length, strlen(exp));
++	ASSERT_int(s->length, _strlen(exp));
 +	ASSERT_int(s->area_size, INITIAL_STR_SIZE);
 +	ASSERT_charp(s->ptr, exp);
 +}
@@ -421,7 +423,7 @@ Patch: patches/Add-test-for-Str.patch
 +
 +	assert(s);
 +	assert(s->ptr);
-+	ASSERT_int(s->length, strlen(exp));
++	ASSERT_int(s->length, _strlen(exp));
 +	ASSERT_int(s->area_size, INITIAL_STR_SIZE);
 +	ASSERT_charp(s->ptr, exp);
 +}
@@ -439,7 +441,7 @@ Patch: patches/Add-test-for-Str.patch
 +
 +	assert(s);
 +	assert(s->ptr);
-+	ASSERT_int(s->length, strlen(exp));
++	ASSERT_int(s->length, _strlen(exp));
 +	ASSERT_int(s->area_size, INITIAL_STR_SIZE);
 +	ASSERT_charp(s->ptr, exp);
 +}
@@ -457,7 +459,7 @@ Patch: patches/Add-test-for-Str.patch
 +
 +	assert(s);
 +	assert(s->ptr);
-+	ASSERT_int(s->length, strlen(exp));
++	ASSERT_int(s->length, _strlen(exp));
 +	ASSERT_int(s->area_size, INITIAL_STR_SIZE);
 +	ASSERT_charp(s->ptr, exp);
 +}
@@ -476,7 +478,7 @@ Patch: patches/Add-test-for-Str.patch
 +	assert(s->ptr);
 +	ASSERT_int(s->area_size, INITIAL_STR_SIZE);
 +	ASSERT_charp(s->ptr, exp);
-+	ASSERT_int(s->length, strlen(exp));
++	ASSERT_int(s->length, _strlen(exp));
 +}
 +
 +void
@@ -490,7 +492,7 @@ Patch: patches/Add-test-for-Str.patch
 +
 +	assert(s);
 +	assert(s->ptr);
-+	ASSERT_int(s->length, strlen(exp));
++	ASSERT_int(s->length, _strlen(exp));
 +	ASSERT_int(s->area_size, INITIAL_STR_SIZE);
 +	ASSERT_charp(s->ptr, exp);
 +}
@@ -501,7 +503,7 @@ Patch: patches/Add-test-for-Str.patch
 +	Str s;
 +	char *in  = "0123456789";
 +	char *exp = "0123456789     ";
-+	int n = strlen(exp);
++	int n = _strlen(exp);
 +
 +	s = Strnew_charp(in);
 +	s = Stralign_left(s, n);
@@ -509,7 +511,7 @@ Patch: patches/Add-test-for-Str.patch
 +	assert(s);
 +	assert(s->ptr);
 +	ASSERT_int(s->area_size, INITIAL_STR_SIZE);
-+	ASSERT_int(s->length, strlen(exp));
++	ASSERT_int(s->length, _strlen(exp));
 +	ASSERT_charp(s->ptr, exp);
 +}
 +
@@ -519,7 +521,7 @@ Patch: patches/Add-test-for-Str.patch
 +	Str s;
 +	char *in  = "0123456789";
 +	char *exp = "     0123456789";
-+	int n = strlen(exp);
++	int n = _strlen(exp);
 +
 +	s = Strnew_charp(in);
 +	s = Stralign_right(t, n);
@@ -527,7 +529,7 @@ Patch: patches/Add-test-for-Str.patch
 +	assert(s);
 +	assert(s->ptr);
 +	ASSERT_int(s->area_size, INITIAL_STR_SIZE);
-+	ASSERT_int(s->length, strlen(exp));
++	ASSERT_int(s->length, _strlen(exp));
 +	ASSERT_charp(s->ptr, exp);
 +}
 +
@@ -537,15 +539,15 @@ Patch: patches/Add-test-for-Str.patch
 +	Str s;
 +	char *in  = "0123456789";
 +	char *exp = "  0123456789   ";
-+	int n = strlen(exp);
++	int n = _strlen(exp);
 +
 +	s = Strnew_charp(in);
-+	s = Stralign_center(s, strlen(exp));
++	s = Stralign_center(s, _strlen(exp));
 +
 +	assert(s);
 +	assert(s->ptr);
 +	ASSERT_int(s->area_size, INITIAL_STR_SIZE);
-+	ASSERT_int(s->length, strlen(exp));
++	ASSERT_int(s->length, _strlen(exp));
 +	ASSERT_charp(s->ptr, exp);
 +}
 +
@@ -572,7 +574,7 @@ Patch: patches/Add-test-for-Str.patch
 +{
 +	t = malloc(sizeof (struct _Str));
 +	t->ptr = char10;
-+	t->length = strlen(t->ptr);
++	t->length = _strlen(t->ptr);
 +	t->area_size = t->length + 1;
 +
 +	if (argc > 1)
@@ -612,7 +614,11 @@ Patch: patches/Add-test-for-Str.patch
 +}
 --- a/t/run
 +++ b/t/run
-@@ -14,6 +14,8 @@ do
+@@ -11,9 +11,12 @@ test -x ../w3m || exit 2
+ 
+ for t in [0-9][0-9][0-9][0-9]*
+ do
++	chmod +x ./$t
  	./$t || exit 1
  done
  
