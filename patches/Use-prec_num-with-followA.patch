@@ -1,0 +1,21 @@
+From: Rene Kita <mail@rkta.de>
+Date: Tue Oct 22 05:45:14 CEST 2024
+Subject: Use prec_num with followA
+Patch: patches/Use-prec_num-with-followA.patch
+
+---
+ main.c |    3 +++
+ 1 file changed, 3 insertions(+)
+
+--- a/main.c
++++ b/main.c
+@@ -3220,6 +3220,9 @@ DEFUN(followA, GOTO_LINK, "Follow curren
+ #endif
+     char *url;
+ 
++    if (prec_num)
++	topA();
++
+     if (Currentbuf->firstLine == NULL)
+ 	return;
+ 

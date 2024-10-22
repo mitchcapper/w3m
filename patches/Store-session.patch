@@ -100,7 +100,7 @@
 +		break;
 +	    if (n > max) {
 +		max <<= 1;
-+		New_Reuse(char *, session, max);
++		session = New_Reuse(char *, session, max);
 +	    }
 +	    session[n++] = line->ptr;
 +	}

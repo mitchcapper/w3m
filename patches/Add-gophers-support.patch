@@ -1,6 +1,6 @@
 From: Rene Kita <mail@rkta.de>
 Date: Sun Oct 29 16:11:29 CET 2023
-Subject: add gophers support
+Subject: Add gophers support
 ---
  file.c |    4 ++--
  html.h |    7 ++++++-

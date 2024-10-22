@@ -2,7 +2,7 @@ From: Rene Kita <mail@rkta.de>
 Date: Tue Oct 31 10:43:55 CET 2023
 Subject: refactor openUrl scheme handling
 
-Instead of breaking in this really long switch statement, except a
+Instead of breaking in this really long switch statement, accept a
 little more code duplication to make the control flow more obvious.
 ---
  url.c |   11 ++++++-----

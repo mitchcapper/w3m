@@ -1,7 +1,7 @@
 From 86aedae122329e79b44bca723b1a77186dd48a26 Mon Sep 17 00:00:00 2001
 From: Rene Kita <mail@rkta.de>
 Date: Sat, 4 Sep 2021 11:18:46 +0200
-Subject: [PATCH 014/172] Remove dead code
+Subject: Remove dead code
 ---
  buffer.c    |    5 --
  display.c   |   13 ------
