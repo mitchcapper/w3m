@@ -48,7 +48,7 @@ unsigned char EscKeymap[128] = {
     /*  C-p     C-q     C-r     C-s     C-t     C-u     C-v     C-w      */
     nulcmd, nulcmd, nulcmd, nulcmd, nulcmd, nulcmd, nulcmd, nulcmd,
     /*  C-x     C-y     C-z     C-[     C-\     C-]     C-^     C-_      */
-    nulcmd, nulcmd, nulcmd, nulcmd, nulcmd, nulcmd, nulcmd, nulcmd,
+    nulcmd, nulcmd, nulcmd, escmap, nulcmd, nulcmd, nulcmd, nulcmd,
     /*  SPC     !       "       #       $       %       &       '        */
     nulcmd, nulcmd, nulcmd, nulcmd, nulcmd, nulcmd, nulcmd, nulcmd,
     /*  (       )       *       +       ,       -       .       /        */

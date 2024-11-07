@@ -213,11 +213,6 @@ fusage(FILE * f, int err)
 #ifdef USE_M17N
     fprintf(f, "    -I charset       document charset\n");
     fprintf(f, "    -O charset       display/output charset\n");
-#if 0				/* use -O{s|j|e} instead */
-    fprintf(f, "    -e               EUC-JP\n");
-    fprintf(f, "    -s               Shift_JIS\n");
-    fprintf(f, "    -j               JIS\n");
-#endif
 #endif
     fprintf(f, "    -B               load bookmark\n");
     fprintf(f, "    -bookmark file   specify bookmark file\n");
@@ -268,11 +263,7 @@ fusage(FILE * f, int err)
 #endif				/* USE_COOKIE */
     fprintf(f, "    -graph           use DEC special graphics for border of table and menu\n");
     fprintf(f, "    -no-graph        use ASCII character for border of table and menu\n");
-#if 1				/* pager requires -s */
     fprintf(f, "    -s               squeeze multiple blank lines\n");
-#else
-    fprintf(f, "    -S               squeeze multiple blank lines\n");
-#endif
     fprintf(f, "    -W               toggle search wrap mode\n");
     fprintf(f, "    -X               don't use termcap init/deinit\n");
     fprintf(f,
@@ -588,14 +579,6 @@ main(int argc, char **argv)
 		    PagerMax = atoi(argv[i]);
 	    }
 #ifdef USE_M17N
-#if 0				/* use -O{s|j|e} instead */
-	    else if (!strcmp("-s", argv[i]))
-		DisplayCharset = WC_CES_SHIFT_JIS;
-	    else if (!strcmp("-j", argv[i]))
-		DisplayCharset = WC_CES_ISO_2022_JP;
-	    else if (!strcmp("-e", argv[i]))
-		DisplayCharset = WC_CES_EUC_JP;
-#endif
 	    else if (!strncmp("-I", argv[i], 2)) {
 		if (argv[i][2] != '\0')
 		    p = argv[i] + 2;
@@ -770,11 +753,7 @@ main(int argc, char **argv)
 		accept_cookie = TRUE;
 	    }
 #endif				/* USE_COOKIE */
-#if 1				/* pager requires -s */
 	    else if (!strcmp("-s", argv[i]))
-#else
-	    else if (!strcmp("-S", argv[i]))
-#endif
 		squeezeBlankLine = TRUE;
 	    else if (!strcmp("-X", argv[i]))
 		Do_not_use_ti_te = TRUE;
@@ -907,9 +886,6 @@ main(int argc, char **argv)
 #endif				/* not USE_HISTORY */
 
 #ifdef USE_M17N
-    /*  if (w3m_dump)
-     *    WcOption.pre_conv = WC_TRUE;
-     */
 #endif
 
     if (w3m_backend)
@@ -1473,7 +1449,15 @@ escKeyProc(int c, int esc, unsigned char *map)
 DEFUN(escmap, ESCMAP, "ESC map")
 {
     char c;
+#ifdef USE_MOUSE
+    if (use_mouse)
+	mouse_active();
+#endif
     c = getch();
+#ifdef USE_MOUSE
+    if (use_mouse)
+	mouse_inactive();
+#endif
     if (IS_ASCII(c))
 	escKeyProc((int)c, K_ESC, EscKeymap);
 }
@@ -1737,11 +1721,6 @@ DEFUN(ctrCsrV, CENTER_V, "Center on cursor line")
 	return;
     offsety = Currentbuf->LINES / 2 - Currentbuf->cursorY;
     if (offsety != 0) {
-#if 0
-	Currentbuf->currentLine = lineSkip(Currentbuf,
-					   Currentbuf->currentLine, offsety,
-					   FALSE);
-#endif
 	Currentbuf->topLine =
 	    lineSkip(Currentbuf, Currentbuf->topLine, -offsety, FALSE);
 	arrangeLine(Currentbuf);
@@ -3163,14 +3142,6 @@ DEFUN(followA, GOTO_LINK, "Follow current hyperlink in a new buffer")
     }
     if (handleMailto(a->url))
 	return;
-#if 0
-    else if (!strncasecmp(a->url, "news:", 5) && strchr(a->url, '@') == NULL) {
-	/* news:newsgroup is not supported */
-	/* FIXME: gettextize? */
-	disp_err_message("news:newsgroup_name is not supported", TRUE);
-	return;
-    }
-#endif				/* USE_NNTP */
     url = a->url;
 #ifdef USE_IMAGE
     if (map)
@@ -4304,14 +4275,6 @@ cmd_loadURL(char *url, ParsedURL *current, char *referer, FormList *request)
 
     if (handleMailto(url))
 	return;
-#if 0
-    if (!strncasecmp(url, "news:", 5) && strchr(url, '@') == NULL) {
-	/* news:newsgroup is not supported */
-	/* FIXME: gettextize? */
-	disp_err_message("news:newsgroup_name is not supported", TRUE);
-	return;
-    }
-#endif				/* USE_NNTP */
 
     refresh();
     buf = loadGeneralFile(url, current, referer, 0, request);
@@ -5190,7 +5153,7 @@ chkURLBuffer(Buffer *buf)
 	"https?://[a-zA-Z0-9][a-zA-Z0-9:%\\-\\./?=~_\\&+@#,\\$;]*[a-zA-Z0-9_/=\\-]",
 	"file:/[a-zA-Z0-9:%\\-\\./=_\\+@#,\\$;]*",
 #ifdef USE_GOPHER
-	"gopher://[a-zA-Z0-9][a-zA-Z0-9:%\\-\\./_~]*",
+	"gophers?://[a-zA-Z0-9][a-zA-Z0-9:%\\-\\./_~]*",
 #endif				/* USE_GOPHER */
 	"ftp://[a-zA-Z0-9][a-zA-Z0-9:%\\-\\./=_+@#,\\$]*[a-zA-Z0-9_/]",
 #ifdef USE_NNTP
@@ -5428,10 +5391,6 @@ DEFUN(dispI, DISPLAY_IMAGE, "Restart loading and drawing of images")
     if (!activeImage)
 	return;
     displayImage = TRUE;
-    /*
-     * if (!(Currentbuf->type && is_html_type(Currentbuf->type)))
-     * return;
-     */
     Currentbuf->image_flag = IMG_FLAG_AUTO;
     Currentbuf->need_reshape = TRUE;
     displayBuffer(Currentbuf, B_REDRAW_IMAGE);
@@ -5441,10 +5400,6 @@ DEFUN(stopI, STOP_IMAGE, "Stop loading and drawing of images")
 {
     if (!activeImage)
 	return;
-    /*
-     * if (!(Currentbuf->type && is_html_type(Currentbuf->type)))
-     * return;
-     */
     Currentbuf->image_flag = IMG_FLAG_SKIP;
     displayBuffer(Currentbuf, B_REDRAW_IMAGE);
 }
@@ -6440,11 +6395,7 @@ void
 calcTabPos(void)
 {
     TabBuffer *tab;
-#if 0
-    int lcol = 0, rcol = 2, col;
-#else
     int lcol = 0, rcol = 0, col;
-#endif
     int n1, n2, na, nx, ny, ix, iy;
 
 #ifdef USE_MOUSE
