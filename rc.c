@@ -78,6 +78,7 @@ static int OptionEncode = FALSE;
 #define CMT_OPEN_TAB_DL_LIST N_("Open download list panel on new tab")
 #define CMT_DISPLINK     N_("Display link URL automatically")
 #define CMT_DISPLINKNUMBER N_("Display link numbers")
+#define CMT_ZEROBASEDLINKNO N_("Use 0 as first link number")
 #define CMT_DECODE_URL   N_("Display decoded URL")
 #define CMT_DISPLINEINFO N_("Display current line information")
 #define CMT_DISP_COLUMN_NUMBER N_("Display column number in line information")
@@ -400,6 +401,8 @@ struct param_ptr params1[] = {
      NULL},
     {"display_link_number", P_INT, PI_ONOFF, (void *)&displayLinkNumber,
      CMT_DISPLINKNUMBER, NULL},
+    {"zero_based_link_no", P_INT, PI_ONOFF, (void *)&zeroBasedLinkNo,
+     CMT_ZEROBASEDLINKNO, NULL},
     {"decode_url", P_INT, PI_ONOFF, (void *)&DecodeURL, CMT_DECODE_URL, NULL},
     {"display_lineinfo", P_INT, PI_ONOFF, (void *)&displayLineInfo,
      CMT_DISPLINEINFO, NULL},

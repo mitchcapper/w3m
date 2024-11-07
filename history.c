@@ -20,12 +20,14 @@ historyBuffer(Hist *hist)
 {
     Str src = Strnew();
     HistItem *item;
+    char n[sizeof("0")];
     char *p, *q;
 
+    sprintf(n, "%d", !zeroBasedLinkNo);
     /* FIXME: gettextize? */
     Strcat_charp(src, "<html>\n<head><title>History Page</title></head>\n");
     Strcat_charp(src, "<body>\n<h1>History Page</h1>\n<hr>\n");
-    Strcat_charp(src, "<ol>\n");
+    Strcat_m_charp(src, "<ol start=", n, ">\n", NULL);
     if (hist && hist->list) {
 	for (item = hist->list->last; item; item = item->prev) {
 	    q = html_quote(item->ptr);

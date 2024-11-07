@@ -3619,7 +3619,7 @@ DEFUN(topA, LINK_BEGIN, "Move to the first hyperlink")
     if (prec_num > hl->nmark)
 	hseq = hl->nmark - 1;
     else if (prec_num > 0)
-	hseq = prec_num - 1;
+	hseq = prec_num - 1 + !!zeroBasedLinkNo;
     do {
 	if (hseq >= hl->nmark)
 	    return;

@@ -1673,7 +1673,7 @@ checkRedirection(ParsedURL *pu)
 Str
 getLinkNumberStr(int correction)
 {
-    return Sprintf("[%d]", cur_hseq + correction);
+    return Sprintf("[%d]", cur_hseq + correction - !!zeroBasedLinkNo);
 }
 
 /* 
