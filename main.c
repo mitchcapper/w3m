@@ -6118,8 +6118,11 @@ DEFUN(execCmd, COMMAND, "Invoke w3m function(s)")
 	}
 	p = getWord(&data);
 	cmd = getFuncList(p);
-	if (cmd < 0)
+	if (cmd < 0) {
+	    Str e = Sprintf("Unknown command: %s", p);
+	    disp_err_message(e->ptr, FALSE);
 	    break;
+	}
 	p = getQWord(&data);
 	CurrentKey = -1;
 	CurrentKeyData = NULL;
