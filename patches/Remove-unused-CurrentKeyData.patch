@@ -187,7 +187,7 @@ Patch: patches/Remove-unused-CurrentKeyData.patch
  	data = inputStrHist("Key definition: ", "", TextHist);
 --- a/menu.c
 +++ b/menu.c
-@@ -575,7 +575,6 @@ action_menu(Menu *menu)
+@@ -577,7 +577,6 @@ action_menu(Menu *menu)
  	    *item.variable = item.value;
  	if (item.type & MENU_FUNC) {
  	    CurrentKey = -1;

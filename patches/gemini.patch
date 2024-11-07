@@ -27,7 +27,7 @@ w3m-0.5.3+git20230121.
 
 --- a/file.c
 +++ b/file.c
-@@ -30,6 +30,8 @@
+@@ -29,6 +29,8 @@
  
  #define MAX_INPUT_SIZE 80 /* TODO - max should be screen line length */
  
@@ -36,7 +36,7 @@ w3m-0.5.3+git20230121.
  extern int fold_pre;
  static int frame_source = 0;
  static int need_number = 0;
-@@ -247,7 +249,7 @@ loadSomething(URLFile *f,
+@@ -246,7 +248,7 @@ loadSomething(URLFile *f,
         )
  	buf->type = "text/html";
      else
@@ -45,7 +45,7 @@ w3m-0.5.3+git20230121.
      return buf;
  }
  
-@@ -2009,6 +2011,166 @@ loadGeneralFile(char *path, ParsedURL *v
+@@ -2008,6 +2010,166 @@ loadGeneralFile(char *path, ParsedURL *v
      else if (pu.scheme == SCM_DATA) {
  	t = f.guess_type;
      }
@@ -212,7 +212,7 @@ w3m-0.5.3+git20230121.
      else if (searchHeader) {
  	searchHeader = SearchHeader = FALSE;
  	if (t_buf == NULL)
-@@ -2186,6 +2348,8 @@ loadGeneralFile(char *path, ParsedURL *v
+@@ -2185,6 +2347,8 @@ loadGeneralFile(char *path, ParsedURL *v
  
      if (is_html_type(t))
  	proc = loadHTMLBuffer;
@@ -221,7 +221,7 @@ w3m-0.5.3+git20230121.
      else if (is_plain_text_type(t))
  	proc = loadBuffer;
  #ifdef USE_IMAGE
-@@ -2440,7 +2604,6 @@ is_boundary(unsigned char *ch1, unsigned
+@@ -2439,7 +2603,6 @@ is_boundary(unsigned char *ch1, unsigned
      return 1;
  }
  
@@ -229,7 +229,7 @@ w3m-0.5.3+git20230121.
  static void
  set_breakpoint(struct readbuffer *obuf, int tag_length)
  {
-@@ -7473,6 +7636,130 @@ loadGopherSearch0(ParsedURL *pu)
+@@ -7472,6 +7635,130 @@ loadGopherSearch0(ParsedURL *pu)
  }
  #endif				/* USE_GOPHER */
  
@@ -304,7 +304,7 @@ w3m-0.5.3+git20230121.
 +	    buf->hmarklist = putHmarker(buf->hmarklist, currentLn(buf),
 +					0, hseq);
 +	    if (displayLinkNumber)
-+		line = Sprintf("[%d]: %s", hseq + 1, q);
++		line = Sprintf("[%d]: %s", hseq + 1 - !!zeroBasedLinkNo, q);
 +	    else
 +		line = Sprintf("%s", q);
 +	    line = checkType(line, &propBuf, NULL);
@@ -413,7 +413,7 @@ w3m-0.5.3+git20230121.
  #endif				/* USE_SSL */
      };
  
-@@ -1980,6 +1984,35 @@ openURL(char *url, ParsedURL *pu, Parsed
+@@ -1985,6 +1989,35 @@ openURL(char *url, ParsedURL *pu, Parsed
  	}
  	return uf;
  #endif				/* USE_GOPHER */
@@ -727,7 +727,7 @@ w3m-0.5.3+git20230121.
 --- a/istream.c
 +++ b/istream.c
 @@ -1,6 +1,7 @@
- /* $Id: istream.c,v 1.27 2010/07/18 13:43:23 htrb Exp $ */
+ /* vi: set sw=4 ts=8 ai sm noet : */
  #include "fm.h"
  #include "myctype.h"
 +#include "rc.h"
@@ -976,7 +976,7 @@ w3m-0.5.3+git20230121.
  #define P_INT      0
  #define P_SHORT    1
  #define P_CHARINT  2
-@@ -214,6 +216,7 @@ static int OptionEncode = FALSE;
+@@ -219,6 +221,7 @@ static int OptionEncode = FALSE;
  #define CMT_SSL_CA_PATH N_("Path to directory for PEM encoded certificates of CAs")
  #define CMT_SSL_CA_FILE N_("File consisting of PEM encoded certificates of CAs")
  #define CMT_SSL_CA_DEFAULT N_("Use default locations for PEM encoded certificates of CAs")
@@ -984,7 +984,7 @@ w3m-0.5.3+git20230121.
  #endif				/* USE_SSL_VERIFY */
  #define CMT_SSL_FORBID_METHOD N_("List of forbidden SSL methods (2: SSLv2, 3: SSLv3, t: TLSv1.0, 5: TLSv1.1, 6: TLSv1.2, 7: TLSv1.3)")
  #ifdef SSL_CTX_set_min_proto_version
-@@ -649,6 +652,8 @@ struct param_ptr params7[] = {
+@@ -656,6 +659,8 @@ struct param_ptr params7[] = {
       NULL},
      {"ssl_ca_default", P_INT, PI_ONOFF, (void *)&ssl_ca_default,
       CMT_SSL_CA_DEFAULT, NULL},
@@ -995,7 +995,7 @@ w3m-0.5.3+git20230121.
  };
 --- a/rc.h
 +++ b/rc.h
-@@ -4,4 +4,6 @@
+@@ -5,4 +5,6 @@
  extern void show_params(FILE * fp);
  extern int str_to_bool(char *value, int old);
  
@@ -1024,7 +1024,7 @@ w3m-0.5.3+git20230121.
  GOTO_LINE	Go to the specified line
 --- a/scripts/w3mhelp.cgi.in
 +++ b/scripts/w3mhelp.cgi.in
-@@ -152,8 +152,9 @@ print "<P><A HREF=\"$keymap\">$head</A>\
+@@ -151,8 +151,9 @@ print "<P><A HREF=\"$keymap\">$head</A>\
  		pipeBuf"));
  
  &show_keymap('Buffer Operations',

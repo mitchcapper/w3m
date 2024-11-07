@@ -1,36 +1,5 @@
-# modernC
-# PENDING
-#266 reorder
-# ?
-#278 md5
-# gophers
-# 279 deadcode
-Fix-some-casts-that-discard-qualifiers.patch
-Remove-const-where-we-can-t-keep-the-promise.patch
-Remove-declarations-without-definition.patch
-Remove-unused-function-declarations.patch
-Remove-unused-function.patch
-Move-declarations-to-the-correct-header-file.patch
-Remove-redundant-declarations.patch
-Remove-if-condition-that-is-always-false.patch
-Fix-dead-store.patch
-Remove-unused-variable.patch
-Remove-unused-typedef-s.patch
-Remove-unused-parameters.patch
-Remove-unnecessary-casts.patch
-Remove-pointer-indirection-where-not-needed.patch
-Remove-redundant-assignment.patch
-Fix-Wstrict-prototypes.patch
-# NEXT
-Replace-deprecated-bcopy.patch
-# FEATURES
-Display-error-for-unkown-command.patch
+# gemini
 gemini.patch
-Zero-based-link-no.patch
-Use-https-with-USE_SSL-and-retry_http.patch
-# META
-Remove-VCS-Id-lines.patch
-Add-vi-modelines.patch
 # WARNINGS
 Enable-more-optimization.patch
 Enable-Wcast-qual.patch

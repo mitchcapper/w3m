@@ -9,7 +9,7 @@ Patch: patches/Fix-select-menu-setup.patch
 
 --- a/menu.c
 +++ b/menu.c
-@@ -1330,9 +1330,6 @@ popupMenu(int x, int y, Menu *menu)
+@@ -1337,9 +1337,6 @@ popupMenu(int x, int y, Menu *menu)
  {
      set_menu_frame();
  
@@ -19,7 +19,7 @@ Patch: patches/Fix-select-menu-setup.patch
      menu->cursorX = Currentbuf->cursorX + Currentbuf->rootX;
      menu->cursorY = Currentbuf->cursorY + Currentbuf->rootY;
      menu->x = x + FRAME_WIDTH + 1;
-@@ -1380,6 +1377,7 @@ DEFUN(selMn, SELECT_MENU, "Pop up buffer
+@@ -1387,6 +1384,7 @@ DEFUN(selMn, SELECT_MENU, "Pop up buffer
  	y = mouse_action.cursorY;
      }
  #endif
@@ -27,7 +27,7 @@ Patch: patches/Fix-select-menu-setup.patch
      popupMenu(x, y, &SelectMenu);
  }
  
-@@ -1599,6 +1597,7 @@ DEFUN(tabMn, TAB_MENU, "Pop up tab selec
+@@ -1606,6 +1604,7 @@ DEFUN(tabMn, TAB_MENU, "Pop up tab selec
  	y = mouse_action.cursorY;
      }
  #endif

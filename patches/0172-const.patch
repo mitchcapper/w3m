@@ -1437,7 +1437,7 @@ Subject: [PATCH 172/172] const
  
 --- a/menu.c
 +++ b/menu.c
-@@ -1612,7 +1612,7 @@ initSelTabMenu(void)
+@@ -1619,7 +1619,7 @@ initSelTabMenu(void)
      Str str;
      char **label;
      char *p;

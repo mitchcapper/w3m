@@ -273,7 +273,7 @@ Subject: [PATCH 018/172] Remove unused function
  {
 --- a/menu.c
 +++ b/menu.c
-@@ -1342,12 +1342,6 @@ popupMenu(int x, int y, Menu *menu)
+@@ -1349,12 +1349,6 @@ popupMenu(int x, int y, Menu *menu)
      popup_menu(NULL, menu);
  }
  
