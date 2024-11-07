@@ -100,6 +100,7 @@ newInputStream(int des)
     init_base_stream(&stream->base, STREAM_BUF_SIZE);
     stream->base.type = IST_BASIC;
     stream->base.handle = NewWithoutGC(int);
+    /* TODO(rkta): Check cast from int to void ptr */
     *(int *)stream->base.handle = des;
     stream->base.read = basic_read;
     stream->base.close = basic_close;
