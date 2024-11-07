@@ -1,4 +1,4 @@
-/* $Id: regex.c,v 1.23 2010/08/24 10:11:51 htrb Exp $ */
+/* vi: set sw=4 ts=8 ai sm noet : */
 /* 
  * regex: Regular expression pattern match library
  * 

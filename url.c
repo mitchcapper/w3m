@@ -1,4 +1,4 @@
-/* $Id: url.c,v 1.100 2010/12/15 10:50:24 htrb Exp $ */
+/* vi: set sw=4 ts=8 ai sm noet : */
 #include "fm.h"
 #ifndef __MINGW32_VERSION
 #include <unistd.h>
@@ -605,7 +605,6 @@ openSocket(char *const hostname,
 	    /* try next ai family */
 	    continue;
 	}
-	sock = -1;
 	for (res = res0; res; res = res->ai_next) {
 	    sock = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
 	    if (sock < 0) {
@@ -647,7 +646,7 @@ openSocket(char *const hostname,
     if (regexMatch(hostname, -1, 1)) {
 	sscanf(hostname, "%d.%d.%d.%d", &a1, &a2, &a3, &a4);
 	adr = htonl((a1 << 24) | (a2 << 16) | (a3 << 8) | a4);
-	bcopy((void *)&adr, (void *)&hostaddr.sin_addr, sizeof(long));
+	memmove((void *)&hostaddr.sin_addr, (void *)&adr, sizeof(long));
 	hostaddr.sin_family = AF_INET;
 	hostaddr.sin_port = s_port;
 	if (fmInitialized) {
@@ -681,8 +680,7 @@ openSocket(char *const hostname,
 	hostaddr.sin_family = AF_INET;
 	hostaddr.sin_port = s_port;
 	for (h_addr_list = entry->h_addr_list; *h_addr_list; h_addr_list++) {
-	    bcopy((void *)h_addr_list[0], (void *)&hostaddr.sin_addr,
-		  entry->h_length);
+	    memmove(&hostaddr.sin_addr, h_addr_list[0], entry->h_length);
 #ifdef SOCK_DEBUG
 	    adr = ntohl(*(long *)&hostaddr.sin_addr);
 	    sock_log("openSocket: connecting %d.%d.%d.%d\n",
@@ -1740,8 +1738,13 @@ openURL(char *url, ParsedURL *pu, ParsedURL *current,
 	}
 	if (uf.stream == NULL && retryAsHttp && url[0] != '/') {
 	    if (scheme == SCM_MISSING || scheme == SCM_UNKNOWN) {
+#ifdef USE_SSL
+		/* retry it as "https://" */
+		u = Strnew_m_charp("https://", url, NULL)->ptr;
+#else
 		/* retry it as "http://" */
 		u = Strnew_m_charp("http://", url, NULL)->ptr;
+#endif
 		goto retry;
 	    }
 	}
@@ -2448,14 +2451,14 @@ schemeToProxy(int scheme)
 
 #ifdef USE_M17N
 wc_ces
-url_to_charset(const char *url, const ParsedURL *base, wc_ces doc_charset)
+url_to_charset(char *url, ParsedURL *base, wc_ces doc_charset)
 {
-    const ParsedURL *pu;
+    ParsedURL *pu;
     ParsedURL pu_buf;
     const wc_ces *csptr;
 
     if (url && *url && *url != '#') {
-	parseURL2((char *)url, &pu_buf, (ParsedURL *)base);
+	parseURL2(url, &pu_buf, base);
 	pu = &pu_buf;
     } else {
 	pu = base;
@@ -2468,14 +2471,14 @@ url_to_charset(const char *url, const ParsedURL *base, wc_ces doc_charset)
 }
 
 char *
-url_encode(const char *url, const ParsedURL *base, wc_ces doc_charset)
+url_encode(char *url, ParsedURL *base, wc_ces doc_charset)
 {
     return url_quote_conv((char *)url,
 			  url_to_charset(url, base, doc_charset));
 }
 
 char *
-url_decode2(const char *url, const Buffer *buf)
+url_decode2(char *url, Buffer *buf)
 {
     wc_ces url_charset;
 

@@ -1,4 +1,4 @@
-/* $Id: w3mhelperpanel.c,v 1.14 2007/05/31 01:19:50 inu Exp $ */
+/* vi: set sw=4 ts=8 ai sm noet : */
 #include <errno.h>
 #include <stdlib.h>
 #include <stdio.h>

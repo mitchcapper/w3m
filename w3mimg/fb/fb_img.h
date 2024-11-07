@@ -1,4 +1,4 @@
-/* $Id: fb_img.h,v 1.9 2004/08/04 17:32:28 ukai Exp $ */
+/* vi: set sw=4 ts=8 ai sm noet : */
 #ifndef fb_img_header
 #define fb_img_header
 #include "fb.h"

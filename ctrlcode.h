@@ -1,4 +1,4 @@
-/* $Id: ctrlcode.h,v 1.3 2003/09/22 21:02:17 ukai Exp $ */
+/* vi: set sw=4 ts=8 ai sm noet : */
 /* control characters */
 
 #define CTRL_A          1

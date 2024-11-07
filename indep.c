@@ -1,4 +1,4 @@
-/* $Id: indep.c,v 1.38 2007/05/23 15:06:05 inu Exp $ */
+/* vi: set sw=4 ts=8 ai sm noet : */
 #include "fm.h"
 #include <stdio.h>
 #ifndef __MINGW32_VERSION
@@ -68,33 +68,6 @@ strtoclen(const char *s)
 #endif
 }
 
-#ifndef HAVE_BCOPY
-void
-bcopy(const void *src, void *dest, int len)
-{
-    int i;
-    if (src == dest)
-	return;
-    if (src < dest) {
-	for (i = len - 1; i >= 0; i--)
-	    ((char *)dest)[i] = ((const char *)src)[i];
-    }
-    else {			/* src > dest */
-	for (i = 0; i < len; i++)
-	    ((char *)dest)[i] = ((const char *)src)[i];
-    }
-}
-
-void
-bzero(void *ptr, int len)
-{
-    int i;
-    char *p = ptr;
-    for (i = 0; i < len; i++)
-	*(p++) = 0;
-}
-#endif				/* not HAVE_BCOPY */
-
 char *
 allocStr(const char *s, int len)
 {
@@ -108,7 +81,7 @@ allocStr(const char *s, int len)
 int
 strCmp(const void *s1, const void *s2) /* helper for qsort */
 {
-    return strcmp(*(const char **)s1, *(const char **)s2);
+    return strcmp(*(const char * const *)s1, *(const char * const *)s2);
 }
 
 char *
@@ -313,40 +286,6 @@ strcasestr(const char *s1, const char *s2)
     return 0;
 }
 #endif
-
-static int
-strcasematch(char *s1, char *s2)
-{
-    int x;
-    while (*s1) {
-	if (*s2 == '\0')
-	    return 1;
-	x = TOLOWER(*s1) - TOLOWER(*s2);
-	if (x != 0)
-	    break;
-	s1++;
-	s2++;
-    }
-    return (*s2 == '\0');
-}
-
-/* search multiple strings */
-int
-strcasemstr(char *str, char *srch[], char **ret_ptr)
-{
-    int i;
-    while (*str) {
-	for (i = 0; srch[i]; i++) {
-	    if (strcasematch(str, srch[i])) {
-		if (ret_ptr)
-		    *ret_ptr = str;
-		return i;
-	    }
-	}
-	str++;
-    }
-    return -1;
-}
 
 int
 strmatchlen(const char *s1, const char *s2, int maxlen)

@@ -1,5 +1,4 @@
-/* $Id: cookie.c,v 1.11 2010/07/26 11:38:53 htrb Exp $ */
-
+/* vi: set sw=4 ts=8 ai sm noet : */
 /*
  * References for version 0 cookie:                                  
  *   [NETACAPE] http://www.netscape.com/newsref/std/cookie_spec.html
@@ -222,7 +221,7 @@ find_cookie(ParsedURL *pu)
 	    if (p1)
 		continue;
 	    p1 = New(struct cookie);
-	    bcopy(p, p1, sizeof(struct cookie));
+	    memmove(p1, p, sizeof(struct cookie));
 	    p1->next = fco;
 	    fco = p1;
 	    if (p1->version > version)

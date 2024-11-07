@@ -1,4 +1,4 @@
-/* $Id: parsetagx.c,v 1.18 2006/06/07 03:52:03 inu Exp $ */
+/* vi: set sw=4 ts=8 ai sm noet : */
 #include "fm.h"
 #include "myctype.h"
 #include "indep.h"

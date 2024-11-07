@@ -1,4 +1,4 @@
-/* $Id: textlist.h,v 1.6 2003/01/20 15:30:22 ukai Exp $ */
+/* vi: set sw=4 ts=8 ai sm noet : */
 #ifndef TEXTLIST_H
 #define TEXTLIST_H
 #include "Str.h"

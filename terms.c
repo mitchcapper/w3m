@@ -1,4 +1,4 @@
-/* $Id: terms.c,v 1.63 2010/08/20 09:34:47 htrb Exp $ */
+/* vi: set sw=4 ts=8 ai sm noet : */
 /* 
  * An original curses library for EUC-kanji by Akinori ITO,     December 1989
  * revised by Akinori ITO, January 1995
@@ -41,7 +41,7 @@ static int xpix, ypix, nbs, obs = 0;
 
 static int is_xterm = 0;
 
-void mouse_init(void), mouse_end(void);
+static void mouse_init(void);
 int mouseActive = 0;
 #endif				/* USE_MOUSE */
 
@@ -159,8 +159,6 @@ read_win32_console_input(void)
 static int
 read_win32_console(char *s, int n)
 {
-    KEY_EVENT_RECORD *ker;
-
     if (hConIn == INVALID_HANDLE_VALUE)
 	return read(tty, s, n);
 
@@ -260,10 +258,7 @@ check_cygwin_console(void)
 }
 #endif				/* __CYGWIN__ */
 
-char *getenv(const char *);
 void reset_exit(SIGNAL_ARG), reset_error_exit(SIGNAL_ARG), error_dump(SIGNAL_ARG);
-void setlinescols(void);
-void flush_tty(void);
 
 #ifndef SIGIOT
 #define SIGIOT SIGABRT
@@ -450,7 +445,7 @@ extern int tgetflag(char *);
 extern char *tgetstr(char *, char **);
 extern char *tgoto(char *, int, int);
 extern int tputs(char *, int, int (*)(char));
-void clear(void), wrap(void), touch_line(void), touch_column(int);
+void wrap(void), touch_line(void), touch_column(int);
 void clrtoeol(void);		/* conflicts with curs_clear(3)? */
 
 static int write1(char);
@@ -1237,7 +1232,7 @@ setupscreen(void)
 	for (i = 0; i < max_LINES; i++) {
 #ifdef USE_M17N
 	    ScreenElem[i].lineimage = New_N(char *, max_COLS);
-	    bzero((void *)ScreenElem[i].lineimage, max_COLS * sizeof(char *));
+	    bzero(ScreenElem[i].lineimage, max_COLS * sizeof(char *));
 #else
 	    ScreenElem[i].lineimage = New_N(char, max_COLS);
 #endif
@@ -2035,12 +2030,6 @@ clrtobot_eol(void (*clrtoeol) (void))
 }
 
 void
-clrtobot(void)
-{
-    clrtobot_eol(clrtoeol);
-}
-
-void
 clrtobotx(void)
 {
     clrtobot_eol(clrtoeolx);
@@ -2126,29 +2115,6 @@ crmode(void)
     ttymode_set(CBREAK, 0);
 }
 #endif				/* HAVE_SGTTY_H */
-
-void
-nocrmode(void)
-#ifndef HAVE_SGTTY_H
-{
-    ttymode_set(ICANON, 0);
-#ifdef HAVE_TERMIOS_H
-    set_cc(VMIN, 4);
-#else				/* not HAVE_TERMIOS_H */
-    set_cc(VEOF, 4);
-#endif				/* not HAVE_TERMIOS_H */
-}
-#else				/* HAVE_SGTTY_H */
-{
-    ttymode_reset(CBREAK, 0);
-}
-#endif				/* HAVE_SGTTY_H */
-
-void
-term_echo(void)
-{
-    ttymode_set(ECHO, 0);
-}
 
 void
 term_noecho(void)

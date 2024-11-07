@@ -1,4 +1,4 @@
-/* $Id: w3mimgdisplay.c,v 1.19 2010/12/21 10:13:55 htrb Exp $ */
+/* vi: set sw=4 ts=8 ai sm noet : */
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
@@ -279,8 +279,7 @@ DrawImage(char *buf, int redraw)
 	    maxImage = MAX_IMAGE;
 	else if (n >= maxImage)
 	    maxImage = n + 1;
-	imageBuf = (W3MImage *) realloc((void *)imageBuf,
-					sizeof(W3MImage) * maxImage);
+	imageBuf = (W3MImage *) realloc(imageBuf, sizeof(W3MImage) * maxImage);
 	if (imageBuf == NULL) {
 	    fprintf(stderr, "Out of memory\n");
 	    exit(1);

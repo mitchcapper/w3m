@@ -1,4 +1,4 @@
-/* $Id: keybind_lynx.c,v 1.8 2006/05/29 12:17:25 inu Exp $ */
+/* vi: set sw=4 ts=8 ai sm noet : */
 /* 
  * Lynx-like key binding.
  *

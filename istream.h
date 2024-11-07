@@ -1,4 +1,4 @@
-/* $Id: istream.h,v 1.12 2003/10/20 16:41:56 ukai Exp $ */
+/* vi: set sw=4 ts=8 ai sm noet : */
 #ifndef IO_STREAM_H
 #define IO_STREAM_H
 
@@ -95,12 +95,6 @@ union input_stream {
 };
 
 typedef struct base_stream *BaseStream;
-typedef struct file_stream *FileStream;
-typedef struct str_stream *StrStream;
-#ifdef USE_SSL
-typedef struct ssl_stream *SSLStream;
-#endif				/* USE_SSL */
-typedef struct encoded_stream *EncodedStrStream;
 
 typedef union input_stream *InputStream;
 
@@ -137,7 +131,6 @@ extern Str ssl_get_certificate(SSL * ssl, char *hostname);
 #define IST_UNCLOSE	0x10
 
 #define IStype(stream) ((stream)->base.type)
-#define is_eos(stream) ISeos(stream)
 #define iseos(stream) ((stream)->base.iseos)
 #define str_of(stream) ((stream)->str.handle)
 #ifdef USE_SSL

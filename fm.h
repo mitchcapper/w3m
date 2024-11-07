@@ -1,4 +1,4 @@
-/* $Id: fm.h,v 1.149 2010/08/20 09:47:09 htrb Exp $ */
+/* vi: set sw=4 ts=8 ai sm noet : */
 /* 
  * w3m: WWW wo Miru utility
  * 
@@ -43,8 +43,6 @@
 #ifdef USE_M17N
 #include "wc.h"
 #include "wtf.h"
-#else
-typedef int wc_ces;	/* XXX: not used */
 #endif
 
 #ifdef HAVE_LOCALE_H
@@ -79,10 +77,6 @@ typedef int wc_ces;	/* XXX: not used */
 #include "terms.h"
 #include "istream.h"
 
-#ifndef HAVE_BCOPY
-void bcopy(const void *, void *, int);
-void bzero(void *, int);
-#endif				/* HAVE_BCOPY */
 #ifdef __EMX__
 #include <strings.h>		/* for bzero() and bcopy() */
 #endif
@@ -277,7 +271,7 @@ extern int REV_LB[];
 #define SCONF_NO_REFERER_TO	4
 #define SCONF_USER_AGENT	5
 #define SCONF_N_FIELD		6
-#define query_SCONF_SUBSTITUTE_URL(pu) ((const char *)querySiteconf(pu, SCONF_SUBSTITUTE_URL))
+#define query_SCONF_SUBSTITUTE_URL(pu) ((char *)querySiteconf(pu, SCONF_SUBSTITUTE_URL))
 #define query_SCONF_USER_AGENT(pu) ((const char *)querySiteconf(pu, SCONF_USER_AGENT))
 #define query_SCONF_URL_CHARSET(pu) ((const wc_ces *)querySiteconf(pu, SCONF_URL_CHARSET))
 #define query_SCONF_NO_REFERER_FROM(pu) ((const int *)querySiteconf(pu, SCONF_NO_REFERER_FROM))
@@ -817,7 +811,6 @@ typedef struct http_request {
  * Globals.
  */
 
-extern int LINES, COLS;
 #if defined(__CYGWIN__)
 extern int LASTLINE;
 #else				/* not defined(__CYGWIN__) */
@@ -979,6 +972,7 @@ global int nextpage_topline init(FALSE);
 global char *displayTitleTerm init(NULL);
 global int displayLink init(FALSE);
 global int displayLinkNumber init(FALSE);
+global int zeroBasedLinkNo init(FALSE);
 global int displayLineInfo init(FALSE);
 global int displayColumnNumber init(FALSE);
 global int DecodeURL init(FALSE);
@@ -1143,7 +1137,6 @@ global char *config_file init(NULL);
 
 #ifdef USE_MOUSE
 global int use_mouse init(TRUE);
-extern int mouseActive;
 global int reverse_mouse init(FALSE);
 global int relative_wheel_scroll init(FALSE);
 global int fixed_wheel_scroll_count init(5);

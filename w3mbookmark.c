@@ -1,4 +1,4 @@
-/* $Id: w3mbookmark.c,v 1.12 2007/05/31 01:19:50 inu Exp $ */
+/* vi: set sw=4 ts=8 ai sm noet : */
 #include <stdlib.h>
 #include <stdio.h>
 #include "config.h"

@@ -1,4 +1,4 @@
-/* $Id: inflate.c,v 1.7 2002/01/31 18:28:24 ukai Exp $ */
+/* vi: set sw=4 ts=8 ai sm noet : */
 #include <stdio.h>
 #include <stdlib.h>
 #include <zlib.h>
@@ -61,7 +61,7 @@ main(int argc, char **argv)
 	    }
 	    s.next_in = (Bytef *) dummy_head;
 	    s.avail_in = sizeof(dummy_head);
-	    status = inflate(&s, flush);
+	    inflate(&s, flush);
 	    s.next_in = (Bytef *) inbuf;
 	    s.avail_in = len;
 	    continue;

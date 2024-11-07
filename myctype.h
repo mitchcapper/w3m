@@ -1,4 +1,4 @@
-/* $Id: myctype.h,v 1.6 2003/09/22 21:02:20 ukai Exp $ */
+/* vi: set sw=4 ts=8 ai sm noet : */
 #ifndef _MYCTYPE_H
 #define _MYCTYPE_H
 

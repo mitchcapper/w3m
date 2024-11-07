@@ -1,4 +1,4 @@
-/* $Id: istream.c,v 1.27 2010/07/18 13:43:23 htrb Exp $ */
+/* vi: set sw=4 ts=8 ai sm noet : */
 #include "fm.h"
 #include "myctype.h"
 #include "istream.h"
@@ -55,7 +55,7 @@ buffer_read(StreamBuffer sb, unsigned char *obuf, int count)
     if (len > 0) {
 	if (len > count)
 	    len = count;
-	bcopy((const void *)&sb->buf[sb->cur], obuf, len);
+	memmove(obuf, (const void *)&sb->buf[sb->cur], len);
 	sb->cur += len;
     }
     return len;
@@ -100,6 +100,7 @@ newInputStream(int des)
     init_base_stream(&stream->base, STREAM_BUF_SIZE);
     stream->base.type = IST_BASIC;
     stream->base.handle = NewWithoutGC(int);
+    /* TODO(rkta): Check cast from int to void ptr */
     *(int *)stream->base.handle = des;
     stream->base.read = basic_read;
     stream->base.close = basic_close;
@@ -270,26 +271,6 @@ ISgets_to_growbuf(InputStream stream, struct growbuf *gb, char crnl)
     return;
 }
 
-#ifdef unused
-int
-ISread(InputStream stream, Str buf, int count)
-{
-    int len;
-
-    if (count + 1 > buf->area_size) {
-	char *newptr = GC_MALLOC_ATOMIC(count + 1);
-	memcpy(newptr, buf->ptr, buf->length);
-	newptr[buf->length] = '\0';
-	buf->ptr = newptr;
-	buf->area_size = count + 1;
-    }
-    len = ISread_n(stream, buf->ptr, count);
-    buf->length = (len > 0) ? len : 0;
-    buf->ptr[buf->length] = '\0';
-    return (len > 0) ? 1 : 0;
-}
-#endif
-
 int
 ISread_n(InputStream stream, unsigned char *dst, int count)
 {
@@ -332,15 +313,6 @@ ISfileno(InputStream stream)
     default:
 	return -1;
     }
-}
-
-int
-ISeos(InputStream stream)
-{
-    BaseStream base = &stream->base;
-    if (!base->iseos && MUST_BE_UPDATED(base))
-	do_update(base);
-    return base->iseos;
 }
 
 #ifdef USE_SSL
@@ -433,7 +405,7 @@ ssl_check_cert_ident(X509 * x, char *hostname)
 		    char *asn = GC_MALLOC(sl + 1);
 		    if (!asn)
 			exit(1);
-		    bcopy(sn, asn, sl);
+		    memmove(asn, sn, sl);
 		    asn[sl] = '\0';
 
 		    if (!seen_dnsname)
@@ -730,11 +702,11 @@ ens_read(struct ens_handle *handle, char *buf, int len)
 	growbuf_init_without_GC(&gbtmp);
 	p = handle->gb.ptr;
 	if (handle->encoding == ENC_QUOTE)
-	    decodeQP_to_growbuf(&gbtmp, &p);
+	    decodeQP_to_growbuf(&gbtmp, p);
 	else if (handle->encoding == ENC_BASE64)
-	    decodeB_to_growbuf(&gbtmp, &p);
+	    decodeB_to_growbuf(&gbtmp, p);
 	else if (handle->encoding == ENC_UUENCODE)
-	    decodeU_to_growbuf(&gbtmp, &p);
+	    decodeU_to_growbuf(&gbtmp, p);
 	growbuf_clear(&handle->gb);
 	handle->gb = gbtmp;
 	handle->pos = 0;

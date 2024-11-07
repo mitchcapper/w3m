@@ -1,4 +1,4 @@
-/* $Id: search.c,v 1.31 2004/03/23 16:44:02 ukai Exp $ */
+/* vi: set sw=4 ts=8 ai sm noet : */
 #include "fm.h"
 #include "regex.h"
 #include <signal.h>

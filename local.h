@@ -1,4 +1,4 @@
-/* $Id: local.h,v 1.3 2001/11/20 17:49:23 ukai Exp $ */
+/* vi: set sw=4 ts=8 ai sm noet : */
 /*
  * w3m local.h
  */

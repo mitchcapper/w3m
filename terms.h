@@ -1,4 +1,4 @@
-/* $Id: terms.h,v 1.10 2004/07/15 16:32:39 ukai Exp $ */
+/* vi: set sw=4 ts=8 ai sm noet : */
 #ifndef TERMS_H
 #define TERMS_H
 
@@ -6,6 +6,10 @@ extern int LINES, COLS;
 #if defined(__CYGWIN__)
 extern int LASTLINE;
 #endif
+
+void clear(void);
+void flush_tty(void);
+void setlinescols(void);
 
 #ifdef USE_MOUSE
 /* Addition:mouse event */
@@ -18,6 +22,8 @@ extern int LASTLINE;
 #define MOUSE_BTN5_DOWN_XTERM 65
 #define MOUSE_BTN_UP 3
 #define MOUSE_BTN_RESET -1
+
+void mouse_end(void);
 #endif
 
 #ifdef __CYGWIN__

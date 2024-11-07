@@ -1,4 +1,4 @@
-/* $Id: frame.h,v 1.6 2003/01/25 17:42:17 ukai Exp $ */
+/* vi: set sw=4 ts=8 ai sm noet : */
 /*
  * frame support
  */

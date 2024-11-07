@@ -1,4 +1,4 @@
-/* $Id: keybind.c,v 1.10 2006/05/29 12:17:25 inu Exp $ */
+/* vi: set sw=4 ts=8 ai sm noet : */
 #include "funcname2.h"
 
 unsigned char GlobalKeymap[128] = {

@@ -1,4 +1,4 @@
-/* $Id: entity.c,v 1.7 2003/09/24 18:48:59 ukai Exp $ */
+/* vi: set sw=4 ts=8 ai sm noet : */
 #ifdef DUMMY
 #include "Str.h"
 #define NBSP " "
@@ -13,8 +13,6 @@
 #endif
 #endif
 #endif				/* DUMMY */
-
-extern char * conv_entity(unsigned int c);
 
 /* *INDENT-OFF* */
 static char *alt_latin1[ 96 ] = {

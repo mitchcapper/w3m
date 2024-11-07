@@ -1,4 +1,4 @@
-/* $Id: Str.h,v 1.6 2006/04/07 13:35:35 inu Exp $ */
+/* vi: set sw=4 ts=8 ai sm noet : */
 /* 
  * String manipulation library for Boehm GC
  *

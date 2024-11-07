@@ -1,4 +1,4 @@
-/* $Id: rc.c,v 1.116 2010/08/20 09:47:09 htrb Exp $ */
+/* vi: set sw=4 ts=8 ai sm noet : */
 /* 
  * Initialization file etc.
  */
@@ -78,6 +78,7 @@ static int OptionEncode = FALSE;
 #define CMT_OPEN_TAB_DL_LIST N_("Open download list panel on new tab")
 #define CMT_DISPLINK     N_("Display link URL automatically")
 #define CMT_DISPLINKNUMBER N_("Display link numbers")
+#define CMT_ZEROBASEDLINKNO N_("Use 0 as first link number")
 #define CMT_DECODE_URL   N_("Display decoded URL")
 #define CMT_DISPLINEINFO N_("Display current line information")
 #define CMT_DISP_COLUMN_NUMBER N_("Display column number in line information")
@@ -190,7 +191,11 @@ static int OptionEncode = FALSE;
 #endif				/* USE_DICT */
 #define CMT_IGNORE_NULL_IMG_ALT	N_("Display link name for images lacking ALT")
 #define CMT_IFILE        N_("Index file for directories")
+#ifdef USE_SSL
+#define CMT_RETRY_HTTP   N_("Prepend https:// to URL automatically")
+#else
 #define CMT_RETRY_HTTP   N_("Prepend http:// to URL automatically")
+#endif				/* USE_SSL */
 #define CMT_DEFAULT_URL  N_("Default value for open-URL command")
 #define CMT_DECODE_CTE   N_("Decode Content-Transfer-Encoding when saving")
 #define CMT_PRESERVE_TIMESTAMP N_("Preserve timestamp when saving")
@@ -400,6 +405,8 @@ struct param_ptr params1[] = {
      NULL},
     {"display_link_number", P_INT, PI_ONOFF, (void *)&displayLinkNumber,
      CMT_DISPLINKNUMBER, NULL},
+    {"zero_based_link_no", P_INT, PI_ONOFF, (void *)&zeroBasedLinkNo,
+     CMT_ZEROBASEDLINKNO, NULL},
     {"decode_url", P_INT, PI_ONOFF, (void *)&DecodeURL, CMT_DECODE_URL, NULL},
     {"display_lineinfo", P_INT, PI_ONOFF, (void *)&displayLineInfo,
      CMT_DISPLINEINFO, NULL},
@@ -1800,7 +1807,7 @@ loadSiteconf(void)
 
 	    /* Second, create a new record. */
 	    newent = newSiteconfRec();
-	    url = getRegexWord((const char **)&p, &newent->re_url);
+	    url = getRegexWord(&p, &newent->re_url);
 	    opt = getWord(&p);
 	    SKIP_BLANKS(p);
 	    if (!newent->re_url) {
@@ -1861,10 +1868,10 @@ loadSiteconf(void)
     fclose(fp);
 }
 
-const void *
-querySiteconf(const ParsedURL *query_pu, int field)
+void *
+querySiteconf(ParsedURL *query_pu, int field)
 {
-    const struct siteconf_rec *ent;
+    struct siteconf_rec *ent;
     Str u;
     char *firstp, *lastp;
 

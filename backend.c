@@ -1,4 +1,4 @@
-/* $Id: backend.c,v 1.15 2010/08/08 09:53:42 htrb Exp $ */
+/* vi: set sw=4 ts=8 ai sm noet : */
 #include <stdio.h>
 #include <string.h>
 #include <sys/types.h>

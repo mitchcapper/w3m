@@ -1,4 +1,4 @@
-/* $Id: fb_img.c,v 1.6 2003/07/07 15:48:17 ukai Exp $ */
+/* vi: set sw=4 ts=8 ai sm noet : */
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>

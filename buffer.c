@@ -1,4 +1,4 @@
-/* $Id: buffer.c,v 1.30 2010/07/18 14:10:09 htrb Exp $ */
+/* vi: set sw=4 ts=8 ai sm noet : */
 #include "fm.h"
 
 #ifdef USE_MOUSE
@@ -29,7 +29,7 @@ newBuffer(int width)
     n = New(Buffer);
     if (n == NULL)
 	exit(3);
-    bzero((void *)n, sizeof(Buffer));
+    bzero(n, sizeof(Buffer));
     n->width = width;
     n->COLS = COLS;
     n->LINES = LASTLINE;
@@ -114,25 +114,6 @@ discardBuffer(Buffer *buf)
 	deleteFrameSet(buf->frameset);
 	buf->frameset = popFrameTree(&(buf->frameQ));
     }
-}
-
-/* 
- * namedBuffer: Select buffer which have specified name
- */
-Buffer *
-namedBuffer(Buffer *first, char *name)
-{
-    Buffer *buf;
-
-    if (!strcmp(first->buffername, name)) {
-	return first;
-    }
-    for (buf = first; buf->nextBuffer != NULL; buf = buf->nextBuffer) {
-	if (!strcmp(buf->nextBuffer->buffername, name)) {
-	    return buf->nextBuffer;
-	}
-    }
-    return NULL;
 }
 
 /* 
@@ -607,7 +588,7 @@ void
 copyBuffer(Buffer *a, Buffer *b)
 {
     readBufferCache(b);
-    bcopy((void *)b, (void *)a, sizeof(Buffer));
+    memmove(a, b, sizeof(Buffer));
 }
 
 Buffer *

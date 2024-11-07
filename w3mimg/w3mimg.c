@@ -1,4 +1,4 @@
-/* $Id: w3mimg.c,v 1.6 2010/12/21 10:13:55 htrb Exp $ */
+/* vi: set sw=4 ts=8 ai sm noet : */
 
 #include <stdio.h>
 #include <stdlib.h>

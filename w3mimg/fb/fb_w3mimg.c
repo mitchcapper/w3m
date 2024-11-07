@@ -1,4 +1,4 @@
-/* $Id: fb_w3mimg.c,v 1.14 2004/08/04 17:32:28 ukai Exp $ */
+/* vi: set sw=4 ts=8 ai sm noet : */
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>

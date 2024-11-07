@@ -1,4 +1,4 @@
-/* $Id: table.h,v 1.12 2003/09/22 21:02:21 ukai Exp $ */
+/* vi: set sw=4 ts=8 ai sm noet : */
 #if (defined(MESCHACH) && !defined(MATRIX))
 #define MATRIX
 #endif				/* (defined(MESCHACH) && !defined(MATRIX)) */

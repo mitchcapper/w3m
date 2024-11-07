@@ -1,4 +1,4 @@
-/* $Id: news.c,v 1.17 2003/10/05 18:52:51 ukai Exp $ */
+/* vi: set sw=4 ts=8 ai sm noet : */
 #include "fm.h"
 #include "myctype.h"
 #include <stdio.h>

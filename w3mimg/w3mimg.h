@@ -1,4 +1,4 @@
-/* $Id: w3mimg.h,v 1.9 2010/12/21 10:13:55 htrb Exp $ */
+/* vi: set sw=4 ts=8 ai sm noet : */
 #ifndef W3MIMG_W3MIMG_H
 #define W3MIMG_W3MIMG_H
 
@@ -50,7 +50,7 @@ extern w3mimg_op *w3mimg_x11open(void);
 extern w3mimg_op *w3mimg_fbopen(void);
 #endif
 #ifdef USE_W3MIMG_WIN
-extern w3mimg_op *w3mimg_winopen();
+extern w3mimg_op *w3mimg_winopen(void);
 #endif
 
 extern w3mimg_op *w3mimg_open(void);

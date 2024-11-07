@@ -1,4 +1,4 @@
-/* $Id: func.c,v 1.27 2003/09/26 17:59:51 ukai Exp $ */
+/* vi: set sw=4 ts=8 ai sm noet : */
 /*
  * w3m func.c
  */
@@ -84,7 +84,7 @@ setKeymap(char *p, int lineno, int verbose)
 	}
 	if (keyData == NULL)
 	    keyData = newHash_iv(KEYDATA_HASH_SIZE);
-	putHash_iv(keyData, m, (void *)mmap);
+	putHash_iv(keyData, m, mmap);
 	if (c & K_ESCD)
 	    map = mmap[3];
 	else if (c & K_ESCB)
@@ -109,7 +109,7 @@ setKeymap(char *p, int lineno, int verbose)
     if (*s) {
 	if (keyData == NULL)
 	    keyData = newHash_iv(KEYDATA_HASH_SIZE);
-	putHash_iv(keyData, c, (void *)s);
+	putHash_iv(keyData, c, s);
     }
     else if (getKeyData(c))
 	putHash_iv(keyData, c, NULL);
@@ -127,7 +127,6 @@ interpret_keymap(FILE * kf, struct stat *current, int force)
     wc_ces charset = SystemCharset;
 #endif
     int verbose = 1;
-    extern int str_to_bool(char *value, int old);
 
     if ((fd = fileno(kf)) < 0 || fstat(fd, &kstat) ||
 	(!force &&
@@ -446,10 +445,10 @@ getQWord(char **str)
  * XXX: Actually this is unrelated to func.c.
  */
 char *
-getRegexWord(const char **str, Regex **regex_ret)
+getRegexWord(char **str, Regex **regex_ret)
 {
     char *word = NULL;
-    const char *p, *headp, *bodyp, *tailp;
+    char *p, *headp, *bodyp, *tailp;
     char delimiter;
     int esc;
     int igncase = 0;
@@ -514,7 +513,7 @@ getRegexWord(const char **str, Regex **regex_ret)
 
 not_regex:
     p = headp;
-    word = getQWord((char **)&p);
+    word = getQWord(&p);
     if (regex_ret)
 	*regex_ret = NULL;
 
@@ -690,12 +689,10 @@ initMouseAction(void)
 {
     FILE *mf;
 
-    bcopy((void *)&default_mouse_action, (void *)&mouse_action,
-	  sizeof(default_mouse_action));
+    memmove(&mouse_action, &default_mouse_action, sizeof(default_mouse_action));
     mouse_action.lastline_map[0] = New_N(MouseActionMap, 6);
-    bcopy((void *)&default_lastline_action,
-	  (void *)mouse_action.lastline_map[0],
-	  sizeof(default_lastline_action));
+    memmove(mouse_action.lastline_map[0], &default_lastline_action,
+	    sizeof(default_lastline_action));
     {
 #ifdef USE_M17N
 	int w = 0;

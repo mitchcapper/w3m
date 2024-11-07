@@ -1,4 +1,4 @@
-/* $Id: map.c,v 1.30 2003/09/24 18:49:00 ukai Exp $ */
+/* vi: set sw=4 ts=8 ai sm noet : */
 /*
  * client-side image maps
  */

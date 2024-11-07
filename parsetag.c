@@ -1,4 +1,4 @@
-/* $Id: parsetag.c,v 1.4 2001/11/20 17:49:23 ukai Exp $ */
+/* vi: set sw=4 ts=8 ai sm noet : */
 #include "myctype.h"
 #include "indep.h"
 #include "Str.h"
@@ -12,16 +12,6 @@ tag_get_value(struct parsed_tagarg *t, char *arg)
 	    return t->value;
     }
     return NULL;
-}
-
-int
-tag_exists(struct parsed_tagarg *t, char *arg)
-{
-    for (; t; t = t->next) {
-	if (!strcasecmp(t->arg, arg))
-	    return 1;
-    }
-    return 0;
 }
 
 struct parsed_tagarg *

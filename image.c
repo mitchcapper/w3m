@@ -1,4 +1,4 @@
-/* $Id: image.c,v 1.37 2010/12/21 10:13:55 htrb Exp $ */
+/* vi: set sw=4 ts=8 ai sm noet : */
 
 #include "fm.h"
 #include <sys/types.h>
@@ -43,8 +43,6 @@ initImage(void)
     if (getCharSize())
 	activeImage = TRUE;
 }
-
-int get_pixel_per_cell(int *ppc, int *ppl);
 
 static int
 getCharSize(void)
@@ -591,17 +589,17 @@ getImage(Image * image, ParsedURL *current, int flag)
 	cache->height = image->height ;
 	cache->a_width = image->width;
 	cache->a_height = image->height;
-	putHash_sv(image_hash, key->ptr, (void *)cache);
+	putHash_sv(image_hash, key->ptr, cache);
     }
     if (flag != IMG_FLAG_SKIP) {
 	if (cache->loaded == IMG_FLAG_UNLOADED) {
 	    if (!image_file)
 		image_file = newHash_sv(100);
 	    if (!getHash_sv(image_file, cache->file, NULL)) {
-		putHash_sv(image_file, cache->file, (void *)cache);
+		putHash_sv(image_file, cache->file, cache);
 		if (!image_list)
 		    image_list = newGeneralList();
-		pushValue(image_list, (void *)cache);
+		pushValue(image_list, cache);
 	    }
 	}
 	if (!cache->index)
@@ -740,7 +738,7 @@ got_image_size:
     if (cache->height == 0)
 	cache->height = 1;
     tmp = Sprintf("%d;%d;%s", cache->width, cache->height, cache->url);
-    putHash_sv(image_hash, tmp->ptr, (void *)cache);
+    putHash_sv(image_hash, tmp->ptr, cache);
     return TRUE;
 }
 #endif

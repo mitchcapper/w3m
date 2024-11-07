@@ -1,4 +1,4 @@
-/* $Id: parsetagx.h,v 1.4 2001/11/24 02:01:26 ukai Exp $ */
+/* vi: set sw=4 ts=8 ai sm noet : */
 #ifndef PARSETAGX_H
 #define PARSETAGX_H
 

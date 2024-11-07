@@ -1,4 +1,4 @@
-/* $Id: ftp.c,v 1.42 2010/12/15 10:50:24 htrb Exp $ */
+/* vi: set sw=4 ts=8 ai sm noet : */
 #include <stdio.h>
 #ifndef __MINGW32_VERSION
 #include <pwd.h>

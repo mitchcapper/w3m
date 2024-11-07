@@ -1,4 +1,4 @@
-/* $Id: main.c,v 1.270 2010/08/24 10:11:51 htrb Exp $ */
+/* vi: set sw=4 ts=8 ai sm noet : */
 #define MAINPROGRAM
 #include "fm.h"
 #include <stdio.h>
@@ -98,7 +98,6 @@ static void cmd_loadURL(char *url, ParsedURL *current, char *referer,
 static void cmd_loadBuffer(Buffer *buf, int prop, int linkid);
 static void keyPressEventProc(int c);
 int show_params_p = 0;
-void show_params(FILE * fp);
 
 static char *getCurWord(Buffer *buf, int *spos, int *epos);
 
@@ -450,7 +449,7 @@ main(int argc, char **argv)
     load_argc = 0;
 
     CurrentDir = currentdir();
-    CurrentPid = (int)getpid();
+    CurrentPid = getpid();
 #if defined(DONT_CALL_GC_AFTER_FORK) && defined(USE_IMAGE)
     if (argv[0] && *argv[0])
 	MyProgramName = argv[0];
@@ -466,7 +465,7 @@ main(int argc, char **argv)
 	    hostname[HOST_NAME_MAX + 1] = '\0';
 	    hostname_len = strlen(hostname);
 	    if (hostname_len <= HOST_NAME_MAX && hostname_len < STR_SIZE_MAX)
-		HostName = allocStr(hostname, (int)hostname_len);
+		HostName = allocStr(hostname, hostname_len);
 	}
     }
 
@@ -1171,7 +1170,7 @@ main(int argc, char **argv)
 	if (CurrentEvent) {
 	    CurrentKey = -1;
 	    CurrentKeyData = NULL;
-	    CurrentCmdData = (char *)CurrentEvent->data;
+	    CurrentCmdData = CurrentEvent->data;
 	    w3mFuncList[CurrentEvent->cmd].func();
 	    CurrentCmdData = NULL;
 	    CurrentEvent = CurrentEvent->next;
@@ -1186,7 +1185,7 @@ main(int argc, char **argv)
 		    Currentbuf->event = NULL;
 		    CurrentKey = -1;
 		    CurrentKeyData = NULL;
-		    CurrentCmdData = (char *)CurrentAlarm->data;
+		    CurrentCmdData = CurrentAlarm->data;
 		    w3mFuncList[CurrentAlarm->cmd].func();
 		    CurrentCmdData = NULL;
 		    continue;
@@ -1255,7 +1254,7 @@ main(int argc, char **argv)
 	    else {
 		set_buffer_environ(Currentbuf);
 		save_buffer_position(Currentbuf);
-		keyPressEventProc((int)c);
+		keyPressEventProc(c);
 		prec_num = 0;
 	    }
 	}
@@ -1358,7 +1357,7 @@ dump_extra(Buffer *buf)
 static int
 cmp_anchor_hseq(const void *a, const void *b)
 {
-    return (*((const Anchor **) a))->hseq - (*((const Anchor **) b))->hseq;
+    return (*((const Anchor * const *) a))->hseq - (*((const Anchor * const *) b))->hseq;
 }
 
 static void
@@ -1459,7 +1458,7 @@ DEFUN(escmap, ESCMAP, "ESC map")
 	mouse_inactive();
 #endif
     if (IS_ASCII(c))
-	escKeyProc((int)c, K_ESC, EscKeymap);
+	escKeyProc(c, K_ESC, EscKeymap);
 }
 
 DEFUN(escbmap, ESCBMAP, "ESC [ map")
@@ -1471,7 +1470,7 @@ DEFUN(escbmap, ESCBMAP, "ESC [ map")
 	return;
     }
     if (IS_ASCII(c))
-	escKeyProc((int)c, K_ESCB, EscBKeymap);
+	escKeyProc(c, K_ESCB, EscBKeymap);
 }
 
 void
@@ -1485,7 +1484,7 @@ escdmap(char c)
 	c = getch();
     }
     if (c == '~')
-	escKeyProc((int)d, K_ESCD, EscDKeymap);
+	escKeyProc(d, K_ESCD, EscDKeymap);
 }
 
 DEFUN(multimap, MULTIMAP, "multimap")
@@ -1494,7 +1493,7 @@ DEFUN(multimap, MULTIMAP, "multimap")
     c = getch();
     if (IS_ASCII(c)) {
 	CurrentKey = K_MULTI | (CurrentKey << 16) | c;
-	escKeyProc((int)c, 0, NULL);
+	escKeyProc(c, 0, NULL);
     }
 }
 
@@ -3166,15 +3165,6 @@ DEFUN(followA, GOTO_LINK, "Follow current hyperlink in a new buffer")
     displayBuffer(Currentbuf, B_NORMAL);
 }
 
-/* follow HREF link in the buffer */
-void
-bufferA(void)
-{
-    on_target = FALSE;
-    followA();
-    on_target = TRUE;
-}
-
 /* view inline image */
 DEFUN(followI, VIEW_IMAGE, "Display image in viewer")
 {
@@ -3422,13 +3412,6 @@ DEFUN(submitForm, SUBMIT, "Submit form")
     _followForm(TRUE);
 }
 
-/* process form */
-void
-followForm(void)
-{
-    _followForm(FALSE);
-}
-
 static void
 _followForm(int submit)
 {
@@ -3636,7 +3619,7 @@ DEFUN(topA, LINK_BEGIN, "Move to the first hyperlink")
     if (prec_num > hl->nmark)
 	hseq = hl->nmark - 1;
     else if (prec_num > 0)
-	hseq = prec_num - 1;
+	hseq = prec_num - 1 + !!zeroBasedLinkNo;
     do {
 	if (hseq >= hl->nmark)
 	    return;
@@ -4771,7 +4754,7 @@ _peekURL(int only_img)
 #ifdef USE_M17N
     s = checkType(s, &pp, NULL);
     p = NewAtom_N(Lineprop, s->length);
-    bcopy((void *)pp, (void *)p, s->length * sizeof(Lineprop));
+    memmove(p, pp, s->length * sizeof(Lineprop));
 #endif
   disp:
     n = searchKeyNum();
@@ -4830,7 +4813,7 @@ DEFUN(curURL, PEEK, "Show current address")
 #ifdef USE_M17N
 	s = checkType(s, &pp, NULL);
 	p = NewAtom_N(Lineprop, s->length);
-	bcopy((void *)pp, (void *)p, s->length * sizeof(Lineprop));
+	memmove(p, pp, s->length * sizeof(Lineprop));
 #endif
     }
     n = searchKeyNum();
@@ -6135,8 +6118,11 @@ DEFUN(execCmd, COMMAND, "Invoke w3m function(s)")
 	}
 	p = getWord(&data);
 	cmd = getFuncList(p);
-	if (cmd < 0)
+	if (cmd < 0) {
+	    Str e = Sprintf("Unknown command: %s", p);
+	    disp_err_message(e->ptr, FALSE);
 	    break;
+	}
 	p = getQWord(&data);
 	CurrentKey = -1;
 	CurrentKeyData = NULL;

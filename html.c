@@ -1,4 +1,4 @@
-/* $Id: html.c,v 1.33 2012/05/22 09:45:56 inu Exp $ */
+/* vi: set sw=4 ts=8 ai sm noet : */
 #include "html.h"
 
 #define ARR_SZ(arr) (sizeof(arr) / sizeof(arr[0]))

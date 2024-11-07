@@ -1,4 +1,4 @@
-/* $Id: display.c,v 1.71 2010/07/18 14:10:09 htrb Exp $ */
+/* vi: set sw=4 ts=8 ai sm noet : */
 #include "display.h"
 
 #include <signal.h>
@@ -1462,14 +1462,6 @@ cursorLeft(Buffer *buf, int n)
     }
     buf->cursorX = buf->visualpos - l->bwidth;
 }
-
-void
-cursorHome(Buffer *buf)
-{
-    buf->visualpos = 0;
-    buf->cursorX = buf->cursorY = 0;
-}
-
 
 /* 
  * Arrange line,column and cursor position according to current line and

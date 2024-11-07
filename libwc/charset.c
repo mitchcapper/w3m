@@ -1,3 +1,4 @@
+/* vi: set sw=4 ts=8 ai sm noet : */
 
 #include <stdlib.h>
 #include <ctype.h>
@@ -410,8 +411,6 @@ wc_locale_to_ces(char *locale)
 	return wc_charset_to_ces(p);
     }
 
-    if (!strcmp(buf, "japanese"))
-	return WC_CES_SHIFT_JIS;
     if (!strcmp(buf, "zh_tw") ||
 	!strcmp(buf, "zh_hk"))
 	return WC_CES_BIG5;
@@ -468,7 +467,7 @@ wc_check_ces(wc_ces ces)
 static int
 wc_ces_list_cmp(const void *a, const void *b)
 {
-    return strcasecmp(((wc_ces_list *)a)->desc, ((wc_ces_list *)b)->desc);
+    return strcasecmp(((const wc_ces_list *)a)->desc, ((const wc_ces_list *)b)->desc);
 }
 
 static wc_ces_list *list = NULL;

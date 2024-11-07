@@ -1,4 +1,4 @@
-/* $Id: func.h,v 1.4 2002/12/03 16:01:33 ukai Exp $ */
+/* vi: set sw=4 ts=8 ai sm noet : */
 /*
  * w3m func.h
  */

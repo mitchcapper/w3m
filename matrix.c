@@ -1,4 +1,4 @@
-/*  $Id: matrix.c,v 1.8 2003/04/07 16:27:10 ukai Exp $ */
+/* vi: set sw=4 ts=8 ai sm noet : */
 /* 
  * matrix.h, matrix.c: Liner equation solver using LU decomposition.
  *

@@ -1,4 +1,4 @@
-/* $Id: indep.h,v 1.16 2003/09/22 21:02:19 ukai Exp $ */
+/* vi: set sw=4 ts=8 ai sm noet : */
 #ifndef INDEP_H
 #define INDEP_H
 #include "alloc.h"
@@ -59,7 +59,6 @@ extern int strncasecmp(const char *s1, const char *s2, size_t n);
 #ifndef HAVE_STRCASESTR
 extern char *strcasestr(const char *s1, const char *s2);
 #endif
-extern int strcasemstr(char *str, char *srch[], char **ret_ptr);
 int strmatchlen(const char *s1, const char *s2, int maxlen);
 extern char *remove_space(char *str);
 extern int non_null(char *s);

@@ -1,4 +1,4 @@
-/* $Id: fb.c,v 1.16 2003/07/13 16:19:10 ukai Exp $ */
+/* vi: set sw=4 ts=8 ai sm noet : */
 /**************************************************************************
                 fb.c 0.3 Copyright (C) 2002, hito
  **************************************************************************/
@@ -1020,7 +1020,7 @@ fb_munmap(void *buf, video_adapter_info_t *video_adapter_info)
     mmap_offset = (size_t)(video_adapter_info->va_window) & (PAGE_MASK);
     mmap_length = (size_t)(video_adapter_info->va_window_size +
 			   mmap_offset + PAGE_MASK) & (~PAGE_MASK);
-    return munmap((void *)((u_long)buf & (~PAGE_MASK)), mmap_length);
+    return munmap(((u_long)buf & (~PAGE_MASK)), mmap_length);
 #endif
 }
 

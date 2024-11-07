@@ -1,4 +1,4 @@
-/* $Id: menu.c,v 1.46 2007/05/23 12:34:20 inu Exp $ */
+/* vi: set sw=4 ts=8 ai sm noet : */
 /* 
  * w3m menu.c
  */
@@ -479,9 +479,11 @@ select_menu(Menu *menu, int mselect)
 	menu->select < menu->offset + menu->height)
 	draw_menu_item(menu, menu->select);
     menu->select = mselect;
-    standout();
-    draw_menu_item(menu, menu->select);
-    standend();
+    if (menu->item[menu->select].type != MENU_NOP) {
+	standout();
+	draw_menu_item(menu, menu->select);
+	standend();
+    }
     move(menu->y + mselect - menu->offset, menu->x);
     toggle_stand();
     refresh();
@@ -614,6 +616,11 @@ popup_menu(Menu *parent, Menu *menu)
 	menu->cursorX = parent->cursorX;
 	menu->cursorY = parent->cursorY;
 	guess_menu_xy(parent, menu->width, &menu->x, &menu->y);
+    }
+    while (menu->item[menu->select].type == MENU_NOP) {
+	if (menu->select >= menu->nitem - 1)
+	    break;
+	menu->select++;
     }
     geom_menu(menu, menu->select);
 
@@ -1340,12 +1347,6 @@ popupMenu(int x, int y, Menu *menu)
     menu->y = y + 2;
 
     popup_menu(NULL, menu);
-}
-
-void
-mainMenu(int x, int y)
-{
-    popupMenu(x, y, &MainMenu);
 }
 
 DEFUN(mainMn, MAIN_MENU MENU, "Pop up menu")

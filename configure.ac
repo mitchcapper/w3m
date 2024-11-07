@@ -137,7 +137,7 @@ dnl Checks for typedefs, structures, and compiler characteristics.
 AC_CHECK_SIZEOF(long long, 0)
 
 dnl Checks for library functions.
-AC_CHECK_FUNCS(strcasecmp strcasestr strchr memcpy strerror bcopy setpgrp chdir mkdtemp faccessat getcwd getwd readlink setenv putenv strtoll stroq atoll atoq symlink readlink lstat srand48 srandom getpassphrase waitpid setlocale)
+AC_CHECK_FUNCS(strcasecmp strcasestr strchr memcpy strerror setpgrp chdir mkdtemp faccessat getcwd getwd readlink setenv putenv strtoll stroq atoll atoq symlink readlink lstat srand48 srandom getpassphrase waitpid setlocale)
 AC_FUNC_STRFTIME
 AC_FUNC_SETPGRP
 case "$host_os" in
