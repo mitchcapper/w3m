@@ -241,7 +241,7 @@ Subject: [PATCH 018/172] Remove unused function
  
 --- a/main.c
 +++ b/main.c
-@@ -3158,15 +3158,6 @@ DEFUN(followA, GOTO_LINK, "Follow curren
+@@ -3166,15 +3166,6 @@ DEFUN(followA, GOTO_LINK, "Follow curren
      displayBuffer(Currentbuf, B_NORMAL);
  }
  
@@ -257,7 +257,7 @@ Subject: [PATCH 018/172] Remove unused function
  /* view inline image */
  DEFUN(followI, VIEW_IMAGE, "Display image in viewer")
  {
-@@ -3414,13 +3405,6 @@ DEFUN(submitForm, SUBMIT, "Submit form")
+@@ -3422,13 +3413,6 @@ DEFUN(submitForm, SUBMIT, "Submit form")
      _followForm(TRUE);
  }
  
@@ -273,7 +273,7 @@ Subject: [PATCH 018/172] Remove unused function
  {
 --- a/menu.c
 +++ b/menu.c
-@@ -1331,12 +1331,6 @@ popupMenu(int x, int y, Menu *menu)
+@@ -1342,12 +1342,6 @@ popupMenu(int x, int y, Menu *menu)
      popup_menu(NULL, menu);
  }
  

@@ -384,16 +384,16 @@
  		prec_num = 0;
  	    }
  	}
-@@ -1450,7 +1450,7 @@ DEFUN(escmap, ESCMAP, "ESC map")
-     char c;
-     c = getch();
+@@ -1458,7 +1458,7 @@ DEFUN(escmap, ESCMAP, "ESC map")
+ 	mouse_inactive();
+ #endif
      if (IS_ASCII(c))
 -	escKeyProc((int)c, K_ESC, EscKeymap);
 +	escKeyProc(c, K_ESC, EscKeymap);
  }
  
  DEFUN(escbmap, ESCBMAP, "ESC [ map")
-@@ -1462,7 +1462,7 @@ DEFUN(escbmap, ESCBMAP, "ESC [ map")
+@@ -1470,7 +1470,7 @@ DEFUN(escbmap, ESCBMAP, "ESC [ map")
  	return;
      }
      if (IS_ASCII(c))
@@ -402,7 +402,7 @@
  }
  
  void
-@@ -1476,7 +1476,7 @@ escdmap(char c)
+@@ -1484,7 +1484,7 @@ escdmap(char c)
  	c = getch();
      }
      if (c == '~')
@@ -411,7 +411,7 @@
  }
  
  DEFUN(multimap, MULTIMAP, "multimap")
-@@ -1485,7 +1485,7 @@ DEFUN(multimap, MULTIMAP, "multimap")
+@@ -1493,7 +1493,7 @@ DEFUN(multimap, MULTIMAP, "multimap")
      c = getch();
      if (IS_ASCII(c)) {
  	CurrentKey = K_MULTI | (CurrentKey << 16) | c;
@@ -420,7 +420,7 @@
      }
  }
  
-@@ -4746,7 +4746,7 @@ _peekURL(int only_img)
+@@ -4754,7 +4754,7 @@ _peekURL(int only_img)
  #ifdef USE_M17N
      s = checkType(s, &pp, NULL);
      p = NewAtom_N(Lineprop, s->length);
@@ -429,7 +429,7 @@
  #endif
    disp:
      n = searchKeyNum();
-@@ -4805,7 +4805,7 @@ DEFUN(curURL, PEEK, "Show current addres
+@@ -4813,7 +4813,7 @@ DEFUN(curURL, PEEK, "Show current addres
  #ifdef USE_M17N
  	s = checkType(s, &pp, NULL);
  	p = NewAtom_N(Lineprop, s->length);

@@ -1350,7 +1350,7 @@ Subject: [PATCH 172/172] const
  static void _newT(void);
  static void followTab(TabBuffer * tab);
  static void moveTab(TabBuffer * t, TabBuffer * t2, int right);
-@@ -1807,7 +1807,7 @@ srchcore(const char *str, int (*func) (B
+@@ -1815,7 +1815,7 @@ srchcore(const char *str, int (*func) (B
  }
  
  static void
@@ -1359,7 +1359,7 @@ Subject: [PATCH 172/172] const
  {
      if (str == NULL)
  	str = "";
-@@ -1892,7 +1892,7 @@ dispincsrch(int ch, Str buf, Lineprop *p
+@@ -1900,7 +1900,7 @@ dispincsrch(int ch, Str buf, Lineprop *p
  }
  
  static void
@@ -1368,7 +1368,7 @@ Subject: [PATCH 172/172] const
  {
      char *str;
      Buffer sbuf;
-@@ -1908,7 +1908,7 @@ isrch(int (*func) (Buffer *, const char
+@@ -1916,7 +1916,7 @@ isrch(int (*func) (Buffer *, const char
  }
  
  static void
@@ -1377,7 +1377,7 @@ Subject: [PATCH 172/172] const
  {
      const char *str;
      int result;
-@@ -2578,7 +2578,7 @@ save_known_hosts(void)
+@@ -2586,7 +2586,7 @@ save_known_hosts(void)
  static void
  _quitfm(int confirm)
  {
@@ -1386,7 +1386,7 @@ Subject: [PATCH 172/172] const
      int err = 0;
  
      if (checkDownloadList())
-@@ -2710,7 +2710,7 @@ DEFUN(susp, INTERRUPT SUSPEND, "Suspend
+@@ -2718,7 +2718,7 @@ DEFUN(susp, INTERRUPT SUSPEND, "Suspend
  
  /* Go to specified line */
  static void
@@ -1395,7 +1395,7 @@ Subject: [PATCH 172/172] const
  {
      if (l == NULL || *l == '\0' || Currentbuf->currentLine == NULL) {
  	displayBuffer(Currentbuf, B_FORCE_REDRAW);
-@@ -4326,7 +4326,7 @@ cmd_loadURL(char *url, ParsedURL *curren
+@@ -4334,7 +4334,7 @@ cmd_loadURL(char *url, ParsedURL *curren
  
  /* go to specified URL */
  static void
@@ -1404,7 +1404,7 @@ Subject: [PATCH 172/172] const
  {
      char *url, *referer;
      ParsedURL p_url, *current;
-@@ -5381,10 +5381,10 @@ DEFUN(rFrame, FRAME, "Toggle rendering H
+@@ -5389,10 +5389,10 @@ DEFUN(rFrame, FRAME, "Toggle rendering H
  
  /* spawn external browser */
  static void
@@ -1417,7 +1417,7 @@ Subject: [PATCH 172/172] const
      int bg = 0, len;
  
      CurrentKeyData = NULL;	/* not allowed in w3m-control: */
-@@ -6039,7 +6039,7 @@ GetWord(Buffer *buf)
+@@ -6047,7 +6047,7 @@ GetWord(Buffer *buf)
  
  #ifdef USE_DICT
  static void
@@ -1426,7 +1426,7 @@ Subject: [PATCH 172/172] const
  {
      char *w, *dictcmd;
      Buffer *buf;
-@@ -6708,7 +6708,7 @@ DEFUN(tabA, TAB_LINK, "Follow current hy
+@@ -6716,7 +6716,7 @@ DEFUN(tabA, TAB_LINK, "Follow current hy
  }
  
  static void
@@ -1437,7 +1437,7 @@ Subject: [PATCH 172/172] const
  
 --- a/menu.c
 +++ b/menu.c
-@@ -1601,7 +1601,7 @@ initSelTabMenu(void)
+@@ -1612,7 +1612,7 @@ initSelTabMenu(void)
      Str str;
      char **label;
      char *p;

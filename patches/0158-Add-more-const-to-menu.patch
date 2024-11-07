@@ -9,7 +9,7 @@ Subject: [PATCH 158/172] Add more const to menu
 
 --- a/menu.c
 +++ b/menu.c
-@@ -924,15 +924,15 @@ mSusp(char c)
+@@ -935,15 +935,15 @@ mSusp(char c)
      return (MENU_NOTHING);
  }
  
@@ -29,7 +29,7 @@ Subject: [PATCH 158/172] Add more const to menu
      if ((p = regexCompile(str, IgnoreCase)) != NULL) {
  	message(p, 0, 0);
  	return -1;
-@@ -949,7 +949,7 @@ menuForwardSearch(Menu *menu, char *str,
+@@ -960,7 +960,7 @@ menuForwardSearch(Menu *menu, char *str,
  static int
  menu_search_forward(Menu *menu, int from)
  {
@@ -38,7 +38,7 @@ Subject: [PATCH 158/172] Add more const to menu
      int found;
      str = inputStrHist("Forward: ", NULL, TextHist);
      if (str != NULL && *str == '\0')
-@@ -979,10 +979,10 @@ mSrchF(char c)
+@@ -990,10 +990,10 @@ mSrchF(char c)
  }
  
  static int
@@ -51,7 +51,7 @@ Subject: [PATCH 158/172] Add more const to menu
      if ((p = regexCompile(str, IgnoreCase)) != NULL) {
  	message(p, 0, 0);
  	return -1;
-@@ -999,7 +999,7 @@ menuBackwardSearch(Menu *menu, char *str
+@@ -1010,7 +1010,7 @@ menuBackwardSearch(Menu *menu, char *str
  static int
  menu_search_backward(Menu *menu, int from)
  {
@@ -60,7 +60,7 @@ Subject: [PATCH 158/172] Add more const to menu
      int found;
      str = inputStrHist("Backward: ", NULL, TextHist);
      if (str != NULL && *str == '\0')
-@@ -1032,9 +1032,9 @@ static int
+@@ -1043,9 +1043,9 @@ static int
  menu_search_next_previous(Menu *menu, int from, int reverse)
  {
      int found;

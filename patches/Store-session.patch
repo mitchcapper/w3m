@@ -119,7 +119,7 @@
  
      if (w3m_backend)
  	backend();
-@@ -2608,6 +2660,10 @@ _quitfm(int confirm)
+@@ -2616,6 +2668,10 @@ _quitfm(int confirm)
  #endif				/* USE_HISTORY */
      if ((err = save_known_hosts()))
  	perror(_("Cannot save known hosts"));
@@ -130,7 +130,7 @@
      if (deprecated)
  	fprintf(stderr, "%s\n%s\n%s\n",
  		"DEPRECATION WARNING",
-@@ -4477,6 +4533,68 @@ DEFUN(adBmark, ADD_BOOKMARK, "Add curren
+@@ -4485,6 +4541,68 @@ DEFUN(adBmark, ADD_BOOKMARK, "Add curren
  		request);
  }
  

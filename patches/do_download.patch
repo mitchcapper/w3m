@@ -276,7 +276,7 @@ Next step: use 'flags' parameter for all options, include do_download.
  	    }
  	    if (newbuf == NULL) {
  		if (ArgvIsURL && !retry) {
-@@ -2333,7 +2336,7 @@ cmd_loadfile(char *fn)
+@@ -2341,7 +2344,7 @@ cmd_loadfile(char *fn)
  {
      Buffer *buf;
  
@@ -285,7 +285,7 @@ Next step: use 'flags' parameter for all options, include do_download.
      if (buf == NULL) {
  	char *emsg = Sprintf(_("%s not found"), conv_from_system(fn))->ptr;
  	disp_err_message(emsg, FALSE);
-@@ -3041,7 +3044,8 @@ loadLink(char *url, char *target, char *
+@@ -3049,7 +3052,8 @@ loadLink(char *url, char *target, char *
  	referer = NO_REFERER;
      if (referer == NULL)
  	referer = parsedURL2RefererStr(&Currentbuf->currentURL)->ptr;
@@ -295,7 +295,7 @@ Next step: use 'flags' parameter for all options, include do_download.
      if (buf == NULL) {
  	char *emsg = Sprintf("Can't load %s", url)->ptr;
  	disp_err_message(emsg, FALSE);
-@@ -3268,7 +3272,7 @@ DEFUN(followI, VIEW_IMAGE, "Display imag
+@@ -3276,7 +3280,7 @@ DEFUN(followI, VIEW_IMAGE, "Display imag
  	return;
      message(Sprintf(_("loading %s"), a->url)->ptr, 0, 0);
      refresh();
@@ -304,7 +304,7 @@ Next step: use 'flags' parameter for all options, include do_download.
      if (buf == NULL) {
  	char *emsg = Sprintf(_("Can't load %s"), a->url)->ptr;
  	disp_err_message(emsg, FALSE);
-@@ -4344,7 +4348,7 @@ cmd_loadURL(char *url, ParsedURL *curren
+@@ -4352,7 +4356,7 @@ cmd_loadURL(char *url, ParsedURL *curren
  	return;
  
      refresh();
@@ -313,7 +313,7 @@ Next step: use 'flags' parameter for all options, include do_download.
      if (buf == NULL) {
  	char *emsg = Sprintf(_("Can't load %s"), conv_from_system(url))->ptr;
  	disp_err_message(emsg, FALSE);
-@@ -5247,7 +5251,8 @@ DEFUN(reload, RELOAD, "Load current docu
+@@ -5255,7 +5259,8 @@ DEFUN(reload, RELOAD, "Load current docu
  #endif
      SearchHeader = Currentbuf->search_header;
      DefaultType = Currentbuf->real_type;
@@ -323,7 +323,7 @@ Next step: use 'flags' parameter for all options, include do_download.
  #ifdef USE_M17N
      DocumentCharset = old_charset;
  #endif
-@@ -6139,7 +6144,7 @@ execdict(const char *word)
+@@ -6147,7 +6152,7 @@ execdict(const char *word)
      }
      dictcmd = Sprintf("%s?%s", DictCommand,
  		      Str_form_quote(Strnew_charp(w))->ptr)->ptr;

@@ -4,10 +4,7 @@
 # ?
 #278 md5
 # gophers
-refactor-openUrl-scheme-handling.patch
-Add-gophers-support.patch
 # 279 deadcode
-Remove-dead-code.patch
 Fix-some-casts-that-discard-qualifiers.patch
 Remove-const-where-we-can-t-keep-the-promise.patch
 Remove-declarations-without-definition.patch

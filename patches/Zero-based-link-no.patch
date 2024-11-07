@@ -57,7 +57,7 @@
  global int DecodeURL init(FALSE);
 --- a/main.c
 +++ b/main.c
-@@ -3668,7 +3668,7 @@ DEFUN(topA, LINK_BEGIN, "Move to the fir
+@@ -3676,7 +3676,7 @@ DEFUN(topA, LINK_BEGIN, "Move to the fir
      if (prec_num > hl->nmark)
  	hseq = hl->nmark - 1;
      else if (prec_num > 0)
