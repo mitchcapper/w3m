@@ -105,13 +105,14 @@ Get-rid-of-xfree.patch
 Strinsert_charp_n.patch
 Let-Str-functions-return-a-Str.patch
 Get-rid-of-Strnulterm.patch
-# BORKED
 Refactor-handling-of-close-tags.patch
 Allow-unknown-tags-to-have-an-id.patch
 Remove-islang.c.patch
 Fix-yank.patch
 Use-prec_num-with-followA.patch
+Add-command-to-protect-buffers.patch
 lto.patch
+# BORKED
 Refactor-regex-library.patch
 Enable-command-completion.patch
 Add-option-to-auto-accept-self-signed.patch

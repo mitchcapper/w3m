@@ -1,0 +1,224 @@
+From: Rene Kita <mail@rkta.de>
+Date: Sat Nov  9 08:15:03 CET 2024
+Subject: Add protected buffers
+Patch: patches/Add-command-to-protect-buffers.patch
+
+Protected buffers cannot be deleted with BACK.
+
+---
+ doc-de/README.func     |    1 +
+ doc/README.func        |    1 +
+ fm.h                   |    1 +
+ main.c                 |   37 +++++++++++++++++++++++++++++--------
+ menu.c                 |   37 +++++++++++++++++++++++++++++++++++--
+ proto.h                |    1 +
+ scripts/w3mhelp.cgi.in |    6 +++---
+ 7 files changed, 71 insertions(+), 13 deletions(-)
+
+--- a/fm.h
++++ b/fm.h
+@@ -511,6 +511,7 @@ typedef struct _Buffer {
+     struct _AlarmEvent *event;
+ #endif
+     int mainline;
++    int protected;
+ } Buffer;
+ 
+ typedef struct _BufferPos {
+--- a/main.c
++++ b/main.c
+@@ -4450,15 +4450,20 @@ DEFUN(backBf, BACK, "Close current buffe
+ {
+     Buffer *buf = Currentbuf->linkBuffer[LB_N_FRAME];
+ 
++    if (Currentbuf->protected) {
++	disp_message(_("Can't go back on protected buffer"), TRUE);
++	return;
++    }
++
+     if (!checkBackBuffer(Currentbuf)) {
+ 	if (exit_on_last && nTab == 1)
+ 	    _quitfm(FALSE);
+-	else if (close_tab_back || exit_on_last) {
++	if (close_tab_back || exit_on_last) {
+ 	    deleteTab(CurrentTab);
+ 	    displayBuffer(Currentbuf, B_FORCE_REDRAW);
++	    return;
+ 	}
+-	else
+-	    disp_message(_("Can't go back..."), TRUE);
++	disp_message(_("Can't go back..."), TRUE);
+ 	return;
+     }
+ 
+@@ -4503,6 +4508,13 @@ DEFUN(deletePrevBuf, DELETE_PREVBUF, "De
+ 	delBuffer(buf);
+ }
+ 
++DEFUN(togBufP, PROTB, "Toggle protected buffer")
++{
++    Currentbuf->protected = !Currentbuf->protected;
++    disp_message(_(Currentbuf->protected ?
++		   "Buffer protected" : "Buffer unprotected"), TRUE);
++}
++
+ static void
+ cmd_loadURL(char *url, ParsedURL *current, char *referer, FormList *request)
+ {
+@@ -6854,16 +6866,25 @@ deleteTab(TabBuffer * tab)
+ 
+ DEFUN(closeT, CLOSE_TAB, "Close tab")
+ {
++    Buffer *buf;
+     TabBuffer *tab;
+ 
+     if (nTab <= 1)
+ 	return;
++
++    tab = CurrentTab;
+     if (prec_num)
+-	tab = numTab(PREC_NUM);
+-    else
+-	tab = CurrentTab;
+-    if (tab)
+-	deleteTab(tab);
++	if (!(tab = numTab(PREC_NUM)))
++	    return;
++
++    for (buf = tab->firstBuffer; buf != NULL; buf = buf->nextBuffer) {
++	if (buf->protected && *buf->clone == 1) {
++	    disp_message(_("Cannot close tab with protected buffer"), TRUE);
++	    return;
++	}
++    }
++
++    deleteTab(tab);
+     displayBuffer(Currentbuf, B_REDRAW_IMAGE);
+ }
+ 
+--- a/doc-de/README.func
++++ b/doc-de/README.func
+@@ -106,6 +106,7 @@ PREV_TAB	Schalte zum vorherigen Reiter
+ PREV_VISITED	Gehe zum vorherigen besuchten Hyperlink
+ PREV_WORD	Gehe zum vorherigen Wort
+ PRINT		Speichere verarbeitetes Dokument
++PROTB		Wechsle Pufferschutzstatus
+ QUIT		Mit Bestätigungsfrage beenden
+ READ_SHELL	Führe Shell-Befehl aus und zeige Ausgabe an
+ REDO		Den letzten Rücknahmebefehl zurücknehmen
+--- a/doc/README.func
++++ b/doc/README.func
+@@ -109,6 +109,7 @@ PREV_TAB	Switch to the previous tab
+ PREV_VISITED	Move to the previous visited hyperlink
+ PREV_WORD	Move to the previous word
+ PRINT		Save rendered document
++PROTB		Toggle buffer protection flag
+ QUIT		Quit with confirmation request
+ READ_SHELL	Execute shell command and display output
+ REDO		Cancel the last undo
+--- a/proto.h
++++ b/proto.h
+@@ -83,6 +83,7 @@ extern void nextBf(void);
+ extern void prevBf(void);
+ extern void backBf(void);
+ extern void deletePrevBuf(void);
++extern void togBufP(void);
+ extern void goURL(void);
+ extern void goHome(void);
+ extern void goMain(void);
+--- a/scripts/w3mhelp.cgi.in
++++ b/scripts/w3mhelp.cgi.in
+@@ -151,9 +151,9 @@ print "<P><A HREF=\"$keymap\">$head</A>\
+ 		pipeBuf"));
+ 
+ &show_keymap('Buffer Operations',
+-	     split(" ", "backBf nextBf prevBf goHome selMn selBuf geminize
+-		vwSrc svSrc svBuf editBf editScr reload reshape rdrwSc
+-		dispI stopI"));
++	     split(" ", "backBf nextBf prevBf togBufP goHome selMn selBuf
++	     geminize vwSrc svSrc svBuf editBf editScr reload reshape rdrwSc
++	     dispI stopI"));
+ 
+ &show_keymap('Tab Operations',
+ 	     split(" ", "newT closeT nextT prevT tabMn tabR tabL"));
+--- a/menu.c
++++ b/menu.c
+@@ -245,6 +245,7 @@ static void smChBuf(void);
+ static int smDelBuf(char c);
+ static int smDnBuf(char c);
+ static int smUpBuf(char c);
++static int smProBuf(char c);
+ 
+ /* --- SelectMenu (END) --- */
+ 
+@@ -1397,7 +1398,7 @@ initSelectMenu(void)
+     char **label;
+     char *p;
+     static const char *comment =
+-	    " SPC: select | D: delete | </>: move down/up ";
++	    " SPC: select | D: delete | </>: move down/up | p: protect";
+ 
+     SelectV = -1;
+     for (i = 0, buf = Firstbuf; buf != NULL; i++, buf = buf->nextBuffer) {
+@@ -1408,7 +1409,7 @@ initSelectMenu(void)
+ 
+     label = New_N(char *, nitem + 2);
+     for (i = 0, buf = Firstbuf; i < nitem; i++, buf = buf->nextBuffer) {
+-	str = Sprintf("<%s>", buf->buffername);
++	str = Sprintf("%s<%s>", buf->protected ? "!" : " ", buf->buffername);
+ 	if (buf->filename != NULL) {
+ 	    switch (buf->currentURL.scheme) {
+ 	    case SCM_LOCAL:
+@@ -1454,6 +1455,7 @@ initSelectMenu(void)
+     SelectMenu.keymap['D'] = smDelBuf;
+     SelectMenu.keymap['>'] = smUpBuf;
+     SelectMenu.keymap['<'] = smDnBuf;
++    SelectMenu.keymap['p'] = smProBuf;
+     SelectMenu.item[nitem].type = MENU_NOP;
+ }
+ 
+@@ -1479,6 +1481,30 @@ smChBuf(void)
+ }
+ 
+ static int
++smProBuf(char c)
++{
++    int i, mselect, x, y;
++    Buffer *buf;
++
++    for (i = 0, buf = Firstbuf; i < CurrentMenu->select;
++	 i++, buf = buf->nextBuffer) ;
++    buf->protected = !buf->protected;
++
++    x = CurrentMenu->x;
++    y = CurrentMenu->y;
++    mselect = CurrentMenu->select;
++    initSelectMenu();
++    CurrentMenu->x = x;
++    CurrentMenu->y = y;
++
++    geom_menu(CurrentMenu, 0);
++    displayBuffer(Currentbuf, B_FORCE_REDRAW);
++    draw_all_menu(CurrentMenu);
++    select_menu(CurrentMenu, mselect);
++    return MENU_NOTHING;
++}
++
++static int
+ smDelBuf(char c)
+ {
+     int i, x, y, mselect;
+@@ -1488,6 +1514,13 @@ smDelBuf(char c)
+ 	return (MENU_NOTHING);
+     for (i = 0, buf = Firstbuf; i < CurrentMenu->select;
+ 	 i++, buf = buf->nextBuffer) ;
++    if (buf->protected) {
++	disp_message(_("Can't delete protected buffer"), TRUE);
++	move(CurrentMenu->y + CurrentMenu->select - CurrentMenu->offset,
++	     CurrentMenu->x);
++	refresh();
++	return MENU_NOTHING;
++    }
+     if (Currentbuf == buf)
+ 	Currentbuf = buf->nextBuffer;
+     Firstbuf = deleteBuffer(Firstbuf, buf);
