@@ -111,6 +111,7 @@ Remove-islang.c.patch
 Fix-yank.patch
 Use-prec_num-with-followA.patch
 Add-command-to-protect-buffers.patch
+Improve-protected-buffers.patch
 lto.patch
 # BORKED
 Refactor-regex-library.patch
