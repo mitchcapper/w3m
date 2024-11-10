@@ -6,14 +6,14 @@ Patch: patches/Add-command-to-protect-buffers.patch
 Protected buffers cannot be deleted with BACK.
 
 ---
- doc-de/README.func     |    1 +
- doc/README.func        |    1 +
- fm.h                   |    1 +
- main.c                 |   37 +++++++++++++++++++++++++++++--------
- menu.c                 |   37 +++++++++++++++++++++++++++++++++++--
- proto.h                |    1 +
- scripts/w3mhelp.cgi.in |    6 +++---
- 7 files changed, 71 insertions(+), 13 deletions(-)
+ doc-de/README.func     |    1 
+ doc/README.func        |    1 
+ fm.h                   |    1 
+ main.c                 |   53 +++++++++++++++++++++++++++++++++++++++++--------
+ menu.c                 |   37 ++++++++++++++++++++++++++++++++--
+ proto.h                |    1 
+ scripts/w3mhelp.cgi.in |    6 ++---
+ 7 files changed, 87 insertions(+), 13 deletions(-)
 
 --- a/fm.h
 +++ b/fm.h
@@ -27,7 +27,28 @@ Protected buffers cannot be deleted with BACK.
  typedef struct _BufferPos {
 --- a/main.c
 +++ b/main.c
-@@ -4450,15 +4450,20 @@ DEFUN(backBf, BACK, "Close current buffe
+@@ -2657,6 +2657,7 @@ save_known_hosts(void)
+ static void
+ _quitfm(int confirm)
+ {
++    Buffer *buf;
+     const char *ans = "y";
+     int err = 0;
+ 
+@@ -2666,6 +2667,12 @@ _quitfm(int confirm)
+ 			"Do you want to exit w3m? (y/n)");
+     else if (confirm)
+ 	ans = inputChar(_("Do you want to exit w3m? (y/n)"));
++
++    for (buf = Currentbuf; buf; buf = buf->nextBuffer) {
++	if (buf->protected)
++	    ans = inputChar(_("Protected buffers, really quit? (y/n)"));
++    }
++
+     if (!(ans && TOLOWER(*ans) == 'y')) {
+ 	displayBuffer(Currentbuf, B_NORMAL);
+ 	return;
+@@ -4450,15 +4457,20 @@ DEFUN(backBf, BACK, "Close current buffe
  {
      Buffer *buf = Currentbuf->linkBuffer[LB_N_FRAME];
  
@@ -51,7 +72,7 @@ Protected buffers cannot be deleted with BACK.
  	return;
      }
  
-@@ -4503,6 +4508,13 @@ DEFUN(deletePrevBuf, DELETE_PREVBUF, "De
+@@ -4503,6 +4515,13 @@ DEFUN(deletePrevBuf, DELETE_PREVBUF, "De
  	delBuffer(buf);
  }
  
@@ -65,7 +86,30 @@ Protected buffers cannot be deleted with BACK.
  static void
  cmd_loadURL(char *url, ParsedURL *current, char *referer, FormList *request)
  {
-@@ -6854,16 +6866,25 @@ deleteTab(TabBuffer * tab)
+@@ -6217,6 +6236,7 @@ DEFUN(tabMs, TAB_MOUSE, "Select tab by m
+ 
+ DEFUN(closeTMs, CLOSE_TAB_MOUSE, "Close tab at mouse pointer")
+ {
++    Buffer *buf;
+     TabBuffer *tab;
+ 
+     if (!mouse_action.in_action)
+@@ -6224,6 +6244,14 @@ DEFUN(closeTMs, CLOSE_TAB_MOUSE, "Close
+     tab = posTab(mouse_action.cursorX, mouse_action.cursorY);
+     if (!tab || tab == NO_TABBUFFER)
+ 	return;
++
++    for (buf = tab->firstBuffer; buf; buf = buf->nextBuffer) {
++	if (buf->protected && *buf->clone == 1) {
++	    disp_message(_("Cannot close tab with protected buffer"), TRUE);
++	    return;
++	}
++    }
++
+     deleteTab(tab);
+     displayBuffer(Currentbuf, B_FORCE_REDRAW);
+ }
+@@ -6854,16 +6882,25 @@ deleteTab(TabBuffer * tab)
  
  DEFUN(closeT, CLOSE_TAB, "Close tab")
  {
@@ -85,7 +129,7 @@ Protected buffers cannot be deleted with BACK.
 +	if (!(tab = numTab(PREC_NUM)))
 +	    return;
 +
-+    for (buf = tab->firstBuffer; buf != NULL; buf = buf->nextBuffer) {
++    for (buf = tab->firstBuffer; buf; buf = buf->nextBuffer) {
 +	if (buf->protected && *buf->clone == 1) {
 +	    disp_message(_("Cannot close tab with protected buffer"), TRUE);
 +	    return;
