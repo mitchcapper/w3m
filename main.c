@@ -389,7 +389,7 @@ make_optional_header_string(char *s)
 static void *
 die_oom(size_t bytes)
 {
-    fprintf(stderr, "Out of memory: %lu bytes unavailable!\n", (unsigned long)bytes);
+    fprintf(stderr, "Out of memory: %zu bytes unavailable!\n", bytes);
     exit(1);
     /*
      * Suppress compiler warning: function might return no value
