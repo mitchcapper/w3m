@@ -6,6 +6,7 @@ Patch: patches/Add-command-to-protect-buffers.patch
 Protected buffers cannot be deleted with BACK.
 
 ---
+ display.c              |    2 -
  doc-de/README.func     |    1 
  doc/README.func        |    1 
  fm.h                   |    1 
@@ -13,7 +14,7 @@ Protected buffers cannot be deleted with BACK.
  menu.c                 |   37 ++++++++++++++++++++++++++++++++--
  proto.h                |    1 
  scripts/w3mhelp.cgi.in |    6 ++---
- 7 files changed, 87 insertions(+), 13 deletions(-)
+ 8 files changed, 88 insertions(+), 14 deletions(-)
 
 --- a/fm.h
 +++ b/fm.h
@@ -266,3 +267,14 @@ Protected buffers cannot be deleted with BACK.
      if (Currentbuf == buf)
  	Currentbuf = buf->nextBuffer;
      Firstbuf = deleteBuffer(Firstbuf, buf);
+--- a/display.c
++++ b/display.c
+@@ -367,7 +367,7 @@ make_lastline_message(Buffer *buf)
+     if (buf->ssl_certificate)
+ 	Strcat_charp(msg, "[SSL]");
+ #endif
+-    Strcat_charp(msg, " <");
++    Strcat_charp(msg, buf->protected ? "!<" : " <");
+     Strcat_charp(msg, buf->buffername);
+ 
+     if (s) {

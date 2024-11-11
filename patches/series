@@ -1,3 +1,5 @@
+Add-option-to-change-the-dictionary-prompt.patch
+Remove-unused-CurrentKeyData.patch
 # gemini
 gemini.patch
 # WARNINGS
@@ -59,7 +61,6 @@ save-history.patch
 Store-session.patch
 shorten-not-assigned-in-help.patch
 Use-gettext-for-user-facing-strings.patch
-Remove-unused-CurrentKeyData.patch
 Add-cd-command.patch
 do_download.patch
 Fix-scan-build-issues.patch
@@ -77,7 +78,6 @@ Update-URLHist-mtime-when-saving-history.patch
 Recognize-main-tag.html
 Add-goto-main-command.patch
 Add-key-binding-to-insert-word-under-cursor.patch
-Add-option-to-change-the-dictionary-prompt.patch
 Add-smartcase-option-for-search.patch
 Make-CTRL-Y-insert-deleted-text.patch
 Show-all-link-numbers.patch

@@ -4,25 +4,24 @@ Subject: Refactor inputAnswer
 Patch: patches/Refactor-inputAnswer.patch
 
 ---
- file.c    |   35 ++++++++++++++++++++++-------------
+ file.c    |   34 +++++++++++++++++++++-------------
  istream.c |   23 +++++++++++------------
  proto.h   |    3 ++-
- 3 files changed, 35 insertions(+), 26 deletions(-)
+ 3 files changed, 34 insertions(+), 26 deletions(-)
 
 --- a/file.c
 +++ b/file.c
-@@ -859,8 +859,8 @@ readHeader(URLFile *uf, Buffer *newBuf,
+@@ -859,8 +859,7 @@ readHeader(URLFile *uf, Buffer *newBuf,
  		    add_cookie(pu, name, value, expires, domain, path, flag,
  			       comment, version, port, commentURL);
  		if (err) {
 -		    const char *ans = (accept_bad_cookie == ACCEPT_BAD_COOKIE_ACCEPT)
 -			? "y" : NULL;
-+		    int ans = (accept_bad_cookie == ACCEPT_BAD_COOKIE_ACCEPT)
-+			? 1 : 0;
++		    int ans = (accept_bad_cookie == ACCEPT_BAD_COOKIE_ACCEPT);
  		    if (fmInitialized && (err & COO_OVERRIDE_OK) &&
  			accept_bad_cookie == ACCEPT_BAD_COOKIE_ASK) {
  			Str msg = Sprintf("Accept bad cookie from %s for %s?",
-@@ -869,10 +869,9 @@ readHeader(URLFile *uf, Buffer *newBuf,
+@@ -869,10 +868,9 @@ readHeader(URLFile *uf, Buffer *newBuf,
  					   ? domain->ptr : "<localdomain>"));
  			if (msg->length > COLS - 10)
  			    Strshrink(msg, msg->length - (COLS - 10));
@@ -35,7 +34,7 @@ Patch: patches/Refactor-inputAnswer.patch
  			(err =
  			 add_cookie(pu, name, value, expires, domain, path,
  				    flag | COO_OVERRIDE, comment, version,
-@@ -8746,34 +8745,44 @@ int
+@@ -8746,34 +8744,44 @@ int
  checkOverWrite(const char *path)
  {
      struct stat st;

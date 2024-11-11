@@ -205,7 +205,7 @@ While at it, refactor Strshrink.
  Str
 --- a/file.c
 +++ b/file.c
-@@ -4508,8 +4508,7 @@ getMetaRefreshParam(const char *q, Str *
+@@ -4507,8 +4507,7 @@ getMetaRefreshParam(const char *q, Str *
  	    if (s_tmp->length > 0 &&
  	        (s_tmp->ptr[s_tmp->length - 1] == '\"' ||	/* " */
  		 s_tmp->ptr[s_tmp->length - 1] == '\'')) {	/* ' */

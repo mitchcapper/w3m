@@ -119,7 +119,7 @@
  
      if (w3m_backend)
  	backend();
-@@ -2616,6 +2668,10 @@ _quitfm(int confirm)
+@@ -2608,6 +2660,10 @@ _quitfm(int confirm)
  #endif				/* USE_HISTORY */
      if ((err = save_known_hosts()))
  	perror(_("Cannot save known hosts"));
@@ -130,7 +130,7 @@
      if (deprecated)
  	fprintf(stderr, "%s\n%s\n%s\n",
  		"DEPRECATION WARNING",
-@@ -4485,6 +4541,68 @@ DEFUN(adBmark, ADD_BOOKMARK, "Add curren
+@@ -4477,6 +4533,68 @@ DEFUN(adBmark, ADD_BOOKMARK, "Add curren
  		request);
  }
  
@@ -220,7 +220,7 @@
  #define CMT_FRAME        N_("Render frames automatically")
  #define CMT_ARGV_IS_URL  N_("Treat argument without scheme as URL")
  #define CMT_TSELF        N_("Use _self as default target")
-@@ -515,6 +517,8 @@ struct param_ptr params3[] = {
+@@ -517,6 +519,8 @@ struct param_ptr params3[] = {
      {"history", P_INT, PI_TEXT, (void *)&URLHistSize, CMT_HISTSIZE, NULL},
      {"save_hist", P_INT, PI_ONOFF, (void *)&SaveURLHist, CMT_SAVEHIST, NULL},
  #endif				/* USE_HISTORY */
@@ -231,7 +231,7 @@
      {"exit_on_last", P_INT, PI_ONOFF, (void *)&exit_on_last, CMT_EXIT_ON_LAST,
 --- a/fm.h
 +++ b/fm.h
-@@ -1083,6 +1083,8 @@ global int UseHistory init(TRUE);
+@@ -1084,6 +1084,8 @@ global int UseHistory init(TRUE);
  global int URLHistSize init(100);
  global int SaveURLHist init(TRUE);
  #endif				/* USE_HISTORY */

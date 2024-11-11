@@ -10,7 +10,7 @@ Patch: patches/Refactor-checkOverwrite.patch
 
 --- a/file.c
 +++ b/file.c
-@@ -8539,7 +8539,7 @@ _doFileCopy(char *tmpf, char *defstr, in
+@@ -8538,7 +8538,7 @@ _doFileCopy(char *tmpf, char *defstr, in
  		p = conv_to_system(p);
  	    }
  	    p = expandPath(p);
@@ -19,7 +19,7 @@ Patch: patches/Refactor-checkOverwrite.patch
  		return -1;
  	}
  	if (checkCopyFile(tmpf, p) < 0) {
-@@ -8596,7 +8596,7 @@ _doFileCopy(char *tmpf, char *defstr, in
+@@ -8595,7 +8595,7 @@ _doFileCopy(char *tmpf, char *defstr, in
  	    is_pipe = TRUE;
  	else {
  	    p = expandPath(p);
@@ -28,7 +28,7 @@ Patch: patches/Refactor-checkOverwrite.patch
  		return -1;
  	}
  	if (checkCopyFile(tmpf, p) < 0) {
-@@ -8644,7 +8644,7 @@ doFileSave(URLFile uf, const char *defst
+@@ -8643,7 +8643,7 @@ doFileSave(URLFile uf, const char *defst
  		return -1;
  	    p = conv_to_system(p);
  	}
@@ -37,7 +37,7 @@ Patch: patches/Refactor-checkOverwrite.patch
  	    return -1;
  	if (checkSaveFile(uf.stream, p) < 0) {
  	    msg = Sprintf(_("Can't save. Load file and %s are identical."),
-@@ -8693,7 +8693,7 @@ doFileSave(URLFile uf, const char *defst
+@@ -8692,7 +8692,7 @@ doFileSave(URLFile uf, const char *defst
  	if (*q == '\0')
  	    return -1;
  	p = expandPath(q);
@@ -46,7 +46,7 @@ Patch: patches/Refactor-checkOverwrite.patch
  	    return -1;
  	if (checkSaveFile(uf.stream, p) < 0) {
  	    printf(_("Can't save. Load file and %s are identical."), p);
-@@ -8747,11 +8747,11 @@ checkOverWrite(const char *path)
+@@ -8746,11 +8746,11 @@ checkOverWrite(const char *path)
      struct stat st;
  
      if (stat(path, &st) < 0)
