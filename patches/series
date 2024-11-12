@@ -1,5 +1,8 @@
 Add-option-to-change-the-dictionary-prompt.patch
 Remove-unused-CurrentKeyData.patch
+Recognize-main-tag.html
+Add-goto-main-command.patch
+Allow-unknown-tags-to-have-an-id.patch
 # gemini
 gemini.patch
 # WARNINGS
@@ -55,9 +58,10 @@ Suppress-Wstrict-prototypes.patch
 0171-Add-more-const-correctness.patch
 0172-const.patch
 Remove-some-volatile.patch
-# ACTIVE
+# Save history
 Refactor-URL-history-handling.patch
 save-history.patch
+# ACTIVE
 Store-session.patch
 shorten-not-assigned-in-help.patch
 Use-gettext-for-user-facing-strings.patch
@@ -75,8 +79,6 @@ Refactor-get_cookie_info.patch
 Merge-cookies-if-modified-after-start.patch
 Add-option-to-provide-cookie-jar.patch
 Update-URLHist-mtime-when-saving-history.patch
-Recognize-main-tag.html
-Add-goto-main-command.patch
 Add-key-binding-to-insert-word-under-cursor.patch
 Add-smartcase-option-for-search.patch
 Make-CTRL-Y-insert-deleted-text.patch
@@ -106,7 +108,6 @@ Strinsert_charp_n.patch
 Let-Str-functions-return-a-Str.patch
 Get-rid-of-Strnulterm.patch
 Refactor-handling-of-close-tags.patch
-Allow-unknown-tags-to-have-an-id.patch
 Remove-islang.c.patch
 Fix-yank.patch
 Use-prec_num-with-followA.patch

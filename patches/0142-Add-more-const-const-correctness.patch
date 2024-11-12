@@ -232,7 +232,7 @@ Subject: [PATCH 142/172] Add more const const correctness
  #ifdef USE_M17N
 --- a/proto.h
 +++ b/proto.h
-@@ -310,7 +310,7 @@ extern Buffer *selectBuffer(Buffer *firs
+@@ -311,7 +311,7 @@ extern Buffer *selectBuffer(Buffer *firs
  			    char *selectchar);
  extern void reshapeBuffer(Buffer *buf);
  extern void copyBuffer(Buffer *a, Buffer *b);
@@ -241,7 +241,7 @@ Subject: [PATCH 142/172] Add more const const correctness
  extern int writeBufferCache(Buffer *buf);
  extern int readBufferCache(Buffer *buf);
  extern void displayBuffer(Buffer *buf, int mode);
-@@ -587,13 +587,13 @@ extern void shiftAnchorPosition(AnchorLi
+@@ -588,13 +588,13 @@ extern void shiftAnchorPosition(AnchorLi
  extern char *getAnchorText(Buffer *buf, AnchorList *al, Anchor *a);
  extern Buffer *link_list_panel(Buffer *buf);
  

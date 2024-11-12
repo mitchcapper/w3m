@@ -42,7 +42,7 @@ Patch: patches/Fix-scan-build-issues.patch
  			SKIP_BLANKS(p);
  			p = extract_auth_param(p, none_auth_param);
  		    }
-@@ -6568,7 +6566,6 @@ HTMLlineproc0(char *line, struct html_fe
+@@ -6575,7 +6573,6 @@ HTMLlineproc0(char *line, struct html_fe
  		    str = Strnew_charp_n(str, p - str)->ptr;
  		    line = Strnew_m_charp(p, line, NULL)->ptr;
  		}
@@ -50,7 +50,7 @@ Patch: patches/Fix-scan-build-issues.patch
  		continue;
  	    }
  	    if (obuf->table_level >= 0)
-@@ -7253,7 +7250,7 @@ loadHTMLstream(URLFile *f, Buffer *newBu
+@@ -7260,7 +7257,7 @@ loadHTMLstream(URLFile *f, Buffer *newBu
      struct environment envs[MAX_ENV_LEVEL];
      clen_t linelen = 0;
      clen_t trbyte = 0;
@@ -59,7 +59,7 @@ Patch: patches/Fix-scan-build-issues.patch
  #ifdef USE_M17N
      wc_ces charset = WC_CES_US_ASCII;
      wc_ces volatile doc_charset = DocumentCharset;
-@@ -7494,11 +7491,11 @@ loadGopherDir0(URLFile *uf, ParsedURL *p
+@@ -7501,11 +7498,11 @@ loadGopherDir0(URLFile *uf, ParsedURL *p
  			 "</title>\n</head>\n<body>\n<h1>Index of ", q,
  			 "</h1>\n<table>\n", NULL);
  
@@ -74,7 +74,7 @@ Patch: patches/Fix-scan-build-issues.patch
  	    break;
 --- a/main.c
 +++ b/main.c
-@@ -4554,7 +4554,7 @@ _strSession(char *sf)
+@@ -4566,7 +4566,7 @@ _strSession(char *sf)
  	sep = "\n";
      }
  
@@ -83,7 +83,7 @@ Patch: patches/Fix-scan-build-issues.patch
      if ((r = fclose(f)) == EOF) goto fail;
      unlink_session = 0;
      return;
-@@ -6383,11 +6383,9 @@ DEFUN(execCmd, COMMAND, "Invoke w3m func
+@@ -6395,11 +6395,9 @@ DEFUN(execCmd, COMMAND, "Invoke w3m func
  static void
  SigAlarm(SIGNAL_ARG)
  {

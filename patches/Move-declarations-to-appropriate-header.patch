@@ -86,7 +86,7 @@ Move declarations, delete unused auth_cookie.
 +#endif
 --- a/fm.h
 +++ b/fm.h
-@@ -721,49 +721,6 @@ struct html_feed_environ {
+@@ -722,49 +722,6 @@ struct html_feed_environ {
      int blank_lines;
  };
  
@@ -136,7 +136,7 @@ Move declarations, delete unused auth_cookie.
  /* modes for align() */
  
  #define ALIGN_CENTER 0
-@@ -1061,11 +1018,6 @@ global int migemo_active init(0);
+@@ -1062,11 +1019,6 @@ global int migemo_active init(0);
  global char *migemo_command init(DEF_MIGEMO_COMMAND);
  #endif				/* USE_MIGEMO */
  
@@ -148,7 +148,7 @@ Move declarations, delete unused auth_cookie.
  global char *mailcap_files init(USER_MAILCAP ", " SYS_MAILCAP);
  global char *mimetypes_files init(USER_MIMETYPES ", " SYS_MIMETYPES);
  #ifdef USE_EXTERNAL_URI_LOADER
-@@ -1167,23 +1119,6 @@ global MouseAction mouse_action;
+@@ -1168,23 +1120,6 @@ global MouseAction mouse_action;
  #define LIMIT_MOUSE_MENU 100
  #endif				/* USE_MOUSE */
  
@@ -233,7 +233,7 @@ Move declarations, delete unused auth_cookie.
  #include "myctype.h"
 --- a/proto.h
 +++ b/proto.h
-@@ -658,7 +658,6 @@ extern int add_cookie(ParsedURL *pu, Str
+@@ -659,7 +659,6 @@ extern int add_cookie(ParsedURL *pu, Str
  		      Str domain, Str path, int flag, Str comment, int version,
  		      Str port, Str commentURL);
  extern void save_cookies(void);

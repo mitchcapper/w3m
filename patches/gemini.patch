@@ -229,7 +229,7 @@ w3m-0.5.3+git20230121.
  static void
  set_breakpoint(struct readbuffer *obuf, int tag_length)
  {
-@@ -7472,6 +7635,130 @@ loadGopherSearch0(ParsedURL *pu)
+@@ -7479,6 +7642,130 @@ loadGopherSearch0(ParsedURL *pu)
  }
  #endif				/* USE_GOPHER */
  
@@ -362,7 +362,7 @@ w3m-0.5.3+git20230121.
   */
 --- a/html.h
 +++ b/html.h
-@@ -423,6 +423,7 @@ struct environment {
+@@ -425,6 +425,7 @@ struct environment {
  #define SCM_GOPHERS	13
  #ifdef USE_SSL
  #define SCM_HTTPS       14
@@ -598,7 +598,7 @@ w3m-0.5.3+git20230121.
  }
  
  /* Quit */
-@@ -4826,6 +4883,13 @@ DEFUN(vwSrc, SOURCE VIEW, "Toggle betwee
+@@ -4838,6 +4895,13 @@ DEFUN(vwSrc, SOURCE VIEW, "Toggle betwee
  	displayBuffer(Currentbuf, B_NORMAL);
  	return;
      }
@@ -612,7 +612,7 @@ w3m-0.5.3+git20230121.
      if (Currentbuf->sourcefile == NULL) {
  	if (Currentbuf->pagerSource &&
  	    !strcasecmp(Currentbuf->type, "text/plain")) {
-@@ -4911,6 +4975,93 @@ DEFUN(foldPre, FOLD_PRE, "Fold long line
+@@ -4923,6 +4987,93 @@ DEFUN(foldPre, FOLD_PRE, "Fold long line
      fold_pre = FoldPre;
  }
  
@@ -706,7 +706,7 @@ w3m-0.5.3+git20230121.
  /* reload */
  DEFUN(reload, RELOAD, "Load current document anew")
  {
-@@ -5137,6 +5288,7 @@ chkURLBuffer(Buffer *buf)
+@@ -5149,6 +5300,7 @@ chkURLBuffer(Buffer *buf)
  	"https?://[a-zA-Z0-9:%\\-\\./_@]*\\[[a-fA-F0-9:][a-fA-F0-9:\\.]*\\][a-zA-Z0-9:%\\-\\./?=~_\\&+@#,\\$;]*",
  	"ftp://[a-zA-Z0-9:%\\-\\./_@]*\\[[a-fA-F0-9:][a-fA-F0-9:\\.]*\\][a-zA-Z0-9:%\\-\\./=_+@#,\\$]*",
  #endif				/* INET6 */
@@ -716,7 +716,7 @@ w3m-0.5.3+git20230121.
      int i;
 --- a/proto.h
 +++ b/proto.h
-@@ -98,6 +98,7 @@ extern void peekURL(void);
+@@ -99,6 +99,7 @@ extern void peekURL(void);
  extern void peekIMG(void);
  extern void curURL(void);
  extern void vwSrc(void);

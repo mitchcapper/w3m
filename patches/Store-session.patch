@@ -130,7 +130,7 @@
      if (deprecated)
  	fprintf(stderr, "%s\n%s\n%s\n",
  		"DEPRECATION WARNING",
-@@ -4477,6 +4533,68 @@ DEFUN(adBmark, ADD_BOOKMARK, "Add curren
+@@ -4489,6 +4545,68 @@ DEFUN(adBmark, ADD_BOOKMARK, "Add curren
  		request);
  }
  
@@ -201,7 +201,7 @@
  {
 --- a/proto.h
 +++ b/proto.h
-@@ -86,6 +86,7 @@ extern void goHome(void);
+@@ -87,6 +87,7 @@ extern void goMain(void);
  extern void gorURL(void);
  extern void ldBmark(void);
  extern void adBmark(void);
@@ -231,7 +231,7 @@
      {"exit_on_last", P_INT, PI_ONOFF, (void *)&exit_on_last, CMT_EXIT_ON_LAST,
 --- a/fm.h
 +++ b/fm.h
-@@ -1084,6 +1084,8 @@ global int UseHistory init(TRUE);
+@@ -1085,6 +1085,8 @@ global int UseHistory init(TRUE);
  global int URLHistSize init(100);
  global int SaveURLHist init(TRUE);
  #endif				/* USE_HISTORY */

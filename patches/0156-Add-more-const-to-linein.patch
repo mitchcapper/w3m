@@ -22,7 +22,7 @@ Subject: [PATCH 156/172] Add more const to linein
      int opos, x, y, lpos, rpos, epos;
 --- a/proto.h
 +++ b/proto.h
-@@ -375,8 +375,9 @@ extern void escmap(void);
+@@ -376,8 +376,9 @@ extern void escmap(void);
  extern void escbmap(void);
  extern void escdmap(char c);
  extern void multimap(void);
