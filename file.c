@@ -1184,8 +1184,6 @@ AuthBasicCred(struct http_auth *ha, Str uname, Str pw, ParsedURL *pu,
 }
 
 #ifdef USE_DIGEST_AUTH
-#include <openssl/evp.h>
-
 /* RFC2617: 3.2.2 The Authorization Request Header
  * 
  * credentials      = "Digest" digest-response
@@ -1213,6 +1211,9 @@ AuthBasicCred(struct http_auth *ha, Str uname, Str pw, ParsedURL *pu,
 
 #define MD5_DIGEST_LENGTH 16
 
+#if defined(OPENSSL_VERSION_MAJOR) && OPENSSL_VERSION_MAJOR >= 3
+#include <openssl/evp.h>
+
 static void
 MD5(const unsigned char *d, unsigned long n, unsigned char *md)
 {
@@ -1223,7 +1224,9 @@ MD5(const unsigned char *d, unsigned long n, unsigned char *md)
     EVP_DigestFinal_ex(ctx, md, NULL);
     EVP_MD_CTX_free(ctx);
 }
-
+#else
+#include <openssl/md5.h>
+#endif
 
 static Str
 digest_hex(unsigned char *p)
