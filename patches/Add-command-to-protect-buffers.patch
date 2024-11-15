@@ -201,7 +201,7 @@ Protected buffers cannot be deleted with BACK.
      char *p;
      static const char *comment =
 -	    " SPC: select | D: delete | </>: move down/up ";
-+	    " SPC: select | D: delete | </>: move down/up | p: protect";
++	    " SPC: select | D: delete | </>: move down/up | !: protect";
  
      SelectV = -1;
      for (i = 0, buf = Firstbuf; buf != NULL; i++, buf = buf->nextBuffer) {
@@ -218,7 +218,7 @@ Protected buffers cannot be deleted with BACK.
      SelectMenu.keymap['D'] = smDelBuf;
      SelectMenu.keymap['>'] = smUpBuf;
      SelectMenu.keymap['<'] = smDnBuf;
-+    SelectMenu.keymap['p'] = smProBuf;
++    SelectMenu.keymap['!'] = smProBuf;
      SelectMenu.item[nitem].type = MENU_NOP;
  }
  

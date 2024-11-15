@@ -30,7 +30,7 @@ Patch: patches/Get-rid-of-xfree.patch
      ISclose(f1);
      if (is_pipe)
  	pclose(f2);
-@@ -8868,7 +8868,7 @@ uncompress_stream(URLFile *uf, char **sr
+@@ -8869,7 +8869,7 @@ uncompress_stream(URLFile *uf, char **sr
  	    UFclose(uf);
  	    if (f)
  		fclose(f);
