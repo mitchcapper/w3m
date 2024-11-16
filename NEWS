@@ -5,25 +5,29 @@ Unreleased
   - ChangeLog file, use the git log for all the details
 
 * new features
-  - Add command to navigate between image links directly
-  - Add command to display user-defined messages
-  - Add option to include current column number in line info
+  - Add command to navigate between image links directly (NEXT_IMAGE,
+    PREV_IMAGE)
+  - Add command to display user-defined messages (MESSAGE),
+    e.g. keymap .  COMMAND "REINIT ; MESSAGE 'Configuration Reloaded!'"
+  - Add option display_column_number to include current column number
+    in line info
   - Drop undocumented upper limit for -cols
   - Make -cols work without -dump
-  - Add option to permanently set -cols, i.e. limit the text width on
+  - Add option maxcols to permanently set -cols, i.e. limit the text width on
     wide terminals
-  - Add command and option to wrap long lines in <pre> elements to
-    workaround missing CSS support on some sites
+  - Add command FOLD_PRE and option fold_pre to wrap long lines in <pre>
+    elements to workaround missing CSS support on some sites
   - Make https links clickable in w3mman
   - Enable re-ordering of buffers in the stack menu
-  - Add option to close the last buffer with BACK(B)
+  - Add option exit_on_last to close the last buffer with BACK(B)
   - Add gophers support
   - Display an error if the users enters an unknown command via COMMAND
-  - Add option for zero based link numbers
+  - Add option for zero based link numbers (zero_based_link_no)
   - Prepend https instead of http if the URL has no scheme
-  - Add option to change the dictionary prompt
-  - Add command to jump to the line which contains the <main> tag
+  - Add option to change the dictionary prompt (dictprompt)
+  - Add command to jump to the line which contains the <main> tag (MAIN)
   - Enable using 'skip to content' links
+  - Improved image documentation
 
 * bug fixes
   - Create history file if it does not exist
@@ -45,6 +49,7 @@ Unreleased
 * removed
   - Drop wait3 support
   - Drop support for old ss family
+  - README.sixel, merged into README.img
 
 
 Debian's w3m 0.5.3+git20230121
