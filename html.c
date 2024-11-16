@@ -88,7 +88,7 @@ unsigned char ALST_IMG_ALT[] =
 unsigned char ALST_NOP[] = { ATTR_CORE };
 
 TagInfo TagMAP[MAX_HTMLTAG] = {
-    {NULL, NULL, 0, 0},						/*   0 HTML_UNKNOWN    */
+    {NULL, ALST_ID, ARR_SZ(ALST_ID), 0},						/*   0 HTML_UNKNOWN    */
     {"a", ALST_A, ARR_SZ(ALST_A), 0},				/*   1 HTML_A          */
     {"/a", NULL, 0, TFLG_END},					/*   2 HTML_N_A        */
     {"h", ALST_P, ARR_SZ(ALST_P), 0},				/*   3 HTML_H          */
@@ -240,9 +240,9 @@ TagInfo TagMAP[MAX_HTMLTAG] = {
     {"/dd", NULL, 0, TFLG_END},					/* 148 HTML_N_DD       */
     {"dfn", ALST_ID, ARR_SZ(ALST_ID), 0},			/* 149 HTML_DFN */
     {"/dfn", NULL, 0, TFLG_END},				/* 150 HTML_N_DFN */
+    {"main", ALST_ID, ARR_SZ(ALST_ID), 0},			/* 151 HTML_MAIN */
+    {"/main", NULL, 0, TFLG_END},				/* 152 HTML_N_MAIN */
 
-    {NULL, NULL, 0, 0},						/* 151 Undefined */
-    {NULL, NULL, 0, 0},						/* 152 Undefined */
     {NULL, NULL, 0, 0},						/* 153 Undefined */
     {NULL, NULL, 0, 0},						/* 154 Undefined */
     {NULL, NULL, 0, 0},						/* 155 Undefined */

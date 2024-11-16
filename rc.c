@@ -188,6 +188,7 @@ static int OptionEncode = FALSE;
 #ifdef USE_DICT
 #define CMT_USE_DICTCOMMAND  N_("Enable dictionary lookup through CGI")
 #define CMT_DICTCOMMAND  N_("URL of dictionary lookup command")
+#define CMT_DICTPROMPT	N_("Dictionary command prompt")
 #endif				/* USE_DICT */
 #define CMT_IGNORE_NULL_IMG_ALT	N_("Display link name for images lacking ALT")
 #define CMT_IFILE        N_("Index file for directories")
@@ -421,6 +422,7 @@ struct param_ptr params1[] = {
      CMT_USE_DICTCOMMAND, NULL},
     {"dictcommand", P_STRING, PI_TEXT, (void *)&DictCommand,
      CMT_DICTCOMMAND, NULL},
+    {"dictprompt", P_STRING, PI_TEXT, (void *)&DictPrompt, CMT_DICTPROMPT, NULL},
 #endif				/* USE_DICT */
     {"multicol", P_INT, PI_ONOFF, (void *)&multicolList, CMT_MULTICOL, NULL},
     {"alt_entity", P_CHARINT, PI_ONOFF, (void *)&UseAltEntity, CMT_ALT_ENTITY,

@@ -1184,8 +1184,6 @@ AuthBasicCred(struct http_auth *ha, Str uname, Str pw, ParsedURL *pu,
 }
 
 #ifdef USE_DIGEST_AUTH
-#include <openssl/evp.h>
-
 /* RFC2617: 3.2.2 The Authorization Request Header
  * 
  * credentials      = "Digest" digest-response
@@ -1213,6 +1211,9 @@ AuthBasicCred(struct http_auth *ha, Str uname, Str pw, ParsedURL *pu,
 
 #define MD5_DIGEST_LENGTH 16
 
+#if defined(OPENSSL_VERSION_MAJOR) && OPENSSL_VERSION_MAJOR >= 3
+#include <openssl/evp.h>
+
 static void
 MD5(const unsigned char *d, unsigned long n, unsigned char *md)
 {
@@ -1223,7 +1224,9 @@ MD5(const unsigned char *d, unsigned long n, unsigned char *md)
     EVP_DigestFinal_ex(ctx, md, NULL);
     EVP_MD_CTX_free(ctx);
 }
-
+#else
+#include <openssl/md5.h>
+#endif
 
 static Str
 digest_hex(unsigned char *p)
@@ -5417,6 +5420,10 @@ HTMLtagproc1(struct parsed_tag *tag, struct html_feed_environ *h_env)
     case HTML_HEAD:
     case HTML_N_BODY:
 	return 1;
+    case HTML_MAIN:
+	Strcopy_charp(obuf->line, "<main>");
+	flushline(h_env, obuf, 0, 0, h_env->limit);
+	return 1;
     default:
 	/* obuf->prevchar = '\0'; */
 	return 0;
@@ -6116,6 +6123,9 @@ HTMLlineproc2body(Buffer *buf, Str (*feed) (void), int llimit)
 		    break;
 		case HTML_N_SYMBOL:
 		    effect &= ~PC_SYMBOL;
+		    break;
+		case HTML_MAIN:
+		    buf->mainline = currentLn(buf);
 		    break;
 		}
 #ifdef	ID_EXT

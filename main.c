@@ -389,7 +389,7 @@ make_optional_header_string(char *s)
 static void *
 die_oom(size_t bytes)
 {
-    fprintf(stderr, "Out of memory: %lu bytes unavailable!\n", (unsigned long)bytes);
+    fprintf(stderr, "Out of memory: %zu bytes unavailable!\n", bytes);
     exit(1);
     /*
      * Suppress compiler warning: function might return no value
@@ -1169,7 +1169,6 @@ main(int argc, char **argv)
 	/* event processing */
 	if (CurrentEvent) {
 	    CurrentKey = -1;
-	    CurrentKeyData = NULL;
 	    CurrentCmdData = CurrentEvent->data;
 	    w3mFuncList[CurrentEvent->cmd].func();
 	    CurrentCmdData = NULL;
@@ -1184,7 +1183,6 @@ main(int argc, char **argv)
 		if (CurrentAlarm->sec == 0) {	/* refresh (0sec) */
 		    Currentbuf->event = NULL;
 		    CurrentKey = -1;
-		    CurrentKeyData = NULL;
 		    CurrentCmdData = CurrentAlarm->data;
 		    w3mFuncList[CurrentAlarm->cmd].func();
 		    CurrentCmdData = NULL;
@@ -1260,7 +1258,6 @@ main(int argc, char **argv)
 	}
 	prev_key = CurrentKey;
 	CurrentKey = -1;
-	CurrentKeyData = NULL;
     }
 }
 
@@ -2068,7 +2065,6 @@ DEFUN(setEnv, SETENV, "Set environment variable")
     char *env;
     char *var, *value;
 
-    CurrentKeyData = NULL;	/* not allowed in w3m-control: */
     env = searchKeyData();
     if (env == NULL || *env == '\0' || strchr(env, '=') == NULL) {
 	if (env != NULL && *env != '\0')
@@ -2093,7 +2089,6 @@ DEFUN(pipeBuf, PIPE_BUF, "Pipe current buffer through a shell command and displa
     char *cmd, *tmpf;
     FILE *f;
 
-    CurrentKeyData = NULL;	/* not allowed in w3m-control: */
     cmd = searchKeyData();
     if (cmd == NULL || *cmd == '\0') {
 	/* FIXME: gettextize? */
@@ -2138,7 +2133,6 @@ DEFUN(pipesh, PIPE_SHELL, "Execute shell command and display output")
     Buffer *buf;
     char *cmd;
 
-    CurrentKeyData = NULL;	/* not allowed in w3m-control: */
     cmd = searchKeyData();
     if (cmd == NULL || *cmd == '\0') {
 	cmd = inputLineHist("(read shell[pipe])!", "", IN_COMMAND, ShellHist);
@@ -2170,7 +2164,6 @@ DEFUN(readsh, READ_SHELL, "Execute shell command and display output")
     void (*prevtrap) (SIGNAL_ARG);
     char *cmd;
 
-    CurrentKeyData = NULL;	/* not allowed in w3m-control: */
     cmd = searchKeyData();
     if (cmd == NULL || *cmd == '\0') {
 	cmd = inputLineHist("(read shell)!", "", IN_COMMAND, ShellHist);
@@ -2205,7 +2198,6 @@ DEFUN(execsh, EXEC_SHELL SHELL, "Execute shell command and display output")
 {
     char *cmd;
 
-    CurrentKeyData = NULL;	/* not allowed in w3m-control: */
     cmd = searchKeyData();
     if (cmd == NULL || *cmd == '\0') {
 	cmd = inputLineHist("(exec shell)!", "", IN_COMMAND, ShellHist);
@@ -3603,6 +3595,18 @@ _followForm(int submit)
     displayBuffer(Currentbuf, B_FORCE_REDRAW);
 }
 
+DEFUN(goMain, MAIN, "Goto main content")
+{
+    if (!Currentbuf->mainline) {
+	disp_err_message(_("<main> not found"), FALSE);
+	return;
+    }
+    gotoLine(Currentbuf, Currentbuf->mainline);
+    Currentbuf->pos = 0;
+    arrangeCursor(Currentbuf);
+    displayBuffer(Currentbuf, B_NORMAL);
+}
+
 /* go to the top anchor */
 DEFUN(topA, LINK_BEGIN, "Move to the first hyperlink")
 {
@@ -4439,7 +4443,6 @@ DEFUN(setOpt, SET_OPTION, "Set option")
 {
     char *opt;
 
-    CurrentKeyData = NULL;	/* not allowed in w3m-control: */
     opt = searchKeyData();
     if (opt == NULL || *opt == '\0' || strchr(opt, '=') == NULL) {
 	if (opt != NULL && *opt != '\0') {
@@ -4624,7 +4627,6 @@ DEFUN(ldHist, HISTORY, "Show browsing history")
 /* download HREF link */
 DEFUN(svA, SAVE_LINK, "Save hyperlink target")
 {
-    CurrentKeyData = NULL;	/* not allowed in w3m-control: */
     do_download = TRUE;
     followA();
     do_download = FALSE;
@@ -4633,7 +4635,6 @@ DEFUN(svA, SAVE_LINK, "Save hyperlink target")
 /* download IMG link */
 DEFUN(svI, SAVE_IMAGE, "Save inline image")
 {
-    CurrentKeyData = NULL;	/* not allowed in w3m-control: */
     do_download = TRUE;
     followI();
     do_download = FALSE;
@@ -4646,7 +4647,6 @@ DEFUN(svBuf, PRINT SAVE_SCREEN, "Save rendered document")
     FILE *f;
     int is_pipe;
 
-    CurrentKeyData = NULL;	/* not allowed in w3m-control: */
     file = searchKeyData();
     if (file == NULL || *file == '\0') {
 	/* FIXME: gettextize? */
@@ -4695,7 +4695,6 @@ DEFUN(svSrc, DOWNLOAD SAVE, "Save document source")
 
     if (Currentbuf->sourcefile == NULL)
 	return;
-    CurrentKeyData = NULL;	/* not allowed in w3m-control: */
     PermitSaveToPipe = TRUE;
     if (Currentbuf->real_scheme == SCM_LOCAL)
 	file = conv_from_system(guess_save_name(NULL,
@@ -5243,7 +5242,6 @@ invoke_browser(char *url)
     char *browser = NULL;
     int bg = 0, len;
 
-    CurrentKeyData = NULL;	/* not allowed in w3m-control: */
     browser = searchKeyData();
     if (browser == NULL || *browser == '\0') {
 	switch (prec_num) {
@@ -5497,7 +5495,6 @@ do_mouse_action(int btn, int x, int y)
 	mouse_action.cursorX = x;
 	mouse_action.cursorY = y;
 	CurrentKey = -1;
-	CurrentKeyData = NULL;
 	CurrentCmdData = map->data;
 	(*map->func) ();
 	CurrentCmdData = NULL;
@@ -5926,7 +5923,7 @@ execdict(char *word)
 
 DEFUN(dictword, DICT_WORD, "Execute dictionary command (see README.dict)")
 {
-    execdict(inputStr("(dictionary)!", ""));
+    execdict(inputStr(DictPrompt, ""));
 }
 
 DEFUN(dictwordat, DICT_WORD_AT,
@@ -6005,13 +6002,10 @@ searchKeyData(void)
 {
     char *data = NULL;
 
-    if (CurrentKeyData != NULL && *CurrentKeyData != '\0')
-	data = CurrentKeyData;
-    else if (CurrentCmdData != NULL && *CurrentCmdData != '\0')
+    if (CurrentCmdData != NULL && *CurrentCmdData != '\0')
 	data = CurrentCmdData;
     else if (CurrentKey >= 0)
 	data = getKeyData(CurrentKey);
-    CurrentKeyData = NULL;
     CurrentCmdData = NULL;
     if (data == NULL || *data == '\0')
 	return NULL;
@@ -6100,7 +6094,6 @@ DEFUN(execCmd, COMMAND, "Invoke w3m function(s)")
     char *data, *p;
     int cmd;
 
-    CurrentKeyData = NULL;	/* not allowed in w3m-control: */
     data = searchKeyData();
     if (data == NULL || *data == '\0') {
 	data = inputStrHist("command [; ...]: ", "", TextHist);
@@ -6125,7 +6118,6 @@ DEFUN(execCmd, COMMAND, "Invoke w3m function(s)")
 	}
 	p = getQWord(&data);
 	CurrentKey = -1;
-	CurrentKeyData = NULL;
 	CurrentCmdData = *p ? p : NULL;
 #ifdef USE_MOUSE
 	if (use_mouse)
@@ -6149,7 +6141,6 @@ SigAlarm(SIGNAL_ARG)
 
     if (CurrentAlarm->sec > 0) {
 	CurrentKey = -1;
-	CurrentKeyData = NULL;
 	CurrentCmdData = data = (char *)CurrentAlarm->data;
 #ifdef USE_MOUSE
 	if (use_mouse)
@@ -6186,7 +6177,6 @@ DEFUN(setAlarm, ALARM, "Set alarm")
     char *data;
     int sec = 0, cmd = -1;
 
-    CurrentKeyData = NULL;	/* not allowed in w3m-control: */
     data = searchKeyData();
     if (data == NULL || *data == '\0') {
 	data = inputStrHist("(Alarm)sec command: ", "", TextHist);
@@ -6298,7 +6288,6 @@ DEFUN(defKey, DEFINE_KEY, "Define a binding between a key stroke combination and
 {
     char *data;
 
-    CurrentKeyData = NULL;	/* not allowed in w3m-control: */
     data = searchKeyData();
     if (data == NULL || *data == '\0') {
 	data = inputStrHist("Key definition: ", "", TextHist);

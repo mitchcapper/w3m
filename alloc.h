@@ -7,16 +7,17 @@
 #ifndef W3_ALLOC_H
 #define W3_ALLOC_H
 #include <gc.h>
-#include <stdlib.h>
-#include <stdio.h>
 #include <limits.h>
+#include <stdlib.h>
+#include <stdint.h>
+#include <stdio.h>
 
 static inline size_t
 z_mult_no_oflow_(size_t n, size_t size)
 {
-	if (size != 0 && n > ULONG_MAX / size) {
+	if (size != 0 && n > SIZE_MAX / size) {
 		fprintf(stderr,
-		    "w3m: overflow in malloc, %lu*%lu\n", (unsigned long)n, (unsigned long)size);
+		    "w3m: overflow in malloc, %zu*%zu\n", n, size);
 		exit(1);
 	}
 	return n * size;

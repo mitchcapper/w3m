@@ -242,6 +242,8 @@ typedef struct {
 #define HTML_N_DD       148
 #define HTML_DFN        149
 #define HTML_N_DFN      150
+#define HTML_MAIN	151
+#define HTML_N_MAIN	152
 
    /* pseudo tag */
 #define HTML_SELECT_INT     160
