@@ -1,3 +1,52 @@
+Unreleased
+
+* deprecated
+  - option -H Users should use -o high-intensity=true instead
+  - ChangeLog file, use the git log for all the details
+
+* new features
+  - Add command to navigate between image links directly
+  - Add command to display user-defined messages
+  - Add option to include current column number in line info
+  - Drop undocumented upper limit for -cols
+  - Make -cols work without -dump
+  - Add option to permanently set -cols, i.e. limit the text width on
+    wide terminals
+  - Add command and option to wrap long lines in <pre> elements to
+    workaround missing CSS support on some sites
+  - Make https links clickable in w3mman
+  - Enable re-ordering of buffers in the stack menu
+  - Add option to close the last buffer with BACK(B)
+  - Add gophers support
+  - Display an error if the users enters an unknown command via COMMAND
+  - Add option for zero based link numbers
+  - Prepend https instead of http if the URL has no scheme
+  - Add option to change the dictionary prompt
+  - Add command to jump to the line which contains the <main> tag
+  - Enable using 'skip to content' links
+
+* bug fixes
+  - Create history file if it does not exist
+  - Fix redirection check that broke wikipedia search
+  - Add tilde('~') to gopher regex for MARK_URL(':')
+  - Fix build error with --disable-color
+  - Check for buffer underruns in checkType
+  - Fix gopher selector string, use "\r\n" instead of "\n"
+  - Prevent a segfault when calling some partial gopher URLs
+  - Prevent a buffer overflow when printing mis-positioned images on
+    lines shorter than their intended line.
+  - Replace deprecated MD% function when building with OpenSSL 3 or greater
+  - Enable building with "modern C" build options
+  - Prevent segfault when aborting URL prompt in some build configurations
+  - Fix slow backward search in long lines
+  - Fix handling of key press after ESC
+  - Fix selection of nop menu items
+
+* removed
+  - Drop wait3 support
+  - Drop support for old ss family
+
+
 Debian's w3m 0.5.3+git20230121
 
 * new features
