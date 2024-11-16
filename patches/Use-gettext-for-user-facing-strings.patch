@@ -97,7 +97,7 @@
  	disp_message(delayed_msg, FALSE);
 --- a/file.c
 +++ b/file.c
-@@ -1585,12 +1585,11 @@ getAuthCookie(struct http_auth *hauth, c
+@@ -1588,12 +1588,11 @@ getAuthCookie(struct http_auth *hauth, c
  	if (fmInitialized) {
  	    char *pp;
  	    term_raw();
@@ -112,7 +112,7 @@
  				IN_PASSWORD)) == NULL) {
  		*uname = NULL;
  		return;
-@@ -1607,12 +1606,11 @@ getAuthCookie(struct http_auth *hauth, c
+@@ -1610,12 +1609,11 @@ getAuthCookie(struct http_auth *hauth, c
  	     * (This is same behavior as lwp-request.)
  	     */
  	    if (feof(stdin) || ferror(stdin)) {
@@ -127,7 +127,7 @@
  	    /* FIXME: gettextize? */
  	    printf(proxy ? "Proxy Username for %s: " : "Username for %s: ",
  		   realm);
-@@ -1663,8 +1661,7 @@ checkRedirection(ParsedURL *pu)
+@@ -1666,8 +1664,7 @@ checkRedirection(ParsedURL *pu)
      }
  
      if (nredir >= FollowRedirection) {
@@ -137,7 +137,7 @@
  		      FollowRedirection, parsedURL2Str(pu)->ptr);
  	disp_err_message(tmp->ptr, FALSE);
  	return FALSE;
-@@ -1793,8 +1790,7 @@ loadGeneralFile(char *path, ParsedURL *v
+@@ -1796,8 +1793,7 @@ loadGeneralFile(char *path, ParsedURL *v
  		return b;
  	    }
  #endif
@@ -147,7 +147,7 @@
  				     parsedURL2Str(&pu)->ptr)->ptr, FALSE);
  	    break;
  	}
-@@ -1841,8 +1837,7 @@ loadGeneralFile(char *path, ParsedURL *v
+@@ -1844,8 +1840,7 @@ loadGeneralFile(char *path, ParsedURL *v
  
  	if (fmInitialized) {
  	    term_cbreak();
@@ -157,7 +157,7 @@
  		    ptr, 0, 0);
  	    refresh();
  	}
-@@ -8541,8 +8536,7 @@ _doFileCopy(char *tmpf, char *defstr, in
+@@ -8544,8 +8539,7 @@ _doFileCopy(char *tmpf, char *defstr, in
      if (fmInitialized) {
  	p = searchKeyData();
  	if (p == NULL || *p == '\0') {
@@ -167,7 +167,7 @@
  			      defstr, IN_COMMAND, SaveHist);
  	    if (q == NULL || *q == '\0')
  		return FALSE;
-@@ -8560,16 +8554,14 @@ _doFileCopy(char *tmpf, char *defstr, in
+@@ -8563,16 +8557,14 @@ _doFileCopy(char *tmpf, char *defstr, in
  		return -1;
  	}
  	if (checkCopyFile(tmpf, p) < 0) {
@@ -186,7 +186,7 @@
  		disp_err_message(msg->ptr, FALSE);
  	    }
  	    return -1;
-@@ -8599,8 +8591,7 @@ _doFileCopy(char *tmpf, char *defstr, in
+@@ -8602,8 +8594,7 @@ _doFileCopy(char *tmpf, char *defstr, in
      else {
  	q = searchKeyData();
  	if (q == NULL || *q == '\0') {
@@ -196,7 +196,7 @@
  	    fflush(stdout);
  	    filen = Strfgets(stdin);
  	    if (filen->length == 0)
-@@ -8620,13 +8611,11 @@ _doFileCopy(char *tmpf, char *defstr, in
+@@ -8623,13 +8614,11 @@ _doFileCopy(char *tmpf, char *defstr, in
  		return -1;
  	}
  	if (checkCopyFile(tmpf, p) < 0) {
@@ -212,7 +212,7 @@
  	    return -1;
  	}
  	if (PreserveTimestamp && !is_pipe && !stat(tmpf, &st))
-@@ -8660,8 +8649,7 @@ doFileSave(URLFile uf, const char *defst
+@@ -8663,8 +8652,7 @@ doFileSave(URLFile uf, const char *defst
      if (fmInitialized) {
  	p = searchKeyData();
  	if (p == NULL || *p == '\0') {
@@ -222,7 +222,7 @@
  			      defstr, IN_FILENAME, SaveHist);
  	    if (p == NULL || *p == '\0')
  		return -1;
-@@ -8670,8 +8658,7 @@ doFileSave(URLFile uf, const char *defst
+@@ -8673,8 +8661,7 @@ doFileSave(URLFile uf, const char *defst
  	if (checkOverWrite(p) < 0)
  	    return -1;
  	if (checkSaveFile(uf.stream, p) < 0) {
@@ -232,7 +232,7 @@
  			  conv_from_system(p));
  	    disp_err_message(msg->ptr, FALSE);
  	    return -1;
-@@ -8705,8 +8692,7 @@ doFileSave(URLFile uf, const char *defst
+@@ -8708,8 +8695,7 @@ doFileSave(URLFile uf, const char *defst
      else {
  	q = searchKeyData();
  	if (q == NULL || *q == '\0') {
@@ -242,7 +242,7 @@
  	    fflush(stdout);
  	    filen = Strfgets(stdin);
  	    if (filen->length == 0)
-@@ -8721,15 +8707,13 @@ doFileSave(URLFile uf, const char *defst
+@@ -8724,15 +8710,13 @@ doFileSave(URLFile uf, const char *defst
  	if (checkOverWrite(p) < 0)
  	    return -1;
  	if (checkSaveFile(uf.stream, p) < 0) {
@@ -260,7 +260,7 @@
  	    return -1;
  	}
  	if (PreserveTimestamp && uf.modtime != -1)
-@@ -8776,8 +8760,7 @@ checkOverWrite(const char *path)
+@@ -8779,8 +8763,7 @@ checkOverWrite(const char *path)
  
      if (stat(path, &st) < 0)
  	return 0;

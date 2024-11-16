@@ -32,7 +32,7 @@ Patch: patches/Fix-scan-build-issues.patch
  		(IS_SPACE(*q) || *q == '=')) {
  		SKIP_BLANKS(q);
  		if (*q != '=')
-@@ -1515,8 +1514,7 @@ findAuthentication(struct http_auth *hau
+@@ -1518,8 +1517,7 @@ findAuthentication(struct http_auth *hau
  		}
  		if (p0 == p) {
  		    /* all unknown auth failed */
@@ -42,7 +42,7 @@ Patch: patches/Fix-scan-build-issues.patch
  			SKIP_BLANKS(p);
  			p = extract_auth_param(p, none_auth_param);
  		    }
-@@ -6575,7 +6573,6 @@ HTMLlineproc0(char *line, struct html_fe
+@@ -6578,7 +6576,6 @@ HTMLlineproc0(char *line, struct html_fe
  		    str = Strnew_charp_n(str, p - str)->ptr;
  		    line = Strnew_m_charp(p, line, NULL)->ptr;
  		}
@@ -50,7 +50,7 @@ Patch: patches/Fix-scan-build-issues.patch
  		continue;
  	    }
  	    if (obuf->table_level >= 0)
-@@ -7260,7 +7257,7 @@ loadHTMLstream(URLFile *f, Buffer *newBu
+@@ -7263,7 +7260,7 @@ loadHTMLstream(URLFile *f, Buffer *newBu
      struct environment envs[MAX_ENV_LEVEL];
      clen_t linelen = 0;
      clen_t trbyte = 0;
@@ -59,7 +59,7 @@ Patch: patches/Fix-scan-build-issues.patch
  #ifdef USE_M17N
      wc_ces charset = WC_CES_US_ASCII;
      wc_ces volatile doc_charset = DocumentCharset;
-@@ -7501,11 +7498,11 @@ loadGopherDir0(URLFile *uf, ParsedURL *p
+@@ -7504,11 +7501,11 @@ loadGopherDir0(URLFile *uf, ParsedURL *p
  			 "</title>\n</head>\n<body>\n<h1>Index of ", q,
  			 "</h1>\n<table>\n", NULL);
  

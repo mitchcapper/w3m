@@ -11,7 +11,7 @@ Patch: patches/Add-default-download-directory.patch
 
 --- a/file.c
 +++ b/file.c
-@@ -8637,6 +8637,14 @@ doFileSave(URLFile uf, const char *defst
+@@ -8640,6 +8640,14 @@ doFileSave(URLFile uf, const char *defst
      FILE *f;
  #endif
  

@@ -15,7 +15,7 @@ Patch: patches/Refactor-handling-of-close-tags.patch
 
 --- a/file.c
 +++ b/file.c
-@@ -3227,7 +3227,7 @@ close_anchor(struct html_feed_environ *h
+@@ -3230,7 +3230,7 @@ close_anchor(struct html_feed_environ *h
  	    obuf->pos++;
  	}
  
@@ -24,7 +24,7 @@ Patch: patches/Refactor-handling-of-close-tags.patch
      }
      bzero((void *)&obuf->anchor, sizeof(obuf->anchor));
  }
-@@ -3241,15 +3241,15 @@ save_fonteffect(struct html_feed_environ
+@@ -3244,15 +3244,15 @@ save_fonteffect(struct html_feed_environ
      if (obuf->fontstat_sp < INT_MAX)
  	obuf->fontstat_sp++;
      if (obuf->in_bold)
@@ -45,7 +45,7 @@ Patch: patches/Refactor-handling-of-close-tags.patch
      bzero(obuf->fontstat, FONTSTAT_SIZE);
  }
  
-@@ -4020,7 +4020,7 @@ feed_select(char *str)
+@@ -4023,7 +4023,7 @@ feed_select(char *str)
  		cur_option_selected = parsedtag_exists(tag, ATTR_SELECTED);
  		prev_spaces = -1;
  		break;
@@ -54,7 +54,7 @@ Patch: patches/Refactor-handling-of-close-tags.patch
  		/* do nothing */
  		break;
  	    default:
-@@ -4539,11 +4539,9 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -4542,11 +4542,9 @@ HTMLtagproc1(struct parsed_tag *tag, str
      cmd = tag->tagid;
  
      if (obuf->flag & RB_PRE) {
@@ -67,7 +67,7 @@ Patch: patches/Refactor-handling-of-close-tags.patch
  	    return 1;
  	}
      }
-@@ -4555,7 +4553,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -4558,7 +4556,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	if (obuf->in_bold > 1)
  	    return 1;
  	return 0;
@@ -76,7 +76,7 @@ Patch: patches/Refactor-handling-of-close-tags.patch
  	if (obuf->in_bold == 1 && close_effect0(obuf, HTML_B))
  	    obuf->in_bold = 0;
  	if (obuf->in_bold > 0) {
-@@ -4570,7 +4568,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -4573,7 +4571,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	if (obuf->in_italic > 1)
  	    return 1;
  	return 0;
@@ -85,7 +85,7 @@ Patch: patches/Refactor-handling-of-close-tags.patch
  	if (obuf->in_italic == 1 && close_effect0(obuf, HTML_I))
  	    obuf->in_italic = 0;
  	if (obuf->in_italic > 0) {
-@@ -4585,7 +4583,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -4588,7 +4586,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	if (obuf->in_under > 1)
  	    return 1;
  	return 0;
@@ -94,7 +94,7 @@ Patch: patches/Refactor-handling-of-close-tags.patch
  	if (obuf->in_under == 1 && close_effect0(obuf, HTML_U))
  	    obuf->in_under = 0;
  	if (obuf->in_under > 0) {
-@@ -4597,13 +4595,13 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -4600,13 +4598,13 @@ HTMLtagproc1(struct parsed_tag *tag, str
      case HTML_EM:
  	HTMLlineproc1("<i>", h_env);
  	return 1;
@@ -110,7 +110,7 @@ Patch: patches/Refactor-handling-of-close-tags.patch
  	HTMLlineproc1("</b>", h_env);
  	return 1;
      case HTML_Q:
-@@ -4618,7 +4616,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -4621,7 +4619,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  #endif
  	HTMLlineproc1("`", h_env);
  	return 1;
@@ -119,7 +119,7 @@ Patch: patches/Refactor-handling-of-close-tags.patch
  #ifdef USE_M17N
  #ifdef USE_UNICODE
  	if (DisplayCharset != WC_CES_US_ASCII) {
-@@ -4631,9 +4629,9 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -4634,9 +4632,9 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	HTMLlineproc1("'", h_env);
  	return 1;
      case HTML_FIGURE:
@@ -131,7 +131,7 @@ Patch: patches/Refactor-handling-of-close-tags.patch
  	CLOSE_A;
  	if (!(obuf->flag & RB_IGNORE_P)) {
  	    flushline(h_env, obuf, envs[h_env->envc].indent, 1, h_env->limit);
-@@ -4646,7 +4644,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -4649,7 +4647,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	}
  	return 1;
      case HTML_FIGCAPTION:
@@ -140,7 +140,7 @@ Patch: patches/Refactor-handling-of-close-tags.patch
      case HTML_BR:
  	flushline(h_env, obuf, envs[h_env->envc].indent, 1, h_env->limit);
  	h_env->blank_lines = 0;
-@@ -4659,7 +4657,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -4662,7 +4660,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	HTMLlineproc1("<b>", h_env);
  	set_alignment(obuf, tag);
  	return 1;
@@ -149,7 +149,7 @@ Patch: patches/Refactor-handling-of-close-tags.patch
  	HTMLlineproc1("</b>", h_env);
  	if (!(obuf->flag & RB_PREMODE)) {
  	    flushline(h_env, obuf, envs[h_env->envc].indent, 0, h_env->limit);
-@@ -4695,11 +4693,11 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -4698,11 +4696,11 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	    envs[h_env->envc].type = ul_type(tag, 0);
  	flushline(h_env, obuf, envs[h_env->envc].indent, 0, h_env->limit);
  	return 1;
@@ -166,7 +166,7 @@ Patch: patches/Refactor-handling-of-close-tags.patch
  	CLOSE_DT;
  	CLOSE_A;
  	if (h_env->envc > 0) {
-@@ -4707,7 +4705,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -4710,7 +4708,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  		      h_env->limit);
  	    POP_ENV;
  	    if (!(obuf->flag & RB_PREMODE) &&
@@ -175,7 +175,7 @@ Patch: patches/Refactor-handling-of-close-tags.patch
  		do_blankline(h_env, obuf,
  			     envs[h_env->envc].indent, h_env->limit);
  		obuf->flag |= RB_IGNORE_P;
-@@ -4815,6 +4813,8 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -4818,6 +4816,8 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	}
  	obuf->flag |= RB_IGNORE_P;
  	return 1;
@@ -184,7 +184,7 @@ Patch: patches/Refactor-handling-of-close-tags.patch
      case HTML_DT:
  	CLOSE_A;
  	if (h_env->envc == 0 ||
-@@ -4833,7 +4833,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -4836,7 +4836,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	}
  	obuf->flag |= RB_IGNORE_P;
  	return 1;
@@ -193,7 +193,7 @@ Patch: patches/Refactor-handling-of-close-tags.patch
  	if (!(obuf->flag & RB_IN_DT)) {
  	    return 1;
  	}
-@@ -4866,9 +4866,9 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -4869,9 +4869,9 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	close_anchor(h_env, obuf);
  	process_title(tag);
  	obuf->flag |= RB_TITLE;
@@ -205,7 +205,7 @@ Patch: patches/Refactor-handling-of-close-tags.patch
  	if (!(obuf->flag & RB_TITLE))
  	    return 1;
  	obuf->flag &= ~RB_TITLE;
-@@ -4886,7 +4886,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -4889,7 +4889,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	push_charp(obuf, 9, "--FRAME--", PC_ASCII);
  	flushline(h_env, obuf, envs[h_env->envc].indent, 0, h_env->limit);
  	return 0;
@@ -214,7 +214,7 @@ Patch: patches/Refactor-handling-of-close-tags.patch
  	if (h_env->envc > 0) {
  	    POP_ENV;
  	    flushline(h_env, obuf, envs[h_env->envc].indent, 0, h_env->limit);
-@@ -4898,7 +4898,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -4901,7 +4901,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	obuf->flag |= (RB_NOFRAMES | RB_IGNORE_P);
  	/* istr = str; */
  	return 1;
@@ -223,7 +223,7 @@ Patch: patches/Refactor-handling-of-close-tags.patch
  	CLOSE_A;
  	flushline(h_env, obuf, envs[h_env->envc].indent, 0, h_env->limit);
  	obuf->flag &= ~RB_NOFRAMES;
-@@ -4914,7 +4914,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -4917,7 +4917,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	    if (r)
  		q = html_quote(r);
  	    push_charp(obuf, get_strwidth(q), q, PC_ASCII);
@@ -232,7 +232,7 @@ Patch: patches/Refactor-handling-of-close-tags.patch
  	}
  	flushline(h_env, obuf, envs[h_env->envc].indent, 0, h_env->limit);
  	return 0;
-@@ -4938,7 +4938,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -4941,7 +4941,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	obuf->flag |= (RB_PRE | RB_IGNORE_P);
  	/* istr = str; */
  	return 1;
@@ -241,7 +241,7 @@ Patch: patches/Refactor-handling-of-close-tags.patch
  	flushline(h_env, obuf, envs[h_env->envc].indent, 0, h_env->limit);
  	if (!(obuf->flag & RB_IGNORE_P)) {
  	    do_blankline(h_env, obuf, envs[h_env->envc].indent, h_env->limit);
-@@ -4956,8 +4956,8 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -4959,8 +4959,8 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	}
  	obuf->flag |= RB_PRE_INT;
  	return 0;
@@ -252,7 +252,7 @@ Patch: patches/Refactor-handling-of-close-tags.patch
  	obuf->flag &= ~RB_PRE_INT;
  	if (!(obuf->flag & RB_SPECIAL) && obuf->pos > obuf->bp.pos) {
  	    set_prevchar(obuf->prevchar, "", 0);
-@@ -4968,7 +4968,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -4971,7 +4971,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	obuf->flag |= RB_NOBR;
  	obuf->nobr_level++;
  	return 0;
@@ -261,7 +261,7 @@ Patch: patches/Refactor-handling-of-close-tags.patch
  	if (obuf->nobr_level > 0)
  	    obuf->nobr_level--;
  	if (obuf->nobr_level == 0)
-@@ -4982,7 +4982,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -4985,7 +4985,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	}
  	obuf->flag |= (RB_PRE | RB_IGNORE_P);
  	return 1;
@@ -270,7 +270,7 @@ Patch: patches/Refactor-handling-of-close-tags.patch
  	CLOSE_A;
  	if (!(obuf->flag & RB_IGNORE_P)) {
  	    flushline(h_env, obuf, envs[h_env->envc].indent, 0, h_env->limit);
-@@ -5002,18 +5002,18 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -5005,18 +5005,18 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	obuf->flag |= (RB_PLAIN | RB_IGNORE_P);
  	switch (cmd) {
  	case HTML_LISTING:
@@ -293,7 +293,7 @@ Patch: patches/Refactor-handling-of-close-tags.patch
  	CLOSE_A;
  	if (!(obuf->flag & RB_IGNORE_P)) {
  	    flushline(h_env, obuf, envs[h_env->envc].indent, 0, h_env->limit);
-@@ -5025,17 +5025,17 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -5028,17 +5028,17 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	return 1;
      case HTML_SCRIPT:
  	obuf->flag |= RB_SCRIPT;
@@ -315,7 +315,7 @@ Patch: patches/Refactor-handling-of-close-tags.patch
  	obuf->flag &= ~RB_STYLE;
  	obuf->end_tag = 0;
  	return 1;
-@@ -5066,7 +5066,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -5069,7 +5069,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	    return 1;
  	}
  	return 0;
@@ -324,7 +324,7 @@ Patch: patches/Refactor-handling-of-close-tags.patch
  	close_anchor(h_env, obuf);
  	return 1;
      case HTML_IMG:
-@@ -5095,10 +5095,10 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -5098,10 +5098,10 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	}
  #endif
  	return 0;
@@ -337,7 +337,7 @@ Patch: patches/Refactor-handling-of-close-tags.patch
  	    obuf->img_alt = NULL;
  	}
  	return 1;
-@@ -5130,10 +5130,10 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -5133,10 +5133,10 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	}
  	obuf->input_alt.in = 1;
  	return 0;
@@ -350,7 +350,7 @@ Patch: patches/Refactor-handling-of-close-tags.patch
  	    obuf->input_alt.hseq = 0;
  	    obuf->input_alt.fid = -1;
  	    obuf->input_alt.in = 0;
-@@ -5212,7 +5212,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -5215,7 +5215,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	tables[obuf->table_level]->total_width = 0;
  #endif
  	return 1;
@@ -359,7 +359,7 @@ Patch: patches/Refactor-handling-of-close-tags.patch
  	/* should be processed in HTMLlineproc() */
  	return 1;
      case HTML_CENTER:
-@@ -5225,7 +5225,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -5228,7 +5228,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	else
  	    RB_SET_ALIGN(obuf, RB_CENTER);
  	return 1;
@@ -368,7 +368,7 @@ Patch: patches/Refactor-handling-of-close-tags.patch
  	CLOSE_A;
  	if (!(obuf->flag & RB_PREMODE))
  	    flushline(h_env, obuf, envs[h_env->envc].indent, 0, h_env->limit);
-@@ -5237,7 +5237,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -5240,7 +5240,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	    flushline(h_env, obuf, envs[h_env->envc].indent, 0, h_env->limit);
  	set_alignment(obuf, tag);
  	return 1;
@@ -377,7 +377,7 @@ Patch: patches/Refactor-handling-of-close-tags.patch
  	CLOSE_A;
  	flushline(h_env, obuf, envs[h_env->envc].indent, 0, h_env->limit);
  	RB_RESTORE_FLAG(obuf);
-@@ -5248,7 +5248,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -5251,7 +5251,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	    flushline(h_env, obuf, envs[h_env->envc].indent, 0, h_env->limit);
  	set_alignment(obuf, tag);
  	return 1;
@@ -386,7 +386,7 @@ Patch: patches/Refactor-handling-of-close-tags.patch
  	CLOSE_P;
  	flushline(h_env, obuf, envs[h_env->envc].indent, 0, h_env->limit);
  	RB_RESTORE_FLAG(obuf);
-@@ -5261,7 +5261,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -5264,7 +5264,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	if (tmp)
  	    HTMLlineproc1(tmp->ptr, h_env);
  	return 1;
@@ -395,7 +395,7 @@ Patch: patches/Refactor-handling-of-close-tags.patch
  	CLOSE_A;
  	flushline(h_env, obuf, envs[h_env->envc].indent, 0, h_env->limit);
  	obuf->flag |= RB_IGNORE_P;
-@@ -5279,7 +5279,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -5282,7 +5282,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	if (tmp)
  	    HTMLlineproc1(tmp->ptr, h_env);
  	return 1;
@@ -404,7 +404,7 @@ Patch: patches/Refactor-handling-of-close-tags.patch
  	tmp = process_n_button();
  	if (tmp)
  	    HTMLlineproc1(tmp->ptr, h_env);
-@@ -5290,9 +5290,9 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -5293,9 +5293,9 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	if (tmp)
  	    HTMLlineproc1(tmp->ptr, h_env);
  	obuf->flag |= RB_INSELECT;
@@ -416,7 +416,7 @@ Patch: patches/Refactor-handling-of-close-tags.patch
  	obuf->flag &= ~RB_INSELECT;
  	obuf->end_tag = 0;
  	tmp = process_n_select();
-@@ -5308,9 +5308,9 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -5311,9 +5311,9 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	if (tmp)
  	    HTMLlineproc1(tmp->ptr, h_env);
  	obuf->flag |= RB_INTXTA;
@@ -428,7 +428,7 @@ Patch: patches/Refactor-handling-of-close-tags.patch
  	obuf->flag &= ~RB_INTXTA;
  	obuf->end_tag = 0;
  	tmp = process_n_textarea();
-@@ -5391,7 +5391,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -5394,7 +5394,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	}
  #endif
      case HTML_MAP:
@@ -437,7 +437,7 @@ Patch: patches/Refactor-handling-of-close-tags.patch
      case HTML_AREA:
  	return 0;
      case HTML_DEL:
-@@ -5411,7 +5411,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -5414,7 +5414,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	    break;
  	}
  	return 1;
@@ -446,7 +446,7 @@ Patch: patches/Refactor-handling-of-close-tags.patch
  	switch (displayInsDel) {
  	case DISPLAY_INS_DEL_SIMPLE:
  	    obuf->flag &= ~RB_DEL;
-@@ -5426,7 +5426,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -5429,7 +5429,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	    if (obuf->in_strike > 0) {
  		obuf->in_strike--;
  		if (obuf->in_strike == 0) {
@@ -455,7 +455,7 @@ Patch: patches/Refactor-handling-of-close-tags.patch
  		}
  	    }
  	    break;
-@@ -5449,7 +5449,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -5452,7 +5452,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	    break;
  	}
  	return 1;
@@ -464,7 +464,7 @@ Patch: patches/Refactor-handling-of-close-tags.patch
  	switch (displayInsDel) {
  	case DISPLAY_INS_DEL_SIMPLE:
  	    obuf->flag &= ~RB_S;
-@@ -5465,7 +5465,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -5468,7 +5468,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	    if (obuf->in_strike > 0) {
  		obuf->in_strike--;
  		if (obuf->in_strike == 0) {
@@ -473,7 +473,7 @@ Patch: patches/Refactor-handling-of-close-tags.patch
  		}
  	    }
  	}
-@@ -5486,7 +5486,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -5489,7 +5489,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	    break;
  	}
  	return 1;
@@ -482,7 +482,7 @@ Patch: patches/Refactor-handling-of-close-tags.patch
  	switch (displayInsDel) {
  	case DISPLAY_INS_DEL_SIMPLE:
  	    break;
-@@ -5501,7 +5501,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -5504,7 +5504,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	    if (obuf->in_ins > 0) {
  		obuf->in_ins--;
  		if (obuf->in_ins == 0) {
@@ -491,7 +491,7 @@ Patch: patches/Refactor-handling-of-close-tags.patch
  		}
  	    }
  	    break;
-@@ -5511,18 +5511,18 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -5514,18 +5514,18 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	if (!(obuf->flag & (RB_DEL | RB_S)))
  	    HTMLlineproc1("^", h_env);
  	return 1;
@@ -513,7 +513,7 @@ Patch: patches/Refactor-handling-of-close-tags.patch
      case HTML_NOP:
  	return 1;
      case HTML_BGSOUND:
-@@ -5565,11 +5565,11 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -5568,11 +5568,11 @@ HTMLtagproc1(struct parsed_tag *tag, str
  		HTMLlineproc1(s->ptr, h_env);
  	    }
  	}
@@ -527,7 +527,7 @@ Patch: patches/Refactor-handling-of-close-tags.patch
  	return 1;
      case HTML_MAIN:
  	Strcopy_charp(obuf->line, "<main>");
-@@ -5810,31 +5810,31 @@ HTMLlineproc2body(Buffer *buf, Str (*fee
+@@ -5813,31 +5813,31 @@ HTMLlineproc2body(Buffer *buf, Str (*fee
  		case HTML_B:
  		    effect |= PE_BOLD;
  		    break;
@@ -564,7 +564,7 @@ Patch: patches/Refactor-handling-of-close-tags.patch
  		    ex_effect &= ~PE_EX_STRIKE;
  		    break;
  		case HTML_A:
-@@ -5895,7 +5895,7 @@ HTMLlineproc2body(Buffer *buf, Str (*fee
+@@ -5898,7 +5898,7 @@ HTMLlineproc2body(Buffer *buf, Str (*fee
  			a_href->slave = (hseq > 0) ? FALSE : TRUE;
  		    }
  		    break;
@@ -573,7 +573,7 @@ Patch: patches/Refactor-handling-of-close-tags.patch
  		    effect &= ~PE_ANCHOR;
  		    if (a_href) {
  			a_href->end.line = currentLn(buf);
-@@ -5986,7 +5986,7 @@ HTMLlineproc2body(Buffer *buf, Str (*fee
+@@ -5989,7 +5989,7 @@ HTMLlineproc2body(Buffer *buf, Str (*fee
  		    }
  		    effect |= PE_IMAGE;
  		    break;
@@ -582,7 +582,7 @@ Patch: patches/Refactor-handling-of-close-tags.patch
  		    effect &= ~PE_IMAGE;
  		    if (a_img) {
  			a_img->end.line = currentLn(buf);
-@@ -6080,7 +6080,7 @@ HTMLlineproc2body(Buffer *buf, Str (*fee
+@@ -6083,7 +6083,7 @@ HTMLlineproc2body(Buffer *buf, Str (*fee
  			    break;
  			}
  		    }
@@ -591,7 +591,7 @@ Patch: patches/Refactor-handling-of-close-tags.patch
  		    effect &= ~PE_FORM;
  		    if (a_form) {
  			a_form->end.line = currentLn(buf);
-@@ -6100,7 +6100,7 @@ HTMLlineproc2body(Buffer *buf, Str (*fee
+@@ -6103,7 +6103,7 @@ HTMLlineproc2body(Buffer *buf, Str (*fee
  			buf->maplist = m;
  		    }
  		    break;
@@ -600,7 +600,7 @@ Patch: patches/Refactor-handling-of-close-tags.patch
  		    /* nothing to do */
  		    break;
  		case HTML_AREA:
-@@ -6144,7 +6144,7 @@ HTMLlineproc2body(Buffer *buf, Str (*fee
+@@ -6147,7 +6147,7 @@ HTMLlineproc2body(Buffer *buf, Str (*fee
  					   *(union frameset_element *)
  					   &frameset_s[frameset_sp]);
  		    break;
@@ -609,7 +609,7 @@ Patch: patches/Refactor-handling-of-close-tags.patch
  		    if (frameset_sp >= 0)
  			frameset_sp--;
  		    break;
-@@ -6204,8 +6204,8 @@ HTMLlineproc2body(Buffer *buf, Str (*fee
+@@ -6207,8 +6207,8 @@ HTMLlineproc2body(Buffer *buf, Str (*fee
  		case HTML_INTERNAL:
  		    internal = HTML_INTERNAL;
  		    break;
@@ -620,7 +620,7 @@ Patch: patches/Refactor-handling-of-close-tags.patch
  		    break;
  		case HTML_FORM_INT:
  		    if (parsedtag_get_value(tag, ATTR_FID, &form_id))
-@@ -6220,7 +6220,7 @@ HTMLlineproc2body(Buffer *buf, Str (*fee
+@@ -6223,7 +6223,7 @@ HTMLlineproc2body(Buffer *buf, Str (*fee
  		    else
  			n_textarea = -1;
  		    break;
@@ -629,7 +629,7 @@ Patch: patches/Refactor-handling-of-close-tags.patch
  		    if (a_textarea && n_textarea >= 0) {
  			FormItemList *item =
  			    (FormItemList *)a_textarea[n_textarea]->url;
-@@ -6238,7 +6238,7 @@ HTMLlineproc2body(Buffer *buf, Str (*fee
+@@ -6241,7 +6241,7 @@ HTMLlineproc2body(Buffer *buf, Str (*fee
  		    else
  			n_select = -1;
  		    break;
@@ -638,7 +638,7 @@ Patch: patches/Refactor-handling-of-close-tags.patch
  		    if (a_select && n_select >= 0) {
  			FormItemList *item =
  			    (FormItemList *)a_select[n_select]->url;
-@@ -6272,7 +6272,7 @@ HTMLlineproc2body(Buffer *buf, Str (*fee
+@@ -6275,7 +6275,7 @@ HTMLlineproc2body(Buffer *buf, Str (*fee
  		    if (parsedtag_get_value(tag, ATTR_TYPE, &p))
  			symbol = (char)atoi(p);
  		    break;
@@ -647,7 +647,7 @@ Patch: patches/Refactor-handling-of-close-tags.patch
  		    effect &= ~PC_SYMBOL;
  		    break;
  		case HTML_MAIN:
-@@ -6305,7 +6305,7 @@ HTMLlineproc2body(Buffer *buf, Str (*fee
+@@ -6308,7 +6308,7 @@ HTMLlineproc2body(Buffer *buf, Str (*fee
  	/* end of processing for one line */
  	if (!internal)
  	    addnewline(buf, outc, outp, NULL, pos, -1, nlines);
@@ -656,7 +656,7 @@ Patch: patches/Refactor-handling-of-close-tags.patch
  	    internal = 0;
  	if (str != endp) {
  	    line = Strsubstr(line, str - line->ptr, endp - str);
-@@ -6554,9 +6554,10 @@ HTMLlineproc0(char *line, struct html_fe
+@@ -6557,9 +6557,10 @@ HTMLlineproc0(char *line, struct html_fe
  		p = str;
  		if ((tag = parse_tag(&p, internal))) {
  		    if (tag->tagid == end_tag ||
@@ -669,7 +669,7 @@ Patch: patches/Refactor-handling-of-close-tags.patch
  				|| tag->tagid == HTML_BODY)))
  			goto proc_normal;
  		}
-@@ -7145,11 +7146,11 @@ completeHTMLstream(struct html_feed_envi
+@@ -7148,11 +7149,11 @@ completeHTMLstream(struct html_feed_envi
  {
      close_anchor(h_env, obuf);
      if (obuf->img_alt) {
@@ -683,7 +683,7 @@ Patch: patches/Refactor-handling-of-close-tags.patch
  	obuf->input_alt.hseq = 0;
  	obuf->input_alt.fid = -1;
  	obuf->input_alt.in = 0;
-@@ -7158,23 +7159,23 @@ completeHTMLstream(struct html_feed_envi
+@@ -7161,23 +7162,23 @@ completeHTMLstream(struct html_feed_envi
  	obuf->input_alt.value = NULL;
      }
      if (obuf->in_bold) {

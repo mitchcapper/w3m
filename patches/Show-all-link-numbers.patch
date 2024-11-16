@@ -9,7 +9,7 @@ Patch: patches/Show-all-link-numbers.patch
 
 --- a/file.c
 +++ b/file.c
-@@ -3900,7 +3900,8 @@ process_button(struct parsed_tag *tag)
+@@ -3903,7 +3903,8 @@ process_button(struct parsed_tag *tag)
         qq = html_quote(q);
      }
  
@@ -19,7 +19,7 @@ Patch: patches/Show-all-link-numbers.patch
      Strcat(tmp, Sprintf("<input_alt hseq=\"%d\" fid=\"%d\" type=\"%s\" "
                         "name=\"%s\" value=\"%s\">",
                         cur_hseq++, cur_form_id, html_quote(p),
-@@ -4149,8 +4150,10 @@ process_n_textarea(void)
+@@ -4152,8 +4153,10 @@ process_n_textarea(void)
      if (cur_textarea == NULL)
  	return NULL;
  
@@ -32,7 +32,7 @@ Patch: patches/Show-all-link-numbers.patch
  			"type=textarea name=\"%s\" size=%d rows=%d "
  			"top_margin=%d textareanumber=%d",
  			cur_hseq, cur_form_id,
-@@ -5059,6 +5062,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -5062,6 +5065,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	    obuf->anchor.hseq = cur_hseq;
  	    tmp = process_anchor(tag, h_env->tagbuf->ptr);
  	    push_tag(obuf, tmp->ptr, HTML_A);
@@ -40,7 +40,7 @@ Patch: patches/Show-all-link-numbers.patch
  	    return 1;
  	}
  	return 0;
-@@ -6538,7 +6542,7 @@ HTMLlineproc0(char *line, struct html_fe
+@@ -6541,7 +6545,7 @@ HTMLlineproc0(char *line, struct html_fe
  	    if (obuf->status != R_ST_NORMAL)	/* R_ST_AMP ? */
  		obuf->status = R_ST_NORMAL;
  	    str = tokbuf->ptr;
@@ -49,7 +49,7 @@ Patch: patches/Show-all-link-numbers.patch
  		str = Strnew_m_charp(getLinkNumberStr(-1)->ptr, str, NULL)->ptr;
  		need_number = 0;
  	    }
-@@ -6666,14 +6670,11 @@ HTMLlineproc0(char *line, struct html_fe
+@@ -6669,14 +6673,11 @@ HTMLlineproc0(char *line, struct html_fe
  #endif				/* ID_EXT */
  	    obuf->bp.init_flag = 1;
  	    clear_ignore_p_flag(cmd, obuf);
