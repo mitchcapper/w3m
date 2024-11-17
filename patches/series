@@ -1,79 +1,49 @@
+remove-unused-macros.patch
+Remove-all-usage-of-variable-length-arrays.patch
+Make-usage-of-variable-length-arrays-an-error.patch
+Fix-Wnested-externs.patch
+Fix-missing-declaration.patch
+Fix-scan-build-issues.patch
+Remove-unused-variable.patch
+Remove-redundant-cast.patch
+# NULL check
+Remove-redundant-NULL-check.patch
+# const
+Add-more-const-correctness.patch
+# volatile
+Remove-some-volatile.patch
+# Save history
+Refactor-URL-history-handling.patch
+Add-command-to-save-history.patch
+# Session
+Add-session-store-and-restore-feature.patch
 # gemini
 gemini.patch
 # WARNINGS
-Enable-more-optimization.patch
-Enable-Wcast-qual.patch
-Enable-Wduplicated-branches.patch
-Enable-Wduplicated-cond.patch
-Enable-Wnested-externs.patch
-Enable-Wredundant-decls.patch
-Enable-Wstring-compare.patch
-Enable-Wtype-limits.patch
-Enable-Wuninitialized.patch
-Enable-Wunused.patch
-Enable-Wmissing-declarations.patch
-Enable-Wold-style-declaration.patch
-Enable-Wlogical-op.patch
-Enable-Wold-style-definition.patch
+Enable-more-warnings.patch
 0143-Add-cppcheck-target.patch
 # WIP
-remove-unused-macros.patch
-0078-Remove-all-usage-of-variable-length-arrays.patch
-0079-Make-usage-of-variable-length-arrays-an-error.patch
-Fix-Wnested-externs.patch
 WIP-gpm_process_mouse-prototyp.patch
 Workaround-entity-desaster-fix-missing-prototypes.patch
-Fix-missing-declaration.patch
 Add-comment-for-wgetch.patch
 0101-WIP-getch-Fix-warning-strict-prototype.patch
 Suppress-Wlogical-op.patch
 Suppress-Wold-style-definition.patch
 Suppress-Wstrict-prototypes.patch
-0080-Fix-malloc-calls.patch
 0081-Only-use-malloc-if-the-default-buffer-is-to-small.patch
-# NULL check
-0136-Remove-redundant-NULL-check.patch
-0137-Remove-redundant-NULL-check.patch
-0138-Remove-redundant-NULL-check.patch
-0139-Remove-redundant-NULL-check.patch
-0140-Remove-redundant-NULL-check.patch
-# const
-0142-Add-more-const-const-correctness.patch
-0153-Add-more-const-to-the-regex-library.patch
-0154-Add-more-const-to-libwc.patch
-0155-Add-more-const-to-anchor.patch
-0156-Add-more-const-to-linein.patch
-0157-Add-more-const-to-search.patch
-0158-Add-more-const-to-menu.patch
-0159-Add-more-const-to-rc.patch
-0160-Add-more-const-to-terms.patch
-0161-Add-more-const-to-main.patch
-0162-Add-more-const-to-display.patch
-0163-Add-more-const-const-correctness.patch
-0171-Add-more-const-correctness.patch
-0172-const.patch
-Remove-some-volatile.patch
-# Save history
-Refactor-URL-history-handling.patch
-save-history.patch
 # ACTIVE
-Store-session.patch
 shorten-not-assigned-in-help.patch
 Use-gettext-for-user-facing-strings.patch
 Add-cd-command.patch
 do_download.patch
-Fix-scan-build-issues.patch
 gophertmp.patch
-Reset-optimization.patch
-Remove-unused-variable-2.patch
-Remove-redundant-cast.patch
+# Cookies
 Truncate-cookie-file-if-no-cookies-left.patch
 Move-declarations-to-appropriate-header.patch
 Refactor-load-cookies.patch
 Refactor-get_cookie_info.patch
 Merge-cookies-if-modified-after-start.patch
 Add-option-to-provide-cookie-jar.patch
-Update-URLHist-mtime-when-saving-history.patch
 Add-key-binding-to-insert-word-under-cursor.patch
 Add-smartcase-option-for-search.patch
 Make-CTRL-Y-insert-deleted-text.patch

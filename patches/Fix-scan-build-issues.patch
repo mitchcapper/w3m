@@ -6,8 +6,8 @@ Patch: patches/Fix-scan-build-issues.patch
 ---
  etc.c  |    1 -
  file.c |   11 ++++-------
- main.c |    6 ++----
- 3 files changed, 6 insertions(+), 12 deletions(-)
+ main.c |    4 +---
+ 3 files changed, 5 insertions(+), 11 deletions(-)
 
 --- a/etc.c
 +++ b/etc.c
@@ -21,7 +21,7 @@ Patch: patches/Fix-scan-build-issues.patch
      *p = '\0';
 --- a/file.c
 +++ b/file.c
-@@ -1145,9 +1145,8 @@ extract_auth_param(char *q, struct auth_
+@@ -1138,9 +1138,8 @@ extract_auth_param(char *q, struct auth_
  	}
  	if (ap->name == NULL) {
  	    /* skip unknown param */
@@ -32,7 +32,7 @@ Patch: patches/Fix-scan-build-issues.patch
  		(IS_SPACE(*q) || *q == '=')) {
  		SKIP_BLANKS(q);
  		if (*q != '=')
-@@ -1518,8 +1517,7 @@ findAuthentication(struct http_auth *hau
+@@ -1511,8 +1510,7 @@ findAuthentication(struct http_auth *hau
  		}
  		if (p0 == p) {
  		    /* all unknown auth failed */
@@ -42,7 +42,7 @@ Patch: patches/Fix-scan-build-issues.patch
  			SKIP_BLANKS(p);
  			p = extract_auth_param(p, none_auth_param);
  		    }
-@@ -6578,7 +6576,6 @@ HTMLlineproc0(char *line, struct html_fe
+@@ -6427,7 +6425,6 @@ HTMLlineproc0(char *line, struct html_fe
  		    str = Strnew_charp_n(str, p - str)->ptr;
  		    line = Strnew_m_charp(p, line, NULL)->ptr;
  		}
@@ -50,7 +50,7 @@ Patch: patches/Fix-scan-build-issues.patch
  		continue;
  	    }
  	    if (obuf->table_level >= 0)
-@@ -7263,7 +7260,7 @@ loadHTMLstream(URLFile *f, Buffer *newBu
+@@ -7112,7 +7109,7 @@ loadHTMLstream(URLFile *f, Buffer *newBu
      struct environment envs[MAX_ENV_LEVEL];
      clen_t linelen = 0;
      clen_t trbyte = 0;
@@ -59,7 +59,7 @@ Patch: patches/Fix-scan-build-issues.patch
  #ifdef USE_M17N
      wc_ces charset = WC_CES_US_ASCII;
      wc_ces volatile doc_charset = DocumentCharset;
-@@ -7504,11 +7501,11 @@ loadGopherDir0(URLFile *uf, ParsedURL *p
+@@ -7353,11 +7350,11 @@ loadGopherDir0(URLFile *uf, ParsedURL *p
  			 "</title>\n</head>\n<body>\n<h1>Index of ", q,
  			 "</h1>\n<table>\n", NULL);
  
@@ -74,16 +74,7 @@ Patch: patches/Fix-scan-build-issues.patch
  	    break;
 --- a/main.c
 +++ b/main.c
-@@ -4566,7 +4566,7 @@ _strSession(char *sf)
- 	sep = "\n";
-     }
- 
--    int r;
-+    int r; /* TODO(rkta): Remove from store session patch */
-     if ((r = fclose(f)) == EOF) goto fail;
-     unlink_session = 0;
-     return;
-@@ -6395,11 +6395,9 @@ DEFUN(execCmd, COMMAND, "Invoke w3m func
+@@ -6261,11 +6261,9 @@ DEFUN(execCmd, COMMAND, "Invoke w3m func
  static void
  SigAlarm(SIGNAL_ARG)
  {

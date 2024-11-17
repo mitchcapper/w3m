@@ -1,0 +1,66 @@
+From 213cff12a39713c04941aea579362f0f1a1b7191 Mon Sep 17 00:00:00 2001
+From: Rene Kita <mail@rkta.de>
+Date: Thu, 23 Dec 2021 12:22:42 +0100
+Subject: Remove redundant NULL check
+
+---
+ buffer.c |    2 +-
+ file.c   |    5 ++---
+ main.c   |    2 +-
+ url.c    |    2 +-
+ 4 files changed, 5 insertions(+), 6 deletions(-)
+
+--- a/url.c
++++ b/url.c
+@@ -577,7 +577,7 @@ openSocket(char *const hostname,
+ #ifdef INET6
+     /* rfc2732 compliance */
+     hname = hostname;
+-    if (hname != NULL && hname[0] == '[' && hname[strlen(hname) - 1] == ']') {
++    if (hname[0] == '[' && hname[strlen(hname) - 1] == ']') {
+ 	hname = allocStr(hostname + 1, -1);
+ 	hname[strlen(hname) - 1] = '\0';
+ 	if (strspn(hname, "0123456789abcdefABCDEF:.") != strlen(hname))
+--- a/buffer.c
++++ b/buffer.c
+@@ -154,7 +154,7 @@ replaceBuffer(Buffer *first, Buffer *del
+ 	discardBuffer(delbuf);
+ 	return newbuf;
+     }
+-    if (delbuf && (buf = prevBuffer(first, delbuf))) {
++    if ((buf = prevBuffer(first, delbuf))) {
+ 	buf->nextBuffer = newbuf;
+ 	newbuf->nextBuffer = delbuf->nextBuffer;
+ 	discardBuffer(delbuf);
+--- a/file.c
++++ b/file.c
+@@ -1077,7 +1077,7 @@ extract_auth_val(char **q)
+ 		}
+ 	    }
+ 	}
+-	else if (quoted && *qq == '\\')
++	else if (*qq == '\\')
+ 	    Strcat_char(val, *qq++);
+ 	Strcat_char(val, *qq++);
+     }
+@@ -7632,8 +7632,7 @@ loadImageBuffer(URLFile *uf, Buffer *new
+     init_stream(&f, SCM_LOCAL, newStrStream(tmp));
+     loadHTMLstream(&f, newBuf, src, TRUE);
+     UFclose(&f);
+-    if (src)
+-	fclose(src);
++    fclose(src);
+ 
+     newBuf->topLine = newBuf->firstLine;
+     newBuf->lastLine = newBuf->currentLine;
+--- a/main.c
++++ b/main.c
+@@ -3873,7 +3873,7 @@ _prevA(int visited)
+ 	    }
+ 	    x = an->start.pos;
+ 	    y = an->start.line;
+-	    if (visited == TRUE && an) {
++	    if (visited == TRUE) {
+ 		parseURL2(an->url, &url, baseURL(Currentbuf));
+ 		if (getHashHist(URLHist, parsedURL2Str(&url)->ptr)) {
+ 		    goto _end;

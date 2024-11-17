@@ -4,7 +4,7 @@
 
 --- a/terms.c
 +++ b/terms.c
-@@ -2220,6 +2220,11 @@ getch(void)
+@@ -2221,6 +2221,11 @@ getch(void)
  
  #ifdef USE_MOUSE
  #ifdef USE_GPM

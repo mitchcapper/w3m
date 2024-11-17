@@ -4,11 +4,11 @@
  doc/README.func        |    1 
  doc/w3m.1              |   20 ++++++++
  fm.h                   |    2 
- main.c                 |  122 ++++++++++++++++++++++++++++++++++++++++++++++++-
+ main.c                 |  121 ++++++++++++++++++++++++++++++++++++++++++++++++-
  proto.h                |    1 
  rc.c                   |    4 +
  scripts/w3mhelp.cgi.in |    3 -
- 9 files changed, 152 insertions(+), 3 deletions(-)
+ 9 files changed, 151 insertions(+), 3 deletions(-)
 
 --- a/config.h.in
 +++ b/config.h.in
@@ -48,7 +48,7 @@
      fprintf(f, "    -T type          specify content-type\n");
      fprintf(f, "    -m               internet message mode\n");
      fprintf(f, "    -v               visual startup mode\n");
-@@ -442,6 +448,7 @@ main(int argc, char **argv)
+@@ -416,6 +422,7 @@ main(int argc, char **argv)
      char *default_type = NULL;
      char *post_file = NULL;
      Str err_msg;
@@ -56,7 +56,7 @@
  #ifdef USE_M17N
      char *Locale = NULL;
      wc_uint8 auto_detect;
-@@ -664,6 +671,13 @@ main(int argc, char **argv)
+@@ -638,6 +645,13 @@ main(int argc, char **argv)
  		    BookmarkFile = cleanupName(tmp->ptr);
  		}
  	    }
@@ -70,9 +70,9 @@
  	    else if (!strcmp("-F", argv[i]))
  		RenderFrame = TRUE;
  	    else if (!strcmp("-W", argv[i])) {
-@@ -913,8 +927,46 @@ main(int argc, char **argv)
-     if (ssl_known_hosts)
- 	known_hosts = load_known_hosts();
+@@ -884,8 +898,46 @@ main(int argc, char **argv)
+ 	loadUrlHistory();
+ #endif				/* not USE_HISTORY */
  
 -#ifdef USE_M17N
 -#endif
@@ -119,10 +119,10 @@
  
      if (w3m_backend)
  	backend();
-@@ -2608,6 +2660,10 @@ _quitfm(int confirm)
+@@ -2551,6 +2603,10 @@ _quitfm(int confirm)
+     if (UseHistory && SaveURLHist)
+ 	saveUrlHistory();
  #endif				/* USE_HISTORY */
-     if ((err = save_known_hosts()))
- 	perror(_("Cannot save known hosts"));
 +    if (unlink_session)
 +	unlink(rcFile(SESSION_FILE));
 +    if (StoreSession)
@@ -130,7 +130,7 @@
      if (deprecated)
  	fprintf(stderr, "%s\n%s\n%s\n",
  		"DEPRECATION WARNING",
-@@ -4489,6 +4545,68 @@ DEFUN(adBmark, ADD_BOOKMARK, "Add curren
+@@ -4432,6 +4488,67 @@ DEFUN(adBmark, ADD_BOOKMARK, "Add curren
  		request);
  }
  
@@ -165,8 +165,7 @@
 +	sep = "\n";
 +    }
 +
-+    int r;
-+    if ((r = fclose(f)) == EOF) goto fail;
++    if ((fclose(f)) == EOF) goto fail;
 +    unlink_session = 0;
 +    return;
 +
@@ -211,7 +210,7 @@
  extern void pginfo(void);
 --- a/rc.c
 +++ b/rc.c
-@@ -73,6 +73,8 @@ static int OptionEncode = FALSE;
+@@ -71,6 +71,8 @@ static int OptionEncode = FALSE;
  #define CMT_HISTORY	 N_("Use URL history")
  #define CMT_HISTSIZE     N_("Number of remembered URL")
  #define CMT_SAVEHIST     N_("Save URL history")
@@ -220,7 +219,7 @@
  #define CMT_FRAME        N_("Render frames automatically")
  #define CMT_ARGV_IS_URL  N_("Treat argument without scheme as URL")
  #define CMT_TSELF        N_("Use _self as default target")
-@@ -517,6 +519,8 @@ struct param_ptr params3[] = {
+@@ -514,6 +516,8 @@ struct param_ptr params3[] = {
      {"history", P_INT, PI_TEXT, (void *)&URLHistSize, CMT_HISTSIZE, NULL},
      {"save_hist", P_INT, PI_ONOFF, (void *)&SaveURLHist, CMT_SAVEHIST, NULL},
  #endif				/* USE_HISTORY */
@@ -285,7 +284,7 @@
  .TP
 --- a/doc-de/README.func
 +++ b/doc-de/README.func
-@@ -134,6 +134,7 @@ SHIFT_LEFT	Anzeigebereich nach links ver
+@@ -133,6 +133,7 @@ SHIFT_LEFT	Anzeigebereich nach links ver
  SHIFT_RIGHT	Anzeigebereich nach rechts versetzen
  SOURCE		Wechsle zwischen HTML-Wiedergabe und -Verarbeitung
  STOP_IMAGE	Bilder nicht mehr laden und anzeigen
@@ -295,7 +294,7 @@
  TAB_GOTO	Öffne das angegebene Dokument in einem neuen Reiter
 --- a/doc/README.func
 +++ b/doc/README.func
-@@ -137,6 +137,7 @@ SHIFT_LEFT	Shift screen left
+@@ -136,6 +136,7 @@ SHIFT_LEFT	Shift screen left
  SHIFT_RIGHT	Shift screen right
  SOURCE		Toggle between HTML shown or processed
  STOP_IMAGE	Stop loading and drawing of images
@@ -305,7 +304,7 @@
  TAB_GOTO	Open specified document in a new tab
 --- a/scripts/w3mhelp.cgi.in
 +++ b/scripts/w3mhelp.cgi.in
-@@ -171,7 +171,8 @@ print "<P><A HREF=\"$keymap\">$head</A>\
+@@ -170,7 +170,8 @@ print "<P><A HREF=\"$keymap\">$head</A>\
  	     split(" ", "_mark nextMk prevMk reMark"));
  
  &show_keymap('Miscellaneous',

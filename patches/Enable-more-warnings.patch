@@ -1,0 +1,181 @@
+---
+ Makefile.in            |   19 ++++++++++++++++++-
+ libwc/Makefile.in      |   18 ++++++++++++++++++
+ w3mimg/Makefile.in     |   18 ++++++++++++++++++
+ w3mimg/fb/Makefile.in  |   18 ++++++++++++++++++
+ w3mimg/win/Makefile.in |   18 ++++++++++++++++++
+ w3mimg/x11/Makefile.in |   18 ++++++++++++++++++
+ 6 files changed, 108 insertions(+), 1 deletion(-)
+
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -36,11 +36,28 @@ ETC_DIR = $(sysconfdir)
+ CONF_DIR = $(sysconfdir)/$(PACKAGE)
+ 
+ WARNINGS  = -Wall
++WARNINGS += -Wcast-qual
++WARNINGS += -Wduplicated-branches
++WARNINGS += -Wduplicated-cond
+ WARNINGS += -Werror=vla
+-WARNINGS += -Wnull-dereference
+ WARNINGS += -Wimplicit-function-declaration
+ WARNINGS += -Wimplicit-int
++WARNINGS += -Wlogical-op
++WARNINGS += -Wmissing-declarations
++WARNINGS += -Wnested-externs
++WARNINGS += -Wnull-dereference
++WARNINGS += -Wold-style-declaration
++WARNINGS += -Wold-style-definition
++WARNINGS += -Wredundant-decls
+ WARNINGS += -Wstrict-prototypes
++WARNINGS += -Wstring-compare
++WARNINGS += -Wtype-limits
++WARNINGS += -Wuninitialized
++WARNINGS += -Wunused
++WARNINGS += -D_FORTIFY_SOURCE=2
++WARNINGS += -O1 -g3
++WARNINGS += -Wno-missing-field-initializers
++WARNINGS += -Wno-unused-result
+ 
+ CFLAGS = $(WARNINGS) -I. -I$(top_srcdir) @CFLAGS@ $(CPPFLAGS) $(DEFS) $(OPTS)
+ WCCFLAGS = @WCCFLAGS@
+--- a/libwc/Makefile.in
++++ b/libwc/Makefile.in
+@@ -7,7 +7,25 @@ VPATH=$(srcdir):.
+ LIBRARY = libwc.a
+ CC=@CC@
+ WARNINGS  = -Wall
++WARNINGS += -D_FORTIFY_SOURCE=2
++WARNINGS += -O1 -g3
++WARNINGS += -Wcast-qual
++WARNINGS += -Wduplicated-branches
++WARNINGS += -Wduplicated-cond
+ WARNINGS += -Werror=vla
++WARNINGS += -Wlogical-op
++WARNINGS += -Wmissing-declarations
++WARNINGS += -Wnested-externs
++WARNINGS += -Wno-missing-field-initializers
++WARNINGS += -Wno-unused-result
++WARNINGS += -Wnull-dereference
++WARNINGS += -Wold-style-declaration
++WARNINGS += -Wold-style-definition
++WARNINGS += -Wredundant-decls
++WARNINGS += -Wstring-compare
++WARNINGS += -Wtype-limits
++WARNINGS += -Wuninitialized
++WARNINGS += -Wunused
+ CFLAGS = $(WARNINGS) $(OPTS) -I.. -I$(top_srcdir) -I$(srcdir) @CFLAGS@ @CPPFLAGS@ @WCCFLAGS@ @DEFS@
+ AR=ar
+ RANLIB=@RANLIB@
+--- a/w3mimg/Makefile.in
++++ b/w3mimg/Makefile.in
+@@ -7,7 +7,25 @@ srcdir = @srcdir@
+ top_srcdir = @top_srcdir@
+ VPATH = $(srcdir):.
+ WARNINGS  = -Wall
++WARNINGS += -D_FORTIFY_SOURCE=2
++WARNINGS += -O1 -g3
++WARNINGS += -Wcast-qual
++WARNINGS += -Wduplicated-branches
++WARNINGS += -Wduplicated-cond
+ WARNINGS += -Werror=vla
++WARNINGS += -Wlogical-op
++WARNINGS += -Wmissing-declarations
++WARNINGS += -Wnested-externs
++WARNINGS += -Wno-missing-field-initializers
++WARNINGS += -Wno-unused-result
++WARNINGS += -Wnull-dereference
++WARNINGS += -Wold-style-declaration
++WARNINGS += -Wold-style-definition
++WARNINGS += -Wredundant-decls
++WARNINGS += -Wstring-compare
++WARNINGS += -Wtype-limits
++WARNINGS += -Wuninitialized
++WARNINGS += -Wunused
+ CFLAGS=$(WARNINGS) $(OPTS) -I.. -I$(top_srcdir) -I$(srcdir) @CFLAGS@ @CPPFLAGS@ @DEFS@ $(IMGCFLAGS)
+ AR=ar
+ RANLIB=@RANLIB@
+--- a/w3mimg/fb/Makefile.in
++++ b/w3mimg/fb/Makefile.in
+@@ -8,7 +8,25 @@ srcdir = @srcdir@
+ top_srcdir = @top_srcdir@
+ VPATH = $(srcdir):.
+ WARNINGS  = -Wall
++WARNINGS += -D_FORTIFY_SOURCE=2
++WARNINGS += -O1 -g3
++WARNINGS += -Wcast-qual
++WARNINGS += -Wduplicated-branches
++WARNINGS += -Wduplicated-cond
+ WARNINGS += -Werror=vla
++WARNINGS += -Wlogical-op
++WARNINGS += -Wmissing-declarations
++WARNINGS += -Wnested-externs
++WARNINGS += -Wno-missing-field-initializers
++WARNINGS += -Wno-unused-result
++WARNINGS += -Wnull-dereference
++WARNINGS += -Wold-style-declaration
++WARNINGS += -Wold-style-definition
++WARNINGS += -Wredundant-decls
++WARNINGS += -Wstring-compare
++WARNINGS += -Wtype-limits
++WARNINGS += -Wuninitialized
++WARNINGS += -Wunused
+ CFLAGS=$(WARNINGS) $(OPTS) -I../.. -I$(top_srcdir) -I$(srcdir) @CFLAGS@ @CPPFLAGS@ @DEFS@ $(IMGCFLAGS)
+ RM=rm
+ 
+--- a/w3mimg/win/Makefile.in
++++ b/w3mimg/win/Makefile.in
+@@ -8,7 +8,25 @@ srcdir = @srcdir@
+ top_srcdir = @top_srcdir@
+ VPATH = $(srcdir):.
+ WARNINGS  = -Wall
++WARNINGS += -D_FORTIFY_SOURCE=2
++WARNINGS += -O1 -g3
++WARNINGS += -Wcast-qual
++WARNINGS += -Wduplicated-branches
++WARNINGS += -Wduplicated-cond
+ WARNINGS += -Werror=vla
++WARNINGS += -Wlogical-op
++WARNINGS += -Wmissing-declarations
++WARNINGS += -Wnested-externs
++WARNINGS += -Wno-missing-field-initializers
++WARNINGS += -Wno-unused-result
++WARNINGS += -Wnull-dereference
++WARNINGS += -Wold-style-declaration
++WARNINGS += -Wold-style-definition
++WARNINGS += -Wredundant-decls
++WARNINGS += -Wstring-compare
++WARNINGS += -Wtype-limits
++WARNINGS += -Wuninitialized
++WARNINGS += -Wunused
+ CFLAGS=$(WARNINGS) $(OPTS) -I../.. -I$(top_srcdir) -I$(srcdir) @CFLAGS@ @CPPFLAGS@ @DEFS@ $(IMGCFLAGS)
+ RM=rm
+ CC=@CC@
+--- a/w3mimg/x11/Makefile.in
++++ b/w3mimg/x11/Makefile.in
+@@ -8,7 +8,25 @@ srcdir = @srcdir@
+ top_srcdir = @top_srcdir@
+ VPATH = $(srcdir):.
+ WARNINGS  = -Wall
++WARNINGS += -D_FORTIFY_SOURCE=2
++WARNINGS += -O1 -g3
++WARNINGS += -Wcast-qual
++WARNINGS += -Wduplicated-branches
++WARNINGS += -Wduplicated-cond
+ WARNINGS += -Werror=vla
++WARNINGS += -Wlogical-op
++WARNINGS += -Wmissing-declarations
++WARNINGS += -Wnested-externs
++WARNINGS += -Wno-missing-field-initializers
++WARNINGS += -Wno-unused-result
++WARNINGS += -Wnull-dereference
++WARNINGS += -Wold-style-declaration
++WARNINGS += -Wold-style-definition
++WARNINGS += -Wredundant-decls
++WARNINGS += -Wstring-compare
++WARNINGS += -Wtype-limits
++WARNINGS += -Wuninitialized
++WARNINGS += -Wunused
+ CFLAGS=$(WARNINGS) $(OPTS) -I../.. -I$(top_srcdir) -I$(srcdir) @CFLAGS@ @CPPFLAGS@ @DEFS@ $(IMGCFLAGS)
+ RM=rm
+ 

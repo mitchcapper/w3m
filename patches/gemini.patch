@@ -17,13 +17,13 @@ w3m-0.5.3+git20230121.
  html.h                 |    1 
  istream.c              |  140 ++++++++++++++++++-----
  istream.h              |    5 
- main.c                 |  154 +++++++++++++++++++++++++
+ main.c                 |  152 +++++++++++++++++++++++++
  proto.h                |    1 
  rc.c                   |    5 
  rc.h                   |    2 
  scripts/w3mhelp.cgi.in |    5 
  url.c                  |   35 +++++
- 14 files changed, 615 insertions(+), 38 deletions(-)
+ 14 files changed, 614 insertions(+), 37 deletions(-)
 
 --- a/file.c
 +++ b/file.c
@@ -45,7 +45,7 @@ w3m-0.5.3+git20230121.
      return buf;
  }
  
-@@ -2011,6 +2013,166 @@ loadGeneralFile(char *path, ParsedURL *v
+@@ -2009,6 +2011,166 @@ loadGeneralFile(char *path, ParsedURL *v
      else if (pu.scheme == SCM_DATA) {
  	t = f.guess_type;
      }
@@ -212,7 +212,7 @@ w3m-0.5.3+git20230121.
      else if (searchHeader) {
  	searchHeader = SearchHeader = FALSE;
  	if (t_buf == NULL)
-@@ -2188,6 +2350,8 @@ loadGeneralFile(char *path, ParsedURL *v
+@@ -2186,6 +2348,8 @@ loadGeneralFile(char *path, ParsedURL *v
  
      if (is_html_type(t))
  	proc = loadHTMLBuffer;
@@ -221,7 +221,7 @@ w3m-0.5.3+git20230121.
      else if (is_plain_text_type(t))
  	proc = loadBuffer;
  #ifdef USE_IMAGE
-@@ -2442,7 +2606,6 @@ is_boundary(unsigned char *ch1, unsigned
+@@ -2440,7 +2604,6 @@ is_boundary(const unsigned char *ch1, co
      return 1;
  }
  
@@ -229,7 +229,7 @@ w3m-0.5.3+git20230121.
  static void
  set_breakpoint(struct readbuffer *obuf, int tag_length)
  {
-@@ -7482,6 +7645,130 @@ loadGopherSearch0(ParsedURL *pu)
+@@ -7479,6 +7642,130 @@ loadGopherSearch0(ParsedURL *pu)
  }
  #endif				/* USE_GOPHER */
  
@@ -405,7 +405,7 @@ w3m-0.5.3+git20230121.
  }
  
  #if SSLEAY_VERSION_NUMBER >= 0x00905100
-@@ -1262,6 +1265,7 @@ _parsedURL2Str(ParsedURL *pu, int pass,
+@@ -1262,6 +1265,7 @@ _parsedURL2Str(const ParsedURL *pu, int
  	"gophers",
  #ifdef USE_SSL
  	"https",
@@ -464,7 +464,7 @@ w3m-0.5.3+git20230121.
 --- a/buffer.c
 +++ b/buffer.c
 @@ -18,6 +18,10 @@ extern int do_getch(void);
- char *NullLine = "";
+ const char *NullLine = "";
  Lineprop NullProp[] = { 0 };
  
 +
@@ -502,7 +502,7 @@ w3m-0.5.3+git20230121.
      UFclose(&f);
 --- a/main.c
 +++ b/main.c
-@@ -398,6 +398,32 @@ die_oom(size_t bytes)
+@@ -404,6 +404,32 @@ die_oom(size_t bytes)
      return NULL;
  }
  
@@ -535,17 +535,17 @@ w3m-0.5.3+git20230121.
  int
  main(int argc, char **argv)
  {
-@@ -883,6 +909,9 @@ main(int argc, char **argv)
+@@ -897,6 +923,9 @@ main(int argc, char **argv)
      if (UseHistory)
- 	loadHistory(URLHist);
+ 	loadUrlHistory();
  #endif				/* not USE_HISTORY */
 +    known_hosts_file = rcFile("known_hosts");
 +    if (ssl_known_hosts)
 +	known_hosts = load_known_hosts();
  
- #ifdef USE_M17N
- #endif
-@@ -2521,10 +2550,36 @@ DEFUN(movRW, NEXT_WORD, "Move to the nex
+     /* Restore a previously saved session */
+     if (RestoreSession || opt_restore) {
+@@ -2573,10 +2602,36 @@ DEFUN(movRW, NEXT_WORD, "Move to the nex
      displayBuffer(Currentbuf, B_NORMAL);
  }
  
@@ -577,28 +577,21 @@ w3m-0.5.3+git20230121.
  static void
  _quitfm(int confirm)
  {
-     char *ans = "y";
+     const char *ans = "y";
 +    int err = 0;
  
      if (checkDownloadList())
  	/* FIXME: gettextize? */
-@@ -2551,12 +2606,14 @@ _quitfm(int confirm)
-     if (UseHistory && SaveURLHist)
- 	saveHistory(URLHist, URLHistSize);
- #endif				/* USE_HISTORY */
+@@ -2607,6 +2662,8 @@ _quitfm(int confirm)
+ 	unlink(rcFile(SESSION_FILE));
+     if (StoreSession)
+ 	_strSession(NULL);
 +    if ((err = save_known_hosts()))
 +	perror(_("Cannot save known hosts"));
      if (deprecated)
  	fprintf(stderr, "%s\n%s\n%s\n",
  		"DEPRECATION WARNING",
- 		"-H is deprecated and will be removed in the future.",
- 		"Use -o highIntensityColors=true instead.");
--    w3m_exit(0);
-+    w3m_exit(err);
- }
- 
- /* Quit */
-@@ -4838,6 +4895,13 @@ DEFUN(vwSrc, SOURCE VIEW, "Toggle betwee
+@@ -4962,6 +5019,13 @@ DEFUN(vwSrc, SOURCE VIEW, "Toggle betwee
  	displayBuffer(Currentbuf, B_NORMAL);
  	return;
      }
@@ -612,7 +605,7 @@ w3m-0.5.3+git20230121.
      if (Currentbuf->sourcefile == NULL) {
  	if (Currentbuf->pagerSource &&
  	    !strcasecmp(Currentbuf->type, "text/plain")) {
-@@ -4923,6 +4987,93 @@ DEFUN(foldPre, FOLD_PRE, "Fold long line
+@@ -5047,6 +5111,93 @@ DEFUN(foldPre, FOLD_PRE, "Fold long line
      fold_pre = FoldPre;
  }
  
@@ -706,7 +699,7 @@ w3m-0.5.3+git20230121.
  /* reload */
  DEFUN(reload, RELOAD, "Load current document anew")
  {
-@@ -5149,6 +5300,7 @@ chkURLBuffer(Buffer *buf)
+@@ -5273,6 +5424,7 @@ chkURLBuffer(Buffer *buf)
  	"https?://[a-zA-Z0-9:%\\-\\./_@]*\\[[a-fA-F0-9:][a-fA-F0-9:\\.]*\\][a-zA-Z0-9:%\\-\\./?=~_\\&+@#,\\$;]*",
  	"ftp://[a-zA-Z0-9:%\\-\\./_@]*\\[[a-fA-F0-9:][a-fA-F0-9:\\.]*\\][a-zA-Z0-9:%\\-\\./=_+@#,\\$]*",
  #endif				/* INET6 */
@@ -716,7 +709,7 @@ w3m-0.5.3+git20230121.
      int i;
 --- a/proto.h
 +++ b/proto.h
-@@ -99,6 +99,7 @@ extern void peekURL(void);
+@@ -100,6 +100,7 @@ extern void peekURL(void);
  extern void peekIMG(void);
  extern void curURL(void);
  extern void vwSrc(void);
@@ -976,7 +969,7 @@ w3m-0.5.3+git20230121.
  #define P_INT      0
  #define P_SHORT    1
  #define P_CHARINT  2
-@@ -220,6 +222,7 @@ static int OptionEncode = FALSE;
+@@ -222,6 +224,7 @@ static int OptionEncode = FALSE;
  #define CMT_SSL_CA_PATH N_("Path to directory for PEM encoded certificates of CAs")
  #define CMT_SSL_CA_FILE N_("File consisting of PEM encoded certificates of CAs")
  #define CMT_SSL_CA_DEFAULT N_("Use default locations for PEM encoded certificates of CAs")
@@ -984,7 +977,7 @@ w3m-0.5.3+git20230121.
  #endif				/* USE_SSL_VERIFY */
  #define CMT_SSL_FORBID_METHOD N_("List of forbidden SSL methods (2: SSLv2, 3: SSLv3, t: TLSv1.0, 5: TLSv1.1, 6: TLSv1.2, 7: TLSv1.3)")
  #ifdef SSL_CTX_set_min_proto_version
-@@ -658,6 +661,8 @@ struct param_ptr params7[] = {
+@@ -662,6 +665,8 @@ struct param_ptr params7[] = {
       NULL},
      {"ssl_ca_default", P_INT, PI_ONOFF, (void *)&ssl_ca_default,
       CMT_SSL_CA_DEFAULT, NULL},
@@ -997,7 +990,7 @@ w3m-0.5.3+git20230121.
 +++ b/rc.h
 @@ -5,4 +5,6 @@
  extern void show_params(FILE * fp);
- extern int str_to_bool(char *value, int old);
+ extern int str_to_bool(const char *value, int old);
  
 +extern int ssl_known_hosts;
 +

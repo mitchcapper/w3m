@@ -5,8 +5,8 @@ Patch: patches/Improve-protected-buffers.patch
 
 ---
  doc/MANUAL.html |   15 +++++++++++++++
- main.c          |   49 +++++++++++++++++++++++++++++++++++++------------
- 2 files changed, 52 insertions(+), 12 deletions(-)
+ main.c          |   46 ++++++++++++++++++++++++++++++++++++----------
+ 2 files changed, 51 insertions(+), 10 deletions(-)
 
 --- a/main.c
 +++ b/main.c
@@ -136,16 +136,6 @@ Patch: patches/Improve-protected-buffers.patch
  	    /*
  	     * Needs refactoring of HistoryPage handling first.
  	    else if (!strcmp(buf->buffername, "HistoryPage"))
-@@ -4729,8 +4755,7 @@ _strSession(char *sf)
- 	sep = "\n";
-     }
- 
--    int r; /* TODO(rkta): Remove from store session patch */
--    if ((r = fclose(f)) == EOF) goto fail;
-+    if ((fclose(f)) == EOF) goto fail;
-     unlink_session = 0;
-     return;
- 
 --- a/doc/MANUAL.html
 +++ b/doc/MANUAL.html
 @@ -66,6 +66,7 @@ insertions tagged with "mh 2016-03-29" a

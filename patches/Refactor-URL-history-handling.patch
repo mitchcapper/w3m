@@ -187,21 +187,21 @@ This is in preparation for the next patch.
  #define ldHist nulcmd
 --- a/main.c
 +++ b/main.c
-@@ -907,7 +907,7 @@ main(int argc, char **argv)
+@@ -881,7 +881,7 @@ main(int argc, char **argv)
  #endif				/* USE_COOKIE */
  #ifdef USE_HISTORY
      if (UseHistory)
 -	loadHistory(URLHist);
 +	loadUrlHistory();
  #endif				/* not USE_HISTORY */
-     known_hosts_file = rcFile("known_hosts");
-     if (ssl_known_hosts)
-@@ -2604,7 +2604,7 @@ _quitfm(int confirm)
+ 
+ #ifdef USE_M17N
+@@ -2549,7 +2549,7 @@ _quitfm(int confirm)
  #endif				/* USE_COOKIE */
  #ifdef USE_HISTORY
      if (UseHistory && SaveURLHist)
 -	saveHistory(URLHist, URLHistSize);
 +	saveUrlHistory();
  #endif				/* USE_HISTORY */
-     if ((err = save_known_hosts()))
- 	perror(_("Cannot save known hosts"));
+     if (deprecated)
+ 	fprintf(stderr, "%s\n%s\n%s\n",
