@@ -1,3 +1,4 @@
+#include "search.h"
 
 #include <stdlib.h>
 #include "wc.h"
