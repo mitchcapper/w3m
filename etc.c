@@ -35,6 +35,8 @@ struct auth_pass {
 
 struct auth_pass *passwords = NULL;
 
+extern Hash_si tagtable;
+
 int
 columnSkip(Buffer *buf, int offset)
 {
@@ -122,7 +124,6 @@ currentLineSkip(Buffer *buf, Line *line, int offset, int last)
 int
 gethtmlcmd(char *s)
 {
-    extern Hash_si tagtable;
     char cmdstr[MAX_CMD_LEN];
     char *p = cmdstr;
     char *save = s;
@@ -1600,7 +1601,7 @@ char *
 expandName(char *name)
 {
     char *p;
-    struct passwd *passent, *getpwnam(const char *);
+    struct passwd *passent;
     Str extpath = NULL;
 
     if (name == NULL)

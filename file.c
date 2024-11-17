@@ -7746,7 +7746,7 @@ static Buffer *
 loadcmdout(char *cmd,
 	   Buffer *(*loadproc) (URLFile *, Buffer *), Buffer *defaultbuf)
 {
-    FILE *f, *popen(const char *, const char *);
+    FILE *f;
     Buffer *buf;
     URLFile uf;
 
@@ -7784,7 +7784,7 @@ getshell(char *cmd)
 Buffer *
 getpipe(char *cmd)
 {
-    FILE *f, *popen(const char *, const char *);
+    FILE *f;
     Buffer *buf;
 
     if (cmd == NULL || *cmd == '\0')

@@ -183,7 +183,7 @@ char *
 expandPath(char *name)
 {
     char *p;
-    struct passwd *passent, *getpwnam(const char *);
+    struct passwd *passent;
     Str extpath = NULL;
 
     if (name == NULL)
