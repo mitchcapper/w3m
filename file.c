@@ -1688,7 +1688,7 @@ loadGeneralFile(char *path, ParsedURL *volatile current, char *referer,
     Buffer *b = NULL;
     Buffer *(*volatile proc)(URLFile *, Buffer *);
     char *volatile tpath;
-    char *volatile t = "text/plain", *p, *volatile real_type = NULL;
+    char *t = "text/plain", *p, *volatile real_type = NULL;
     Buffer *volatile t_buf = NULL;
     int volatile searchHeader = SearchHeader;
     int volatile searchHeader_through = TRUE;
