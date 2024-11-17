@@ -220,8 +220,7 @@ fusage(FILE * f, int err)
     fprintf(f, "    -v               visual startup mode\n");
 #ifdef USE_COLOR
     fprintf(f, "    -M               monochrome display\n");
-    fprintf(f,
-	    "    -H Deprecated! Do not use! Use -o high-intensity=true instead");
+    fprintf(f, "    -H Deprecated! Do not use! Use -o high-intensity=true instead\n");
 #endif				/* USE_COLOR */
     fprintf(f,
 	    "    -N               open URL of command line on each new tab\n");
