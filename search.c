@@ -51,8 +51,8 @@ open_migemo(char *migemo_command)
     return 0;
 }
 
-static char *
-migemostr(char *str)
+static const char *
+migemostr(const char *str)
 {
     Str tmp = NULL;
     if (migemor == NULL || migemow == NULL)
@@ -83,8 +83,8 @@ migemostr(char *str)
 
 #ifdef USE_M17N
 /* normalize search string */
-char *
-conv_search_string(char *str, wc_ces f_ces)
+const char *
+conv_search_string(const char *str, wc_ces f_ces)
 {
     if (SearchConv && !WcOption.pre_conv &&
 	Currentbuf->document_charset != f_ces)
@@ -94,9 +94,9 @@ conv_search_string(char *str, wc_ces f_ces)
 #endif
 
 int
-forwardSearch(Buffer *buf, char *str)
+forwardSearch(Buffer *buf, const char *str)
 {
-    char *p, *first, *last;
+    const char *p, *first, *last;
     Line *l, *begin;
     int wrapped = FALSE;
     int pos;
@@ -189,9 +189,9 @@ forwardSearch(Buffer *buf, char *str)
 }
 
 int
-backwardSearch(Buffer *buf, char *str)
+backwardSearch(Buffer *buf, const char *str)
 {
-    char *p, *q, *found, *found_last, *first, *last;
+    const char *p, *q, *found, *found_last, *first, *last;
     Line *l, *begin;
     int wrapped = FALSE;
     int pos;

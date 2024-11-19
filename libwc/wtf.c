@@ -110,10 +110,10 @@ wtf_init(wc_ces ces1, wc_ces ces2)
 }
 
 int
-wtf_strwidth(wc_uchar *p)
+wtf_strwidth(const wc_uchar *p)
 {
     int w = 0;
-    wc_uchar *q = p + strlen((char *)p);
+    const wc_uchar *q = p + strlen((const char *)p);
 
     while (p < q) {
 	w += wtf_width(p);
@@ -123,7 +123,7 @@ wtf_strwidth(wc_uchar *p)
 }
 
 size_t
-wtf_len1(wc_uchar *p)
+wtf_len1(const wc_uchar *p)
 {
     size_t len, len_max = WTF_LEN_MAP[*p];
 
@@ -136,10 +136,10 @@ wtf_len1(wc_uchar *p)
 }
 
 size_t
-wtf_len(wc_uchar *p)
+wtf_len(const wc_uchar *p)
 {
-    wc_uchar *q = p;
-    wc_uchar *strz = p + strlen((char *)p);
+    const wc_uchar *q = p;
+    const wc_uchar *strz = p + strlen((const char *)p);
 
     q += WTF_LEN_MAP[*q];
     while (q < strz && ! WTF_WIDTH_MAP[*q])
@@ -380,9 +380,9 @@ wtf_push_unknown(Str os, wc_uchar *p, size_t len)
 }
 
 wc_wchar_t
-wtf_parse1(wc_uchar **p)
+wtf_parse1(const wc_uchar **p)
 {
-    wc_uchar *q = *p;
+    const wc_uchar *q = *p;
     wc_wchar_t cc;
 
     if (*q < 0x80) {
@@ -482,9 +482,9 @@ wtf_parse1(wc_uchar **p)
 }
 
 wc_wchar_t
-wtf_parse(wc_uchar **p)
+wtf_parse(const wc_uchar **p)
 {
-    wc_uchar *q;
+    const wc_uchar *q;
     wc_wchar_t cc, cc2;
     wc_uint32 ucs, ucs2;
 
@@ -545,13 +545,13 @@ wtf_parse(wc_uchar **p)
 }
 
 wc_ccs
-wtf_get_ccs(wc_uchar *p)
+wtf_get_ccs(const wc_uchar *p)
 {
    return wtf_parse1(&p).ccs;
 }
 
 wc_uint32
-wtf_get_code(wc_uchar *p)
+wtf_get_code(const wc_uchar *p)
 {
    return wtf_parse1(&p).code;
 }
@@ -582,10 +582,10 @@ wtf_is_hangul(wc_uchar *p)
     return WC_FALSE;
 }
 
-char *
-wtf_conv_fit(char *s, wc_ces ces)
+const char *
+wtf_conv_fit(const char *s, wc_ces ces)
 {
-    wc_uchar *p;
+    const wc_uchar *p;
     Str os;
     wc_wchar_t cc;
     wc_ces major_ces;
@@ -594,14 +594,14 @@ wtf_conv_fit(char *s, wc_ces ces)
     if (ces == WC_CES_WTF || ces == WC_CES_US_ASCII)
 	return s;
 
-    for (p = (wc_uchar *)s; *p && *p < 0x80; p++)
+    for (p = (const wc_uchar *)s; *p && *p < 0x80; p++)
 	;
     if (! *p)
 	return s;
 
     os = Strnew_size(strlen(s));
-    if (p > (wc_uchar *)s)
-	Strcopy_charp_n(os, s, (int)(p - (wc_uchar *)s));
+    if (p > (const wc_uchar *)s)
+	Strcopy_charp_n(os, s, (int)(p - (const wc_uchar *)s));
 
     major_ces = wtf_major_ces;
     pre_conv = WcOption.pre_conv;

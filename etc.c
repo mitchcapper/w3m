@@ -35,6 +35,8 @@ struct auth_pass {
 
 struct auth_pass *passwords = NULL;
 
+extern Hash_si tagtable;
+
 int
 columnSkip(Buffer *buf, int offset)
 {
@@ -120,12 +122,10 @@ currentLineSkip(Buffer *buf, Line *line, int offset, int last)
 #define MAX_CMD_LEN 128
 
 int
-gethtmlcmd(char *s)
+gethtmlcmd(const char *s)
 {
-    extern Hash_si tagtable;
     char cmdstr[MAX_CMD_LEN];
     char *p = cmdstr;
-    char *save = s;
     int cmd;
 
     s++;
@@ -144,7 +144,6 @@ gethtmlcmd(char *s)
     }
     if (p - cmdstr == MAX_CMD_LEN) {
 	/* buffer overflow: perhaps caused by bad HTML source */
-	s = save + 1;
 	return HTML_UNKNOWN;
     }
     *p = '\0';
@@ -538,7 +537,7 @@ checkType(Str s, Lineprop **oprop, Linecolor **ocolor)
 }
 
 static int
-nextColumn(int n, char *p, Lineprop *pr)
+nextColumn(int n, char *p, const Lineprop *pr)
 {
     if (*pr & PC_CTRL) {
 	if (*p == '\t')
@@ -622,9 +621,9 @@ columnLen(Line *line, int column)
 }
 
 char *
-lastFileName(char *path)
+lastFileName(const char *path)
 {
-    char *p, *q;
+    const char *p, *q;
 
     p = q = path;
     while (*p != '\0') {
@@ -660,9 +659,9 @@ lrand48(void)
 #endif
 
 char *
-mybasename(char *s)
+mybasename(const char *s)
 {
-    char *p = s;
+    const char *p = s;
     while (*p)
 	p++;
     while (s <= p && *p != '/')
@@ -675,9 +674,9 @@ mybasename(char *s)
 }
 
 char *
-mydirname(char *s)
+mydirname(const char *s)
 {
-    char *p = s;
+    const char *p = s;
     while (*p)
 	p++;
     if (s != p)
@@ -703,7 +702,7 @@ strerror(int errno)
 #endif				/* not HAVE_STRERROR */
 
 int
-next_status(char c, int *status)
+next_status(const char c, int *status)
 {
     switch (*status) {
     case R_ST_NORMAL:
@@ -1524,10 +1523,10 @@ mySystem(char *command, int background)
 }
 
 Str
-myExtCommand(char *cmd, char *arg, int redirect)
+myExtCommand(const char *cmd, const char *arg, int redirect)
 {
     Str tmp = NULL;
-    char *p;
+    const char *p;
     int set_arg = FALSE;
 
     for (p = cmd; *p; p++) {
@@ -1553,10 +1552,10 @@ myExtCommand(char *cmd, char *arg, int redirect)
 }
 
 Str
-myEditor(char *cmd, char *file, int line)
+myEditor(const char *cmd, const char *file, int line)
 {
     Str tmp = NULL;
-    char *p;
+    const char *p;
     int set_file = FALSE, set_line = FALSE;
 
     for (p = cmd; *p; p++) {
@@ -1600,7 +1599,7 @@ char *
 expandName(char *name)
 {
     char *p;
-    struct passwd *passent, *getpwnam(const char *);
+    struct passwd *passent;
     Str extpath = NULL;
 
     if (name == NULL)
@@ -1706,10 +1705,10 @@ file_to_url(char *file)
 
 #ifdef USE_M17N
 char *
-url_unquote_conv(char *url, wc_ces charset)
+url_unquote_conv(const char *url, wc_ces charset)
 #else
 char *
-url_unquote_conv0(char *url)
+url_unquote_conv0(const char *url)
 #endif
 {
 #ifdef USE_M17N
@@ -1727,13 +1726,13 @@ url_unquote_conv0(char *url)
     return tmp->ptr;
 }
 
-static char *tmpf_base[MAX_TMPF_TYPE] = {
+static const char *tmpf_base[MAX_TMPF_TYPE] = {
     "tmp", "src", "frame", "cache", "cookie", "hist",
 };
 static unsigned int tmpf_seq[MAX_TMPF_TYPE];
 
 Str
-tmpfname(int type, char *ext)
+tmpfname(int type, const char *ext)
 {
     Str tmpf;
     char *dir;
@@ -1759,7 +1758,7 @@ tmpfname(int type, char *ext)
     return tmpf;
 }
 
-static char *monthtbl[] = {
+static const char *monthtbl[] = {
     "Jan", "Feb", "Mar", "Apr", "May", "Jun",
     "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
 };
@@ -2099,7 +2098,7 @@ void (*mySignal(int signal_number, void (*action) (int))) (int) {
 #endif
 }
 
-static char Base64Table[] =
+static const char Base64Table[] =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
 Str

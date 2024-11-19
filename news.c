@@ -157,7 +157,7 @@ static char *
 html_quote_s(char *str)
 {
     Str tmp = NULL;
-    char *p, *q;
+    const char *p, *q;
     int space = TRUE;
 
     if (!str)

@@ -62,7 +62,7 @@ ha2d(char x, char y)
 }
 
 Str
-decodeB(char *ww)
+decodeB(const char *ww)
 {
     struct growbuf gb;
 
@@ -72,10 +72,10 @@ decodeB(char *ww)
 }
 
 void
-decodeB_to_growbuf(struct growbuf *gb, char *ww)
+decodeB_to_growbuf(struct growbuf *gb, const char *ww)
 {
     unsigned char c[4];
-    char *wp = ww;
+    const char *wp = ww;
     char d[3];
     int i, n_pad;
 
@@ -123,10 +123,10 @@ last:
 }
 
 void
-decodeU_to_growbuf(struct growbuf *gb, char *ww)
+decodeU_to_growbuf(struct growbuf *gb, const char *ww)
 {
     unsigned char c1, c2;
-    char *w = ww;
+    const char *w = ww;
     int n, i;
 
     if (*w <= 0x20 || *w >= 0x60)
@@ -152,9 +152,9 @@ decodeU_to_growbuf(struct growbuf *gb, char *ww)
 
 /* RFC2047 (4.2. The "Q" encoding) */
 Str
-decodeQ(char *ww)
+decodeQ(const char *ww)
 {
-    char *w = ww;
+    const char *w = ww;
     Str a = Strnew_size(strlen(w));
 
     for (; *w != '\0' && *w != '?'; w++) {
@@ -174,9 +174,9 @@ decodeQ(char *ww)
 }
 
 void
-decodeQP_to_growbuf(struct growbuf *gb, char *ww)
+decodeQP_to_growbuf(struct growbuf *gb, const char *ww)
 {
-    char *w = ww;
+    const char *w = ww;
 
     growbuf_reserve(gb, strlen(w) + 1);
     for (; *w != '\0'; w++) {
@@ -205,16 +205,16 @@ decodeQP_to_growbuf(struct growbuf *gb, char *ww)
 
 #ifdef USE_M17N
 Str
-decodeWord(char *ow, wc_ces * charset)
+decodeWord(const char *ow, wc_ces * charset)
 #else
 Str
-decodeWord0(char *ow)
+decodeWord0(const char *ow)
 #endif
 {
 #ifdef USE_M17N
     wc_ces c;
 #endif
-    char *p, *w = ow;
+    const char *p, *w = ow;
     char method;
     Str a = Strnew();
     Str tmp = Strnew();
@@ -280,8 +280,8 @@ Str
 decodeMIME0(Str orgstr)
 #endif
 {
-    char *org = orgstr->ptr, *endp = org + orgstr->length;
-    char *org0, *p;
+    const char *org = orgstr->ptr, *endp = org + orgstr->length;
+    const char *org0, *p;
     Str cnv = NULL;
 
 #ifdef USE_M17N

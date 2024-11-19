@@ -17,14 +17,14 @@ wc_putc_init(wc_ces f_ces, wc_ces t_ces)
 }
 
 void
-wc_putc(char *c, FILE *f)
+wc_putc(const char *c, FILE *f)
 {
-    wc_uchar *p;
+    const wc_uchar *p;
 
     if (putc_f_ces != WC_CES_WTF)
-	p = (wc_uchar *)wc_conv(c, putc_f_ces, WC_CES_WTF)->ptr;
+	p = (const wc_uchar *)wc_conv(c, putc_f_ces, WC_CES_WTF)->ptr;
     else
-	p = (wc_uchar *)c;
+	p = (const wc_uchar *)c;
 
     Strclear(putc_str);
     while (*p)

@@ -191,7 +191,7 @@ searchURLLabel(Buffer *buf, char *url)
 
 #ifdef USE_NNTP
 static Anchor *
-_put_anchor_news(Buffer *buf, char *p1, char *p2, int line, int pos)
+_put_anchor_news(Buffer *buf, const char *p1, const char *p2, int line, int pos)
 {
     Str tmp;
 
@@ -210,7 +210,7 @@ _put_anchor_news(Buffer *buf, char *p1, char *p2, int line, int pos)
 #endif				/* USE_NNTP */
 
 static Anchor *
-_put_anchor_all(Buffer *buf, char *p1, char *p2, int line, int pos)
+_put_anchor_all(Buffer *buf, const char *p1, const char *p2, int line, int pos)
 {
     Str tmp;
 
@@ -222,7 +222,7 @@ _put_anchor_all(Buffer *buf, char *p1, char *p2, int line, int pos)
 }
 
 static void
-reseq_anchor0(AnchorList *al, short *seqmap)
+reseq_anchor0(AnchorList *al, const short *seqmap)
 {
     int i;
     Anchor *a;
@@ -294,9 +294,9 @@ reseq_anchor(Buffer *buf)
     reseq_anchor0(buf->formitem, seqmap);
 }
 
-static char *
-reAnchorPos(Buffer *buf, Line *l, char *p1, char *p2,
-	    Anchor *(*anchorproc) (Buffer *, char *, char *, int, int))
+static const char *
+reAnchorPos(Buffer *buf, Line *l, const char *p1, const char *p2,
+	    Anchor *(*anchorproc) (Buffer *, const char *, const char *, int, int))
 {
     Anchor *a;
     int spos, epos;
@@ -345,12 +345,12 @@ reAnchorWord(Buffer *buf, Line *l, int spos, int epos)
 
 /* search regexp and register them as anchors */
 /* returns error message if any               */
-static char *
-reAnchorAny(Buffer *buf, char *re,
-	    Anchor *(*anchorproc) (Buffer *, char *, char *, int, int))
+static const char *
+reAnchorAny(Buffer *buf, const char *re,
+	    Anchor *(*anchorproc) (Buffer *, const char *, const char *, int, int))
 {
     Line *l;
-    char *p = NULL, *p1, *p2;
+    const char *p = NULL, *p1, *p2;
 
     if (re == NULL || *re == '\0') {
 	return NULL;
@@ -380,14 +380,14 @@ reAnchorAny(Buffer *buf, char *re,
     return NULL;
 }
 
-char *
+const char *
 reAnchor(Buffer *buf, char *re)
 {
     return reAnchorAny(buf, re, _put_anchor_all);
 }
 
 #ifdef USE_NNTP
-char *
+const char *
 reAnchorNews(Buffer *buf, char *re)
 {
     return reAnchorAny(buf, re, _put_anchor_news);
@@ -397,7 +397,7 @@ char *
 reAnchorNewsheader(Buffer *buf)
 {
     Line *l;
-    char *p, *p1, *p2;
+    const char *p, *p1, *p2;
     static char *header_mid[] = {
 	"Message-Id:", "References:", "In-Reply-To:", NULL
     };

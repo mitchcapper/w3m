@@ -36,6 +36,7 @@ ETC_DIR = $(sysconfdir)
 CONF_DIR = $(sysconfdir)/$(PACKAGE)
 
 WARNINGS  = -Wall
+WARNINGS += -Werror=vla
 WARNINGS += -Wnull-dereference
 WARNINGS += -Wimplicit-function-declaration
 WARNINGS += -Wimplicit-int

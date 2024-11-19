@@ -59,7 +59,7 @@ typedef int PERM;
 extern int LUfactor(Matrix, int *);
 extern Matrix m_inverse(Matrix, Matrix);
 extern Matrix LUinverse(Matrix, int *, Matrix);
-extern int LUsolve(Matrix, int *, Vector, Vector);
+extern int LUsolve(Matrix, const int *, Vector, Vector);
 extern int Lsolve(Matrix, Vector, Vector, double);
 extern int Usolve(Matrix, Vector, Vector, double);
 extern Matrix new_matrix(int);

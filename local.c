@@ -184,7 +184,7 @@ loadLocalDir(char *dname)
 }
 
 static int
-check_local_cgi(char *file, int status)
+check_local_cgi(const char *file, int status)
 {
     struct stat st;
 
@@ -202,7 +202,7 @@ check_local_cgi(char *file, int status)
 }
 
 void
-set_environ(char *var, char *value)
+set_environ(const char *var, const char *value)
 {
 #ifdef HAVE_SETENV
     if (var != NULL && value != NULL)
@@ -253,7 +253,7 @@ set_environ(char *var, char *value)
 }
 
 static void
-set_cgi_environ(char *name, char *fn, char *req_uri)
+set_cgi_environ(const char *name, const char *fn, const char *req_uri)
 {
     set_environ("SERVER_SOFTWARE", w3m_version);
     set_environ("SERVER_PROTOCOL", "HTTP/1.0");
@@ -269,7 +269,7 @@ set_cgi_environ(char *name, char *fn, char *req_uri)
 }
 
 static Str
-checkPath(char *fn, char *path)
+checkPath(const char *fn, char *path)
 {
     char *p;
     Str tmp;
@@ -292,7 +292,7 @@ checkPath(char *fn, char *path)
 }
 
 static int
-cgi_filename(char *uri, char **fn, char **name, char **path_info)
+cgi_filename(const char *uri, const char **fn, const char **name, const char **path_info)
 {
     Str tmp;
     int offset;
@@ -353,7 +353,7 @@ localcgi_post(char *uri, char *qstr, FormList *request, char *referer)
     FILE *fr = NULL, *fw = NULL;
     int status;
     pid_t pid;
-    char *file = uri, *name = uri, *path_info = NULL, *tmpf = NULL;
+    const char *file = uri, *name = uri, *path_info = NULL, *tmpf = NULL;
 #ifdef HAVE_CHDIR
     char *cgi_dir;
 #endif

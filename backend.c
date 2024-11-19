@@ -13,7 +13,7 @@
 #else				/* ! HAVE_READLINE */
 static char *readline(char *);
 #endif				/* ! HAVE_READLINE */
-static TextList *split(char *);
+static TextList *split(const char *);
 
 
 /* Prototype declaration of command functions */
@@ -331,7 +331,7 @@ readline(char *prompt)
 
 /* Splits a string into a list of tokens and returns that list. */
 static TextList *
-split(char *p)
+split(const char *p)
 {
     int in_double_quote = FALSE, in_single_quote = FALSE;
     Str s = Strnew();

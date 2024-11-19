@@ -101,8 +101,8 @@ weight3(int x)
 #endif				/* not MATRIX */
 
 static int
-bsearch_2short(short e1, short *ent1, short e2, short *ent2, int base,
-	       short *indexarray, int nent)
+bsearch_2short(short e1, const short *ent1, short e2, const short *ent2,
+	       int base, const short *indexarray, int nent)
 {
     int n = nent;
     int k = 0;
@@ -128,7 +128,7 @@ bsearch_2short(short e1, short *ent1, short e2, short *ent2, int base,
 }
 
 static int
-bsearch_double(double e, double *ent, short *indexarray, int nent)
+bsearch_double(double e, const double *ent, const short *indexarray, int nent)
 {
     int n = nent;
     int k = 0;
@@ -418,7 +418,7 @@ suspend_or_pushdata(struct table *tbl, char *line)
 
 int visible_length_offset = 0;
 int
-visible_length(char *str)
+visible_length(const char *str)
 {
     int len = 0, n, max_len = 0;
     int status = R_ST_NORMAL;
@@ -848,9 +848,9 @@ table_rule_width(struct table *t)
 }
 
 static void
-check_cell_height(int *tabheight, int *cellheight,
-		 short *row, short *rowspan, short maxcell,
-		 short *indexarray, int space, int dir)
+check_cell_height(int *tabheight, const int *cellheight,
+		 const short *row, const short *rowspan, short maxcell,
+		 const short *indexarray, int space, int dir)
 {
     int i, j, k, brow, erow;
     int sheight, height;
@@ -881,9 +881,9 @@ check_cell_height(int *tabheight, int *cellheight,
 }
 
 static void
-check_cell_width(short *tabwidth, short *cellwidth,
-		 short *col, short *colspan, short maxcell,
-		 short *indexarray, int space, int dir)
+check_cell_width(short *tabwidth, const short *cellwidth,
+		 const short *col, const short *colspan, short maxcell,
+		 const short *indexarray, int space, int dir)
 {
     int i, j, k, bcol, ecol;
     int swidth, width;
@@ -1252,16 +1252,12 @@ check_table_width(struct table *t, double *newwidth, MAT * minv, int itr)
     int i, j, k, m, bcol, ecol;
     int corr = 0;
     struct table_cell *cell = &t->cell;
-#ifdef __GNUC__
-    short orgwidth[t->maxcol >= 0 ? t->maxcol + 1 : 1];
-    short corwidth[t->maxcol >= 0 ? t->maxcol + 1 : 1];
-    short cwidth[cell->maxcell >= 0 ? cell->maxcell + 1 : 1];
-    double swidth[cell->maxcell >= 0 ? cell->maxcell + 1 : 1];
-#else				/* __GNUC__ */
-    short orgwidth[MAXCOL], corwidth[MAXCOL];
-    short cwidth[MAXCELL];
-    double swidth[MAXCELL];
-#endif				/* __GNUC__ */
+    int maxcol = t->maxcol >= 0 ? t->maxcol + 1 : 1;
+    int maxcell = cell->maxcell >= 0 ? cell->maxcell + 1 : 1;
+    short *orgwidth = GC_malloc(maxcol * sizeof(*orgwidth));
+    short *corwidth = GC_malloc(maxcol * sizeof(*corwidth));
+    short *cwidth = GC_malloc(maxcell * sizeof(*cwidth));
+    double *swidth = GC_malloc(maxcell * sizeof(*swidth));
     double twidth, sxy, *Sxx, stotal;
 
     twidth = 0.;
@@ -1606,11 +1602,8 @@ check_table_height(struct table *t)
 static int
 get_table_width(struct table *t, short *orgwidth, short *cellwidth, int flag)
 {
-#ifdef __GNUC__
-    short newwidth[t->maxcol >= 0 ? t->maxcol + 1 : 1];
-#else				/* not __GNUC__ */
-    short newwidth[MAXCOL];
-#endif				/* not __GNUC__ */
+    int maxcol = t->maxcol >= 0 ? t->maxcol + 1 : 1;
+    short *newwidth = GC_malloc(maxcol * sizeof(*newwidth));
     int i;
     int swidth;
     struct table_cell *cell = &t->cell;
@@ -1620,11 +1613,8 @@ get_table_width(struct table *t, short *orgwidth, short *cellwidth, int flag)
 	newwidth[i] = max(orgwidth[i], 0);
 
     if (flag & CHECK_FIXED) {
-#ifdef __GNUC__
-	short ccellwidth[cell->maxcell >= 0 ? cell->maxcell + 1 : 1];
-#else				/* not __GNUC__ */
-	short ccellwidth[MAXCELL];
-#endif				/* not __GNUC__ */
+	int maxcell = cell->maxcell >= 0 ? cell->maxcell + 1 : 1;
+	short *ccellwidth = GC_malloc(maxcell * sizeof(*ccellwidth));
 	for (i = 0; i <= t->maxcol; i++) {
 	    if (newwidth[i] < t->fixed_width[i])
 		newwidth[i] = t->fixed_width[i];
@@ -3436,7 +3426,7 @@ correct_table_matrix2(struct table *t, int col, int cspan, double s, double b)
 }
 
 static void
-correct_table_matrix3(struct table *t, int col, char *flags, double s,
+correct_table_matrix3(struct table *t, int col, const char *flags, double s,
 		      double b)
 {
     int i, j;
@@ -3463,7 +3453,7 @@ correct_table_matrix3(struct table *t, int col, char *flags, double s,
 }
 
 static void
-correct_table_matrix4(struct table *t, int col, int cspan, char *flags,
+correct_table_matrix4(struct table *t, int col, int cspan, const char *flags,
 		      double s, double b)
 {
     int i, j;
@@ -3496,13 +3486,8 @@ set_table_matrix0(struct table *t, int maxwidth)
     int i, j, k, bcol, ecol;
     int width;
     double w0, w1, w, s, b;
-#ifdef __GNUC__
-    double we[size];
-    char expand[size];
-#else				/* not __GNUC__ */
-    double we[MAXCOL];
-    char expand[MAXCOL];
-#endif				/* not __GNUC__ */
+    double *we = GC_malloc(size * sizeof(*we));
+    char *expand = GC_malloc(size * sizeof(*expand));
     struct table_cell *cell = &t->cell;
 
     w0 = 0.;

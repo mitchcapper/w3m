@@ -53,14 +53,13 @@ void Strlower(Str);
 void Strupper(Str);
 void Strchop(Str);
 void Strshrink(Str, int);
-void Strshrinkfirst(Str, int);
 void Strremovefirstspaces(Str);
 void Strremovetrailingspaces(Str);
 Str Stralign_left(Str, int);
 Str Stralign_right(Str, int);
 Str Stralign_center(Str, int);
 
-Str Sprintf(char *fmt, ...);
+Str Sprintf(const char *fmt, ...);
 
 Str Strfgets(FILE *);
 Str Strfgetall(FILE *);
@@ -72,15 +71,11 @@ void Strgrow(Str s);
 #define Strnulterm(x) ((x)->ptr[(x)->length]=0)
 #define Strcmp(x,y)                  strcmp((x)->ptr,(y)->ptr)
 #define Strcmp_charp(x,y)            strcmp((x)->ptr,(y))
-#define Strncmp(x,y,n)               strncmp((x)->ptr,(y)->ptr,(n))
-#define Strncmp_charp(x,y,n)         strncmp((x)->ptr,(y),(n))
 #define Strcasecmp(x,y)              strcasecmp((x)->ptr,(y)->ptr)
 #define Strcasecmp_charp(x,y)        strcasecmp((x)->ptr,(y))
-#define Strncasecmp(x,y,n)           strncasecmp((x)->ptr,(y)->ptr,(n))
 #define Strncasecmp_charp(x,y,n)     strncasecmp((x)->ptr,(y),(n))
 
 #define Strlastchar(s)               ((s)->length>0?(s)->ptr[(s)->length-1]:'\0')
-#define Strinsert(s,n,p)             Strinsert_charp((s),(n),(p)->ptr)
 #define Strshrinkfirst(s,n)          Strdelete((s),0,(n))
 #define Strfputs(s,f)                fwrite((s)->ptr,1,(s)->length,(f))
 #endif				/* not GC_STR_H */

@@ -867,7 +867,7 @@ create_option_search_table(void)
 }
 
 static struct param_ptr *
-search_param(char *name)
+search_param(const char *name)
 {
     size_t b, e, i;
     int cmp;
@@ -987,7 +987,7 @@ show_params(FILE * fp)
 }
 
 int
-str_to_bool(char *value, int old)
+str_to_bool(const char *value, int old)
 {
     if (value == NULL)
 	return 1;
@@ -1015,7 +1015,7 @@ str_to_bool(char *value, int old)
 
 #ifdef USE_COLOR
 static int
-str_to_color(char *value)
+str_to_color(const char *value)
 {
     if (value == NULL)
 	return 8;		/* terminal */
@@ -1056,7 +1056,7 @@ str_to_color(char *value)
 #endif
 
 static int
-set_param(char *name, char *value)
+set_param(const char *name, char *value)
 {
     struct param_ptr *p;
     double ppc;
@@ -1088,7 +1088,7 @@ set_param(char *name, char *value)
 	*(char *)p->varptr = value[0];
 	break;
     case P_STRING:
-	*(char **)p->varptr = value;
+	*(const char **)p->varptr = value;
 	break;
 #if defined(USE_SSL) && defined(USE_SSL_VERIFY)
     case P_SSLPATH:
@@ -1690,26 +1690,26 @@ rcFile(char *base)
 }
 
 char *
-auxbinFile(char *base)
+auxbinFile(const char *base)
 {
     return expandPath(Strnew_m_charp(w3m_auxbin_dir(), "/", base, NULL)->ptr);
 }
 
 char *
-etcFile(char *base)
+etcFile(const char *base)
 {
     return expandPath(Strnew_m_charp(w3m_etc_dir(), "/", base, NULL)->ptr);
 }
 
 char *
-confFile(char *base)
+confFile(const char *base)
 {
     return expandPath(Strnew_m_charp(w3m_conf_dir(), "/", base, NULL)->ptr);
 }
 
 #ifndef USE_HELP_CGI
 char *
-helpFile(char *base)
+helpFile(const char *base)
 {
     return expandPath(Strnew_m_charp(w3m_help_dir(), "/", base, NULL)->ptr);
 }
@@ -1875,13 +1875,13 @@ querySiteconf(ParsedURL *query_pu, int field)
 {
     struct siteconf_rec *ent;
     Str u;
-    char *firstp, *lastp;
+    const char *firstp, *lastp;
 
     if (field < 0 || field >= SCONF_N_FIELD)
 	return NULL;
     if (!query_pu || IS_EMPTY_PARSED_URL(query_pu))
 	return NULL;
-    u = parsedURL2Str((ParsedURL *)query_pu);
+    u = parsedURL2Str(query_pu);
     if (u->length == 0)
 	return NULL;
 

@@ -119,7 +119,7 @@ printMailcapPanel(char *mailcap)
 }
 
 static void
-editMailcap(char *mailcap, struct parsed_tagarg *args)
+editMailcap(const char *mailcap, struct parsed_tagarg *args)
 {
     TextList *t = newTextList();
     TextListItem *ti;

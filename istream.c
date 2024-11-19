@@ -62,7 +62,7 @@ buffer_read(StreamBuffer sb, unsigned char *obuf, int count)
 }
 
 static void
-init_buffer(BaseStream base, char *buf, int bufsize)
+init_buffer(BaseStream base, const char *buf, int bufsize)
 {
     StreamBuffer sb = &base->stream;
     sb->size = bufsize;
@@ -328,7 +328,7 @@ ssl_accept_this_site(char *hostname)
 }
 
 static int
-ssl_match_cert_ident(char *ident, int ilen, char *hostname)
+ssl_match_cert_ident(const char *ident, int ilen, char *hostname)
 {
     /* RFC2818 3.1.  Server Identity
      * Names may contain the wildcard
@@ -475,7 +475,7 @@ ssl_get_certificate(SSL * ssl, char *hostname)
     char buf[2048];
     Str amsg = NULL;
     Str emsg;
-    char *ans;
+    const char *ans;
 
     if (ssl == NULL)
 	return NULL;
@@ -495,7 +495,7 @@ ssl_get_certificate(SSL * ssl, char *hostname)
 		("Accept SSL session without any peer certificate");
 	else {
 	    /* FIXME: gettextize? */
-	    char *e = "This SSL session was rejected "
+	    const char *e = "This SSL session was rejected "
 		"to prevent security violation: no peer certificate";
 	    disp_err_message(e, FALSE);
 	    free_ssl_ctx();
@@ -561,7 +561,7 @@ ssl_get_certificate(SSL * ssl, char *hostname)
 	}
 	else {
 	    /* FIXME: gettextize? */
-	    char *e = "This SSL session was rejected "
+	    const char *e = "This SSL session was rejected "
 		"to prevent security violation";
 	    disp_err_message(e, FALSE);
 	    free_ssl_ctx();
@@ -685,7 +685,7 @@ static int
 ens_read(struct ens_handle *handle, char *buf, int len)
 {
     if (handle->pos == handle->gb.length) {
-	char *p;
+	const char *p;
 	struct growbuf gbtmp;
 
 	ISgets_to_growbuf(handle->is, &handle->gb, TRUE);

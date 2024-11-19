@@ -33,11 +33,11 @@ extern int fold_pre;
 static int frame_source = 0;
 static int need_number = 0;
 
-static char *guess_filename(char *file);
-static int _MoveFile(char *path1, char *path2);
+static char *guess_filename(const char *file);
+static int _MoveFile(const char *path1, const char *path2);
 static void uncompress_stream(URLFile *uf, char **src);
-static FILE *lessopen_stream(char *path);
-static Buffer *loadcmdout(char *cmd,
+static FILE *lessopen_stream(const char *path);
+static Buffer *loadcmdout(const char *cmd,
 			  Buffer *(*loadproc) (URLFile *, Buffer *),
 			  Buffer *defaultbuf);
 #ifndef USE_ANSI_COLOR
@@ -141,7 +141,7 @@ static int cur_iseq;
 #ifdef USE_COOKIE
 /* This array should be somewhere else */
 /* FIXME: gettextize? */
-char *violations[COO_EMAX] = {
+const char *violations[COO_EMAX] = {
     "internal error",
     "tail match failed",
     "wrong number of dots",
@@ -251,7 +251,7 @@ loadSomething(URLFile *f,
 }
 
 int
-dir_exist(char *path)
+dir_exist(const char *path)
 {
     struct stat stbuf;
 
@@ -263,7 +263,7 @@ dir_exist(char *path)
 }
 
 static int
-is_dump_text_type(char *type)
+is_dump_text_type(const char *type)
 {
     struct mailcap *mcap;
     return (type && (mcap = searchExtViewer(type)) &&
@@ -271,7 +271,7 @@ is_dump_text_type(char *type)
 }
 
 static int
-is_text_type(char *type)
+is_text_type(const char *type)
 {
     return (type == NULL || type[0] == '\0' ||
 	    strncasecmp(type, "text/", 5) == 0 ||
@@ -281,21 +281,21 @@ is_text_type(char *type)
 }
 
 static int
-is_plain_text_type(char *type)
+is_plain_text_type(const char *type)
 {
     return ((type && strcasecmp(type, "text/plain") == 0) ||
 	    (is_text_type(type) && !is_dump_text_type(type)));
 }
 
 int
-is_html_type(char *type)
+is_html_type(const char *type)
 {
     return (type && (strcasecmp(type, "text/html") == 0 ||
 		     strcasecmp(type, "application/xhtml+xml") == 0));
 }
 
 static void
-check_compression(char *path, URLFile *uf)
+check_compression(const char *path, URLFile *uf)
 {
     int len;
     struct compression_decoder *d;
@@ -331,7 +331,7 @@ compress_application_type(int compression)
 }
 
 static char *
-uncompressed_file_type(char *path, char **ext)
+uncompressed_file_type(const char *path, char **ext)
 {
     int len, slen;
     Str fn;
@@ -364,7 +364,7 @@ uncompressed_file_type(char *path, char **ext)
 }
 
 static int
-setModtime(char *path, time_t modtime)
+setModtime(const char *path, time_t modtime)
 {
     struct utimbuf t;
     struct stat st;
@@ -419,7 +419,7 @@ examineFile(char *path, URLFile *uf)
 #define S_IXANY	(S_IXUSR|S_IXGRP|S_IXOTH)
 
 static int
-check_command(char *cmd, int auxbin_p)
+check_command(const char *cmd, int auxbin_p)
 {
     static char *path = NULL;
     Str dirs;
@@ -498,10 +498,10 @@ convertLine0(URLFile *uf, Str line, int mode)
 }
 
 int
-matchattr(char *p, char *attr, int len, Str *value)
+matchattr(const char *p, const char *attr, int len, Str *value)
 {
     int quoted;
-    char *q = NULL;
+    const char *q = NULL;
 
     if (strncasecmp(p, attr, len) == 0) {
 	p += len;
@@ -576,7 +576,7 @@ readHeader(URLFile *uf, Buffer *newBuf, int thru, ParsedURL *pu)
 {
     char *p, *q;
 #ifdef USE_COOKIE
-    char *emsg;
+    const char *emsg;
 #endif
     char c;
     Str lineBuf2 = NULL;
@@ -851,7 +851,7 @@ readHeader(URLFile *uf, Buffer *newBuf, int thru, ParsedURL *pu)
 		    add_cookie(pu, name, value, expires, domain, path, flag,
 			       comment, version, port, commentURL);
 		if (err) {
-		    char *ans = (accept_bad_cookie == ACCEPT_BAD_COOKIE_ACCEPT)
+		    const char *ans = (accept_bad_cookie == ACCEPT_BAD_COOKIE_ACCEPT)
 			? "y" : NULL;
 		    if (fmInitialized && (err & COO_OVERRIDE_OK) &&
 			accept_bad_cookie == ACCEPT_BAD_COOKIE_ASK) {
@@ -920,7 +920,7 @@ readHeader(URLFile *uf, Buffer *newBuf, int thru, ParsedURL *pu)
 }
 
 char *
-checkHeader(Buffer *buf, char *field)
+checkHeader(Buffer *buf, const char *field)
 {
     int len;
     TextListItem *i;
@@ -1077,7 +1077,7 @@ extract_auth_val(char **q)
 		}
 	    }
 	}
-	else if (quoted && *qq == '\\')
+	else if (*qq == '\\')
 	    Strcat_char(val, *qq++);
 	Strcat_char(val, *qq++);
     }
@@ -1138,9 +1138,8 @@ extract_auth_param(char *q, struct auth_param *auth)
 	}
 	if (ap->name == NULL) {
 	    /* skip unknown param */
-	    int token_type;
 	    p = q;
-	    if ((token_type = skip_auth_token(&q)) == AUTHCHR_TOKEN &&
+	    if (skip_auth_token(&q) == AUTHCHR_TOKEN &&
 		(IS_SPACE(*q) || *q == '=')) {
 		SKIP_BLANKS(q);
 		if (*q != '=')
@@ -1163,7 +1162,7 @@ extract_auth_param(char *q, struct auth_param *auth)
 }
 
 static Str
-get_auth_param(struct auth_param *auth, char *name)
+get_auth_param(struct auth_param *auth, const char *name)
 {
     struct auth_param *ap;
     for (ap = auth; ap->name != NULL; ap++) {
@@ -1229,9 +1228,9 @@ MD5(const unsigned char *d, unsigned long n, unsigned char *md)
 #endif
 
 static Str
-digest_hex(unsigned char *p)
+digest_hex(const unsigned char *p)
 {
-    char *h = "0123456789abcdef";
+    const char *h = "0123456789abcdef";
     Str tmp = Strnew_size(MD5_DIGEST_LENGTH * 2 + 1);
     int i;
     for (i = 0; i < MD5_DIGEST_LENGTH; i++, p++) {
@@ -1511,8 +1510,7 @@ findAuthentication(struct http_auth *hauth, Buffer *buf, char *auth_field)
 		}
 		if (p0 == p) {
 		    /* all unknown auth failed */
-		    int token_type;
-		    if ((token_type = skip_auth_token(&p)) == AUTHCHR_TOKEN && IS_SPACE(*p)) {
+		    if (skip_auth_token(&p) == AUTHCHR_TOKEN && IS_SPACE(*p)) {
 			SKIP_BLANKS(p);
 			p = extract_auth_param(p, none_auth_param);
 		    }
@@ -1690,7 +1688,7 @@ loadGeneralFile(char *path, ParsedURL *volatile current, char *referer,
     Buffer *b = NULL;
     Buffer *(*volatile proc)(URLFile *, Buffer *);
     char *volatile tpath;
-    char *volatile t = "text/plain", *p, *volatile real_type = NULL;
+    char *t = "text/plain", *p, *volatile real_type = NULL;
     Buffer *volatile t_buf = NULL;
     int volatile searchHeader = SearchHeader;
     int volatile searchHeader_through = TRUE;
@@ -2325,7 +2323,7 @@ push_link(int cmd, int offset, int pos)
 }
 
 static int
-is_period_char(unsigned char *ch)
+is_period_char(const unsigned char *ch)
 {
     switch (*ch) {
     case ',':
@@ -2345,7 +2343,7 @@ is_period_char(unsigned char *ch)
 }
 
 static int
-is_beginning_char(unsigned char *ch)
+is_beginning_char(const unsigned char *ch)
 {
     switch (*ch) {
     case '(':
@@ -2360,7 +2358,7 @@ is_beginning_char(unsigned char *ch)
 }
 
 static int
-is_word_char(unsigned char *ch)
+is_word_char(const unsigned char *ch)
 {
     Lineprop ctype = get_mctype(ch);
 
@@ -2407,7 +2405,7 @@ is_word_char(unsigned char *ch)
 
 #ifdef USE_M17N
 static int
-is_combining_char(unsigned char *ch)
+is_combining_char(const unsigned char *ch)
 {
     Lineprop ctype = get_mctype(ch);
 
@@ -2418,7 +2416,7 @@ is_combining_char(unsigned char *ch)
 #endif
 
 int
-is_boundary(unsigned char *ch1, unsigned char *ch2)
+is_boundary(const unsigned char *ch1, const unsigned char *ch2)
 {
     if (!*ch1 || !*ch2)
 	return 1;
@@ -2525,7 +2523,7 @@ append_tags(struct readbuffer *obuf)
 }
 
 static void
-push_tag(struct readbuffer *obuf, char *cmdname, int cmd)
+push_tag(struct readbuffer *obuf, const char *cmdname, int cmd)
 {
     obuf->tag_stack[obuf->tag_sp] = New(struct cmdtable);
     obuf->tag_stack[obuf->tag_sp]->cmdname = allocStr(cmdname, -1);
@@ -2537,7 +2535,7 @@ push_tag(struct readbuffer *obuf, char *cmdname, int cmd)
 
 static void
 push_nchars(struct readbuffer *obuf, int width,
-	    char *str, int len, Lineprop mode)
+	    const char *str, int len, Lineprop mode)
 {
     append_tags(obuf);
     Strcat_charp_n(obuf->line, str, len);
@@ -2556,7 +2554,7 @@ push_nchars(obuf, width, str, strlen(str), mode)
 push_nchars(obuf, width, str->ptr, str->length, mode)
 
 static void
-check_breakpoint(struct readbuffer *obuf, int pre_mode, char *ch)
+check_breakpoint(struct readbuffer *obuf, int pre_mode, const char *ch)
 {
     int tlen, len = obuf->line->length;
 
@@ -2566,12 +2564,12 @@ check_breakpoint(struct readbuffer *obuf, int pre_mode, char *ch)
     tlen = obuf->line->length - len;
     if (tlen > 0
 	|| is_boundary((unsigned char *)obuf->prevchar->ptr,
-		       (unsigned char *)ch))
+		       (const unsigned char *)ch))
 	set_breakpoint(obuf, tlen);
 }
 
 static void
-push_char(struct readbuffer *obuf, int pre_mode, char ch)
+push_char(struct readbuffer *obuf, int pre_mode, const char ch)
 {
     check_breakpoint(obuf, pre_mode, &ch);
     Strcat_char(obuf->line, ch);
@@ -2945,7 +2943,7 @@ flushline(struct html_feed_environ *h_env, struct readbuffer *obuf, int indent,
 	    Strcat_charp(tmp, html_quote(obuf->anchor.title));
 	}
 	if (obuf->anchor.accesskey) {
-	    char *c = html_quote_char(obuf->anchor.accesskey);
+	    const char *c = html_quote_char(obuf->anchor.accesskey);
 	    Strcat_charp(tmp, "\" ACCESSKEY=\"");
 	    if (c)
 		Strcat_charp(tmp, c);
@@ -3502,7 +3500,7 @@ process_img(struct parsed_tag *tag, int width)
 }
 
 Str
-process_anchor(struct parsed_tag *tag, char *tagbuf)
+process_anchor(struct parsed_tag *tag, const char *tagbuf)
 {
     if (parsedtag_need_reconstruct(tag)) {
 	parsedtag_set_value(tag, ATTR_HSEQ, Sprintf("%d", cur_hseq++)->ptr);
@@ -4200,7 +4198,7 @@ process_n_form(void)
 static void
 clear_ignore_p_flag(int cmd, struct readbuffer *obuf)
 {
-    static int clear_flag_cmd[] = {
+    static const int clear_flag_cmd[] = {
 	HTML_HR, HTML_UNKNOWN
     };
     int i;
@@ -4330,10 +4328,10 @@ ul_type(struct parsed_tag *tag, int default_type)
 }
 
 int
-getMetaRefreshParam(char *q, Str *refresh_uri)
+getMetaRefreshParam(const char *q, Str *refresh_uri)
 {
     int refresh_interval;
-    char *r;
+    const char *r;
     Str s_tmp = NULL;
 
     if (q == NULL || refresh_uri == NULL)
@@ -6427,7 +6425,6 @@ HTMLlineproc0(char *line, struct html_feed_environ *h_env, int internal)
 		    str = Strnew_charp_n(str, p - str)->ptr;
 		    line = Strnew_m_charp(p, line, NULL)->ptr;
 		}
-		is_tag = FALSE;
 		continue;
 	    }
 	    if (obuf->table_level >= 0)
@@ -6571,7 +6568,7 @@ HTMLlineproc0(char *line, struct html_feed_environ *h_env, int internal)
 		    str++;
 		}
 		else if (obuf->flag & RB_PLAIN) {
-		    char *p = html_quote_char(*str);
+		    const char *p = html_quote_char(*str);
 		    if (p) {
 			push_charp(obuf, 1, p, PC_ASCII);
 			str++;
@@ -6818,7 +6815,7 @@ loadHTMLBuffer(URLFile *f, Buffer *newBuf)
     return newBuf;
 }
 
-static char *_size_unit[] = { "b", "kb", "Mb", "Gb", "Tb",
+static const char *_size_unit[] = { "b", "kb", "Mb", "Gb", "Tb",
     "Pb", "Eb", "Zb", "Bb", "Yb", NULL
 };
 
@@ -6827,7 +6824,7 @@ convert_size(clen_t size, int usefloat)
 {
     float csize;
     int sizepos = 0;
-    char **sizes = _size_unit;
+    const char **sizes = _size_unit;
 
     csize = (float)size;
     while (csize >= 999.495 && sizes[sizepos + 1]) {
@@ -6841,7 +6838,7 @@ convert_size(clen_t size, int usefloat)
 char *
 convert_size2(clen_t size1, clen_t size2, int usefloat)
 {
-    char **sizes = _size_unit;
+    const char **sizes = _size_unit;
     float csize, factor = 1;
     int sizepos = 0;
 
@@ -7112,7 +7109,7 @@ loadHTMLstream(URLFile *f, Buffer *newBuf, FILE * src, int internal)
     struct environment envs[MAX_ENV_LEVEL];
     clen_t linelen = 0;
     clen_t trbyte = 0;
-    Str lineBuf2 = Strnew();
+    Str lineBuf2;
 #ifdef USE_M17N
     wc_ces charset = WC_CES_US_ASCII;
     wc_ces volatile doc_charset = DocumentCharset;
@@ -7353,11 +7350,11 @@ loadGopherDir0(URLFile *uf, ParsedURL *pu)
 			 "</title>\n</head>\n<body>\n<h1>Index of ", q,
 			 "</h1>\n<table>\n", NULL);
 
+    pre = 0;
     if (SETJMP(AbortLoading) != 0)
 	goto gopher_end;
     TRAP_ON;
 
-    pre = 0;
     while (1) {
 	if (!(lbuf = StrUFgets(uf)) || lbuf->length == 0)
 	    break;
@@ -7635,8 +7632,7 @@ loadImageBuffer(URLFile *uf, Buffer *newBuf)
     init_stream(&f, SCM_LOCAL, newStrStream(tmp));
     loadHTMLstream(&f, newBuf, src, TRUE);
     UFclose(&f);
-    if (src)
-	fclose(src);
+    fclose(src);
 
     newBuf->topLine = newBuf->firstLine;
     newBuf->lastLine = newBuf->currentLine;
@@ -7743,10 +7739,10 @@ saveBufferBody(Buffer *buf, FILE * f, int cont)
 }
 
 static Buffer *
-loadcmdout(char *cmd,
+loadcmdout(const char *cmd,
 	   Buffer *(*loadproc) (URLFile *, Buffer *), Buffer *defaultbuf)
 {
-    FILE *f, *popen(const char *, const char *);
+    FILE *f;
     Buffer *buf;
     URLFile uf;
 
@@ -7784,7 +7780,7 @@ getshell(char *cmd)
 Buffer *
 getpipe(char *cmd)
 {
-    FILE *f, *popen(const char *, const char *);
+    FILE *f;
     Buffer *buf;
 
     if (cmd == NULL || *cmd == '\0')
@@ -8025,7 +8021,7 @@ getNextPage(Buffer *buf, int plen)
 }
 
 int
-save2tmp(URLFile uf, char *tmpf)
+save2tmp(URLFile uf, const char *tmpf)
 {
     FILE *ff;
     clen_t linelen = 0, trbyte = 0;
@@ -8093,7 +8089,7 @@ save2tmp(URLFile uf, char *tmpf)
 }
 
 Buffer *
-doExternal(URLFile uf, char *type, Buffer *defaultbuf)
+doExternal(URLFile uf, const char *type, Buffer *defaultbuf)
 {
     Str tmpf, command;
     struct mailcap *mcap;
@@ -8197,7 +8193,7 @@ doExternal(URLFile uf, char *type, Buffer *defaultbuf)
 }
 
 static int
-_MoveFile(char *path1, char *path2)
+_MoveFile(const char *path1, const char *path2)
 {
     InputStream f1;
     FILE *f2;
@@ -8360,7 +8356,7 @@ doFileMove(char *tmpf, char *defstr)
 }
 
 int
-doFileSave(URLFile uf, char *defstr)
+doFileSave(URLFile uf, const char *defstr)
 {
 #ifndef __MINGW32_VERSION
     Str msg;
@@ -8455,7 +8451,7 @@ doFileSave(URLFile uf, char *defstr)
 }
 
 int
-checkCopyFile(char *path1, char *path2)
+checkCopyFile(const char *path1, const char *path2)
 {
     struct stat st1, st2;
 
@@ -8468,7 +8464,7 @@ checkCopyFile(char *path1, char *path2)
 }
 
 int
-checkSaveFile(InputStream stream, char *path2)
+checkSaveFile(InputStream stream, const char *path2)
 {
     struct stat st1, st2;
     int des = ISfileno(stream);
@@ -8484,7 +8480,7 @@ checkSaveFile(InputStream stream, char *path2)
 }
 
 int
-checkOverWrite(char *path)
+checkOverWrite(const char *path)
 {
     struct stat st;
     char *ans;
@@ -8500,7 +8496,7 @@ checkOverWrite(char *path)
 }
 
 char *
-inputAnswer(char *prompt)
+inputAnswer(const char *prompt)
 {
     char *ans;
 
@@ -8617,7 +8613,7 @@ uncompress_stream(URLFile *uf, char **src)
 
 
 static FILE *
-lessopen_stream(char *path)
+lessopen_stream(const char *path)
 {
     char *lessopen;
     FILE *fp;
@@ -8666,7 +8662,7 @@ lessopen_stream(char *path)
 }
 
 static char *
-guess_filename(char *file)
+guess_filename(const char *file)
 {
     char *p = NULL, *s;
 

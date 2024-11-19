@@ -18,7 +18,7 @@
 #define MULTI_KEY(c) (((c) >> 16) & 0x77F)
 
 typedef struct _FuncList {
-    char *id;
+    const char *id;
     void (*func) (void);
 } FuncList;
 
