@@ -3,12 +3,12 @@
  doc-de/README.func     |    1 
  doc/README.func        |    1 
  doc/w3m.1              |   15 +++++
- fm.h                   |    2 
- main.c                 |  145 +++++++++++++++++++++++++++++++++++++++++++++++--
+ fm.h                   |    1 
+ main.c                 |  140 +++++++++++++++++++++++++++++++++++++++++++++++--
  proto.h                |    1 
- rc.c                   |    4 +
+ rc.c                   |    3 +
  scripts/w3mhelp.cgi.in |    3 -
- 9 files changed, 169 insertions(+), 4 deletions(-)
+ 9 files changed, 162 insertions(+), 4 deletions(-)
 
 --- a/config.h.in
 +++ b/config.h.in
@@ -99,7 +99,7 @@
 -#ifdef USE_M17N
 -#endif
 +    /* Restore a previously saved session */
-+    if (RestoreSession || opt_restore) {
++    if (opt_restore) {
 +	FILE *fp;
 +	Str line;
 +	char *sf, **session;
@@ -189,7 +189,7 @@
      if (deprecated)
  	fprintf(stderr, "%s\n%s\n%s\n",
  		"DEPRECATION WARNING",
-@@ -4425,6 +4503,67 @@ DEFUN(adBmark, ADD_BOOKMARK, "Add curren
+@@ -4425,6 +4503,62 @@ DEFUN(adBmark, ADD_BOOKMARK, "Add curren
  		request);
  }
  
@@ -198,7 +198,6 @@
 +{
 +    Buffer *buf;
 +    FILE *f;
-+    TabBuffer *tab;
 +    ParsedURL *url;
 +    char *sep;
 +
@@ -207,17 +206,13 @@
 +    if (!(f = fopen(sf, "w"))) goto fail;
 +
 +    sep = "";
-+    for (tab = CurrentTab; tab->prevTab; tab = tab->prevTab);
-+    for ( ; tab; tab = tab->nextTab) {
++    for (TabBuffer *tab = FirstTab; tab; tab = tab->nextTab) {
 +	fputs(sep, f);
 +	for (buf = tab->firstBuffer; buf; buf = buf->nextBuffer) {
++	    if (buf->bufferprop & BP_INTERNAL)
++		continue;
 +	    if ((url = baseURL(buf)))
 +		fprintf(f, "%s\n", parsedURL2Str(url)->ptr);
-+	    /*
-+	     * Needs refactoring of HistoryPage handling first.
-+	    else if (!strcmp(buf->buffername, "HistoryPage"))
-+		fprintf(f, "%s\n", buf->buffername);
-+	    */
 +	    else
 +		disp_err_message(buf->buffername, FALSE);
 +	}
@@ -278,22 +273,20 @@
  #define CMT_FRAME        N_("Render frames automatically")
  #define CMT_ARGV_IS_URL  N_("Treat argument without scheme as URL")
  #define CMT_TSELF        N_("Use _self as default target")
-@@ -514,6 +516,8 @@ struct param_ptr params3[] = {
+@@ -514,6 +516,7 @@ struct param_ptr params3[] = {
      {"history", P_INT, PI_TEXT, (void *)&URLHistSize, CMT_HISTSIZE, NULL},
      {"save_hist", P_INT, PI_ONOFF, (void *)&SaveURLHist, CMT_SAVEHIST, NULL},
  #endif				/* USE_HISTORY */
-+    {"load_sess", P_INT, PI_ONOFF, (void *)&RestoreSession, CMT_LOADSESS, NULL},
 +    {"save_sess", P_INT, PI_ONOFF, (void *)&StoreSession, CMT_SAVESESS, NULL},
      {"confirm_qq", P_INT, PI_ONOFF, (void *)&confirm_on_quit, CMT_CONFIRM_QQ,
       NULL},
      {"exit_on_last", P_INT, PI_ONOFF, (void *)&exit_on_last, CMT_EXIT_ON_LAST,
 --- a/fm.h
 +++ b/fm.h
-@@ -1085,6 +1085,8 @@ global int UseHistory init(TRUE);
+@@ -1085,6 +1085,7 @@ global int UseHistory init(TRUE);
  global int URLHistSize init(100);
  global int SaveURLHist init(TRUE);
  #endif				/* USE_HISTORY */
-+global int RestoreSession init(FALSE);
 +global int StoreSession init(FALSE);
  global int multicolList init(FALSE);
  
@@ -330,8 +323,8 @@
 +The default session file will be deleted after restoring a session when exiting w3m.
 +Without a given session file, when manually storing a session, w3m will ask for a filename.
 +If a session file is given, it will not be deleted and will be overwritten if storing a session again.
-+Automatic session storing and restoring can be configured via the options.
-+If URL or files were given as parameters they will be loaded after restoring the session and added to the first tab.
++Automatic session storing can be configured via the options.
++If URLs or files were given as parameters they will be loaded after restoring the session and added to the first tab.
 +If \-N and \-R are given the old session is restored as is and any new buffer are opened in separate tabs.
  .SH EXAMPLES
  .SS Pager-like usage

@@ -65,6 +65,7 @@ Refactor-handling-of-close-tags.patch
 Remove-islang.c.patch
 Fix-yank.patch
 Use-prec_num-with-followA.patch
+Use-confirm-in-quitfm.patch
 Add-command-to-protect-buffers.patch
 Improve-protected-buffers.patch
 lto.patch
