@@ -11,7 +11,7 @@ Patch: patches/Fix-scan-build-issues.patch
 
 --- a/etc.c
 +++ b/etc.c
-@@ -145,7 +145,6 @@ gethtmlcmd(const char *s)
+@@ -145,7 +145,6 @@ gethtmlcmd(char *s)
      }
      if (p - cmdstr == MAX_CMD_LEN) {
  	/* buffer overflow: perhaps caused by bad HTML source */
@@ -74,7 +74,7 @@ Patch: patches/Fix-scan-build-issues.patch
  	    break;
 --- a/main.c
 +++ b/main.c
-@@ -6261,11 +6261,9 @@ DEFUN(execCmd, COMMAND, "Invoke w3m func
+@@ -6137,11 +6137,9 @@ DEFUN(execCmd, COMMAND, "Invoke w3m func
  static void
  SigAlarm(SIGNAL_ARG)
  {

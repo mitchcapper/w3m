@@ -1,17 +1,5 @@
-remove-unused-macros.patch
-Remove-all-usage-of-variable-length-arrays.patch
-Make-usage-of-variable-length-arrays-an-error.patch
-Fix-Wnested-externs.patch
-Fix-missing-declaration.patch
-Fix-scan-build-issues.patch
-Remove-unused-variable.patch
-Remove-redundant-cast.patch
 # NULL check
-Remove-redundant-NULL-check.patch
-# const
-Add-more-const-correctness.patch
 # volatile
-Remove-some-volatile.patch
 # Save history
 Refactor-URL-history-handling.patch
 Add-command-to-save-history.patch
@@ -31,6 +19,7 @@ Suppress-Wlogical-op.patch
 Suppress-Wold-style-definition.patch
 Suppress-Wstrict-prototypes.patch
 0081-Only-use-malloc-if-the-default-buffer-is-to-small.patch
+# const
 # ACTIVE
 shorten-not-assigned-in-help.patch
 Use-gettext-for-user-facing-strings.patch

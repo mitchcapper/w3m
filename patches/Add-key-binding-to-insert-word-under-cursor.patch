@@ -65,7 +65,7 @@ Press e.g. ^] to insert the word under cursor when inserting text.
  static void
 --- a/main.c
 +++ b/main.c
-@@ -6151,7 +6151,8 @@ getCurWord(Buffer *buf, int *spos, int *
+@@ -6166,7 +6166,8 @@ getCurWord(Buffer *buf, int *spos, int *
      return &p[b];
  }
  

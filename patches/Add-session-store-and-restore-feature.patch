@@ -2,13 +2,13 @@
  config.h.in            |    1 
  doc-de/README.func     |    1 
  doc/README.func        |    1 
- doc/w3m.1              |   20 ++++++++
+ doc/w3m.1              |   15 +++++
  fm.h                   |    2 
- main.c                 |  121 ++++++++++++++++++++++++++++++++++++++++++++++++-
+ main.c                 |  145 +++++++++++++++++++++++++++++++++++++++++++++++--
  proto.h                |    1 
  rc.c                   |    4 +
  scripts/w3mhelp.cgi.in |    3 -
- 9 files changed, 151 insertions(+), 3 deletions(-)
+ 9 files changed, 169 insertions(+), 4 deletions(-)
 
 --- a/config.h.in
 +++ b/config.h.in
@@ -39,16 +39,16 @@
  
  void set_buffer_environ(Buffer *);
  static void save_buffer_position(Buffer *buf);
-@@ -215,6 +219,8 @@ fusage(FILE * f, int err)
+@@ -216,6 +220,8 @@ fusage(FILE * f, int err)
  #endif
-     fprintf(f, "    -B               load bookmark\n");
-     fprintf(f, "    -bookmark file   specify bookmark file\n");
-+    fprintf(f, "    -R               restore from session file\n");
-+    fprintf(f, "    -session file    specify session file\n");
-     fprintf(f, "    -T type          specify content-type\n");
-     fprintf(f, "    -m               internet message mode\n");
-     fprintf(f, "    -v               visual startup mode\n");
-@@ -416,6 +422,7 @@ main(int argc, char **argv)
+     PUT("-B", "load bookmark");
+     PUT("-bookmark file", "specify bookmark file");
++    PUT("-R", "restore from session file");
++    PUT("-session file", "specify session file");
+     PUT("-T type", "specify content-type");
+     PUT("-m", "internet message mode");
+     PUT("-v", "visual startup mode");
+@@ -409,6 +415,7 @@ main(int argc, char **argv)
      char *default_type = NULL;
      char *post_file = NULL;
      Str err_msg;
@@ -56,7 +56,20 @@
  #ifdef USE_M17N
      char *Locale = NULL;
      wc_uint8 auto_detect;
-@@ -638,6 +645,13 @@ main(int argc, char **argv)
+@@ -438,7 +445,11 @@ main(int argc, char **argv)
+     NO_proxy_domains = newTextList();
+     fileToDelete = newTextList();
+ 
+-    load_argv = New_N(char *, argc - 1);
++    /*
++     * An empty URL means to open a new tab. If -N was provided we need
++     * to double the size.
++     */
++    load_argv = New_N(char *, (argc - 1) * (1 + !!open_new_tab));
+     load_argc = 0;
+ 
+     CurrentDir = currentdir();
+@@ -631,6 +642,13 @@ main(int argc, char **argv)
  		    BookmarkFile = cleanupName(tmp->ptr);
  		}
  	    }
@@ -70,7 +83,16 @@
  	    else if (!strcmp("-F", argv[i]))
  		RenderFrame = TRUE;
  	    else if (!strcmp("-W", argv[i])) {
-@@ -884,8 +898,46 @@ main(int argc, char **argv)
+@@ -810,6 +828,8 @@ main(int argc, char **argv)
+ 	    line_str = argv[i] + 1;
+ 	}
+ 	else {
++	    if (open_new_tab && load_argc)
++		load_argv[load_argc++] = "";
+ 	    load_argv[load_argc++] = argv[i];
+ 	}
+ 	i++;
+@@ -877,8 +897,54 @@ main(int argc, char **argv)
  	loadUrlHistory();
  #endif				/* not USE_HISTORY */
  
@@ -93,24 +115,32 @@
 +	    return 1;
 +	}
 +
-+	for (;;) {
-+	    line = Strfgets(fp);
-+	    Strchop(line);
-+	    if (line->length == 0)
-+		break;
-+	    if (n > max) {
-+		max <<= 1;
-+		session = New_Reuse(char *, session, max);
-+	    }
-+	    session[n++] = line->ptr;
-+	}
-+
 +	for (int i = 0; i < load_argc; i++) {
 +	    if (n > max) {
 +		max <<= 1;
 +		New_Reuse(char *, session, max);
 +	    }
 +	    session[n++] = load_argv[i];
++	}
++
++	if (open_new_tab) {
++	    if (n > max) {
++		max <<= 1;
++		session = New_Reuse(char *, session, max);
++	    }
++	    session[n++] = "";
++	}
++
++	for (;;) {
++	    line = Strfgets(fp);
++	    if (line->length == 0)
++		break;
++	    Strchop(line);
++	    if (n > max) {
++		max <<= 1;
++		session = New_Reuse(char *, session, max);
++	    }
++	    session[n++] = line->ptr;
 +	}
 +	load_argv = session;
 +	load_argc = n;
@@ -119,7 +149,36 @@
  
      if (w3m_backend)
  	backend();
-@@ -2551,6 +2603,10 @@ _quitfm(int confirm)
+@@ -978,6 +1044,8 @@ main(int argc, char **argv)
+     else {
+ 	i = 0;
+     }
++
++    open_new_tab = FALSE;
+     for (; i < load_argc; i++) {
+ 	if (i >= 0) {
+ 	    SearchHeader = search_header;
+@@ -985,6 +1053,11 @@ main(int argc, char **argv)
+ 	    char *url;
+ 	    int retry = 0;
+ 
++	    if (!*load_argv[i]) {
++		open_new_tab = TRUE;
++		continue;
++	    }
++
+ 	    url = load_argv[i];
+ 	    if (getURLScheme(&url) == SCM_MISSING && !ArgvIsURL)
+ 	  retry_as_local_file:
+@@ -1067,6 +1140,7 @@ main(int argc, char **argv)
+ 	    _newT();
+ 	    Currentbuf->nextBuffer = newbuf;
+ 	    delBuffer(Currentbuf);
++	    open_new_tab = FALSE;
+ 	}
+ 	else {
+ 	    Currentbuf->nextBuffer = newbuf;
+@@ -2544,6 +2618,10 @@ _quitfm(int confirm)
      if (UseHistory && SaveURLHist)
  	saveUrlHistory();
  #endif				/* USE_HISTORY */
@@ -130,7 +189,7 @@
      if (deprecated)
  	fprintf(stderr, "%s\n%s\n%s\n",
  		"DEPRECATION WARNING",
-@@ -4432,6 +4488,67 @@ DEFUN(adBmark, ADD_BOOKMARK, "Add curren
+@@ -4425,6 +4503,67 @@ DEFUN(adBmark, ADD_BOOKMARK, "Add curren
  		request);
  }
  
@@ -175,7 +234,7 @@
 +}
 +
 +/* Store session */
-+DEFUN(strSession, STRSESS, "Store session")
++DEFUN(strSession, STORE, "Store session")
 +{
 +    char *def, *sf;
 +
@@ -261,24 +320,19 @@
  \fB\-o \fIoption=value\fR
  modify one configuration item with an explicitly given value;
  without \fIoption=value\fR, equivalent to \fB\-show-option\fR
-@@ -213,6 +219,20 @@ use debug mode (only for debugging)
+@@ -213,6 +219,15 @@ use debug mode (only for debugging)
  .TP
  \fB\-reqlog\fP
  log headers of HTTP communication in file \f(CW~/.w3m/request.log\fP
 +.SH Session management
 +If \fB\-R\fP is given, w3m will restore a session from a session file.
-+If no session file is provided with \fB\-session\fR the default session file
-+is used. The default session file will be deleted after restoring a session
-+when exiting w3m.
-+
-+Without a given session file, when manually storing a session, w3m will ask
-+for a filename.
-+
-+If a session file is given, it will not be deleted and will be overwritten if
-+storing a session again.
-+
++If no session file is provided with \fB\-session\fR the default session file is used.
++The default session file will be deleted after restoring a session when exiting w3m.
++Without a given session file, when manually storing a session, w3m will ask for a filename.
++If a session file is given, it will not be deleted and will be overwritten if storing a session again.
 +Automatic session storing and restoring can be configured via the options.
-+
++If URL or files were given as parameters they will be loaded after restoring the session and added to the first tab.
++If \-N and \-R are given the old session is restored as is and any new buffer are opened in separate tabs.
  .SH EXAMPLES
  .SS Pager-like usage
  .TP
@@ -288,7 +342,7 @@
  SHIFT_RIGHT	Anzeigebereich nach rechts versetzen
  SOURCE		Wechsle zwischen HTML-Wiedergabe und -Verarbeitung
  STOP_IMAGE	Bilder nicht mehr laden und anzeigen
-+STRSESS		Speichere Session
++STORE		Speichere Session
  SUBMIT		Formular übermitteln
  SUSPEND 	w3m zum Hintergrundprozess machen
  TAB_GOTO	Öffne das angegebene Dokument in einem neuen Reiter
@@ -298,7 +352,7 @@
  SHIFT_RIGHT	Shift screen right
  SOURCE		Toggle between HTML shown or processed
  STOP_IMAGE	Stop loading and drawing of images
-+STRSESS		Store session
++STORE		Store session
  SUBMIT		Submit form
  SUSPEND 	Suspend w3m to background
  TAB_GOTO	Open specified document in a new tab

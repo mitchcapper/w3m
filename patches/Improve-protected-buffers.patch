@@ -5,8 +5,8 @@ Patch: patches/Improve-protected-buffers.patch
 
 ---
  doc/MANUAL.html |   15 +++++++++++++++
- main.c          |   46 ++++++++++++++++++++++++++++++++++++----------
- 2 files changed, 51 insertions(+), 10 deletions(-)
+ main.c          |   45 +++++++++++++++++++++++++++++++++++----------
+ 2 files changed, 50 insertions(+), 10 deletions(-)
 
 --- a/main.c
 +++ b/main.c
@@ -18,7 +18,7 @@ Patch: patches/Improve-protected-buffers.patch
  
  void set_buffer_environ(Buffer *);
  static void save_buffer_position(Buffer *buf);
-@@ -433,6 +434,26 @@ load_known_hosts(void)
+@@ -426,6 +427,26 @@ load_known_hosts(void)
  }
  
  int
@@ -45,16 +45,20 @@ Patch: patches/Improve-protected-buffers.patch
  main(int argc, char **argv)
  {
      Buffer *newbuf = NULL;
-@@ -1089,12 +1110,13 @@ main(int argc, char **argv)
+@@ -1098,17 +1119,17 @@ main(int argc, char **argv)
  	    SearchHeader = search_header;
  	    DefaultType = default_type;
  	    char *url;
 -	    int retry = 0;
 +	    int protected = 0, retry = 0;
  
+ 	    if (!*load_argv[i]) {
+ 		open_new_tab = TRUE;
+ 		continue;
+ 	    }
+ 
 +	    protected = _check_protection(&load_argv[i]);
  	    url = load_argv[i];
-+
  	    if (getURLScheme(&url) == SCM_MISSING && !ArgvIsURL)
 -	  retry_as_local_file:
 -		url = file_to_url(load_argv[i]);
@@ -62,7 +66,7 @@ Patch: patches/Improve-protected-buffers.patch
  	    else
  		url = url_encode(conv_from_system(load_argv[i]), NULL, 0);
  	    if (w3m_dump == DUMP_HEAD) {
-@@ -1135,7 +1157,7 @@ main(int argc, char **argv)
+@@ -1149,7 +1170,7 @@ main(int argc, char **argv)
  	    if (newbuf == NULL) {
  		if (ArgvIsURL && !retry) {
  		    retry = 1;
@@ -71,7 +75,7 @@ Patch: patches/Improve-protected-buffers.patch
  		}
  		Strcat(err_msg,
  		       Sprintf(_("w3m: Can't load %s.\n"), load_argv[i]));
-@@ -1143,6 +1165,9 @@ main(int argc, char **argv)
+@@ -1157,6 +1178,9 @@ main(int argc, char **argv)
  	    }
  	    else if (newbuf == NO_BUFFER)
  		continue;
@@ -81,7 +85,7 @@ Patch: patches/Improve-protected-buffers.patch
  	    switch (newbuf->real_scheme) {
  	    case SCM_MAILTO:
  		break;
-@@ -4526,17 +4551,20 @@ static void
+@@ -4541,17 +4565,20 @@ static void
  cmd_loadURL(char *url, ParsedURL *current, char *referer, FormList *request)
  {
      Buffer *buf;
@@ -102,7 +106,7 @@ Patch: patches/Improve-protected-buffers.patch
  	pushBuffer(buf);
  	if (RenderFrame && Currentbuf->frameset != NULL)
  	    rFrame();
-@@ -4608,8 +4636,6 @@ goURL0(const char *prompt, int relative)
+@@ -4623,8 +4650,6 @@ goURL0(const char *prompt, int relative)
  	gotoLabel(url + 1);
  	return;
      }
@@ -111,7 +115,7 @@ Patch: patches/Improve-protected-buffers.patch
      cmd_loadURL(url, current, referer, NULL);
      if (Currentbuf != cur_buf)	/* success */
  	pushHashHist(URLHist, parsedURL2Str(&Currentbuf->currentURL)->ptr);
-@@ -4703,7 +4729,6 @@ _strSession(char *sf)
+@@ -4718,7 +4743,6 @@ _strSession(char *sf)
  {
      Buffer *buf;
      FILE *f;
@@ -119,7 +123,7 @@ Patch: patches/Improve-protected-buffers.patch
      ParsedURL *url;
      char *sep;
  
-@@ -4712,12 +4737,13 @@ _strSession(char *sf)
+@@ -4727,12 +4751,13 @@ _strSession(char *sf)
      if (!(f = fopen(sf, "w"))) goto fail;
  
      sep = "";

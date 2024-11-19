@@ -502,7 +502,7 @@ w3m-0.5.3+git20230121.
      UFclose(&f);
 --- a/main.c
 +++ b/main.c
-@@ -404,6 +404,32 @@ die_oom(size_t bytes)
+@@ -397,6 +397,32 @@ die_oom(size_t bytes)
      return NULL;
  }
  
@@ -535,7 +535,7 @@ w3m-0.5.3+git20230121.
  int
  main(int argc, char **argv)
  {
-@@ -897,6 +923,9 @@ main(int argc, char **argv)
+@@ -896,6 +922,9 @@ main(int argc, char **argv)
      if (UseHistory)
  	loadUrlHistory();
  #endif				/* not USE_HISTORY */
@@ -545,7 +545,7 @@ w3m-0.5.3+git20230121.
  
      /* Restore a previously saved session */
      if (RestoreSession || opt_restore) {
-@@ -2573,10 +2602,36 @@ DEFUN(movRW, NEXT_WORD, "Move to the nex
+@@ -2588,10 +2617,36 @@ DEFUN(movRW, NEXT_WORD, "Move to the nex
      displayBuffer(Currentbuf, B_NORMAL);
  }
  
@@ -582,7 +582,7 @@ w3m-0.5.3+git20230121.
  
      if (checkDownloadList())
  	/* FIXME: gettextize? */
-@@ -2607,6 +2662,8 @@ _quitfm(int confirm)
+@@ -2622,6 +2677,8 @@ _quitfm(int confirm)
  	unlink(rcFile(SESSION_FILE));
      if (StoreSession)
  	_strSession(NULL);
@@ -591,7 +591,7 @@ w3m-0.5.3+git20230121.
      if (deprecated)
  	fprintf(stderr, "%s\n%s\n%s\n",
  		"DEPRECATION WARNING",
-@@ -4962,6 +5019,13 @@ DEFUN(vwSrc, SOURCE VIEW, "Toggle betwee
+@@ -4977,6 +5034,13 @@ DEFUN(vwSrc, SOURCE VIEW, "Toggle betwee
  	displayBuffer(Currentbuf, B_NORMAL);
  	return;
      }
@@ -605,7 +605,7 @@ w3m-0.5.3+git20230121.
      if (Currentbuf->sourcefile == NULL) {
  	if (Currentbuf->pagerSource &&
  	    !strcasecmp(Currentbuf->type, "text/plain")) {
-@@ -5047,6 +5111,93 @@ DEFUN(foldPre, FOLD_PRE, "Fold long line
+@@ -5062,6 +5126,93 @@ DEFUN(foldPre, FOLD_PRE, "Fold long line
      fold_pre = FoldPre;
  }
  
@@ -699,7 +699,7 @@ w3m-0.5.3+git20230121.
  /* reload */
  DEFUN(reload, RELOAD, "Load current document anew")
  {
-@@ -5273,6 +5424,7 @@ chkURLBuffer(Buffer *buf)
+@@ -5288,6 +5439,7 @@ chkURLBuffer(Buffer *buf)
  	"https?://[a-zA-Z0-9:%\\-\\./_@]*\\[[a-fA-F0-9:][a-fA-F0-9:\\.]*\\][a-zA-Z0-9:%\\-\\./?=~_\\&+@#,\\$;]*",
  	"ftp://[a-zA-Z0-9:%\\-\\./_@]*\\[[a-fA-F0-9:][a-fA-F0-9:\\.]*\\][a-zA-Z0-9:%\\-\\./=_+@#,\\$]*",
  #endif				/* INET6 */

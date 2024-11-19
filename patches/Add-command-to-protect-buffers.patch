@@ -28,7 +28,7 @@ Protected buffers cannot be deleted with BACK.
  typedef struct _BufferPos {
 --- a/main.c
 +++ b/main.c
-@@ -2657,6 +2657,7 @@ save_known_hosts(void)
+@@ -2672,6 +2672,7 @@ save_known_hosts(void)
  static void
  _quitfm(int confirm)
  {
@@ -36,7 +36,7 @@ Protected buffers cannot be deleted with BACK.
      const char *ans = "y";
      int err = 0;
  
-@@ -2666,6 +2667,12 @@ _quitfm(int confirm)
+@@ -2681,6 +2682,12 @@ _quitfm(int confirm)
  			"Do you want to exit w3m? (y/n)");
      else if (confirm)
  	ans = inputChar(_("Do you want to exit w3m? (y/n)"));
@@ -49,7 +49,7 @@ Protected buffers cannot be deleted with BACK.
      if (!(ans && TOLOWER(*ans) == 'y')) {
  	displayBuffer(Currentbuf, B_NORMAL);
  	return;
-@@ -4450,15 +4457,20 @@ DEFUN(backBf, BACK, "Close current buffe
+@@ -4465,15 +4472,20 @@ DEFUN(backBf, BACK, "Close current buffe
  {
      Buffer *buf = Currentbuf->linkBuffer[LB_N_FRAME];
  
@@ -73,7 +73,7 @@ Protected buffers cannot be deleted with BACK.
  	return;
      }
  
-@@ -4503,6 +4515,13 @@ DEFUN(deletePrevBuf, DELETE_PREVBUF, "De
+@@ -4518,6 +4530,13 @@ DEFUN(deletePrevBuf, DELETE_PREVBUF, "De
  	delBuffer(buf);
  }
  
@@ -87,7 +87,7 @@ Protected buffers cannot be deleted with BACK.
  static void
  cmd_loadURL(char *url, ParsedURL *current, char *referer, FormList *request)
  {
-@@ -6216,6 +6235,7 @@ DEFUN(tabMs, TAB_MOUSE, "Select tab by m
+@@ -6231,6 +6250,7 @@ DEFUN(tabMs, TAB_MOUSE, "Select tab by m
  
  DEFUN(closeTMs, CLOSE_TAB_MOUSE, "Close tab at mouse pointer")
  {
@@ -95,7 +95,7 @@ Protected buffers cannot be deleted with BACK.
      TabBuffer *tab;
  
      if (!mouse_action.in_action)
-@@ -6223,6 +6243,14 @@ DEFUN(closeTMs, CLOSE_TAB_MOUSE, "Close
+@@ -6238,6 +6258,14 @@ DEFUN(closeTMs, CLOSE_TAB_MOUSE, "Close
      tab = posTab(mouse_action.cursorX, mouse_action.cursorY);
      if (!tab || tab == NO_TABBUFFER)
  	return;
@@ -110,7 +110,7 @@ Protected buffers cannot be deleted with BACK.
      deleteTab(tab);
      displayBuffer(Currentbuf, B_FORCE_REDRAW);
  }
-@@ -6853,16 +6881,25 @@ deleteTab(TabBuffer * tab)
+@@ -6868,16 +6896,25 @@ deleteTab(TabBuffer * tab)
  
  DEFUN(closeT, CLOSE_TAB, "Close tab")
  {

@@ -150,8 +150,8 @@ Subject: Add more const correctness
 +const char *NullLine = "";
  Lineprop NullProp[] = { 0 };
  
- /* 
-@@ -306,7 +306,7 @@ gotoRealLine(Buffer *buf, int n)
+ 
+@@ -310,7 +310,7 @@ gotoRealLine(Buffer *buf, int n)
  
  
  static Buffer *
@@ -160,7 +160,7 @@ Subject: Add more const correctness
  {
      int i, c = 0;
      Buffer *buf = top;
-@@ -592,7 +592,7 @@ copyBuffer(Buffer *a, Buffer *b)
+@@ -601,7 +601,7 @@ copyBuffer(Buffer *a, Buffer *b)
  }
  
  Buffer *
@@ -309,7 +309,7 @@ Subject: Add more const correctness
  Str
 --- a/file.c
 +++ b/file.c
-@@ -33,11 +33,11 @@ extern int fold_pre;
+@@ -37,11 +37,11 @@ extern int fold_pre;
  static int frame_source = 0;
  static int need_number = 0;
  
@@ -325,7 +325,7 @@ Subject: Add more const correctness
  			  Buffer *(*loadproc) (URLFile *, Buffer *),
  			  Buffer *defaultbuf);
  #ifndef USE_ANSI_COLOR
-@@ -141,7 +141,7 @@ static int cur_iseq;
+@@ -145,7 +145,7 @@ static int cur_iseq;
  #ifdef USE_COOKIE
  /* This array should be somewhere else */
  /* FIXME: gettextize? */
@@ -334,7 +334,7 @@ Subject: Add more const correctness
      "internal error",
      "tail match failed",
      "wrong number of dots",
-@@ -251,7 +251,7 @@ loadSomething(URLFile *f,
+@@ -255,7 +255,7 @@ loadSomething(URLFile *f,
  }
  
  int
@@ -343,7 +343,7 @@ Subject: Add more const correctness
  {
      struct stat stbuf;
  
-@@ -263,7 +263,7 @@ dir_exist(char *path)
+@@ -267,7 +267,7 @@ dir_exist(char *path)
  }
  
  static int
@@ -352,7 +352,7 @@ Subject: Add more const correctness
  {
      struct mailcap *mcap;
      return (type && (mcap = searchExtViewer(type)) &&
-@@ -271,7 +271,7 @@ is_dump_text_type(char *type)
+@@ -275,7 +275,7 @@ is_dump_text_type(char *type)
  }
  
  static int
@@ -361,7 +361,7 @@ Subject: Add more const correctness
  {
      return (type == NULL || type[0] == '\0' ||
  	    strncasecmp(type, "text/", 5) == 0 ||
-@@ -281,21 +281,21 @@ is_text_type(char *type)
+@@ -285,21 +285,21 @@ is_text_type(char *type)
  }
  
  static int
@@ -386,7 +386,7 @@ Subject: Add more const correctness
  {
      int len;
      struct compression_decoder *d;
-@@ -331,7 +331,7 @@ compress_application_type(int compressio
+@@ -335,7 +335,7 @@ compress_application_type(int compressio
  }
  
  static char *
@@ -395,7 +395,7 @@ Subject: Add more const correctness
  {
      int len, slen;
      Str fn;
-@@ -364,7 +364,7 @@ uncompressed_file_type(char *path, char
+@@ -368,7 +368,7 @@ uncompressed_file_type(char *path, char
  }
  
  static int
@@ -404,7 +404,7 @@ Subject: Add more const correctness
  {
      struct utimbuf t;
      struct stat st;
-@@ -419,7 +419,7 @@ examineFile(char *path, URLFile *uf)
+@@ -423,7 +423,7 @@ examineFile(char *path, URLFile *uf)
  #define S_IXANY	(S_IXUSR|S_IXGRP|S_IXOTH)
  
  static int
@@ -413,7 +413,7 @@ Subject: Add more const correctness
  {
      static char *path = NULL;
      Str dirs;
-@@ -498,10 +498,10 @@ convertLine0(URLFile *uf, Str line, int
+@@ -502,10 +502,10 @@ convertLine0(URLFile *uf, Str line, int
  }
  
  int
@@ -426,7 +426,7 @@ Subject: Add more const correctness
  
      if (strncasecmp(p, attr, len) == 0) {
  	p += len;
-@@ -576,7 +576,7 @@ readHeader(URLFile *uf, Buffer *newBuf,
+@@ -580,7 +580,7 @@ readHeader(URLFile *uf, Buffer *newBuf,
  {
      char *p, *q;
  #ifdef USE_COOKIE
@@ -435,7 +435,7 @@ Subject: Add more const correctness
  #endif
      char c;
      Str lineBuf2 = NULL;
-@@ -851,7 +851,7 @@ readHeader(URLFile *uf, Buffer *newBuf,
+@@ -855,7 +855,7 @@ readHeader(URLFile *uf, Buffer *newBuf,
  		    add_cookie(pu, name, value, expires, domain, path, flag,
  			       comment, version, port, commentURL);
  		if (err) {
@@ -444,7 +444,7 @@ Subject: Add more const correctness
  			? "y" : NULL;
  		    if (fmInitialized && (err & COO_OVERRIDE_OK) &&
  			accept_bad_cookie == ACCEPT_BAD_COOKIE_ASK) {
-@@ -920,7 +920,7 @@ readHeader(URLFile *uf, Buffer *newBuf,
+@@ -924,7 +924,7 @@ readHeader(URLFile *uf, Buffer *newBuf,
  }
  
  char *
@@ -453,7 +453,7 @@ Subject: Add more const correctness
  {
      int len;
      TextListItem *i;
-@@ -1162,7 +1162,7 @@ extract_auth_param(char *q, struct auth_
+@@ -1166,7 +1166,7 @@ extract_auth_param(char *q, struct auth_
  }
  
  static Str
@@ -462,7 +462,7 @@ Subject: Add more const correctness
  {
      struct auth_param *ap;
      for (ap = auth; ap->name != NULL; ap++) {
-@@ -1228,9 +1228,9 @@ MD5(const unsigned char *d, unsigned lon
+@@ -1232,9 +1232,9 @@ MD5(const unsigned char *d, unsigned lon
  #endif
  
  static Str
@@ -474,7 +474,7 @@ Subject: Add more const correctness
      Str tmp = Strnew_size(MD5_DIGEST_LENGTH * 2 + 1);
      int i;
      for (i = 0; i < MD5_DIGEST_LENGTH; i++, p++) {
-@@ -2323,7 +2323,7 @@ push_link(int cmd, int offset, int pos)
+@@ -2489,7 +2489,7 @@ push_link(int cmd, int offset, int pos)
  }
  
  static int
@@ -483,7 +483,7 @@ Subject: Add more const correctness
  {
      switch (*ch) {
      case ',':
-@@ -2343,7 +2343,7 @@ is_period_char(unsigned char *ch)
+@@ -2509,7 +2509,7 @@ is_period_char(unsigned char *ch)
  }
  
  static int
@@ -492,7 +492,7 @@ Subject: Add more const correctness
  {
      switch (*ch) {
      case '(':
-@@ -2358,7 +2358,7 @@ is_beginning_char(unsigned char *ch)
+@@ -2524,7 +2524,7 @@ is_beginning_char(unsigned char *ch)
  }
  
  static int
@@ -501,7 +501,7 @@ Subject: Add more const correctness
  {
      Lineprop ctype = get_mctype(ch);
  
-@@ -2405,7 +2405,7 @@ is_word_char(unsigned char *ch)
+@@ -2571,7 +2571,7 @@ is_word_char(unsigned char *ch)
  
  #ifdef USE_M17N
  static int
@@ -510,7 +510,7 @@ Subject: Add more const correctness
  {
      Lineprop ctype = get_mctype(ch);
  
-@@ -2416,7 +2416,7 @@ is_combining_char(unsigned char *ch)
+@@ -2582,7 +2582,7 @@ is_combining_char(unsigned char *ch)
  #endif
  
  int
@@ -519,7 +519,7 @@ Subject: Add more const correctness
  {
      if (!*ch1 || !*ch2)
  	return 1;
-@@ -2523,7 +2523,7 @@ append_tags(struct readbuffer *obuf)
+@@ -2688,7 +2688,7 @@ append_tags(struct readbuffer *obuf)
  }
  
  static void
@@ -528,7 +528,7 @@ Subject: Add more const correctness
  {
      obuf->tag_stack[obuf->tag_sp] = New(struct cmdtable);
      obuf->tag_stack[obuf->tag_sp]->cmdname = allocStr(cmdname, -1);
-@@ -2535,7 +2535,7 @@ push_tag(struct readbuffer *obuf, char *
+@@ -2700,7 +2700,7 @@ push_tag(struct readbuffer *obuf, char *
  
  static void
  push_nchars(struct readbuffer *obuf, int width,
@@ -537,7 +537,7 @@ Subject: Add more const correctness
  {
      append_tags(obuf);
      Strcat_charp_n(obuf->line, str, len);
-@@ -2554,7 +2554,7 @@ push_nchars(obuf, width, str, strlen(str
+@@ -2719,7 +2719,7 @@ push_nchars(obuf, width, str, strlen(str
  push_nchars(obuf, width, str->ptr, str->length, mode)
  
  static void
@@ -546,7 +546,7 @@ Subject: Add more const correctness
  {
      int tlen, len = obuf->line->length;
  
-@@ -2564,12 +2564,12 @@ check_breakpoint(struct readbuffer *obuf
+@@ -2729,12 +2729,12 @@ check_breakpoint(struct readbuffer *obuf
      tlen = obuf->line->length - len;
      if (tlen > 0
  	|| is_boundary((unsigned char *)obuf->prevchar->ptr,
@@ -561,7 +561,7 @@ Subject: Add more const correctness
  {
      check_breakpoint(obuf, pre_mode, &ch);
      Strcat_char(obuf->line, ch);
-@@ -2943,7 +2943,7 @@ flushline(struct html_feed_environ *h_en
+@@ -3108,7 +3108,7 @@ flushline(struct html_feed_environ *h_en
  	    Strcat_charp(tmp, html_quote(obuf->anchor.title));
  	}
  	if (obuf->anchor.accesskey) {
@@ -570,7 +570,7 @@ Subject: Add more const correctness
  	    Strcat_charp(tmp, "\" ACCESSKEY=\"");
  	    if (c)
  		Strcat_charp(tmp, c);
-@@ -3500,7 +3500,7 @@ process_img(struct parsed_tag *tag, int
+@@ -3665,7 +3665,7 @@ process_img(struct parsed_tag *tag, int
  }
  
  Str
@@ -579,7 +579,7 @@ Subject: Add more const correctness
  {
      if (parsedtag_need_reconstruct(tag)) {
  	parsedtag_set_value(tag, ATTR_HSEQ, Sprintf("%d", cur_hseq++)->ptr);
-@@ -4198,7 +4198,7 @@ process_n_form(void)
+@@ -4363,7 +4363,7 @@ process_n_form(void)
  static void
  clear_ignore_p_flag(int cmd, struct readbuffer *obuf)
  {
@@ -588,7 +588,7 @@ Subject: Add more const correctness
  	HTML_HR, HTML_UNKNOWN
      };
      int i;
-@@ -4328,10 +4328,10 @@ ul_type(struct parsed_tag *tag, int defa
+@@ -4493,10 +4493,10 @@ ul_type(struct parsed_tag *tag, int defa
  }
  
  int
@@ -601,7 +601,7 @@ Subject: Add more const correctness
      Str s_tmp = NULL;
  
      if (q == NULL || refresh_uri == NULL)
-@@ -6568,7 +6568,7 @@ HTMLlineproc0(char *line, struct html_fe
+@@ -6733,7 +6733,7 @@ HTMLlineproc0(char *line, struct html_fe
  		    str++;
  		}
  		else if (obuf->flag & RB_PLAIN) {
@@ -610,7 +610,7 @@ Subject: Add more const correctness
  		    if (p) {
  			push_charp(obuf, 1, p, PC_ASCII);
  			str++;
-@@ -6815,7 +6815,7 @@ loadHTMLBuffer(URLFile *f, Buffer *newBu
+@@ -6980,7 +6980,7 @@ loadHTMLBuffer(URLFile *f, Buffer *newBu
      return newBuf;
  }
  
@@ -619,7 +619,7 @@ Subject: Add more const correctness
      "Pb", "Eb", "Zb", "Bb", "Yb", NULL
  };
  
-@@ -6824,7 +6824,7 @@ convert_size(clen_t size, int usefloat)
+@@ -6989,7 +6989,7 @@ convert_size(clen_t size, int usefloat)
  {
      float csize;
      int sizepos = 0;
@@ -628,7 +628,7 @@ Subject: Add more const correctness
  
      csize = (float)size;
      while (csize >= 999.495 && sizes[sizepos + 1]) {
-@@ -6838,7 +6838,7 @@ convert_size(clen_t size, int usefloat)
+@@ -7003,7 +7003,7 @@ convert_size(clen_t size, int usefloat)
  char *
  convert_size2(clen_t size1, clen_t size2, int usefloat)
  {
@@ -637,7 +637,7 @@ Subject: Add more const correctness
      float csize, factor = 1;
      int sizepos = 0;
  
-@@ -7739,7 +7739,7 @@ saveBufferBody(Buffer *buf, FILE * f, in
+@@ -8028,7 +8028,7 @@ saveBufferBody(Buffer *buf, FILE * f, in
  }
  
  static Buffer *
@@ -646,7 +646,7 @@ Subject: Add more const correctness
  	   Buffer *(*loadproc) (URLFile *, Buffer *), Buffer *defaultbuf)
  {
      FILE *f;
-@@ -8021,7 +8021,7 @@ getNextPage(Buffer *buf, int plen)
+@@ -8310,7 +8310,7 @@ getNextPage(Buffer *buf, int plen)
  }
  
  int
@@ -655,7 +655,7 @@ Subject: Add more const correctness
  {
      FILE *ff;
      clen_t linelen = 0, trbyte = 0;
-@@ -8089,7 +8089,7 @@ save2tmp(URLFile uf, char *tmpf)
+@@ -8378,7 +8378,7 @@ save2tmp(URLFile uf, char *tmpf)
  }
  
  Buffer *
@@ -664,7 +664,7 @@ Subject: Add more const correctness
  {
      Str tmpf, command;
      struct mailcap *mcap;
-@@ -8193,7 +8193,7 @@ doExternal(URLFile uf, char *type, Buffe
+@@ -8482,7 +8482,7 @@ doExternal(URLFile uf, char *type, Buffe
  }
  
  static int
@@ -673,7 +673,7 @@ Subject: Add more const correctness
  {
      InputStream f1;
      FILE *f2;
-@@ -8356,7 +8356,7 @@ doFileMove(char *tmpf, char *defstr)
+@@ -8645,7 +8645,7 @@ doFileMove(char *tmpf, char *defstr)
  }
  
  int
@@ -682,7 +682,7 @@ Subject: Add more const correctness
  {
  #ifndef __MINGW32_VERSION
      Str msg;
-@@ -8451,7 +8451,7 @@ doFileSave(URLFile uf, char *defstr)
+@@ -8740,7 +8740,7 @@ doFileSave(URLFile uf, char *defstr)
  }
  
  int
@@ -691,7 +691,7 @@ Subject: Add more const correctness
  {
      struct stat st1, st2;
  
-@@ -8464,7 +8464,7 @@ checkCopyFile(char *path1, char *path2)
+@@ -8753,7 +8753,7 @@ checkCopyFile(char *path1, char *path2)
  }
  
  int
@@ -700,7 +700,7 @@ Subject: Add more const correctness
  {
      struct stat st1, st2;
      int des = ISfileno(stream);
-@@ -8480,7 +8480,7 @@ checkSaveFile(InputStream stream, char *
+@@ -8769,7 +8769,7 @@ checkSaveFile(InputStream stream, char *
  }
  
  int
@@ -709,7 +709,7 @@ Subject: Add more const correctness
  {
      struct stat st;
      char *ans;
-@@ -8496,7 +8496,7 @@ checkOverWrite(char *path)
+@@ -8785,7 +8785,7 @@ checkOverWrite(char *path)
  }
  
  char *
@@ -718,7 +718,7 @@ Subject: Add more const correctness
  {
      char *ans;
  
-@@ -8613,7 +8613,7 @@ uncompress_stream(URLFile *uf, char **sr
+@@ -8902,7 +8902,7 @@ uncompress_stream(URLFile *uf, char **sr
  
  
  static FILE *
@@ -727,7 +727,7 @@ Subject: Add more const correctness
  {
      char *lessopen;
      FILE *fp;
-@@ -8662,7 +8662,7 @@ lessopen_stream(char *path)
+@@ -8951,7 +8951,7 @@ lessopen_stream(char *path)
  }
  
  static char *
@@ -738,7 +738,7 @@ Subject: Add more const correctness
  
 --- a/istream.c
 +++ b/istream.c
-@@ -62,7 +62,7 @@ buffer_read(StreamBuffer sb, unsigned ch
+@@ -63,7 +63,7 @@ buffer_read(StreamBuffer sb, unsigned ch
  }
  
  static void
@@ -747,7 +747,7 @@ Subject: Add more const correctness
  {
      StreamBuffer sb = &base->stream;
      sb->size = bufsize;
-@@ -328,7 +328,7 @@ ssl_accept_this_site(char *hostname)
+@@ -357,7 +357,7 @@ ssl_accept_this_site(char *hostname, X50
  }
  
  static int
@@ -756,7 +756,7 @@ Subject: Add more const correctness
  {
      /* RFC2818 3.1.  Server Identity
       * Names may contain the wildcard
-@@ -475,7 +475,7 @@ ssl_get_certificate(SSL * ssl, char *hos
+@@ -548,7 +548,7 @@ ssl_get_certificate(SSL * ssl, char *hos
      char buf[2048];
      Str amsg = NULL;
      Str emsg;
@@ -765,7 +765,7 @@ Subject: Add more const correctness
  
      if (ssl == NULL)
  	return NULL;
-@@ -495,7 +495,7 @@ ssl_get_certificate(SSL * ssl, char *hos
+@@ -568,7 +568,7 @@ ssl_get_certificate(SSL * ssl, char *hos
  		("Accept SSL session without any peer certificate");
  	else {
  	    /* FIXME: gettextize? */
@@ -774,7 +774,7 @@ Subject: Add more const correctness
  		"to prevent security violation: no peer certificate";
  	    disp_err_message(e, FALSE);
  	    free_ssl_ctx();
-@@ -561,7 +561,7 @@ ssl_get_certificate(SSL * ssl, char *hos
+@@ -641,7 +641,7 @@ ssl_get_certificate(SSL * ssl, char *hos
  	}
  	else {
  	    /* FIXME: gettextize? */
@@ -783,7 +783,7 @@ Subject: Add more const correctness
  		"to prevent security violation";
  	    disp_err_message(e, FALSE);
  	    free_ssl_ctx();
-@@ -685,7 +685,7 @@ static int
+@@ -765,7 +765,7 @@ static int
  ens_read(struct ens_handle *handle, char *buf, int len)
  {
      if (handle->pos == handle->gb.length) {
@@ -908,7 +908,7 @@ Subject: Add more const correctness
  #ifdef USE_M17N
 --- a/proto.h
 +++ b/proto.h
-@@ -185,8 +185,8 @@ extern char *url_decode0(const char *url
+@@ -187,8 +187,8 @@ extern char *url_decode0(const char *url
  #endif /* !defined(USE_M17N) */
  extern void examineFile(char *path, URLFile *uf);
  extern char *acceptableEncoding(void);
@@ -919,7 +919,7 @@ Subject: Add more const correctness
  #ifdef USE_M17N
  extern char **get_symbol(wc_ces charset, int *width);
  extern char **set_symbol(int width);
-@@ -203,7 +203,7 @@ extern void update_utf8_symbol(void);
+@@ -205,7 +205,7 @@ extern void update_utf8_symbol(void);
  #endif
  extern Buffer *loadGeneralFile(char *path, ParsedURL *current, char *referer,
  			       int flag, FormList *request);
@@ -928,7 +928,7 @@ Subject: Add more const correctness
  extern void push_render_image(Str str, int width, int limit,
  			      struct html_feed_environ *h_env);
  extern void flushline(struct html_feed_environ *h_env, struct readbuffer *obuf,
-@@ -223,7 +223,7 @@ extern ImageCache *getImage(Image * imag
+@@ -225,7 +225,7 @@ extern ImageCache *getImage(Image * imag
  extern int getImageSize(ImageCache * cache);
  #endif
  extern Str process_img(struct parsed_tag *tag, int width);
@@ -937,7 +937,7 @@ Subject: Add more const correctness
  extern Str process_input(struct parsed_tag *tag);
  extern Str process_button(struct parsed_tag *tag);
  extern Str process_n_button(void);
-@@ -236,7 +236,7 @@ extern Str process_n_textarea(void);
+@@ -238,7 +238,7 @@ extern Str process_n_textarea(void);
  extern void feed_textarea(char *str);
  extern Str process_form(struct parsed_tag *tag);
  extern Str process_n_form(void);
@@ -946,7 +946,7 @@ Subject: Add more const correctness
  extern int HTMLtagproc1(struct parsed_tag *tag,
  			struct html_feed_environ *h_env);
  extern void HTMLlineproc2(Buffer *buf, TextLineList *tl);
-@@ -276,19 +276,19 @@ extern Buffer *getpipe(char *cmd);
+@@ -278,19 +278,19 @@ extern Buffer *getpipe(char *cmd);
  extern Buffer *openPagerBuffer(InputStream stream, Buffer *buf);
  extern Buffer *openGeneralPagerBuffer(InputStream stream);
  extern Line *getNextPage(Buffer *buf, int plen);
@@ -975,7 +975,7 @@ Subject: Add more const correctness
  extern TabBuffer *newTab(void);
  extern void calcTabPos(void);
  extern TabBuffer *deleteTab(TabBuffer * tab);
-@@ -310,7 +310,7 @@ extern Buffer *selectBuffer(Buffer *firs
+@@ -312,7 +312,7 @@ extern Buffer *selectBuffer(Buffer *firs
  			    char *selectchar);
  extern void reshapeBuffer(Buffer *buf);
  extern void copyBuffer(Buffer *a, Buffer *b);
@@ -984,7 +984,7 @@ Subject: Add more const correctness
  extern int writeBufferCache(Buffer *buf);
  extern int readBufferCache(Buffer *buf);
  extern void displayBuffer(Buffer *buf, int mode);
-@@ -318,19 +318,19 @@ extern void addChar(char c, Lineprop mod
+@@ -320,19 +320,19 @@ extern void addChar(char c, Lineprop mod
  #ifdef USE_M17N
  extern void addMChar(char *c, Lineprop mode, size_t len);
  #endif
@@ -1011,7 +1011,7 @@ Subject: Add more const correctness
  extern void cursorUp0(Buffer *buf, int n);
  extern void cursorUp(Buffer *buf, int n);
  extern void cursorDown0(Buffer *buf, int n);
-@@ -347,16 +347,16 @@ extern int columnPos(Line *line, int col
+@@ -349,16 +349,16 @@ extern int columnPos(Line *line, int col
  extern int columnLen(Line *line, int column);
  extern Line *lineSkip(Buffer *buf, Line *line, int offset, int last);
  extern Line *currentLineSkip(Buffer *buf, Line *line, int offset, int last);
@@ -1032,7 +1032,7 @@ Subject: Add more const correctness
  extern int next_status(char c, int *status);
  extern int read_token(Str buf, char **instr, int *status, int pre, int append);
  extern Str correct_irrtag(int status);
-@@ -364,19 +364,20 @@ extern Str correct_irrtag(int status);
+@@ -366,19 +366,20 @@ extern Str correct_irrtag(int status);
  extern void init_migemo(void);
  #endif
  #ifdef USE_M17N
@@ -1058,7 +1058,7 @@ Subject: Add more const correctness
  							     Lineprop *prop));
  extern Str unescape_spaces(Str s);
  #ifdef USE_HISTORY
-@@ -384,7 +385,7 @@ extern Buffer *historyBuffer(Hist *hist)
+@@ -386,7 +387,7 @@ extern Buffer *historyBuffer(Hist *hist)
  #endif				/* not USE_HISTORY */
  extern struct table *newTable(void);
  extern void pushdata(struct table *t, int row, int col, char *data);
@@ -1067,7 +1067,7 @@ Subject: Add more const correctness
  extern void align(TextLine *lbuf, int width, int mode);
  extern void print_item(struct table *t, int row, int col, int width, Str buf);
  extern void print_sep(struct table *t, int row, int type, int maxcol, Str buf);
-@@ -462,7 +463,7 @@ extern pid_t open_pipe_rw(FILE ** fr, FI
+@@ -464,7 +465,7 @@ extern pid_t open_pipe_rw(FILE ** fr, FI
  extern int initscr(void);
  extern void move(int line, int column);
  #ifdef USE_M17N
@@ -1076,7 +1076,7 @@ Subject: Add more const correctness
  #endif
  extern void addch(char c);
  extern void standout(void);
-@@ -487,15 +488,15 @@ extern void rscroll(int);
+@@ -489,15 +490,15 @@ extern void rscroll(int);
  #endif
  extern void clrtoeolx(void);
  extern void clrtobotx(void);
@@ -1096,7 +1096,7 @@ Subject: Add more const correctness
  extern void toggle_stand(void);
  extern void bell(void);
  extern int sleep_till_anykey(int sec, int purge);
-@@ -510,7 +511,7 @@ extern int openSocket(char *hostname, ch
+@@ -512,7 +513,7 @@ extern int openSocket(char *hostname, ch
  extern void parseURL(char *url, ParsedURL *p_url, ParsedURL *current);
  extern void copyParsedURL(ParsedURL *p, const ParsedURL *q);
  extern void parseURL2(char *url, ParsedURL *pu, ParsedURL *current);
@@ -1105,7 +1105,7 @@ Subject: Add more const correctness
  extern Str parsedURL2RefererStr(ParsedURL *pu);
  extern int getURLScheme(char **url);
  extern void init_stream(URLFile *uf, int scheme, InputStream stream);
-@@ -520,14 +521,14 @@ extern URLFile openURL(char *url, Parsed
+@@ -522,14 +523,14 @@ extern URLFile openURL(char *url, Parsed
  		       URLOption *option, FormList *request,
  		       TextList *extra_header, URLFile *ouf,
  		       HRequest *hr, unsigned char *status);
@@ -1125,7 +1125,7 @@ Subject: Add more const correctness
  extern TextList *make_domain_list(char *domain_list);
  extern int check_no_proxy(char *domain);
  extern InputStream openFTPStream(ParsedURL *pu, URLFile *uf);
-@@ -570,9 +571,9 @@ extern Anchor *retrieveCurrentForm(Buffe
+@@ -572,9 +573,9 @@ extern Anchor *retrieveCurrentForm(Buffe
  extern Anchor *searchAnchor(AnchorList *al, char *str);
  extern Anchor *searchURLLabel(Buffer *buf, char *url);
  extern void reAnchorWord(Buffer *buf, Line *l, int spos, int epos);
@@ -1137,7 +1137,7 @@ Subject: Add more const correctness
  extern char *reAnchorNewsheader(Buffer *buf);
  #endif				/* USE_NNTP */
  extern void addMultirowsForm(Buffer *buf, AnchorList *al);
-@@ -587,13 +588,13 @@ extern void shiftAnchorPosition(AnchorLi
+@@ -589,13 +590,13 @@ extern void shiftAnchorPosition(AnchorLi
  extern char *getAnchorText(Buffer *buf, AnchorList *al, Anchor *a);
  extern Buffer *link_list_panel(Buffer *buf);
  
@@ -1157,7 +1157,7 @@ Subject: Add more const correctness
  extern Str decodeMIME(Str orgstr, wc_ces * charset);
  #else
  extern Str decodeWord0(char *ow);
-@@ -609,14 +610,14 @@ extern Buffer *load_option_panel(void);
+@@ -611,14 +612,14 @@ extern Buffer *load_option_panel(void);
  extern void panel_set_option(struct parsed_tagarg *);
  extern void sync_with_option(void);
  extern char *rcFile(char *base);
@@ -1176,7 +1176,7 @@ Subject: Add more const correctness
  extern FILE *localcgi_post(char *, char *, FormList *, char *);
  #define localcgi_get(u, q, r) localcgi_post((u), (q), NULL, (r))
  extern FILE *openSecretFile(char *fname);
-@@ -634,18 +635,18 @@ extern Str romanAlphabet(int n);
+@@ -636,18 +637,18 @@ extern Str romanAlphabet(int n);
  extern void setup_child(int child, int i, int f);
  extern void myExec(char *command);
  extern int mySystem(char *command, int background);
@@ -1200,7 +1200,7 @@ Subject: Add more const correctness
  extern time_t mymktime(char *timestr);
  extern void (*mySignal(int signal_number, void (*action) (int))) (int);
  #ifdef USE_COOKIE
-@@ -723,7 +724,7 @@ extern char *searchKeyData(void);
+@@ -725,7 +726,7 @@ extern char *searchKeyData(void);
  extern void setKeymap(char *p, int lineno, int verbose);
  extern void initKeymap(int force);
  extern int getFuncList(char *id);
@@ -1211,7 +1211,7 @@ Subject: Add more const correctness
  extern char *getQWord(char **str);
 --- a/table.c
 +++ b/table.c
-@@ -101,8 +101,8 @@ weight3(int x)
+@@ -103,8 +103,8 @@ weight3(int x)
  #endif				/* not MATRIX */
  
  static int
@@ -1222,7 +1222,7 @@ Subject: Add more const correctness
  {
      int n = nent;
      int k = 0;
-@@ -128,7 +128,7 @@ bsearch_2short(short e1, short *ent1, sh
+@@ -130,7 +130,7 @@ bsearch_2short(short e1, short *ent1, sh
  }
  
  static int
@@ -1231,7 +1231,7 @@ Subject: Add more const correctness
  {
      int n = nent;
      int k = 0;
-@@ -418,7 +418,7 @@ suspend_or_pushdata(struct table *tbl, c
+@@ -420,7 +420,7 @@ suspend_or_pushdata(struct table *tbl, c
  
  int visible_length_offset = 0;
  int
@@ -1240,7 +1240,7 @@ Subject: Add more const correctness
  {
      int len = 0, n, max_len = 0;
      int status = R_ST_NORMAL;
-@@ -848,9 +848,9 @@ table_rule_width(struct table *t)
+@@ -850,9 +850,9 @@ table_rule_width(struct table *t)
  }
  
  static void
@@ -1253,7 +1253,7 @@ Subject: Add more const correctness
  {
      int i, j, k, brow, erow;
      int sheight, height;
-@@ -881,9 +881,9 @@ check_cell_height(int *tabheight, int *c
+@@ -883,9 +883,9 @@ check_cell_height(int *tabheight, int *c
  }
  
  static void
@@ -1266,7 +1266,7 @@ Subject: Add more const correctness
  {
      int i, j, k, bcol, ecol;
      int swidth, width;
-@@ -3426,7 +3426,7 @@ correct_table_matrix2(struct table *t, i
+@@ -3441,7 +3441,7 @@ correct_table_matrix2(struct table *t, i
  }
  
  static void
@@ -1275,7 +1275,7 @@ Subject: Add more const correctness
  		      double b)
  {
      int i, j;
-@@ -3453,7 +3453,7 @@ correct_table_matrix3(struct table *t, i
+@@ -3468,7 +3468,7 @@ correct_table_matrix3(struct table *t, i
  }
  
  static void
@@ -1286,7 +1286,7 @@ Subject: Add more const correctness
      int i, j;
 --- a/display.c
 +++ b/display.c
-@@ -1202,7 +1202,7 @@ addChar(char c, Lineprop mode)
+@@ -1208,7 +1208,7 @@ addChar(char c, Lineprop mode)
  static GeneralList *message_list = NULL;
  
  void
@@ -1295,7 +1295,7 @@ Subject: Add more const correctness
  {
      if (fmInitialized) {
  	if (!message_list)
-@@ -1237,7 +1237,7 @@ message_list_panel(void)
+@@ -1243,7 +1243,7 @@ message_list_panel(void)
  }
  
  void
@@ -1304,7 +1304,7 @@ Subject: Add more const correctness
  {
      if (!fmInitialized)
  	return;
-@@ -1248,14 +1248,14 @@ message(char *s, int return_x, int retur
+@@ -1254,14 +1254,14 @@ message(char *s, int return_x, int retur
  }
  
  void
@@ -1321,7 +1321,7 @@ Subject: Add more const correctness
  {
      if (QuietMessage)
  	return;
-@@ -1283,7 +1283,7 @@ disp_message_nsec(char *s, int redraw_cu
+@@ -1289,7 +1289,7 @@ disp_message_nsec(char *s, int redraw_cu
  }
  
  void
@@ -1330,7 +1330,7 @@ Subject: Add more const correctness
  {
      disp_message_nsec(s, redraw_current, 10, FALSE, TRUE);
  }
-@@ -1296,7 +1296,7 @@ disp_message_nomouse(char *s, int redraw
+@@ -1302,7 +1302,7 @@ disp_message_nomouse(char *s, int redraw
  #endif
  
  void
@@ -1584,7 +1584,7 @@ Subject: Add more const correctness
      int *tp;
 --- a/main.c
 +++ b/main.c
-@@ -80,10 +80,10 @@ static void SigPipe(SIGNAL_ARG);
+@@ -81,10 +81,10 @@ static void SigPipe(SIGNAL_ARG);
  #endif
  
  #ifdef USE_MARK
@@ -1598,7 +1598,7 @@ Subject: Add more const correctness
  
  #ifndef __MINGW32_VERSION
  JMP_BUF IntReturn;
-@@ -112,7 +112,7 @@ void set_buffer_environ(Buffer *);
+@@ -116,7 +116,7 @@ void set_buffer_environ(Buffer *);
  static void save_buffer_position(Buffer *buf);
  
  static void _followForm(int);
@@ -1607,7 +1607,7 @@ Subject: Add more const correctness
  static void _newT(void);
  static void followTab(TabBuffer * tab);
  static void moveTab(TabBuffer * t, TabBuffer * t2, int right);
-@@ -1757,7 +1757,7 @@ clear_mark(Line *l)
+@@ -1838,7 +1838,7 @@ clear_mark(Line *l)
  
  /* search by regular expression */
  static int
@@ -1616,7 +1616,7 @@ Subject: Add more const correctness
  {
      void (*prevtrap) (SIGNAL_ARG);
      volatile int i, result = SR_NOTFOUND;
-@@ -1783,7 +1783,7 @@ srchcore(char *volatile str, int (*func)
+@@ -1864,7 +1864,7 @@ srchcore(char *volatile str, int (*func)
  }
  
  static void
@@ -1625,7 +1625,7 @@ Subject: Add more const correctness
  {
      if (str == NULL)
  	str = "";
-@@ -1868,7 +1868,7 @@ dispincsrch(int ch, Str buf, Lineprop *p
+@@ -1949,7 +1949,7 @@ dispincsrch(int ch, Str buf, Lineprop *p
  }
  
  static void
@@ -1634,7 +1634,7 @@ Subject: Add more const correctness
  {
      char *str;
      Buffer sbuf;
-@@ -1884,9 +1884,9 @@ isrch(int (*func) (Buffer *, char *), ch
+@@ -1965,9 +1965,9 @@ isrch(int (*func) (Buffer *, char *), ch
  }
  
  static void
@@ -1646,7 +1646,7 @@ Subject: Add more const correctness
      int result;
      int disp = FALSE;
      int pos;
-@@ -1945,7 +1945,7 @@ srch_nxtprv(int reverse)
+@@ -2026,7 +2026,7 @@ srch_nxtprv(int reverse)
  {
      int result;
      /* *INDENT-OFF* */
@@ -1655,7 +1655,7 @@ Subject: Add more const correctness
  	forwardSearch, backwardSearch
      };
      /* *INDENT-ON* */
-@@ -2372,9 +2372,9 @@ DEFUN(movR1, MOVE_RIGHT1, "Cursor right.
+@@ -2453,9 +2453,9 @@ DEFUN(movR1, MOVE_RIGHT1, "Cursor right.
  #define prevChar(s, l)	do { (s)--; } while ((s) > 0 && (l)->propBuf[s] & PC_WCHAR2)
  
  static wc_uint32
@@ -1667,16 +1667,16 @@ Subject: Add more const correctness
  }
  
  static int
-@@ -2524,7 +2524,7 @@ DEFUN(movRW, NEXT_WORD, "Move to the nex
+@@ -2630,7 +2630,7 @@ save_known_hosts(void)
  static void
  _quitfm(int confirm)
  {
 -    char *ans = "y";
 +    const char *ans = "y";
+     int err = 0;
  
      if (checkDownloadList())
- 	/* FIXME: gettextize? */
-@@ -2653,7 +2653,7 @@ DEFUN(susp, INTERRUPT SUSPEND, "Suspend
+@@ -2766,7 +2766,7 @@ DEFUN(susp, INTERRUPT SUSPEND, "Suspend
  
  /* Go to specified line */
  static void
@@ -1685,7 +1685,7 @@ Subject: Add more const correctness
  {
      if (l == NULL || *l == '\0' || Currentbuf->currentLine == NULL) {
  	displayBuffer(Currentbuf, B_FORCE_REDRAW);
-@@ -2876,8 +2876,8 @@ DEFUN(prevMk, PREV_MARK, "Go to the prev
+@@ -2989,8 +2989,8 @@ DEFUN(prevMk, PREV_MARK, "Go to the prev
  DEFUN(reMark, REG_MARK, "Mark all occurences of a pattern")
  {
      Line *l;
@@ -1696,7 +1696,7 @@ Subject: Add more const correctness
  
      if (!use_mark)
  	return;
-@@ -4281,7 +4281,7 @@ cmd_loadURL(char *url, ParsedURL *curren
+@@ -4394,7 +4394,7 @@ cmd_loadURL(char *url, ParsedURL *curren
  
  /* go to specified URL */
  static void
@@ -1705,7 +1705,7 @@ Subject: Add more const correctness
  {
      char *url, *referer;
      ParsedURL p_url, *current;
-@@ -5236,10 +5236,10 @@ DEFUN(rFrame, FRAME, "Toggle rendering H
+@@ -5512,10 +5512,10 @@ DEFUN(rFrame, FRAME, "Toggle rendering H
  
  /* spawn external browser */
  static void
@@ -1718,7 +1718,7 @@ Subject: Add more const correctness
      int bg = 0, len;
  
      browser = searchKeyData();
-@@ -5890,7 +5890,7 @@ GetWord(Buffer *buf)
+@@ -6168,7 +6168,7 @@ GetWord(Buffer *buf)
  
  #ifdef USE_DICT
  static void
@@ -1727,7 +1727,7 @@ Subject: Add more const correctness
  {
      char *w, *dictcmd;
      Buffer *buf;
-@@ -6549,7 +6549,7 @@ DEFUN(tabA, TAB_LINK, "Follow current hy
+@@ -6827,7 +6827,7 @@ DEFUN(tabA, TAB_LINK, "Follow current hy
  }
  
  static void
@@ -1812,7 +1812,7 @@ Subject: Add more const correctness
      for (i = 0, tab = LastTab; tab != NULL; i++, tab = tab->prevTab) {
 --- a/rc.c
 +++ b/rc.c
-@@ -867,7 +867,7 @@ create_option_search_table(void)
+@@ -876,7 +876,7 @@ create_option_search_table(void)
  }
  
  static struct param_ptr *
@@ -1821,7 +1821,7 @@ Subject: Add more const correctness
  {
      size_t b, e, i;
      int cmp;
-@@ -987,7 +987,7 @@ show_params(FILE * fp)
+@@ -996,7 +996,7 @@ show_params(FILE * fp)
  }
  
  int
@@ -1830,7 +1830,7 @@ Subject: Add more const correctness
  {
      if (value == NULL)
  	return 1;
-@@ -1015,7 +1015,7 @@ str_to_bool(char *value, int old)
+@@ -1024,7 +1024,7 @@ str_to_bool(char *value, int old)
  
  #ifdef USE_COLOR
  static int
@@ -1839,7 +1839,7 @@ Subject: Add more const correctness
  {
      if (value == NULL)
  	return 8;		/* terminal */
-@@ -1056,7 +1056,7 @@ str_to_color(char *value)
+@@ -1065,7 +1065,7 @@ str_to_color(char *value)
  #endif
  
  static int
@@ -1848,7 +1848,7 @@ Subject: Add more const correctness
  {
      struct param_ptr *p;
      double ppc;
-@@ -1088,7 +1088,7 @@ set_param(char *name, char *value)
+@@ -1097,7 +1097,7 @@ set_param(char *name, char *value)
  	*(char *)p->varptr = value[0];
  	break;
      case P_STRING:
@@ -1857,7 +1857,7 @@ Subject: Add more const correctness
  	break;
  #if defined(USE_SSL) && defined(USE_SSL_VERIFY)
      case P_SSLPATH:
-@@ -1690,26 +1690,26 @@ rcFile(char *base)
+@@ -1699,26 +1699,26 @@ rcFile(char *base)
  }
  
  char *
@@ -1888,7 +1888,7 @@ Subject: Add more const correctness
  {
      return expandPath(Strnew_m_charp(w3m_help_dir(), "/", base, NULL)->ptr);
  }
-@@ -1875,7 +1875,7 @@ querySiteconf(ParsedURL *query_pu, int f
+@@ -1884,7 +1884,7 @@ querySiteconf(ParsedURL *query_pu, int f
  {
      struct siteconf_rec *ent;
      Str u;
@@ -2148,7 +2148,7 @@ Subject: Add more const correctness
      int pos;
 --- a/terms.c
 +++ b/terms.c
-@@ -535,9 +535,10 @@ put_image_kitty(char *url, int x, int y,
+@@ -536,9 +536,10 @@ put_image_kitty(char *url, int x, int y,
      int sh, int cols, int rows)
  {
      Str buf, base64;
@@ -2160,7 +2160,7 @@ Subject: Add more const correctness
      FILE *fp;
      int n, m, is_anim;
      struct stat st;
-@@ -1268,7 +1269,7 @@ initscr(void)
+@@ -1269,7 +1270,7 @@ initscr(void)
  }
  
  static int
@@ -2169,7 +2169,7 @@ Subject: Add more const correctness
  {
      putc(c, ttyf);
  #ifdef SCREEN_DEBUG
-@@ -1294,13 +1295,13 @@ move(int line, int column)
+@@ -1295,13 +1296,13 @@ move(int line, int column)
  
  static int
  #ifdef USE_M17N
@@ -2185,7 +2185,7 @@ Subject: Add more const correctness
  {
      if (c1 != c2)
  	return 1;
-@@ -1324,16 +1325,16 @@ need_redraw(char c1, l_prop pr1, char c2
+@@ -1325,16 +1326,16 @@ need_redraw(char c1, l_prop pr1, char c2
  
  #ifdef USE_M17N
  void
@@ -2205,7 +2205,7 @@ Subject: Add more const correctness
  #endif
  {
      l_prop *pr;
-@@ -1342,7 +1343,7 @@ addch(char pc)
+@@ -1343,7 +1344,7 @@ addch(char pc)
      static Str tmp = NULL;
      char **p;
      char c = *pc;
@@ -2214,7 +2214,7 @@ Subject: Add more const correctness
  
      if (tmp == NULL)
  	tmp = Strnew();
-@@ -2036,13 +2037,13 @@ clrtobotx(void)
+@@ -2037,13 +2038,13 @@ clrtobotx(void)
  }
  
  void
@@ -2230,7 +2230,7 @@ Subject: Add more const correctness
  	addmch(s, len);
  	s += len;
      }
-@@ -2053,17 +2054,17 @@ addstr(char *s)
+@@ -2054,17 +2055,17 @@ addstr(char *s)
  }
  
  void
@@ -2251,7 +2251,7 @@ Subject: Add more const correctness
  	addmch(s, len);
  	s += len;
  	i += width;
-@@ -2075,17 +2076,17 @@ addnstr(char *s, int n)
+@@ -2076,17 +2077,17 @@ addnstr(char *s, int n)
  }
  
  void
@@ -2272,7 +2272,7 @@ Subject: Add more const correctness
  	addmch(s, len);
  	s += len;
  	i += width;
-@@ -2176,7 +2177,7 @@ term_cbreak(void)
+@@ -2177,7 +2178,7 @@ term_cbreak(void)
  }
  
  void
@@ -2283,7 +2283,7 @@ Subject: Add more const correctness
          return;
 --- a/url.c
 +++ b/url.c
-@@ -1252,7 +1252,7 @@ parseURL2(char *url, ParsedURL *pu, Pars
+@@ -1255,7 +1255,7 @@ parseURL2(char *url, ParsedURL *pu, Pars
  }
  
  static Str
@@ -2292,7 +2292,7 @@ Subject: Add more const correctness
  {
      Str tmp;
      /* See SCM_* defines in html.h for correct order of entries. */
-@@ -1347,7 +1347,7 @@ _parsedURL2Str(ParsedURL *pu, int pass,
+@@ -1351,7 +1351,7 @@ _parsedURL2Str(ParsedURL *pu, int pass,
  }
  
  Str
@@ -2301,7 +2301,7 @@ Subject: Add more const correctness
  {
      return _parsedURL2Str(pu, FALSE, TRUE, TRUE);
  }
-@@ -2050,10 +2050,10 @@ add_index_file(ParsedURL *pu, URLFile *u
+@@ -2083,10 +2083,10 @@ add_index_file(ParsedURL *pu, URLFile *u
  }
  
  static char *
@@ -2314,7 +2314,7 @@ Subject: Add more const correctness
      if (table == NULL)
  	return NULL;
      p = &filename[strlen(filename) - 1];
-@@ -2074,7 +2074,7 @@ guessContentTypeFromTable(struct table2
+@@ -2107,7 +2107,7 @@ guessContentTypeFromTable(struct table2
  }
  
  char *
@@ -2397,7 +2397,7 @@ Subject: Add more const correctness
  #endif				/* USE_DICT */
  global int ignore_null_img_alt init(TRUE);
  #define DISPLAY_INS_DEL_SIMPLE	0
-@@ -1227,10 +1227,10 @@ global int use_lessopen init(FALSE);
+@@ -1229,10 +1229,10 @@ global int use_lessopen init(FALSE);
  global char *keymap_file init(KEYMAP_FILE);
  
  #ifdef USE_M17N
@@ -2497,7 +2497,7 @@ Subject: Add more const correctness
  Hash_##sym * \
 --- a/history.c
 +++ b/history.c
-@@ -154,7 +154,7 @@ copyHist(Hist *hist)
+@@ -181,7 +181,7 @@ copyHist(Hist *hist)
  }
  
  HistItem *
@@ -2506,7 +2506,7 @@ Subject: Add more const correctness
  {
      HistItem *item;
  
-@@ -173,7 +173,7 @@ unshiftHist(Hist *hist, char *ptr)
+@@ -200,7 +200,7 @@ unshiftHist(Hist *hist, char *ptr)
  }
  
  HistItem *
@@ -2515,7 +2515,7 @@ Subject: Add more const correctness
  {
      HistItem *item;
  
-@@ -194,7 +194,7 @@ pushHist(Hist *hist, char *ptr)
+@@ -221,7 +221,7 @@ pushHist(Hist *hist, char *ptr)
  /* Don't mix pushHashHist() and pushHist()/unshiftHist(). */
  
  HistItem *
@@ -2524,7 +2524,7 @@ Subject: Add more const correctness
  {
      HistItem *item;
  
-@@ -219,7 +219,7 @@ pushHashHist(Hist *hist, char *ptr)
+@@ -246,7 +246,7 @@ pushHashHist(Hist *hist, char *ptr)
  }
  
  HistItem *
@@ -2582,7 +2582,7 @@ Subject: Add more const correctness
  #define AFLG_INT	1
 --- a/indep.c
 +++ b/indep.c
-@@ -117,9 +117,10 @@ currentdir(void)
+@@ -122,9 +122,10 @@ currentdir(void)
  }
  
  char *
@@ -2595,7 +2595,7 @@ Subject: Add more const correctness
  
      buf = allocStr(name, -1);
      p = buf;
-@@ -315,7 +316,7 @@ remove_space(char *str)
+@@ -320,7 +321,7 @@ remove_space(char *str)
  }
  
  int
@@ -2604,7 +2604,7 @@ Subject: Add more const correctness
  {
      if (s == NULL)
  	return FALSE;
-@@ -479,7 +480,7 @@ html_unquote(char *str)
+@@ -484,7 +485,7 @@ html_unquote(char *str)
      return str;
  }
  
@@ -2613,7 +2613,7 @@ Subject: Add more const correctness
  
  #define url_unquote_char(pstr) \
    ((IS_XDIGIT((*(pstr))[1]) && IS_XDIGIT((*(pstr))[2])) ? \
-@@ -490,7 +491,7 @@ char *
+@@ -495,7 +496,7 @@ char *
  url_quote(char *str)
  {
      Str tmp = NULL;
@@ -2622,7 +2622,7 @@ Subject: Add more const correctness
  
      for (p = str; *p; p++) {
  	if (is_url_quote(*p)) {
-@@ -628,11 +629,11 @@ Str_url_unquote(Str x, int is_form, int
+@@ -633,11 +634,11 @@ Str_url_unquote(Str x, int is_form, int
      return x;
  }
  
@@ -2637,7 +2637,7 @@ Subject: Add more const correctness
  
      for (p = str; *p; p++) {
  	if (is_shell_unsafe(*p)) {
-@@ -756,8 +757,8 @@ growbuf_append(struct growbuf *gb, const
+@@ -761,8 +762,8 @@ growbuf_append(struct growbuf *gb, const
      gb->length += len;
  }
  
@@ -2648,7 +2648,7 @@ Subject: Add more const correctness
  {
  #ifdef USE_PATH_ENVVAR
      char *value = getenv(name);
-@@ -767,32 +768,32 @@ w3m_dir(const char *name, char *dft)
+@@ -772,32 +773,32 @@ w3m_dir(const char *name, char *dft)
  #endif
  }
  
@@ -2688,7 +2688,7 @@ Subject: Add more const correctness
      return w3m_dir("W3M_HELP_DIR", HELP_DIR);
 --- a/indep.h
 +++ b/indep.h
-@@ -47,7 +47,7 @@ extern char *getescapecmd(char **s);
+@@ -46,7 +46,7 @@ extern char *getescapecmd(char **s);
  extern char *allocStr(const char *s, int len);
  extern int strCmp(const void *s1, const void *s2);
  extern char *currentdir(void);
@@ -2697,7 +2697,7 @@ Subject: Add more const correctness
  extern char *expandPath(char *name);
  #ifndef HAVE_STRCHR
  extern char *strchr(const char *s, int c);
-@@ -61,7 +61,7 @@ extern char *strcasestr(const char *s1,
+@@ -60,7 +60,7 @@ extern char *strcasestr(const char *s1,
  #endif
  int strmatchlen(const char *s1, const char *s2, int maxlen);
  extern char *remove_space(char *str);
@@ -2706,7 +2706,7 @@ Subject: Add more const correctness
  extern void cleanup_line(Str s, int mode);
  extern char *html_quote(char *str);
  extern char *html_unquote(char *str);
-@@ -71,7 +71,7 @@ extern char *url_quote(char *str);
+@@ -70,7 +70,7 @@ extern char *url_quote(char *str);
  extern Str Str_url_unquote(Str x, int is_form, int safe);
  extern Str Str_form_quote(Str x);
  #define Str_form_unquote(x) Str_url_unquote((x), TRUE, FALSE)
@@ -2715,7 +2715,7 @@ Subject: Add more const correctness
  #define xmalloc(s) xrealloc(NULL, s)
  extern void *xrealloc(void *ptr, size_t size);
  extern void xfree(void *ptr);
-@@ -85,11 +85,11 @@ extern void growbuf_reserve(struct growb
+@@ -84,11 +84,11 @@ extern void growbuf_reserve(struct growb
  extern void growbuf_append(struct growbuf *gb, const unsigned char *src, int len);
  #define GROWBUF_ADD_CHAR(gb,ch) ((((gb)->length>=(gb)->area_size)?growbuf_reserve(gb,(gb)->length+1):(void)0),(void)((gb)->ptr[(gb)->length++] = (ch)))
  
@@ -2913,14 +2913,15 @@ Subject: Add more const correctness
  #endif				/* not PARSETAG_H */
 --- a/rc.h
 +++ b/rc.h
-@@ -3,6 +3,6 @@
+@@ -3,7 +3,7 @@
  #define RC_H
  
  extern void show_params(FILE * fp);
 -extern int str_to_bool(char *value, int old);
 +extern int str_to_bool(const char *value, int old);
  
- #endif /* RC_H */
+ extern int ssl_known_hosts;
+ 
 --- a/version.c.in
 +++ b/version.c.in
 @@ -1,5 +1,5 @@
