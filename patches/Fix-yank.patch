@@ -4,8 +4,8 @@ Subject: Fix yank
 Patch: patches/Fix-yank.patch
 
 ---
- linein.c |   33 ++++++++++++++++++++++++++-------
- 1 file changed, 26 insertions(+), 7 deletions(-)
+ linein.c |   31 +++++++++++++++++++++++++------
+ 1 file changed, 25 insertions(+), 6 deletions(-)
 
 --- a/linein.c
 +++ b/linein.c
@@ -17,15 +17,6 @@ Patch: patches/Fix-yank.patch
  
  static Str CompleteBuf;
  static Str CFileName;
-@@ -211,7 +212,7 @@ inputLineHistSearch(const char *prompt,
- 	    if (incrfunc == NULL
- 		|| (c = incrfunc((int)c, strBuf, strProp)) < 0x20)
- 		(*InputKeymap[(int)c]) ();
--	    if (c > 0x20) {
-+	    if (c != 255 && c > 0x20) {
- 		tmp = wc_char_conv(c);
- 		ins_char(tmp);
- 	    }
 @@ -234,6 +235,7 @@ inputLineHistSearch(const char *prompt,
  	    cm_disp_next = -1;
  	    if (CLen + tmp->length > STR_LEN || !tmp->length)

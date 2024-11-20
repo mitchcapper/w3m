@@ -28,7 +28,7 @@ Patch: patches/Add-default-download-directory.patch
  	if (p == NULL || *p == '\0') {
 --- a/fm.h
 +++ b/fm.h
-@@ -1089,6 +1089,7 @@ global int no_rc_dir init(FALSE);
+@@ -1088,6 +1088,7 @@ global int no_rc_dir init(FALSE);
  global char *rc_dir init(NULL);
  global char *tmp_dir;
  global char *param_tmp_dir init(NULL);
@@ -46,7 +46,7 @@ Patch: patches/Add-default-download-directory.patch
  #define CMT_CONFIRM_QQ  N_("Confirm when calling quit")
  #define CMT_EXIT_ON_LAST  N_("Close w3m/tab if buffer is last when going back")
  #define CMT_CLOSE_TAB_BACK N_("Close tab if buffer is last when going back")
-@@ -611,6 +612,7 @@ struct param_ptr params5[] = {
+@@ -610,6 +611,7 @@ struct param_ptr params5[] = {
      {"cgi_bin", P_STRING, PI_TEXT, (void *)&cgi_bin, CMT_CGIBIN, NULL},
      {"index_file", P_STRING, PI_TEXT, (void *)&index_file, CMT_IFILE, NULL},
      {"tmp_dir", P_STRING, PI_TEXT, (void *)&param_tmp_dir, CMT_TMP, NULL},

@@ -135,7 +135,7 @@ Patch: patches/Make-CTRL-Y-insert-deleted-text.patch
  #define CMT_SPACE_AUTOCOMPLETE  N_("Space key triggers file completion while editing URLs")
  #define CMT_VI_PREC_NUM	 N_("Enable vi-like numeric prefix")
  #define CMT_LABEL_TOPLINE N_("Move cursor to top line when going to label")
-@@ -534,6 +535,8 @@ struct param_ptr params3[] = {
+@@ -533,6 +534,8 @@ struct param_ptr params3[] = {
  #endif
      {"emacs_like_lineedit", P_INT, PI_ONOFF, (void *)&emacs_like_lineedit,
       CMT_EMACS_LIKE_LINEEDIT, NULL},

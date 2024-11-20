@@ -116,7 +116,7 @@ Patch: patches/Add-option-to-provide-cookie-jar.patch
  .TP
 --- a/main.c
 +++ b/main.c
-@@ -259,6 +259,7 @@ fusage(FILE * f, int err)
+@@ -260,6 +260,7 @@ fusage(FILE * f, int err)
  #endif				/* USE_MOUSE */
  #ifdef USE_COOKIE
      PUT("-cookie", "use cookie (-no-cookie: don't use cookie)");
@@ -124,7 +124,7 @@ Patch: patches/Add-option-to-provide-cookie-jar.patch
  #endif				/* USE_COOKIE */
      PUT("-graph", "use DEC special graphics for border of table and menu");
      PUT("-no-graph", "use ASCII character for border of table and menu");
-@@ -789,6 +790,18 @@ main(int argc, char **argv)
+@@ -791,6 +792,18 @@ main(int argc, char **argv)
  		use_cookie = TRUE;
  		accept_cookie = TRUE;
  	    }
@@ -143,7 +143,7 @@ Patch: patches/Add-option-to-provide-cookie-jar.patch
  #endif				/* USE_COOKIE */
  	    else if (!strcmp("-s", argv[i]))
  		squeezeBlankLine = TRUE;
-@@ -891,6 +904,10 @@ main(int argc, char **argv)
+@@ -893,6 +906,10 @@ main(int argc, char **argv)
      CurrentKey = -1;
      if (BookmarkFile == NULL)
  	BookmarkFile = rcFile(BOOKMARK);

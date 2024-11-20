@@ -187,7 +187,7 @@ This is in preparation for the next patch.
  #define ldHist nulcmd
 --- a/main.c
 +++ b/main.c
-@@ -874,7 +874,7 @@ main(int argc, char **argv)
+@@ -876,7 +876,7 @@ main(int argc, char **argv)
  #endif				/* USE_COOKIE */
  #ifdef USE_HISTORY
      if (UseHistory)
@@ -196,7 +196,7 @@ This is in preparation for the next patch.
  #endif				/* not USE_HISTORY */
  
  #ifdef USE_M17N
-@@ -2542,7 +2542,7 @@ _quitfm(int confirm)
+@@ -2544,7 +2544,7 @@ _quitfm(int confirm)
  #endif				/* USE_COOKIE */
  #ifdef USE_HISTORY
      if (UseHistory && SaveURLHist)

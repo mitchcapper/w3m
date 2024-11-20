@@ -29,7 +29,7 @@ Patch: patches/Add-smartcase-option-for-search.patch
  #define CMT_USE_LESSOPEN N_("Use LESSOPEN")
  #ifdef USE_SSL
  #ifdef USE_SSL_VERIFY
-@@ -542,6 +543,8 @@ struct param_ptr params3[] = {
+@@ -541,6 +542,8 @@ struct param_ptr params3[] = {
      {"wrap_search", P_INT, PI_ONOFF, (void *)&WrapDefault, CMT_WRAP, NULL},
      {"ignorecase_search", P_INT, PI_ONOFF, (void *)&IgnoreCase,
       CMT_IGNORE_CASE, NULL},

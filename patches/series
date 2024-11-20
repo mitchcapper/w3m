@@ -3,6 +3,7 @@
 # Save history
 Refactor-URL-history-handling.patch
 Add-command-to-save-history.patch
+Unlink-temp-history-on-error.patch
 # Session
 Add-session-store-and-restore-feature.patch
 # gemini
@@ -41,7 +42,6 @@ scan-build-issues.patch
 Refactor-inputAnswer.patch
 Refactor-checkOverwrite.patch
 Add-password-manager-integration.patch
-WIP-save-history.patch
 Use-Ctrl-L-to-insert-next-char-in-search.patch
 Recognize-aria-label-for-buttons.patch
 Add-keybinding-to-insert-current-search-term.patch

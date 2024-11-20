@@ -502,7 +502,7 @@ w3m-0.5.3+git20230121.
      UFclose(&f);
 --- a/main.c
 +++ b/main.c
-@@ -397,6 +397,32 @@ die_oom(size_t bytes)
+@@ -398,6 +398,32 @@ die_oom(size_t bytes)
      return NULL;
  }
  
@@ -535,7 +535,7 @@ w3m-0.5.3+git20230121.
  int
  main(int argc, char **argv)
  {
-@@ -896,6 +922,9 @@ main(int argc, char **argv)
+@@ -898,6 +924,9 @@ main(int argc, char **argv)
      if (UseHistory)
  	loadUrlHistory();
  #endif				/* not USE_HISTORY */
@@ -544,8 +544,8 @@ w3m-0.5.3+git20230121.
 +	known_hosts = load_known_hosts();
  
      /* Restore a previously saved session */
-     if (RestoreSession || opt_restore) {
-@@ -2588,10 +2617,36 @@ DEFUN(movRW, NEXT_WORD, "Move to the nex
+     if (opt_restore) {
+@@ -2590,10 +2619,36 @@ DEFUN(movRW, NEXT_WORD, "Move to the nex
      displayBuffer(Currentbuf, B_NORMAL);
  }
  
@@ -582,7 +582,7 @@ w3m-0.5.3+git20230121.
  
      if (checkDownloadList())
  	/* FIXME: gettextize? */
-@@ -2622,6 +2677,8 @@ _quitfm(int confirm)
+@@ -2624,6 +2679,8 @@ _quitfm(int confirm)
  	unlink(rcFile(SESSION_FILE));
      if (StoreSession)
  	_strSession(NULL);
@@ -591,7 +591,7 @@ w3m-0.5.3+git20230121.
      if (deprecated)
  	fprintf(stderr, "%s\n%s\n%s\n",
  		"DEPRECATION WARNING",
-@@ -4977,6 +5034,13 @@ DEFUN(vwSrc, SOURCE VIEW, "Toggle betwee
+@@ -4974,6 +5031,13 @@ DEFUN(vwSrc, SOURCE VIEW, "Toggle betwee
  	displayBuffer(Currentbuf, B_NORMAL);
  	return;
      }
@@ -605,7 +605,7 @@ w3m-0.5.3+git20230121.
      if (Currentbuf->sourcefile == NULL) {
  	if (Currentbuf->pagerSource &&
  	    !strcasecmp(Currentbuf->type, "text/plain")) {
-@@ -5062,6 +5126,93 @@ DEFUN(foldPre, FOLD_PRE, "Fold long line
+@@ -5059,6 +5123,93 @@ DEFUN(foldPre, FOLD_PRE, "Fold long line
      fold_pre = FoldPre;
  }
  
@@ -699,7 +699,7 @@ w3m-0.5.3+git20230121.
  /* reload */
  DEFUN(reload, RELOAD, "Load current document anew")
  {
-@@ -5288,6 +5439,7 @@ chkURLBuffer(Buffer *buf)
+@@ -5285,6 +5436,7 @@ chkURLBuffer(Buffer *buf)
  	"https?://[a-zA-Z0-9:%\\-\\./_@]*\\[[a-fA-F0-9:][a-fA-F0-9:\\.]*\\][a-zA-Z0-9:%\\-\\./?=~_\\&+@#,\\$;]*",
  	"ftp://[a-zA-Z0-9:%\\-\\./_@]*\\[[a-fA-F0-9:][a-fA-F0-9:\\.]*\\][a-zA-Z0-9:%\\-\\./=_+@#,\\$]*",
  #endif				/* INET6 */
@@ -977,7 +977,7 @@ w3m-0.5.3+git20230121.
  #endif				/* USE_SSL_VERIFY */
  #define CMT_SSL_FORBID_METHOD N_("List of forbidden SSL methods (2: SSLv2, 3: SSLv3, t: TLSv1.0, 5: TLSv1.1, 6: TLSv1.2, 7: TLSv1.3)")
  #ifdef SSL_CTX_set_min_proto_version
-@@ -662,6 +665,8 @@ struct param_ptr params7[] = {
+@@ -661,6 +664,8 @@ struct param_ptr params7[] = {
       NULL},
      {"ssl_ca_default", P_INT, PI_ONOFF, (void *)&ssl_ca_default,
       CMT_SSL_CA_DEFAULT, NULL},
