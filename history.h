@@ -33,6 +33,7 @@ extern char *prevHist(Hist *hist);
 extern int loadUrlHistory(void);
 extern void saveUrlHistory(void);
 extern void ldHist(void);
+extern void svHist(void);
 #else				/* not USE_HISTORY */
 #define ldHist nulcmd
 #endif				/* not USE_HISTORY */

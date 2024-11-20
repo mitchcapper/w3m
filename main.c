@@ -4617,6 +4617,13 @@ DEFUN(ldHist, HISTORY, "Show browsing history")
 {
     cmd_loadBuffer(historyBuffer(URLHist), BP_NO_URL, LB_NOLINK);
 }
+
+/* Save history */
+DEFUN(svHist, SAVE_HISTORY, "Save browsing history")
+{
+    saveUrlHistory();
+    disp_message_nsec("History written", TRUE, 1, FALSE, TRUE);
+}
 #endif				/* USE_HISTORY */
 
 /* download HREF link */
