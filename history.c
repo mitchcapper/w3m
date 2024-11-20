@@ -109,11 +109,15 @@ saveUrlHistory(void)
     FILE *f;
     HistItem *item;
     char *tmpf;
+    long long mtime;
+    struct stat st;
 
     if (URLHist == NULL || URLHist->list == NULL)
 	return;
 
     syncUrlHistory();
+
+    mtime = URLHist->mtime;
 
     tmpf = tmpfname(TMPF_HIST, NULL)->ptr;
     if ((f = fopen(tmpf, "w")) == NULL)
@@ -128,12 +132,18 @@ saveUrlHistory(void)
 	fprintf(f, "%s\n", (char *)item->ptr);
     if (fclose(f) == EOF)
 	goto fail;
+
+    if (stat(tmpf, &st))
+	goto fail;
+
+    URLHist->mtime = (long long)st.st_mtime;
     if (rename(tmpf, rcFile(HISTORY_FILE)))
 	goto fail;
 
     return;
 
 fail:
+    URLHist->mtime = mtime;
     disp_err_message("Can't open history", FALSE);
     return;
 }

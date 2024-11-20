@@ -115,6 +115,7 @@ RELOAD		Aktuelles Dokument erneut laden
 RESHAPE 	Dokument nochmals verarbeiten
 RIGHT		Anzeigebereich um eine Spalte nach rechts verschieben
 SAVE		Dokument-Quellcode speichern
+SAVE_HISTORY	Speichere Chronik aufgesuchter Dokumente
 SAVE_IMAGE	Speichere Bild
 SAVE_LINK	Speichere Ziel des Hyperlinks
 SAVE_SCREEN	Speichere verarbeitetes Dokument

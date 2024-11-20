@@ -118,6 +118,7 @@ RELOAD		Load current document anew
 RESHAPE 	Re-render document
 RIGHT		Shift screen one column right
 SAVE		Save document source
+SAVE_HISTORY	Save browsing history
 SAVE_IMAGE	Save inline image
 SAVE_LINK	Save hyperlink target
 SAVE_SCREEN	Save rendered document
