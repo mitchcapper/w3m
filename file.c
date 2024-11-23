@@ -33,7 +33,7 @@
 
 extern int fold_pre;
 static int frame_source = 0;
-static int need_number = 0;
+static int need_number;
 
 static char *guess_filename(const char *file);
 static int _MoveFile(const char *path1, const char *path2);
@@ -3580,13 +3580,17 @@ process_input(struct parsed_tag *tag)
     case FORM_INPUT_TEXT:
     case FORM_INPUT_FILE:
     case FORM_INPUT_CHECKBOX:
-	if (displayLinkNumber)
+	if (displayLinkNumber) {
 	    Strcat(tmp, getLinkNumberStr(0));
+	    need_number = 0;
+	}
 	Strcat_char(tmp, '[');
 	break;
     case FORM_INPUT_RADIO:
-	if (displayLinkNumber)
+	if (displayLinkNumber) {
 	    Strcat(tmp, getLinkNumberStr(0));
+	    need_number = 0;
+	}
 	Strcat_char(tmp, '(');
     }
     Strcat(tmp, Sprintf("<input_alt hseq=\"%d\" fid=\"%d\" type=\"%s\" "
@@ -3628,8 +3632,10 @@ process_input(struct parsed_tag *tag)
 	case FORM_INPUT_SUBMIT:
 	case FORM_INPUT_BUTTON:
 	case FORM_INPUT_RESET:
-	    if (displayLinkNumber)
+	    if (displayLinkNumber) {
 		Strcat(tmp, getLinkNumberStr(-1));
+		need_number = 0;
+	    }
 	    Strcat_charp(tmp, "[");
 	    break;
 	}
@@ -6458,6 +6464,12 @@ HTMLlineproc0(char *line, struct html_feed_environ *h_env, int internal)
 	     * are fed to the table renderer, and then the renderer
 	     * makes HTML output.
 	     */
+	    if (is_tag) {
+		char *s = str;
+		tag = parse_tag(&s, internal);
+		if (tag && tag->tagid == HTML_A)
+		    need_number = 1;
+	    }
 	    switch (feed_table(tbl, str, tbl_mode, tbl_width, internal)) {
 	    case 0:
 		/* </table> tag */
