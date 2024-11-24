@@ -170,7 +170,8 @@ print "<P><A HREF=\"$keymap\">$head</A>\n";
 	     split(" ", "_mark nextMk prevMk reMark"));
 
 &show_keymap('Miscellaneous',
-	     split(" ", "mainMn ldhelp ldOpt dispVer cooLst ldHist svHist ldDL
+	     split(" ", "mainMn ldhelp ldOpt dispVer cooLst ldHist svHist
+		strSession ldDL
 		docCSet defCSet msgs userMessage
 		msToggle wrapToggle execCmd setAlarm setOpt setEnv defKey
 		reinit execsh susp qquitfm quitfm"));
