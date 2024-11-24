@@ -136,6 +136,7 @@ SHIFT_LEFT	Shift screen left
 SHIFT_RIGHT	Shift screen right
 SOURCE		Toggle between HTML shown or processed
 STOP_IMAGE	Stop loading and drawing of images
+STORE		Store session
 SUBMIT		Submit form
 SUSPEND 	Suspend w3m to background
 TAB_GOTO	Open specified document in a new tab
