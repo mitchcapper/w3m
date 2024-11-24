@@ -1,5 +1,6 @@
 /* vi: set sw=4 ts=8 ai sm noet : */
 #define MAINPROGRAM
+#include <errno.h>
 #include "fm.h"
 #include <stdio.h>
 #include <signal.h>
@@ -108,6 +109,9 @@ int prec_num = 0;
 int prev_key = -1;
 int on_target = 1;
 static int add_download_list = FALSE;
+static char *session_file = NULL;
+static int unlink_session;
+static void _strSession(char *sf);
 
 void set_buffer_environ(Buffer *);
 static void save_buffer_position(Buffer *buf);
@@ -217,6 +221,8 @@ fusage(FILE * f, int err)
 #endif
     PUT("-B", "load bookmark");
     PUT("-bookmark file", "specify bookmark file");
+    PUT("-R", "restore from session file");
+    PUT("-session file", "specify session file");
     PUT("-T type", "specify content-type");
     PUT("-m", "internet message mode");
     PUT("-v", "visual startup mode");
@@ -410,6 +416,7 @@ main(int argc, char **argv)
     char *default_type = NULL;
     char *post_file = NULL;
     Str err_msg;
+    int opt_restore = FALSE;
 #ifdef USE_M17N
     char *Locale = NULL;
     wc_uint8 auto_detect;
@@ -439,7 +446,11 @@ main(int argc, char **argv)
     NO_proxy_domains = newTextList();
     fileToDelete = newTextList();
 
-    load_argv = New_N(char *, argc - 1);
+    /*
+     * An empty URL means to open a new tab. If -N was provided we need
+     * to double the size.
+     */
+    load_argv = New_N(char *, (argc - 1) * (1 + !!open_new_tab));
     load_argc = 0;
 
     CurrentDir = currentdir();
@@ -633,6 +644,13 @@ main(int argc, char **argv)
 		    BookmarkFile = cleanupName(tmp->ptr);
 		}
 	    }
+	    else if (!strcmp("-R", argv[i]))
+		opt_restore = TRUE;
+	    else if (!strcmp("-session", argv[i])) {
+		if (++i >= argc)
+		    usage();
+		session_file = argv[i];
+	    }
 	    else if (!strcmp("-F", argv[i]))
 		RenderFrame = TRUE;
 	    else if (!strcmp("-W", argv[i])) {
@@ -812,6 +830,8 @@ main(int argc, char **argv)
 	    line_str = argv[i] + 1;
 	}
 	else {
+	    if (open_new_tab && load_argc)
+		load_argv[load_argc++] = "";
 	    load_argv[load_argc++] = argv[i];
 	}
 	i++;
@@ -879,8 +899,54 @@ main(int argc, char **argv)
 	loadUrlHistory();
 #endif				/* not USE_HISTORY */
 
-#ifdef USE_M17N
-#endif
+    /* Restore a previously saved session */
+    if (opt_restore) {
+	FILE *fp;
+	Str line;
+	char *sf, **session;
+	int max = 16, n = 0;
+
+	sf = session_file ? session_file : rcFile(SESSION_FILE);
+	session = New_N(char *, max);
+	if (!(fp = fopen(sf, "r"))) {
+	    Str err = Sprintf("Cannot restore session %s - %s", sf,
+			      strerror(errno));
+	    disp_err_message(err->ptr, FALSE);
+	    fmTerm();
+	    return 1;
+	}
+
+	for (int i = 0; i < load_argc; i++) {
+	    if (n > max) {
+		max <<= 1;
+		New_Reuse(char *, session, max);
+	    }
+	    session[n++] = load_argv[i];
+	}
+
+	if (open_new_tab) {
+	    if (n > max) {
+		max <<= 1;
+		session = New_Reuse(char *, session, max);
+	    }
+	    session[n++] = "";
+	}
+
+	for (;;) {
+	    line = Strfgets(fp);
+	    if (line->length == 0)
+		break;
+	    Strchop(line);
+	    if (n > max) {
+		max <<= 1;
+		session = New_Reuse(char *, session, max);
+	    }
+	    session[n++] = line->ptr;
+	}
+	load_argv = session;
+	load_argc = n;
+	unlink_session = !session_file;
+    }
 
     if (w3m_backend)
 	backend();
@@ -980,12 +1046,19 @@ main(int argc, char **argv)
     else {
 	i = 0;
     }
+
+    open_new_tab = FALSE;
     for (; i < load_argc; i++) {
 	if (i >= 0) {
 	    SearchHeader = search_header;
 	    DefaultType = default_type;
 	    char *url;
 	    int retry = 0;
+
+	    if (!*load_argv[i]) {
+		open_new_tab = TRUE;
+		continue;
+	    }
 
 	    url = load_argv[i];
 	    if (getURLScheme(&url) == SCM_MISSING && !ArgvIsURL)
@@ -1069,6 +1142,7 @@ main(int argc, char **argv)
 	    _newT();
 	    Currentbuf->nextBuffer = newbuf;
 	    delBuffer(Currentbuf);
+	    open_new_tab = FALSE;
 	}
 	else {
 	    Currentbuf->nextBuffer = newbuf;
@@ -2546,6 +2620,10 @@ _quitfm(int confirm)
     if (UseHistory && SaveURLHist)
 	saveUrlHistory();
 #endif				/* USE_HISTORY */
+    if (StoreSession)
+	_strSession(NULL);
+    if (unlink_session)
+	unlink(rcFile(SESSION_FILE));
     if (deprecated)
 	fprintf(stderr, "%s\n%s\n%s\n",
 		"DEPRECATION WARNING",
@@ -4425,6 +4503,62 @@ DEFUN(adBmark, ADD_BOOKMARK, "Add current page to bookmarks")
     request->length = tmp->length;
     cmd_loadURL("file:///$LIB/" W3MBOOKMARK_CMDNAME, NULL, NO_REFERER,
 		request);
+}
+
+void
+_strSession(char *sf)
+{
+    Buffer *buf;
+    FILE *f;
+    ParsedURL *url;
+    char *sep;
+
+    if (!sf)
+	sf = session_file ? session_file : rcFile(SESSION_FILE);
+    if (!(f = fopen(sf, "w"))) goto fail;
+
+    sep = "";
+    for (TabBuffer *tab = FirstTab; tab; tab = tab->nextTab) {
+	fputs(sep, f);
+	for (buf = tab->firstBuffer; buf; buf = buf->nextBuffer) {
+	    if (buf->bufferprop & BP_INTERNAL)
+		continue;
+	    if ((url = baseURL(buf)))
+		fprintf(f, "%s\n", parsedURL2Str(url)->ptr);
+	    else
+		disp_err_message(buf->buffername, FALSE);
+	}
+	sep = "\n";
+    }
+
+    if ((fclose(f)) == EOF) goto fail;
+    unlink_session = 0;
+    return;
+
+fail:
+    disp_err_message(strerror(errno), FALSE);
+    return;
+}
+
+/* Store session */
+DEFUN(strSession, STORE, "Store session")
+{
+    char *def, *sf;
+
+    def = session_file ? session_file : rcFile(SESSION_FILE);
+    sf = inputFilenameHist(Strnew_m_charp("Session file [",
+					  def,
+					  "]? ", NULL)->ptr,
+			   NULL, LoadHist);
+    if (!*sf)
+	sf = def;
+    _strSession(sf);
+#ifdef USE_COOKIE
+    save_cookies();
+#endif
+#ifdef USE_HISTORY
+    saveUrlHistory();
+#endif
 }
 
 /* option setting */
