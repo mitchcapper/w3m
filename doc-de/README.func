@@ -115,6 +115,7 @@ RELOAD		Aktuelles Dokument erneut laden
 RESHAPE 	Dokument nochmals verarbeiten
 RIGHT		Anzeigebereich um eine Spalte nach rechts verschieben
 SAVE		Dokument-Quellcode speichern
+SAVE_HISTORY	Speichere Chronik aufgesuchter Dokumente
 SAVE_IMAGE	Speichere Bild
 SAVE_LINK	Speichere Ziel des Hyperlinks
 SAVE_SCREEN	Speichere verarbeitetes Dokument
@@ -132,6 +133,7 @@ SHIFT_LEFT	Anzeigebereich nach links versetzen
 SHIFT_RIGHT	Anzeigebereich nach rechts versetzen
 SOURCE		Wechsle zwischen HTML-Wiedergabe und -Verarbeitung
 STOP_IMAGE	Bilder nicht mehr laden und anzeigen
+STORE		Speichere Session
 SUBMIT		Formular übermitteln
 SUSPEND 	w3m zum Hintergrundprozess machen
 TAB_GOTO	Öffne das angegebene Dokument in einem neuen Reiter

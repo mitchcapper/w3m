@@ -62,6 +62,9 @@ use -o high-intensity=true instead
 \fB\-M\fP
 monochrome display
 .TP
+\fB\-R\fP
+restore session
+.TP
 \fB\-no-mouse\fP
 deactivate mouse support
 .TP
@@ -204,6 +207,9 @@ use \fIfile\fR instead of the default bookmark.html file
 \fB\-config \fIfile\fR
 use \fIfile\fR instead of the default configuration file
 .TP
+\fB\-session \fIfile\fR
+use \fIfile\fR instead of the default session file
+.TP
 \fB\-o \fIoption=value\fR
 modify one configuration item with an explicitly given value;
 without \fIoption=value\fR, equivalent to \fB\-show-option\fR
@@ -213,6 +219,15 @@ use debug mode (only for debugging)
 .TP
 \fB\-reqlog\fP
 log headers of HTTP communication in file \f(CW~/.w3m/request.log\fP
+.SH Session management
+If \fB\-R\fP is given, w3m will restore a session from a session file.
+If no session file is provided with \fB\-session\fR the default session file is used.
+The default session file will be deleted after restoring a session when exiting w3m.
+Without a given session file, when manually storing a session, w3m will ask for a filename.
+If a session file is given, it will not be deleted and will be overwritten if storing a session again.
+Automatic session storing can be configured via the options.
+If URLs or files were given as parameters they will be loaded after restoring the session and added to the first tab.
+If \-N and \-R are given the old session is restored as is and any new buffer are opened in separate tabs.
 .SH EXAMPLES
 .SS Pager-like usage
 .TP
