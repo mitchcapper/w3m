@@ -1,0 +1,35 @@
+From: Rene Kita <mail@rkta.de>
+Date: Sun Nov 24 06:10:20 CET 2024
+Subject: Change filename when saving compressed source
+Patch: patches/Change-filename-when-saving-compressed-source.patch
+
+---
+ file.c |   10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+--- a/file.c
++++ b/file.c
+@@ -8977,6 +8977,9 @@ guess_filename(const char *file)
+ char *
+ guess_save_name(Buffer *buf, char *path)
+ {
++    char *p;
++    int n;
++
+     if (buf && buf->document_header) {
+ 	Str name = NULL;
+ 	char *p, *q;
+@@ -8991,7 +8994,12 @@ guess_save_name(Buffer *buf, char *path)
+ 		 matchattr(q, "name", 4, &name))
+ 	    path = name->ptr;
+     }
+-    return guess_filename(path);
++
++    p = guess_filename(path);
++    if ((n = strlen(Currentbuf->sourcefile)) >= 3)
++	if (!strcmp(&Currentbuf->sourcefile[n - 3], ".gz"))
++	    return Strnew_m_charp(p, ".gz", NULL)->ptr;
++    return p;
+ }
+ 
+ /* Local Variables:    */

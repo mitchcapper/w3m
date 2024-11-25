@@ -583,9 +583,9 @@ w3m-0.5.3+git20230121.
      if (checkDownloadList())
  	/* FIXME: gettextize? */
 @@ -2624,6 +2679,8 @@ _quitfm(int confirm)
- 	unlink(rcFile(SESSION_FILE));
-     if (StoreSession)
  	_strSession(NULL);
+     if (unlink_session)
+ 	unlink(rcFile(SESSION_FILE));
 +    if ((err = save_known_hosts()))
 +	perror(_("Cannot save known hosts"));
      if (deprecated)

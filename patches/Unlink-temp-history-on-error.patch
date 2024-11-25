@@ -1,6 +1,6 @@
 From: Rene Kita <mail@rkta.de>
 Date: Fri Aug 30 09:31:31 CEST 2024
-Subject: WIP save history
+Subject: Unlink temp history on error
 Patch: patches/Unlink-temp-history-on-error.patch
 
 Remove tmp file in case of failure.

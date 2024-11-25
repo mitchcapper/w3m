@@ -182,10 +182,10 @@
      if (UseHistory && SaveURLHist)
  	saveUrlHistory();
  #endif				/* USE_HISTORY */
-+    if (unlink_session)
-+	unlink(rcFile(SESSION_FILE));
 +    if (StoreSession)
 +	_strSession(NULL);
++    if (unlink_session)
++	unlink(rcFile(SESSION_FILE));
      if (deprecated)
  	fprintf(stderr, "%s\n%s\n%s\n",
  		"DEPRECATION WARNING",

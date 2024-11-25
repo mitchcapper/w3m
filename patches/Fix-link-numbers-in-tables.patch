@@ -1,0 +1,85 @@
+From: Rene Kita <mail@rkta.de>
+Date: Sat Nov 23 16:24:34 CET 2024
+Subject: Fix link numbers in tables
+Patch: patches/Fix-link-numbers-in-tables.patch
+
+Same problem as 9a2b8608 (Fix broken anchor with link number at EOL,
+2021-12-12). Solution is barely acceptable, though. Needs a fix for that
+need_number include.
+
+---
+ file.c  |   20 ++++++++++++++++----
+ table.c |    6 ------
+ 2 files changed, 16 insertions(+), 10 deletions(-)
+
+--- a/file.c
++++ b/file.c
+@@ -38,7 +38,7 @@ char * conv_entity(unsigned int c); /* T
+ 
+ extern int fold_pre;
+ static int frame_source = 0;
+-static int need_number = 0;
++static int need_number;
+ 
+ static char *guess_filename(const char *file);
+ static int _MoveFile(const char *path1, const char *path2);
+@@ -3732,13 +3732,17 @@ process_input(struct parsed_tag *tag)
+     case FORM_INPUT_TEXT:
+     case FORM_INPUT_FILE:
+     case FORM_INPUT_CHECKBOX:
+-	if (displayLinkNumber)
++	if (displayLinkNumber) {
+ 	    Strcat(tmp, getLinkNumberStr(0));
++	    need_number = 0;
++	}
+ 	Strcat_char(tmp, '[');
+ 	break;
+     case FORM_INPUT_RADIO:
+-	if (displayLinkNumber)
++	if (displayLinkNumber) {
+ 	    Strcat(tmp, getLinkNumberStr(0));
++	    need_number = 0;
++	}
+ 	Strcat_char(tmp, '(');
+     }
+     Strcat(tmp, Sprintf("<input_alt hseq=\"%d\" fid=\"%d\" type=\"%s\" "
+@@ -3780,8 +3784,10 @@ process_input(struct parsed_tag *tag)
+ 	case FORM_INPUT_SUBMIT:
+ 	case FORM_INPUT_BUTTON:
+ 	case FORM_INPUT_RESET:
+-	    if (displayLinkNumber)
++	    if (displayLinkNumber) {
+ 		Strcat(tmp, getLinkNumberStr(-1));
++		need_number = 0;
++	    }
+ 	    Strcat_charp(tmp, "[");
+ 	    break;
+ 	}
+@@ -6606,6 +6612,12 @@ HTMLlineproc0(char *line, struct html_fe
+ 	     * are fed to the table renderer, and then the renderer
+ 	     * makes HTML output.
+ 	     */
++	    if (is_tag) {
++		char *s = str;
++		tag = parse_tag(&s, internal);
++		if (tag->tagid == HTML_A)
++		    need_number = 1;
++	    }
+ 	    switch (feed_table(tbl, str, tbl_mode, tbl_width, internal)) {
+ 	    case 0:
+ 		/* </table> tag */
+--- a/table.c
++++ b/table.c
+@@ -3002,12 +3002,6 @@ feed_table_tag(struct table *tbl, char *
+ 	    check_rowcol(tbl, mode);
+ 	    if (i == 0) {
+ 		Str tmp = process_anchor(tag, line);
+-    		if (displayLinkNumber)
+-		{
+-			Str t = getLinkNumberStr(-1);
+-			feed_table_inline_tag(tbl, NULL, mode, t->length);
+-			Strcat(tmp, t);
+-		}
+ 		pushdata(tbl, tbl->row, tbl->col, tmp->ptr);
+ 	    }
+ 	    else

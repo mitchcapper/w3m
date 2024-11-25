@@ -1,11 +1,3 @@
-# NULL check
-# volatile
-# Save history
-Refactor-URL-history-handling.patch
-Add-command-to-save-history.patch
-Unlink-temp-history-on-error.patch
-# Session
-Add-session-store-and-restore-feature.patch
 # gemini
 gemini.patch
 # WARNINGS
@@ -20,7 +12,6 @@ Suppress-Wlogical-op.patch
 Suppress-Wold-style-definition.patch
 Suppress-Wstrict-prototypes.patch
 0081-Only-use-malloc-if-the-default-buffer-is-to-small.patch
-# const
 # ACTIVE
 shorten-not-assigned-in-help.patch
 Use-gettext-for-user-facing-strings.patch
@@ -68,6 +59,8 @@ Use-prec_num-with-followA.patch
 Use-confirm-in-quitfm.patch
 Add-command-to-protect-buffers.patch
 Improve-protected-buffers.patch
+Fix-link-numbers-in-tables.patch
+Change-filename-when-saving-compressed-source.patch
 lto.patch
 # BORKED
 Refactor-regex-library.patch
