@@ -9,7 +9,7 @@ Patch: patches/Change-filename-when-saving-compressed-source.patch
 
 --- a/file.c
 +++ b/file.c
-@@ -8977,6 +8977,9 @@ guess_filename(const char *file)
+@@ -8983,6 +8983,9 @@ guess_filename(const char *file)
  char *
  guess_save_name(Buffer *buf, char *path)
  {
@@ -19,15 +19,15 @@ Patch: patches/Change-filename-when-saving-compressed-source.patch
      if (buf && buf->document_header) {
  	Str name = NULL;
  	char *p, *q;
-@@ -8991,7 +8994,12 @@ guess_save_name(Buffer *buf, char *path)
+@@ -8997,7 +9000,12 @@ guess_save_name(Buffer *buf, char *path)
  		 matchattr(q, "name", 4, &name))
  	    path = name->ptr;
      }
 -    return guess_filename(path);
 +
 +    p = guess_filename(path);
-+    if ((n = strlen(Currentbuf->sourcefile)) >= 3)
-+	if (!strcmp(&Currentbuf->sourcefile[n - 3], ".gz"))
++    if (buf->sourcefile && (n = strlen(buf->sourcefile)) >= 3)
++	if (!strcmp(&buf->sourcefile[n - 3], ".gz"))
 +	    return Strnew_m_charp(p, ".gz", NULL)->ptr;
 +    return p;
  }

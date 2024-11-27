@@ -62,7 +62,7 @@ need_number include.
 +	    if (is_tag) {
 +		char *s = str;
 +		tag = parse_tag(&s, internal);
-+		if (tag->tagid == HTML_A)
++		if (tag && tag->tagid == HTML_A)
 +		    need_number = 1;
 +	    }
  	    switch (feed_table(tbl, str, tbl_mode, tbl_width, internal)) {

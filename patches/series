@@ -37,7 +37,6 @@ Use-Ctrl-L-to-insert-next-char-in-search.patch
 Recognize-aria-label-for-buttons.patch
 Add-keybinding-to-insert-current-search-term.patch
 Fix-select-menu-setup.patch
-Add-default-download-directory.patch
 Add-test-for-Str.patch
 Use-Strnulterm-everywhere.patch
 Replace-STR_SIZE_MAX-with-STR_LEN_MAX.patch
