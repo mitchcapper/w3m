@@ -5,6 +5,9 @@ Unreleased
   - ChangeLog file, use the git log for all the details
 
 * new features
+  - Add command to save the history (SAVE_HISTORY)
+  - Add option to set a default download directory (dl_dir)
+  - Add feature to store and restore sessions (STORE, -o store_session, -R)
   - Add command to navigate between image links directly (NEXT_IMAGE,
     PREV_IMAGE)
   - Add command to display user-defined messages (MESSAGE),

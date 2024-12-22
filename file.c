@@ -1847,7 +1847,8 @@ loadGeneralFile(char *path, ParsedURL *volatile current, char *referer,
 	    t_buf = newBuffer(INIT_BUFFER_WIDTH);
 	readHeader(&f, t_buf, FALSE, &pu);
 	if (((http_response_code >= 301 && http_response_code <= 303)
-	     || http_response_code == 307)
+	     || http_response_code == 307
+	     || http_response_code == 308)
 	    && (p = checkHeader(t_buf, "Location:")) != NULL
 	    && checkRedirection(&pu)) {
 	    /* document moved */
@@ -1855,6 +1856,7 @@ loadGeneralFile(char *path, ParsedURL *volatile current, char *referer,
 	    /* 302: Found */
 	    /* 303: See Other */
 	    /* 307: Temporary Redirect (HTTP/1.1) */
+	    /* 308: Permanent Redirect (HTTP/1.1) */
 	    tpath = url_encode(p, NULL, 0);
 	    request = NULL;
 	    UFclose(&f);

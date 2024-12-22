@@ -109,9 +109,9 @@ int prec_num = 0;
 int prev_key = -1;
 int on_target = 1;
 static int add_download_list = FALSE;
-static char *session_file = NULL;
-static int unlink_session;
-static void _strSession(char *sf);
+static char *session_file;
+static char *session_bak;
+static int _strSession(char *sf);
 
 void set_buffer_environ(Buffer *);
 static void save_buffer_position(Buffer *buf);
@@ -945,7 +945,10 @@ main(int argc, char **argv)
 	}
 	load_argv = session;
 	load_argc = n;
-	unlink_session = !session_file;
+	if (!session_file) {
+	    session_bak = Strnew_m_charp(sf, "~", NULL)->ptr;
+	    rename(sf, session_bak);
+	}
     }
 
     if (w3m_backend)
@@ -2607,6 +2610,10 @@ _quitfm(int confirm)
 	return;
     }
 
+    if (StoreSession)
+	if (_strSession(NULL))
+	    return;
+
     term_title("");		/* XXX */
 #ifdef USE_IMAGE
     if (activeImage)
@@ -2620,10 +2627,8 @@ _quitfm(int confirm)
     if (UseHistory && SaveURLHist)
 	saveUrlHistory();
 #endif				/* USE_HISTORY */
-    if (StoreSession)
-	_strSession(NULL);
-    if (unlink_session)
-	unlink(rcFile(SESSION_FILE));
+    if (session_bak)
+	unlink(session_bak);
     if (deprecated)
 	fprintf(stderr, "%s\n%s\n%s\n",
 		"DEPRECATION WARNING",
@@ -4505,16 +4510,28 @@ DEFUN(adBmark, ADD_BOOKMARK, "Add current page to bookmarks")
 		request);
 }
 
-void
+int
 _strSession(char *sf)
 {
     Buffer *buf;
     FILE *f;
     ParsedURL *url;
-    char *sep;
+    char *ans, *sep;
+    struct stat st;
 
     if (!sf)
 	sf = session_file ? session_file : rcFile(SESSION_FILE);
+
+    while (stat(sf, &st) == 0) {
+	Str msg = Strnew_m_charp(_("Session file exists. Overwrite? [N]"));
+	ans = inputAnswer(msg->ptr);
+	if (ans && TOLOWER(*ans) == 'y')
+	    break;
+	sf = inputFilenameHist(_("Session file (empty: Don't store)? "), sf,
+			       LoadHist);
+	if (!*sf)
+	    return 0;
+    }
     if (!(f = fopen(sf, "w"))) goto fail;
 
     sep = "";
@@ -4532,18 +4549,24 @@ _strSession(char *sf)
     }
 
     if ((fclose(f)) == EOF) goto fail;
-    unlink_session = 0;
-    return;
+    return 0;
 
 fail:
     disp_err_message(strerror(errno), FALSE);
-    return;
+    return -1;
 }
 
 /* Store session */
 DEFUN(strSession, STORE, "Store session")
 {
     char *def, *sf;
+
+#ifdef USE_COOKIE
+    save_cookies();
+#endif
+#ifdef USE_HISTORY
+    saveUrlHistory();
+#endif
 
     def = session_file ? session_file : rcFile(SESSION_FILE);
     sf = inputFilenameHist(Strnew_m_charp("Session file [",
@@ -4552,13 +4575,8 @@ DEFUN(strSession, STORE, "Store session")
 			   NULL, LoadHist);
     if (!*sf)
 	sf = def;
-    _strSession(sf);
-#ifdef USE_COOKIE
-    save_cookies();
-#endif
-#ifdef USE_HISTORY
-    saveUrlHistory();
-#endif
+    if (_strSession(sf))
+	disp_err_message("Unable to store session", FALSE);
 }
 
 /* option setting */
@@ -4827,6 +4845,7 @@ DEFUN(svBuf, PRINT SAVE_SCREEN, "Save rendered document")
 /* save source */
 DEFUN(svSrc, DOWNLOAD SAVE, "Save document source")
 {
+    Str fn;
     char *file;
 
     if (Currentbuf->sourcefile == NULL)
@@ -4838,6 +4857,15 @@ DEFUN(svSrc, DOWNLOAD SAVE, "Save document source")
 						real_file));
     else
 	file = guess_save_name(Currentbuf, Currentbuf->currentURL.file);
+
+    if (param_dl_dir) {
+	fn = Strnew_charp(expandPath(param_dl_dir));
+	if (Strlastchar(fn) != '/')
+	    Strcat_char(fn, '/');
+	Strcat_charp(fn, file);
+	file = fn->ptr;
+    }
+
     doFileCopy(Currentbuf->sourcefile, file);
     PermitSaveToPipe = FALSE;
     displayBuffer(Currentbuf, B_NORMAL);
