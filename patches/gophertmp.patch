@@ -9,7 +9,7 @@ Patch: patches/gophertmp.patch
 
 --- a/url.c
 +++ b/url.c
-@@ -1631,8 +1631,6 @@ openURL(char *url, ParsedURL *pu, Parsed
+@@ -1632,8 +1632,6 @@ openURL(char *url, ParsedURL *pu, Parsed
      char *p, *q, *u;
  #ifdef USE_GOPHER
      Str gophertmp;
@@ -18,7 +18,7 @@ Patch: patches/gophertmp.patch
  #endif
      URLFile uf;
      HRequest hr0;
-@@ -1908,42 +1906,12 @@ openURL(char *url, ParsedURL *pu, Parsed
+@@ -1909,42 +1907,12 @@ openURL(char *url, ParsedURL *pu, Parsed
  #ifdef USE_GOPHER
      case SCM_GOPHER:
      case SCM_GOPHERS:
@@ -64,7 +64,7 @@ Patch: patches/gophertmp.patch
  	}
  	if (non_null(GOPHER_proxy) &&
  	    !Do_not_use_proxy &&
-@@ -1955,15 +1923,16 @@ openURL(char *url, ParsedURL *pu, Parsed
+@@ -1956,15 +1924,16 @@ openURL(char *url, ParsedURL *pu, Parsed
  	    if (sock < 0)
  		return uf;
  	    uf.scheme = SCM_HTTP;
@@ -84,7 +84,7 @@ Patch: patches/gophertmp.patch
  	    Strcat_charp(tmp, "\r\n");
  	}
  #ifdef USE_SSL
-@@ -1982,9 +1951,6 @@ openURL(char *url, ParsedURL *pu, Parsed
+@@ -1983,9 +1952,6 @@ openURL(char *url, ParsedURL *pu, Parsed
  	    write(sock, tmp->ptr, tmp->length);
  	    uf.stream = newInputStream(sock);
  	}

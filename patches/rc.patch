@@ -1,0 +1,5214 @@
+From: Rene Kita <mail@rkta.de>
+Date: Fri Nov 29 10:10:32 CET 2024
+
+---
+ anchor.c  |   17 +-
+ backend.c |    3 
+ buffer.c  |   13 -
+ cookie.c  |    3 
+ display.c |  119 +++++++--------
+ entity.c  |    9 -
+ etc.c     |   19 +-
+ file.c    |  187 ++++++++++++------------
+ fm.h      |  220 +----------------------------
+ form.c    |   13 -
+ frame.c   |   11 -
+ ftp.c     |    9 -
+ history.c |    7 
+ image.c   |   71 ++++-----
+ istream.c |    3 
+ linein.c  |   25 +--
+ local.c   |   19 +-
+ mailcap.c |    5 
+ main.c    |  284 ++++++++++++++++++-------------------
+ map.c     |   17 +-
+ menu.c    |   31 ++--
+ news.c    |   19 +-
+ rc.c      |  470 +++++++++++++++++++++++++++++++-------------------------------
+ rc.h      |  241 +++++++++++++++++++++++++++++++
+ search.c  |   13 -
+ symbol.c  |    3 
+ table.c   |   27 +--
+ terms.c   |   11 -
+ url.c     |  119 +++++++--------
+ 29 files changed, 1030 insertions(+), 958 deletions(-)
+
+--- a/anchor.c
++++ b/anchor.c
+@@ -1,5 +1,6 @@
+ /* vi: set sw=4 ts=8 ai sm noet : */
+ #include "fm.h"
++#include "rc.h"
+ #include "myctype.h"
+ #include "regex.h"
+ 
+@@ -358,8 +359,8 @@ reAnchorAny(Buffer *buf, const char *re,
+     if ((re = regexCompile(re, 1)) != NULL) {
+ 	return re;
+     }
+-    for (l = MarkAllPages ? buf->firstLine : buf->topLine; l != NULL &&
+-	 (MarkAllPages || l->linenumber < buf->topLine->linenumber + LASTLINE);
++    for (l = rc_MarkAllPages ? buf->firstLine : buf->topLine; l != NULL &&
++	 (rc_MarkAllPages || l->linenumber < buf->topLine->linenumber + LASTLINE);
+ 	 l = l->next) {
+ 	if (p && l->bpos)
+ 	    goto next_line;
+@@ -373,9 +374,9 @@ reAnchorAny(Buffer *buf, const char *re,
+ 		break;
+ 	}
+       next_line:
+-	if (MarkAllPages && l->next == NULL && buf->pagerSource &&
++	if (rc_MarkAllPages && l->next == NULL && buf->pagerSource &&
+ 	    !(buf->bufferprop & BP_CLOSE))
+-	    getNextPage(buf, PagerMax);
++	    getNextPage(buf, rc_PagerMax);
+     }
+     return NULL;
+ }
+@@ -765,7 +766,7 @@ link_list_panel(Buffer *buf)
+ 		parseURL2(l->url, &pu, baseURL(buf));
+ 		p = parsedURL2Str(&pu)->ptr;
+ 		u = html_quote(p);
+-		if (DecodeURL)
++		if (rc_DecodeURL)
+ 		    p = html_quote(url_decode2(p, buf));
+ 		else
+ 		    p = u;
+@@ -796,7 +797,7 @@ link_list_panel(Buffer *buf)
+ 	    parseURL2(a->url, &pu, baseURL(buf));
+ 	    p = parsedURL2Str(&pu)->ptr;
+ 	    u = html_quote(p);
+-	    if (DecodeURL)
++	    if (rc_DecodeURL)
+ 		p = html_quote(url_decode2(p, buf));
+ 	    else
+ 		p = u;
+@@ -818,7 +819,7 @@ link_list_panel(Buffer *buf)
+ 	    parseURL2(a->url, &pu, baseURL(buf));
+ 	    p = parsedURL2Str(&pu)->ptr;
+ 	    u = html_quote(p);
+-	    if (DecodeURL)
++	    if (rc_DecodeURL)
+ 		p = html_quote(url_decode2(p, buf));
+ 	    else
+ 		p = u;
+@@ -848,7 +849,7 @@ link_list_panel(Buffer *buf)
+ 		    parseURL2(m->url, &pu, baseURL(buf));
+ 		    p = parsedURL2Str(&pu)->ptr;
+ 		    u = html_quote(p);
+-		    if (DecodeURL)
++		    if (rc_DecodeURL)
+ 			p = html_quote(url_decode2(p, buf));
+ 		    else
+ 			p = u;
+--- a/backend.c
++++ b/backend.c
+@@ -3,6 +3,7 @@
+ #include <string.h>
+ #include <sys/types.h>
+ #include "fm.h"
++#include "rc.h"
+ #include <gc.h>
+ #include "terms.h"
+ 
+@@ -296,7 +297,7 @@ backend(void)
+     if (COLS == 0)
+ 	COLS = DEFAULT_COLS;
+ #ifdef USE_MOUSE
+-    use_mouse = FALSE;
++    rc_use_mouse = FALSE;
+ #endif				/* USE_MOUSE */
+ 
+     if (backend_batch_commands) {
+--- a/buffer.c
++++ b/buffer.c
+@@ -1,5 +1,6 @@
+ /* vi: set sw=4 ts=8 ai sm noet : */
+ #include "fm.h"
++#include "rc.h"
+ 
+ #ifdef USE_MOUSE
+ #ifdef USE_GPM
+@@ -47,8 +48,8 @@ newBuffer(int width)
+ #ifdef USE_M17N
+     n->auto_detect = WcOption.auto_detect;
+ #endif
+-    n->check_url = MarkAllPages; /* use default from -o mark_all_pages */
+-    n->need_reshape = MarkAllPages;
++    n->check_url = rc_MarkAllPages; /* use default from -o mark_all_pages */
++    n->need_reshape = rc_MarkAllPages;
+     return n;
+ }
+ 
+@@ -313,10 +314,10 @@ listBuffer(Buffer *top, const Buffer *cu
+ 
+     move(0, 0);
+ #ifdef USE_COLOR
+-    if (useColor) {
+-	setfcolor(basic_color);
++    if (rc_useColor) {
++	setfcolor(rc_basic_color);
+ #ifdef USE_BG_COLOR
+-	setbcolor(bg_color);
++	setbcolor(rc_bg_color);
+ #endif				/* USE_BG_COLOR */
+     }
+ #endif				/* USE_COLOR */
+@@ -566,7 +567,7 @@ reshapeBuffer(Buffer *buf)
+ 		gotoLine(buf, cur->linenumber);
+ 	}
+ 	buf->pos -= buf->currentLine->bpos;
+-	if (FoldLine && !is_html_type(buf->type))
++	if (rc_FoldLine && !is_html_type(buf->type))
+ 	    buf->currentColumn = 0;
+ 	else
+ 	    buf->currentColumn = sbuf.currentColumn;
+--- a/cookie.c
++++ b/cookie.c
+@@ -9,6 +9,7 @@
+  */
+ 
+ #include "fm.h"
++#include "rc.h"
+ #include "html.h"
+ 
+ #ifdef USE_COOKIE
+@@ -562,7 +563,7 @@ cookie_list_panel(void)
+     int i;
+     char *tmp, tmp2[80];
+ 
+-    if (!use_cookie || !First_cookie)
++    if (!rc_use_cookie || !First_cookie)
+ 	return NULL;
+ 
+     Strcat_charp(src, "<ol>");
+--- a/display.c
++++ b/display.c
+@@ -1,5 +1,6 @@
+ /* vi: set sw=4 ts=8 ai sm noet : */
+ #include "display.h"
++#include "rc.h"
+ 
+ #include <signal.h>
+ #include "fm.h"
+@@ -45,24 +46,24 @@ static void effect_mark_end(void);
+  *     7  white 
+  */
+ 
+-#define EFFECT_ANCHOR_START_C       setfcolor(anchor_color)
+-#define EFFECT_IMAGE_START_C        setfcolor(image_color)
+-#define EFFECT_FORM_START_C         setfcolor(form_color)
+-#define EFFECT_ACTIVE_START_C      (setfcolor(active_color), underline())
+-#define EFFECT_VISITED_START_C      setfcolor(visited_color)
++#define EFFECT_ANCHOR_START_C       setfcolor(rc_anchor_color)
++#define EFFECT_IMAGE_START_C        setfcolor(rc_image_color)
++#define EFFECT_FORM_START_C         setfcolor(rc_form_color)
++#define EFFECT_ACTIVE_START_C      (setfcolor(rc_active_color), underline())
++#define EFFECT_VISITED_START_C      setfcolor(rc_visited_color)
+ #ifdef USE_BG_COLOR
+-#define EFFECT_MARK_START_C         setbcolor(mark_color)
++#define EFFECT_MARK_START_C         setbcolor(rc_mark_color)
+ #else
+ #define EFFECT_MARK_START_C         standout()
+ #endif
+ 
+-#define EFFECT_IMAGE_END_C          setfcolor(basic_color)
+-#define EFFECT_ANCHOR_END_C         setfcolor(basic_color)
+-#define EFFECT_FORM_END_C           setfcolor(basic_color)
+-#define EFFECT_ACTIVE_END_C        (setfcolor(basic_color), underlineend())
+-#define EFFECT_VISITED_END_C        setfcolor(basic_color)
++#define EFFECT_IMAGE_END_C          setfcolor(rc_basic_color)
++#define EFFECT_ANCHOR_END_C         setfcolor(rc_basic_color)
++#define EFFECT_FORM_END_C           setfcolor(rc_basic_color)
++#define EFFECT_ACTIVE_END_C        (setfcolor(rc_basic_color), underlineend())
++#define EFFECT_VISITED_END_C        setfcolor(rc_basic_color)
+ #ifdef USE_BG_COLOR
+-#define EFFECT_MARK_END_C           setbcolor(bg_color)
++#define EFFECT_MARK_END_C           setbcolor(rc_bg_color)
+ #else
+ #define EFFECT_MARK_END_C           standend()
+ #endif
+@@ -82,8 +83,8 @@ static void effect_mark_end(void);
+ #define EFFECT_MARK_START_M         standout()
+ #define EFFECT_MARK_END_M           standend()
+ #define define_effect(name_start,name_end,color_start,color_end,mono_start,mono_end) \
+-static void name_start { if (useColor) { color_start; } else { mono_start; }}\
+-static void name_end { if (useColor) { color_end; } else { mono_end; }}
++static void name_start { if (rc_useColor) { color_start; } else { mono_start; }}\
++static void name_end { if (rc_useColor) { color_end; } else { mono_end; }}
+ 
+ define_effect(effect_anchor_start(void), effect_anchor_end(void),
+ 	      EFFECT_ANCHOR_START_C, EFFECT_ANCHOR_END_C,
+@@ -102,11 +103,11 @@ define_effect(effect_mark_start(void), e
+ static void
+ effect_active_start(void)
+ {
+-    if (useColor) {
+-	if (useActiveColor) {
++    if (rc_useColor) {
++	if (rc_useActiveColor) {
+ #ifdef __EMX__
+ 	    if(!getenv("WINDOWID"))
+-		setfcolor(active_color);
++		setfcolor(rc_active_color);
+ 	    else
+ #endif
+ 	    {
+@@ -123,8 +124,8 @@ effect_active_start(void)
+ static void
+ effect_active_end(void)
+ {
+-    if (useColor) {
+-	if (useActiveColor) {
++    if (rc_useColor) {
++	if (rc_useActiveColor) {
+ 	    EFFECT_ACTIVE_END_C;
+ 	} else {
+ 	    EFFECT_ACTIVE_END_NC;
+@@ -137,8 +138,8 @@ effect_active_end(void)
+ static void
+ effect_visited_start(void)
+ {
+-    if (useVisitedColor) {
+-	if (useColor) {
++    if (rc_useVisitedColor) {
++	if (rc_useColor) {
+ 	    EFFECT_VISITED_START_C;
+ 	} else {
+ 	    EFFECT_VISITED_START_M;
+@@ -149,8 +150,8 @@ effect_visited_start(void)
+ static void
+ effect_visited_end(void)
+ {
+-    if (useVisitedColor) {
+-	if (useColor) {
++    if (rc_useVisitedColor) {
++	if (rc_useColor) {
+ 	    EFFECT_VISITED_END_C;
+ 	} else {
+ 	    EFFECT_VISITED_END_M;
+@@ -187,7 +188,7 @@ fmTerm(void)
+ 	    loadImage(NULL, IMG_FLAG_STOP);
+ #endif
+ #ifdef USE_MOUSE
+-	if (use_mouse)
++	if (rc_use_mouse)
+ 	    mouse_end();
+ #endif				/* USE_MOUSE */
+ 	reset_tty();
+@@ -207,7 +208,7 @@ fmInit(void)
+ 	term_raw();
+ 	term_noecho();
+ #ifdef USE_IMAGE
+-	if (displayImage)
++	if (rc_displayImage)
+ 	    initImage();
+ #endif
+     }
+@@ -275,7 +276,7 @@ make_lastline_link(Buffer *buf, char *ti
+ 	return s;
+     parseURL2(url, &pu, baseURL(buf));
+     u = parsedURL2Str(&pu);
+-    if (DecodeURL)
++    if (rc_DecodeURL)
+ 	u = Strnew_charp(url_decode2(u->ptr, buf));
+ #ifdef USE_M17N
+     u = checkType(u, &pr, NULL);
+@@ -310,7 +311,7 @@ make_lastline_message(Buffer *buf)
+     Str msg, s = NULL;
+     int sl = 0;
+ 
+-    if (displayLink) {
++    if (rc_displayLink) {
+ #ifdef USE_IMAGE
+ 	MapArea *a = retrieveCurrentMapArea(buf);
+ 	if (a)
+@@ -338,18 +339,18 @@ make_lastline_message(Buffer *buf)
+     }
+ 
+ #ifdef USE_MOUSE
+-    if (use_mouse && mouse_action.lastline_str)
++    if (rc_use_mouse && mouse_action.lastline_str)
+ 	msg = Strnew_charp(mouse_action.lastline_str);
+     else
+ #endif				/* not USE_MOUSE */
+ 	msg = Strnew();
+-    if (displayLineInfo && buf->currentLine != NULL && buf->lastLine != NULL) {
++    if (rc_displayLineInfo && buf->currentLine != NULL && buf->lastLine != NULL) {
+ 	int cl = buf->currentLine->real_linenumber;
+ 	int ll = buf->lastLine->real_linenumber;
+ 	int r = (int)((double)cl * 100.0 / (double)(ll ? ll : 1) + 0.5);
+ 	int cc;
+ 
+-	if (displayColumnNumber) {
++	if (rc_displayColumnNumber) {
+ 	    cc = buf->currentColumn + buf->cursorX + 1;
+ 	    Strcat(msg, Sprintf("%d/%d,%d (%d%%)", cl, ll, cc, r));
+ 	}
+@@ -406,11 +407,11 @@ displayBuffer(Buffer *buf, int mode)
+     if (buf->height == 0)
+ 	buf->height = LASTLINE + 1;
+     if ((buf->width != INIT_BUFFER_WIDTH &&
+-	 (is_html_type(buf->type) || FoldLine))
++	 (is_html_type(buf->type) || rc_FoldLine))
+ 	|| buf->need_reshape) {
+ 	reshapeBuffer(buf);
+     }
+-    if (showLineNum) {
++    if (rc_showLineNum) {
+ 	if (buf->lastLine && buf->lastLine->real_linenumber > 0)
+ 	    buf->rootX = (int)(log(buf->lastLine->real_linenumber + 0.1)
+ 			       / log(10)) + 2;
+@@ -444,7 +445,7 @@ displayBuffer(Buffer *buf, int mode)
+ #ifdef USE_RAW_SCROLL
+ 	if (
+ #ifdef USE_IMAGE
+-	       !(activeImage && displayImage && draw_image_flag) &&
++	       !(activeImage && rc_displayImage && draw_image_flag) &&
+ #endif
+ 	       mode == B_SCROLL && cline && buf->currentColumn == ccolumn) {
+ 	    int n = buf->topLine->linenumber - cline->linenumber;
+@@ -507,7 +508,7 @@ displayBuffer(Buffer *buf, int mode)
+     term_title(conv_to_system(buf->buffername));
+     refresh();
+ #ifdef USE_IMAGE
+-    if (activeImage && displayImage && buf->img && buf->image_loaded) {
++    if (activeImage && rc_displayImage && buf->img && buf->image_loaded) {
+ 	drawImage();
+     }
+ #endif
+@@ -548,7 +549,7 @@ drawAnchorCursor0(Buffer *buf, AnchorLis
+ 	    int start_pos = an->start.pos;
+ 	    int end_pos = an->end.pos;
+ 	    for (i = an->start.pos; i < an->end.pos; i++) {
+-	        if (enable_inline_image && (l->propBuf[i] & PE_IMAGE)) {
++	        if (rc_enable_inline_image && (l->propBuf[i] & PE_IMAGE)) {
+ 		    if (start_pos == i)
+ 			start_pos = i + 1;
+ 		    else if (end_pos == an->end.pos)
+@@ -614,10 +615,10 @@ redrawNLine(Buffer *buf, int n)
+     int i;
+ 
+ #ifdef USE_COLOR
+-    if (useColor) {
++    if (rc_useColor) {
+ 	EFFECT_ANCHOR_END_C;
+ #ifdef USE_BG_COLOR
+-	setbcolor(bg_color);
++	setbcolor(rc_bg_color);
+ #endif				/* USE_BG_COLOR */
+     }
+ #endif				/* USE_COLOR */
+@@ -673,7 +674,7 @@ redrawNLine(Buffer *buf, int n)
+     }
+ 
+ #ifdef USE_IMAGE
+-    if (!(activeImage && displayImage && buf->img))
++    if (!(activeImage && rc_displayImage && buf->img))
+ 	return;
+     move(buf->cursorY + buf->rootY, buf->cursorX + buf->rootX);
+     for (i = 0, l = buf->topLine; i < buf->LINES && l; i++, l = l->next) {
+@@ -710,7 +711,7 @@ redrawLine(Buffer *buf, Line *l, int i)
+ 	    return NULL;
+     }
+     move(i, 0);
+-    if (showLineNum) {
++    if (rc_showLineNum) {
+ 	char tmp[16];
+ 	if (!buf->rootX) {
+ 	    if (buf->lastLine->real_linenumber > 0)
+@@ -739,7 +740,7 @@ redrawLine(Buffer *buf, Line *l, int i)
+     p = &(l->lineBuf[pos]);
+     pr = &(l->propBuf[pos]);
+ #ifdef USE_ANSI_COLOR
+-    if (useColor && l->colorBuf)
++    if (rc_useColor && l->colorBuf)
+ 	pc = &(l->colorBuf[pos]);
+     else
+ 	pc = NULL;
+@@ -748,7 +749,7 @@ redrawLine(Buffer *buf, Line *l, int i)
+ 
+     for (j = 0; rcol - column < buf->COLS && pos + j < l->len; j += delta) {
+ #ifdef USE_COLOR
+-	if (useVisitedColor && vpos <= pos + j && !(pr[j] & PE_VISITED)) {
++	if (rc_useVisitedColor && vpos <= pos + j && !(pr[j] & PE_VISITED)) {
+ 	    a = retrieveAnchor(buf->href, l->linenumber, pos + j);
+ 	    if (a) {
+ 		parseURL2(a->url, &url, baseURL(buf));
+@@ -878,11 +879,11 @@ redrawLineImage(Buffer *buf, Line *l, in
+ 		    image->height = cache->height;
+ 		    buf->need_reshape = TRUE;
+ 		}
+-		x = (int)((rcol - column + buf->rootX) * pixel_per_char);
+-		y = (int)(i * pixel_per_line);
+-		sx = (int)((rcol - COLPOS(l, a->start.pos)) * pixel_per_char);
+-		sy = (int)((l->linenumber - image->y) * pixel_per_line);
+-		if (! enable_inline_image) {
++		x = (int)((rcol - column + buf->rootX) * rc_pixel_per_char);
++		y = (int)(i * rc_pixel_per_line);
++		sx = (int)((rcol - COLPOS(l, a->start.pos)) * rc_pixel_per_char);
++		sy = (int)((l->linenumber - image->y) * rc_pixel_per_line);
++		if (! rc_enable_inline_image) {
+ 		    if (sx == 0 && x + image->xoffset >= 0)
+ 			x += image->xoffset;
+ 		    else
+@@ -895,15 +896,15 @@ redrawLineImage(Buffer *buf, Line *l, in
+ 		if (image->width > 0)
+ 		    w = image->width - sx;
+ 		else
+-		    w = (int)(8 * pixel_per_char - sx);
++		    w = (int)(8 * rc_pixel_per_char - sx);
+ 		if (image->height > 0)
+ 		    h = image->height - sy;
+ 		else
+-		    h = (int)(pixel_per_line - sy);
+-		if (w > (int)((buf->rootX + buf->COLS) * pixel_per_char - x))
+-		    w = (int)((buf->rootX + buf->COLS) * pixel_per_char - x);
+-		if (h > (int)(LASTLINE * pixel_per_line - y))
+-		    h = (int)(LASTLINE * pixel_per_line - y);
++		    h = (int)(rc_pixel_per_line - sy);
++		if (w > (int)((buf->rootX + buf->COLS) * rc_pixel_per_char - x))
++		    w = (int)((buf->rootX + buf->COLS) * rc_pixel_per_char - x);
++		if (h > (int)(LASTLINE * rc_pixel_per_line - y))
++		    h = (int)(LASTLINE * rc_pixel_per_line - y);
+ 		addImage(cache, x, y, sx, sy, w, h);
+ 		image->touch = image_touch;
+ 		draw_image_flag = TRUE;
+@@ -938,7 +939,7 @@ redrawLineRegion(Buffer *buf, Line *l, i
+     p = &(l->lineBuf[pos]);
+     pr = &(l->propBuf[pos]);
+ #ifdef USE_ANSI_COLOR
+-    if (useColor && l->colorBuf)
++    if (rc_useColor && l->colorBuf)
+ 	pc = &(l->colorBuf[pos]);
+     else
+ 	pc = NULL;
+@@ -949,7 +950,7 @@ redrawLineRegion(Buffer *buf, Line *l, i
+ 
+     for (j = 0; rcol - column < buf->COLS && pos + j < l->len; j += delta) {
+ #ifdef USE_COLOR
+-	if (useVisitedColor && vpos <= pos + j && !(pr[j] & PE_VISITED)) {
++	if (rc_useVisitedColor && vpos <= pos + j && !(pr[j] & PE_VISITED)) {
+ 	    a = retrieveAnchor(buf->href, l->linenumber, pos + j);
+ 	    if (a) {
+ 		parseURL2(a->url, &url, baseURL(buf));
+@@ -1099,12 +1100,12 @@ do_color(Linecolor c)
+     if (c & 0x8)
+ 	setfcolor(c & 0x7);
+     else if (color_mode & 0x8)
+-	setfcolor(basic_color);
++	setfcolor(rc_basic_color);
+ #ifdef USE_BG_COLOR
+     if (c & 0x80)
+ 	setbcolor((c >> 4) & 0x7);
+     else if (color_mode & 0x80)
+-	setbcolor(bg_color);
++	setbcolor(rc_bg_color);
+ #endif
+     color_mode = c;
+ }
+@@ -1155,7 +1156,7 @@ addChar(char c, Lineprop mode)
+ 	}
+ 	else {
+ #ifdef USE_M17N
+-	    symbol = get_symbol(DisplayCharset, &w);
++	    symbol = get_symbol(rc_DisplayCharset, &w);
+ 	    addstr(symbol[(unsigned char)c % N_SYMBOL]);
+ #else
+ 	    symbol = get_symbol();
+@@ -1270,12 +1271,12 @@ disp_message_nsec(const char *s, int red
+ 	message(s, LASTLINE, 0);
+     refresh();
+ #ifdef USE_MOUSE
+-    if (mouse && use_mouse)
++    if (mouse && rc_use_mouse)
+ 	mouse_active();
+ #endif
+     sleep_till_anykey(sec, purge);
+ #ifdef USE_MOUSE
+-    if (mouse && use_mouse)
++    if (mouse && rc_use_mouse)
+ 	mouse_inactive();
+ #endif
+     if (CurrentTab != NULL && Currentbuf != NULL && redraw_current)
+--- a/entity.c
++++ b/entity.c
+@@ -2,10 +2,11 @@
+ #ifdef DUMMY
+ #include "Str.h"
+ #define NBSP " "
+-#define UseAltEntity 1
++#define rc_UseAltEntity 1
+ #undef USE_M17N
+ #else				/* DUMMY */
+ #include "fm.h"
++#include "rc.h"
+ #ifdef USE_M17N
+ #ifdef USE_UNICODE
+ #include "ucs.h"
+@@ -47,7 +48,7 @@ conv_entity(unsigned int c)
+     if (c == 0xad)		/* SOFT HYPHEN */
+         return "";
+     if (c < 0x100) {		/* Latin1 (ISO 8859-1) */
+-	if (UseAltEntity)
++	if (rc_UseAltEntity)
+ 	    return alt_latin1[c - 0xa0];
+ #ifdef USE_M17N
+ 	return wc_conv_n(&b, 1, WC_CES_ISO_8859_1, InnerCharset)->ptr;
+@@ -61,8 +62,8 @@ conv_entity(unsigned int c)
+ 	char *chk;
+ 	wc_uchar utf8[7];
+ 	wc_ucs_to_utf8(c, utf8);
+-	/* we eventually need to display it so check DisplayCharset */
+-	chk = wc_conv((char *)utf8, WC_CES_UTF_8, DisplayCharset ? DisplayCharset : WC_CES_US_ASCII)->ptr;
++	/* we eventually need to display it so check rc_DisplayCharset */
++	chk = wc_conv((char *)utf8, WC_CES_UTF_8, rc_DisplayCharset ? rc_DisplayCharset : WC_CES_US_ASCII)->ptr;
+ 	if (strcmp(chk, "?") != 0)
+ 	    return wc_conv((char *)utf8, WC_CES_UTF_8, InnerCharset)->ptr;
+     }
+--- a/etc.c
++++ b/etc.c
+@@ -1,5 +1,6 @@
+ /* vi: set sw=4 ts=8 ai sm noet : */
+ #include "fm.h"
++#include "rc.h"
+ #ifndef __MINGW32_VERSION
+ #include <pwd.h>
+ #endif
+@@ -88,7 +89,7 @@ lineSkip(Buffer *buf, Line *line, int of
+     Line *l;
+ 
+     l = currentLineSkip(buf, line, offset, last);
+-    if (!nextpage_topline)
++    if (!rc_nextpage_topline)
+ 	for (i = buf->LINES - 1 - (buf->lastLine->linenumber - l->linenumber);
+ 	     i > 0 && l->prev != NULL; i--, l = l->prev) ;
+     return l;
+@@ -541,7 +542,7 @@ nextColumn(int n, char *p, const Linepro
+ {
+     if (*pr & PC_CTRL) {
+ 	if (*p == '\t')
+-	    return (n + Tabstop) / Tabstop * Tabstop;
++	    return (n + rc_Tabstop) / rc_Tabstop * rc_Tabstop;
+ 	else if (*p == '\n')
+ 	    return n + 1;
+ 	else if (*p != '\r')
+@@ -1223,7 +1224,7 @@ openSecretFile(char *fname)
+      *    readable and writable.
+      *   [w3m-dev 03368][w3m-dev 03369][w3m-dev 03370]
+      */
+-    if (disable_secret_security_check)
++    if (rc_disable_secret_security_check)
+ 	/* do nothing */ ;
+     else if ((st.st_mode & (S_IRWXG | S_IRWXO)) != 0) {
+ 	if (fmInitialized) {
+@@ -1247,7 +1248,7 @@ loadPasswd(void)
+     FILE *fp;
+ 
+     passwords = NULL;
+-    fp = openSecretFile(passwd_file);
++    fp = openSecretFile(rc_passwd_file);
+     if (fp != NULL) {
+ 	parsePasswd(fp, 0);
+ 	fclose(fp);
+@@ -1607,7 +1608,7 @@ expandName(char *name)
+     p = name;
+     if (*p == '/') {
+ 	if ((*(p + 1) == '~' && IS_ALPHA(*(p + 2)))
+-	    && personal_document_root) {
++	    && rc_personal_document_root) {
+ 	    char *q;
+ 	    p += 2;
+ 	    q = strchr(p, '/');
+@@ -1622,8 +1623,8 @@ expandName(char *name)
+ 	    if (!passent)
+ 		goto rest;
+ 	    extpath = Strnew_m_charp(passent->pw_dir, "/",
+-				     personal_document_root, NULL);
+-	    if (*personal_document_root == '\0' && *p == '/')
++				     rc_personal_document_root, NULL);
++	    if (*rc_personal_document_root == '\0' && *p == '/')
+ 		p++;
+ 	}
+ 	else
+@@ -1718,7 +1719,7 @@ url_unquote_conv0(const char *url)
+     tmp = Str_url_unquote(Strnew_charp(url), FALSE, TRUE);
+ #ifdef USE_M17N
+     if (!charset || charset == WC_CES_US_ASCII)
+-	charset = SystemCharset;
++	charset = rc_SystemCharset;
+     WcOption.auto_detect = WC_OPT_DETECT_ON;
+     tmp = convertLine(NULL, tmp, RAW_MODE, &charset, charset);
+     WcOption.auto_detect = old_auto_detect;
+@@ -2036,7 +2037,7 @@ FQDN(char *host)
+ 
+     return allocStr(entry->h_name, -1);
+ #else				/* INET6 */
+-    for (af = ai_family_order_table[DNS_order];; af++) {
++    for (af = ai_family_order_table[rc_DNS_order];; af++) {
+ 	int error;
+ 	struct addrinfo hints;
+ 	struct addrinfo *res, *res0;
+--- a/file.c
++++ b/file.c
+@@ -1,6 +1,7 @@
+ /* vi: set sw=4 ts=8 ai sm noet : */
+ #include "display.h"
+ #include "fm.h"
++#include "rc.h"
+ #include <sys/types.h>
+ #include "myctype.h"
+ #include <signal.h>
+@@ -390,7 +391,7 @@ examineFile(char *path, URLFile *uf)
+     }
+     uf->stream = openIS(path);
+     if (!do_download) {
+-	if (use_lessopen && getenv("LESSOPEN") != NULL) {
++	if (rc_use_lessopen && getenv("LESSOPEN") != NULL) {
+ 	    FILE *fp;
+ 	    uf->guess_type = guessContentType(path);
+ 	    if (uf->guess_type == NULL)
+@@ -647,7 +648,7 @@ readHeader(URLFile *uf, Buffer *newBuf,
+ 	    lineBuf2 = convertLine(NULL, lineBuf2, RAW_MODE,
+ 				   mime_charset ? &mime_charset : &charset,
+ 				   mime_charset ? mime_charset
+-				   : DocumentCharset);
++				   : rc_DocumentCharset);
+ 	    /* separated with line and stored */
+ 	    tmp = Strnew_size(lineBuf2->length);
+ 	    for (p = lineBuf2->ptr; *p; p = q) {
+@@ -661,7 +662,7 @@ readHeader(URLFile *uf, Buffer *newBuf,
+ 		for (; *q && (*q == '\r' || *q == '\n'); q++) ;
+ 	    }
+ #ifdef USE_IMAGE
+-	    if (thru && activeImage && displayImage) {
++	    if (thru && activeImage && rc_displayImage) {
+ 		Str src = NULL;
+ 		if (!strncasecmp(tmp->ptr, "X-Image-URL:", 12)) {
+ 		    tmpf = &tmp->ptr[12];
+@@ -752,7 +753,7 @@ readHeader(URLFile *uf, Buffer *newBuf,
+ 	    uf->content_encoding = uf->compression;
+ 	}
+ #ifdef USE_COOKIE
+-	else if (use_cookie && accept_cookie &&
++	else if (rc_use_cookie && rc_accept_cookie &&
+ 		 pu && check_cookie_accept_domain(pu->host) &&
+ 		 (!strncasecmp(lineBuf2->ptr, "Set-Cookie:", 11) ||
+ 		  !strncasecmp(lineBuf2->ptr, "Set-Cookie2:", 12))) {
+@@ -838,7 +839,7 @@ readHeader(URLFile *uf, Buffer *newBuf,
+ 	    }
+ 	    if (pu && name->length > 0) {
+ 		int err;
+-		if (show_cookie) {
++		if (rc_show_cookie) {
+ 		    if (flag & COO_SECURE)
+ 		        disp_message_nsec("Received a secured cookie", FALSE, 1,
+ 				      TRUE, FALSE);
+@@ -851,10 +852,10 @@ readHeader(URLFile *uf, Buffer *newBuf,
+ 		    add_cookie(pu, name, value, expires, domain, path, flag,
+ 			       comment, version, port, commentURL);
+ 		if (err) {
+-		    const char *ans = (accept_bad_cookie == ACCEPT_BAD_COOKIE_ACCEPT)
++		    const char *ans = (rc_accept_bad_cookie == ACCEPT_BAD_COOKIE_ACCEPT)
+ 			? "y" : NULL;
+ 		    if (fmInitialized && (err & COO_OVERRIDE_OK) &&
+-			accept_bad_cookie == ACCEPT_BAD_COOKIE_ASK) {
++			rc_accept_bad_cookie == ACCEPT_BAD_COOKIE_ASK) {
+ 			Str msg = Sprintf("Accept bad cookie from %s for %s?",
+ 					  pu->host,
+ 					  ((domain && domain->ptr)
+@@ -878,11 +879,11 @@ readHeader(URLFile *uf, Buffer *newBuf,
+ 			    emsg =
+ 				"This cookie was rejected to prevent security violation.";
+ 			record_err_message(emsg);
+-			if (show_cookie)
++			if (rc_show_cookie)
+ 			    disp_message_nsec(emsg, FALSE, 1, TRUE, FALSE);
+ 		    }
+ 		    else
+-			if (show_cookie)
++			if (rc_show_cookie)
+ 			    disp_message_nsec(Sprintf
+ 					  ("Accepting invalid cookie: %s=%s",
+ 					   name->ptr, value->ptr)->ptr, FALSE,
+@@ -1659,10 +1660,10 @@ checkRedirection(ParsedURL *pu)
+ 	return TRUE;
+     }
+ 
+-    if (nredir >= FollowRedirection) {
++    if (nredir >= rc_FollowRedirection) {
+ 	/* FIXME: gettextize? */
+ 	tmp = Sprintf("Number of redirections exceeded %d at %s",
+-		      FollowRedirection, parsedURL2Str(pu)->ptr);
++		      rc_FollowRedirection, parsedURL2Str(pu)->ptr);
+ 	disp_err_message(tmp->ptr, FALSE);
+ 	return FALSE;
+     }
+@@ -1673,7 +1674,7 @@ checkRedirection(ParsedURL *pu)
+ Str
+ getLinkNumberStr(int correction)
+ {
+-    return Sprintf("[%d]", cur_hseq + correction - !!zeroBasedLinkNo);
++    return Sprintf("[%d]", cur_hseq + correction - !!rc_zeroBasedLinkNo);
+ }
+ 
+ /* 
+@@ -1749,9 +1750,9 @@ loadGeneralFile(char *path, ParsedURL *v
+ 		if (stat(pu.real_file, &st) < 0)
+ 		    return NULL;
+ 		if (S_ISDIR(st.st_mode)) {
+-		    if (UseExternalDirBuffer) {
++		    if (rc_UseExternalDirBuffer) {
+ 			Str cmd = Sprintf("%s?dir=%s#current",
+-					  DirBufferCommand, pu.file);
++					  rc_DirBufferCommand, pu.file);
+ 			b = loadGeneralFile(cmd->ptr, NULL, NO_REFERER, 0,
+ 					    NULL);
+ 			if (b != NULL && b != NO_BUFFER) {
+@@ -1764,7 +1765,7 @@ loadGeneralFile(char *path, ParsedURL *v
+ 			page = loadLocalDir(pu.real_file);
+ 			t = "local:directory";
+ #ifdef USE_M17N
+-			charset = SystemCharset;
++			charset = rc_SystemCharset;
+ #endif
+ 		    }
+ 		}
+@@ -1831,9 +1832,9 @@ loadGeneralFile(char *path, ParsedURL *v
+ #endif				/* USE_SSL */
+ 	((
+ #ifdef USE_GOPHER
+-	     (pu.scheme == SCM_GOPHER && non_null(GOPHER_proxy)) ||
++	     (pu.scheme == SCM_GOPHER && non_null(rc_GOPHER_proxy)) ||
+ #endif				/* USE_GOPHER */
+-	     (pu.scheme == SCM_FTP && non_null(FTP_proxy))
++	     (pu.scheme == SCM_FTP && non_null(rc_FTP_proxy))
+ 	 ) && !Do_not_use_proxy && !check_no_proxy(pu.host))) {
+ 
+ 	if (fmInitialized) {
+@@ -2133,11 +2134,11 @@ loadGeneralFile(char *path, ParsedURL *v
+ 	/* download only */
+ 	char *file;
+ 	TRAP_OFF;
+-	if (DecodeCTE && IStype(f.stream) != IST_ENCODED)
++	if (rc_DecodeCTE && IStype(f.stream) != IST_ENCODED)
+ 	    f.stream = newEncodedStream(f.stream, f.encoding);
+ 	if (pu.scheme == SCM_LOCAL) {
+ 	    struct stat st;
+-	    if (PreserveTimestamp && !stat(pu.real_file, &st))
++	    if (rc_PreserveTimestamp && !stat(pu.real_file, &st))
+ 		f.modtime = st.st_mtime;
+ 	    file = conv_from_system(guess_save_name(NULL, pu.real_file));
+ 	}
+@@ -2150,7 +2151,7 @@ loadGeneralFile(char *path, ParsedURL *v
+ 	return NO_BUFFER;
+     }
+ 
+-    if ((f.content_encoding != CMP_NOCOMPRESS) && AutoUncompress
++    if ((f.content_encoding != CMP_NOCOMPRESS) && rc_AutoUncompress
+ 	&& !(w3m_dump & DUMP_EXTRA)) {
+ 	uncompress_stream(&f, &pu.real_file);
+     }
+@@ -2189,7 +2190,7 @@ loadGeneralFile(char *path, ParsedURL *v
+     else if (is_plain_text_type(t))
+ 	proc = loadBuffer;
+ #ifdef USE_IMAGE
+-    else if (activeImage && displayImage && !useExtImageViewer &&
++    else if (activeImage && rc_displayImage && !rc_useExtImageViewer &&
+ 	     !(w3m_dump & ~DUMP_FRAME) && !strncasecmp(t, "image/", 6))
+ 	proc = loadImageBuffer;
+ #endif
+@@ -2211,7 +2212,7 @@ loadGeneralFile(char *path, ParsedURL *v
+ 					     (NULL, pu.real_file)), TRUE);
+ 	    }
+ 	    else {
+-		if (DecodeCTE && IStype(f.stream) != IST_ENCODED)
++		if (rc_DecodeCTE && IStype(f.stream) != IST_ENCODED)
+ 		    f.stream = newEncodedStream(f.stream, f.encoding);
+ 		if (doFileSave(f, guess_save_name(t_buf, pu.file)) == 0)
+ 		    UFhalfclose(&f);
+@@ -2254,7 +2255,7 @@ loadGeneralFile(char *path, ParsedURL *v
+ 		a = searchURLLabel(b, pu.label);
+ 		if (a != NULL) {
+ 		    gotoLine(b, a->start.line);
+-		    if (label_topline)
++		    if (rc_label_topline)
+ 			b->topLine = lineSkip(b, b->topLine,
+ 					      b->currentLine->linenumber
+ 					      - b->topLine->linenumber, FALSE);
+@@ -3179,7 +3180,7 @@ process_img(struct parsed_tag *tag, int
+ #ifdef USE_IMAGE
+     int w, i, nw, ni = 1, n, w0 = -1, i0 = -1;
+     int align, xoffset, yoffset, top, bottom, ismap = 0;
+-    int use_image = activeImage && displayImage;
++    int use_image = activeImage && rc_displayImage;
+ #else
+     int w, i, nw, n;
+ #endif
+@@ -3191,7 +3192,7 @@ process_img(struct parsed_tag *tag, int
+     p = url_encode(remove_space(p), cur_baseURL, cur_document_charset);
+     q = NULL;
+     parsedtag_get_value(tag, ATTR_ALT, &q);
+-    if (!pseudoInlines && (q == NULL || (*q == '\0' && ignore_null_img_alt)))
++    if (!rc_pseudoInlines && (q == NULL || (*q == '\0' && rc_ignore_null_img_alt)))
+ 	return tmp;
+     t = q;
+     parsedtag_get_value(tag, ATTR_TITLE, &t);
+@@ -3199,14 +3200,14 @@ process_img(struct parsed_tag *tag, int
+     if (parsedtag_get_value(tag, ATTR_WIDTH, &w)) {
+ 	if (w < 0) {
+ 	    if (width > 0)
+-		w = (int)(-width * pixel_per_char * w / 100 + 0.5);
++		w = (int)(-width * rc_pixel_per_char * w / 100 + 0.5);
+ 	    else
+ 		w = -1;
+ 	}
+ #ifdef USE_IMAGE
+ 	if (use_image) {
+ 	    if (w > 0) {
+-		w = (int)(w * image_scale / 100 + 0.5);
++		w = (int)(w * rc_image_scale / 100 + 0.5);
+ 		if (w == 0)
+ 		    w = 1;
+ 		else if (w > MAX_IMAGE_SIZE)
+@@ -3220,7 +3221,7 @@ process_img(struct parsed_tag *tag, int
+     if (use_image) {
+ 	if (parsedtag_get_value(tag, ATTR_HEIGHT, &i)) {
+ 	    if (i > 0) {
+-		i = (int)(i * image_scale / 100 + 0.5);
++		i = (int)(i * rc_image_scale / 100 + 0.5);
+ 		if (i == 0)
+ 		    i = 1;
+ 		else if (i > MAX_IMAGE_SIZE)
+@@ -3297,17 +3298,17 @@ process_img(struct parsed_tag *tag, int
+ 		i = i0 = image.cache->height;
+ 	    }
+ 	    if (w < 0)
+-		w = 8 * pixel_per_char;
++		w = 8 * rc_pixel_per_char;
+ 	    if (i < 0)
+-		i = pixel_per_line;
++		i = rc_pixel_per_line;
+ 	}
+-	if (enable_inline_image) {
++	if (rc_enable_inline_image) {
+ 	    nw = (w > 1) ? ((w - 1) / pixel_per_char_i + 1) : 1 ;
+ 	    ni = (i > 1) ? ((i - 1) / pixel_per_line_i + 1) : 1 ;
+ 	}
+ 	else {
+-	    nw = (w > 3) ? (int)((w - 3) / pixel_per_char + 1) : 1;
+-	    ni = (i > 3) ? (int)((i - 3) / pixel_per_line + 1) : 1;
++	    nw = (w > 3) ? (int)((w - 3) / rc_pixel_per_char + 1) : 1;
++	    ni = (i > 3) ? (int)((i - 3) / rc_pixel_per_line + 1) : 1;
+ 	}
+ 	Strcat(tmp,
+ 	       Sprintf("<pre_int><img_alt hseq=\"%d\" src=\"", cur_iseq++));
+@@ -3317,8 +3318,8 @@ process_img(struct parsed_tag *tag, int
+ #endif
+     {
+ 	if (w < 0)
+-	    w = 12 * pixel_per_char;
+-	nw = w ? (int)((w - 1) / pixel_per_char + 1) : 1;
++	    w = 12 * rc_pixel_per_char;
++	nw = w ? (int)((w - 1) / rc_pixel_per_char + 1) : 1;
+ 	if (r) {
+ 	    Strcat_charp(tmp, "<pre_int>");
+ 	    pre_int = TRUE;
+@@ -3340,13 +3341,13 @@ process_img(struct parsed_tag *tag, int
+ 	    Strcat(tmp, Sprintf(" height=%d", i0));
+ 	switch (align) {
+ 	case ALIGN_MIDDLE:
+-	    if (!enable_inline_image) {
++	    if (!rc_enable_inline_image) {
+ 		top = ni / 2;
+ 		bottom = top;
+ 		if (top * 2 == ni)
+-		    yoffset = (int)(((ni + 1) * pixel_per_line - i) / 2);
++		    yoffset = (int)(((ni + 1) * rc_pixel_per_line - i) / 2);
+ 		else
+-		    yoffset = (int)((ni * pixel_per_line - i) / 2);
++		    yoffset = (int)((ni * rc_pixel_per_line - i) / 2);
+ 		break;
+ 	    }
+ 	case ALIGN_TOP:
+@@ -3357,25 +3358,25 @@ process_img(struct parsed_tag *tag, int
+ 	case ALIGN_BOTTOM:
+ 	    top = ni - 1;
+ 	    bottom = 0;
+-	    yoffset = (int)(ni * pixel_per_line - i);
++	    yoffset = (int)(ni * rc_pixel_per_line - i);
+ 	    break;
+ 	default:
+ 	    top = ni - 1;
+ 	    bottom = 0;
+-	    if (ni == 1 && ni * pixel_per_line > i)
++	    if (ni == 1 && ni * rc_pixel_per_line > i)
+ 		yoffset = 0;
+ 	    else {
+-		yoffset = (int)(ni * pixel_per_line - i);
++		yoffset = (int)(ni * rc_pixel_per_line - i);
+ 		if (yoffset <= -2)
+ 		    yoffset++;
+ 	    }
+ 	    break;
+ 	}
+ 
+-	if (enable_inline_image)
++	if (rc_enable_inline_image)
+ 	    xoffset = 0;
+ 	else
+-	    xoffset = (int)((nw * pixel_per_char - w) / 2);
++	    xoffset = (int)((nw * rc_pixel_per_char - w) / 2);
+ 
+ 	if (xoffset)
+ 	    Strcat(tmp, Sprintf(" xoffset=%d", xoffset));
+@@ -3395,7 +3396,7 @@ process_img(struct parsed_tag *tag, int
+     }
+ #endif
+     Strcat_charp(tmp, ">");
+-    if (q != NULL && *q == '\0' && ignore_null_img_alt)
++    if (q != NULL && *q == '\0' && rc_ignore_null_img_alt)
+ 	q = NULL;
+     if (q != NULL) {
+ 	n = get_strwidth(q);
+@@ -3444,7 +3445,7 @@ process_img(struct parsed_tag *tag, int
+ 		Strcat_charp(tmp, "<pre_int>");
+ 		pre_int = TRUE;
+ 	    }
+-	    w = w / pixel_per_char / symbol_width;
++	    w = w / rc_pixel_per_char / symbol_width;
+ 	    if (w <= 0)
+ 		w = 1;
+ 	    push_symbol(tmp, HR_SYMBOL, symbol_width, w);
+@@ -3582,12 +3583,12 @@ process_input(struct parsed_tag *tag)
+     case FORM_INPUT_TEXT:
+     case FORM_INPUT_FILE:
+     case FORM_INPUT_CHECKBOX:
+-	if (displayLinkNumber)
++	if (rc_displayLinkNumber)
+ 	    Strcat(tmp, getLinkNumberStr(0));
+ 	Strcat_char(tmp, '[');
+ 	break;
+     case FORM_INPUT_RADIO:
+-	if (displayLinkNumber)
++	if (rc_displayLinkNumber)
+ 	    Strcat(tmp, getLinkNumberStr(0));
+ 	Strcat_char(tmp, '(');
+     }
+@@ -3630,7 +3631,7 @@ process_input(struct parsed_tag *tag)
+ 	case FORM_INPUT_SUBMIT:
+ 	case FORM_INPUT_BUTTON:
+ 	case FORM_INPUT_RESET:
+-	    if (displayLinkNumber)
++	    if (rc_displayLinkNumber)
+ 		Strcat(tmp, getLinkNumberStr(-1));
+ 	    Strcat_charp(tmp, "[");
+ 	    break;
+@@ -3787,7 +3788,7 @@ process_select(struct parsed_tag *tag)
+ #ifdef MENU_SELECT
+     if (!select_is_multiple) {
+ 	select_str = Strnew_charp("<pre_int>");
+-	if (displayLinkNumber)
++	if (rc_displayLinkNumber)
+ 	    Strcat(select_str, getLinkNumberStr(0));
+ 	Strcat(select_str, Sprintf("[<input_alt hseq=\"%d\" "
+ 			     "fid=\"%d\" type=select name=\"%s\" selectnumber=%d",
+@@ -4220,7 +4221,7 @@ set_alignment(struct readbuffer *obuf, s
+     if (parsedtag_get_value(tag, ATTR_ALIGN, &align)) {
+ 	switch (align) {
+ 	case ALIGN_CENTER:
+-	    if (DisableCenter)
++	    if (rc_DisableCenter)
+ 		flag = RB_LEFT;
+ 	    else
+ 		flag = RB_CENTER;
+@@ -4457,7 +4458,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+     case HTML_Q:
+ #ifdef USE_M17N
+ #ifdef USE_UNICODE
+-	if (DisplayCharset != WC_CES_US_ASCII) {
++	if (rc_DisplayCharset != WC_CES_US_ASCII) {
+ 	    HTMLlineproc1((obuf->q_level & 1 ? "&lsquo;": "&ldquo;"), h_env);
+ 	    obuf->q_level += 1;
+ 	}
+@@ -4469,7 +4470,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+     case HTML_N_Q:
+ #ifdef USE_M17N
+ #ifdef USE_UNICODE
+-	if (DisplayCharset != WC_CES_US_ASCII) {
++	if (rc_DisplayCharset != WC_CES_US_ASCII) {
+ 	    obuf->q_level -= 1;
+ 	    HTMLlineproc1((obuf->q_level & 1 ? "&rsquo;": "&rdquo;"), h_env);
+ 	}
+@@ -5011,7 +5012,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+ 	    else
+ 		w = BORDER_THIN;
+ 	}
+-	if (DisplayBorders && w == BORDER_NONE)
++	if (rc_DisplayBorders && w == BORDER_NONE)
+ 	    w = BORDER_THIN;
+ 	if (parsedtag_get_value(tag, ATTR_WIDTH, &i)) {
+ 	    if (obuf->table_level == 0)
+@@ -5067,7 +5068,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+ 	if (!(obuf->flag & (RB_PREMODE | RB_IGNORE_P)))
+ 	    flushline(h_env, obuf, envs[h_env->envc].indent, 0, h_env->limit);
+ 	RB_SAVE_FLAG(obuf);
+-	if (DisableCenter)
++	if (rc_DisableCenter)
+ 	    RB_SET_ALIGN(obuf, RB_LEFT);
+ 	else
+ 	    RB_SET_ALIGN(obuf, RB_CENTER);
+@@ -5222,7 +5223,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+ 		do_blankline(h_env, obuf, envs[h_env->envc].indent,
+ 			     h_env->limit);
+ 		if (!is_redisplay &&
+-		    !((obuf->flag & RB_NOFRAMES) && RenderFrame)) {
++		    !((obuf->flag & RB_NOFRAMES) && rc_RenderFrame)) {
+ 		    tag->need_reconstruct = TRUE;
+ 		    return 0;
+ 		}
+@@ -5242,7 +5243,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+     case HTML_AREA:
+ 	return 0;
+     case HTML_DEL:
+-	switch (displayInsDel) {
++	switch (rc_displayInsDel) {
+ 	case DISPLAY_INS_DEL_SIMPLE:
+ 	    obuf->flag |= RB_DEL;
+ 	    break;
+@@ -5259,7 +5260,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+ 	}
+ 	return 1;
+     case HTML_N_DEL:
+-	switch (displayInsDel) {
++	switch (rc_displayInsDel) {
+ 	case DISPLAY_INS_DEL_SIMPLE:
+ 	    obuf->flag &= ~RB_DEL;
+ 	    break;
+@@ -5280,7 +5281,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+ 	}
+ 	return 1;
+     case HTML_S:
+-	switch (displayInsDel) {
++	switch (rc_displayInsDel) {
+ 	case DISPLAY_INS_DEL_SIMPLE:
+ 	    obuf->flag |= RB_S;
+ 	    break;
+@@ -5297,7 +5298,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+ 	}
+ 	return 1;
+     case HTML_N_S:
+-	switch (displayInsDel) {
++	switch (rc_displayInsDel) {
+ 	case DISPLAY_INS_DEL_SIMPLE:
+ 	    obuf->flag &= ~RB_S;
+ 	    break;
+@@ -5318,7 +5319,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+ 	}
+ 	return 1;
+     case HTML_INS:
+-	switch (displayInsDel) {
++	switch (rc_displayInsDel) {
+ 	case DISPLAY_INS_DEL_SIMPLE:
+ 	    break;
+ 	case DISPLAY_INS_DEL_NORMAL:
+@@ -5334,7 +5335,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+ 	}
+ 	return 1;
+     case HTML_N_INS:
+-	switch (displayInsDel) {
++	switch (rc_displayInsDel) {
+ 	case DISPLAY_INS_DEL_SIMPLE:
+ 	    break;
+ 	case DISPLAY_INS_DEL_NORMAL:
+@@ -5373,7 +5374,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+     case HTML_NOP:
+ 	return 1;
+     case HTML_BGSOUND:
+-	if (view_unseenobject) {
++	if (rc_view_unseenobject) {
+ 	    if (parsedtag_get_value(tag, ATTR_SRC, &p)) {
+ 		Str s;
+ 		q = html_quote(p);
+@@ -5384,7 +5385,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+ 	return 1;
+     case HTML_EMBED:
+ 	HTML5_CLOSE_A;
+-	if (view_unseenobject) {
++	if (rc_view_unseenobject) {
+ 	    if (parsedtag_get_value(tag, ATTR_SRC, &p)) {
+ 		Str s;
+ 		q = html_quote(p);
+@@ -5394,7 +5395,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+ 	}
+ 	return 1;
+     case HTML_APPLET:
+-	if (view_unseenobject) {
++	if (rc_view_unseenobject) {
+ 	    if (parsedtag_get_value(tag, ATTR_ARCHIVE, &p)) {
+ 		Str s;
+ 		q = html_quote(p);
+@@ -5404,7 +5405,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+ 	}
+ 	return 1;
+     case HTML_BODY:
+-	if (view_unseenobject) {
++	if (rc_view_unseenobject) {
+ 	    if (parsedtag_get_value(tag, ATTR_BACKGROUND, &p)) {
+ 		Str s;
+ 		q = html_quote(p);
+@@ -6022,7 +6023,7 @@ HTMLlineproc2body(Buffer *buf, Str (*fee
+ 		    p = q = NULL;
+ 		    parsedtag_get_value(tag, ATTR_HTTP_EQUIV, &p);
+ 		    parsedtag_get_value(tag, ATTR_CONTENT, &q);
+-		    if (p && q && !strcasecmp(p, "refresh") && MetaRefresh) {
++		    if (p && q && !strcasecmp(p, "refresh") && rc_MetaRefresh) {
+ 			Str tmp = NULL;
+ 			int refresh_interval = getMetaRefreshParam(q, &tmp);
+ #ifdef USE_ALARM
+@@ -6520,7 +6521,7 @@ HTMLlineproc0(char *line, struct html_fe
+ 	    if (cmd == HTML_TABLE)
+ 		goto table_start;
+ 	    else {
+-		if (displayLinkNumber && cmd == HTML_A && !internal)
++		if (rc_displayLinkNumber && cmd == HTML_A && !internal)
+ 		    if (h_env->obuf->anchor.url)
+ 			need_number = 1;
+ 		continue;
+@@ -6564,7 +6565,7 @@ HTMLlineproc0(char *line, struct html_fe
+ 		    do {
+ 			PUSH(' ');
+ 		    } while ((h_env->envs[h_env->envc].indent + obuf->pos)
+-			     % Tabstop != 0);
++			     % rc_Tabstop != 0);
+ 		    str++;
+ 		}
+ 		else if (obuf->flag & RB_PLAIN) {
+@@ -6602,7 +6603,7 @@ HTMLlineproc0(char *line, struct html_fe
+ 			is_hangul = wtf_is_hangul((wc_uchar *) str);
+ 		    else
+ 			is_hangul = 0;
+-		    if (!SimplePreserveSpace && mode == PC_KANJI1 &&
++		    if (!rc_SimplePreserveSpace && mode == PC_KANJI1 &&
+ 			!is_hangul && !prev_is_hangul &&
+ 			obuf->pos > h_env->envs[h_env->envc].indent &&
+ 			Strlastchar(obuf->line) == ' ') {
+@@ -6800,7 +6801,7 @@ loadHTMLBuffer(URLFile *f, Buffer *newBu
+ 	if (src)
+ 	    newBuf->sourcefile = tmp->ptr;
+     }
+-    fold_pre |= FoldPre;
++    fold_pre |= rc_FoldPre;
+ 
+     loadHTMLstream(f, newBuf, src, newBuf->bufferprop & BP_FRAME);
+ 
+@@ -7112,7 +7113,7 @@ loadHTMLstream(URLFile *f, Buffer *newBu
+     Str lineBuf2;
+ #ifdef USE_M17N
+     wc_ces charset = WC_CES_US_ASCII;
+-    wc_ces volatile doc_charset = DocumentCharset;
++    wc_ces volatile doc_charset = rc_DocumentCharset;
+ #endif
+     struct html_feed_environ htmlenv1;
+     struct readbuffer obuf;
+@@ -7127,7 +7128,7 @@ loadHTMLstream(URLFile *f, Buffer *newBu
+     }
+     else {
+ 	symbol_width0 = 0;
+-	get_symbol(DisplayCharset, &symbol_width0);
++	get_symbol(rc_DisplayCharset, &symbol_width0);
+ 	symbol_width = WcOption.use_wide ? symbol_width0 : 1;
+     }
+ #else
+@@ -7155,7 +7156,7 @@ loadHTMLstream(URLFile *f, Buffer *newBu
+     cur_iseq = 1;
+     if (newBuf->image_flag)
+ 	image_flag = newBuf->image_flag;
+-    else if (activeImage && displayImage && autoImage)
++    else if (activeImage && rc_displayImage && rc_autoImage)
+ 	image_flag = IMG_FLAG_AUTO;
+     else
+ 	image_flag = IMG_FLAG_SKIP;
+@@ -7337,7 +7338,7 @@ loadGopherDir0(URLFile *uf, ParsedURL *p
+     int link, pre;
+     void (*volatile prevtrap) (SIGNAL_ARG) = NULL;
+ #ifdef USE_M17N
+-    wc_ces doc_charset = DocumentCharset;
++    wc_ces doc_charset = rc_DocumentCharset;
+ #endif
+ 
+     tmp = parsedURL2Str(pu);
+@@ -7460,7 +7461,7 @@ loadGopherSearch0(ParsedURL *pu)
+     Str tmp;
+     char *volatile p, *volatile q;
+ #ifdef USE_M17N
+-    wc_ces doc_charset = DocumentCharset;
++    wc_ces doc_charset = rc_DocumentCharset;
+ #endif
+ 
+     tmp = parsedURL2Str(pu);
+@@ -7488,7 +7489,7 @@ loadBuffer(URLFile *uf, Buffer *volatile
+     FILE *volatile src = NULL;
+ #ifdef USE_M17N
+     wc_ces charset = WC_CES_US_ASCII;
+-    wc_ces volatile doc_charset = DocumentCharset;
++    wc_ces volatile doc_charset = rc_DocumentCharset;
+ #endif
+     Str lineBuf2;
+     volatile char pre_lbuf = '\0';
+@@ -7668,7 +7669,7 @@ conv_symbol(Line *l)
+ 		Strcopy_charp_n(tmp, l->lineBuf, p - l->lineBuf);
+ #ifdef USE_M17N
+ 		w = (*pr & PC_KANJI) ? 2 : 1;
+-		symbol = get_symbol(DisplayCharset, &w);
++		symbol = get_symbol(rc_DisplayCharset, &w);
+ #endif
+ 	    }
+ 	    Strcat_charp(tmp, symbol[(unsigned char)c % N_SYMBOL]);
+@@ -7695,8 +7696,8 @@ _saveBuffer(Buffer *buf, Line *l, FILE *
+     Str tmp;
+     int is_html = FALSE;
+ #ifdef USE_M17N
+-    int set_charset = !DisplayCharset;
+-    wc_ces charset = DisplayCharset ? DisplayCharset : WC_CES_US_ASCII;
++    int set_charset = !rc_DisplayCharset;
++    wc_ces charset = rc_DisplayCharset ? rc_DisplayCharset : WC_CES_US_ASCII;
+ #endif
+ 
+     is_html = is_html_type(buf->type);
+@@ -7713,7 +7714,7 @@ _saveBuffer(Buffer *buf, Line *l, FILE *
+ 	    putc('\n', f);
+     }
+     if (buf->pagerSource && !(buf->bufferprop & BP_CLOSE)) {
+-	l = getNextPage(buf, PagerMax);
++	l = getNextPage(buf, rc_PagerMax);
+ #ifdef USE_M17N
+ 	if (set_charset)
+ 	    charset = buf->document_charset;
+@@ -7870,7 +7871,7 @@ openGeneralPagerBuffer(InputStream strea
+ 	buf->type = "text/plain";
+     }
+ #ifdef USE_IMAGE
+-    else if (activeImage && displayImage && !useExtImageViewer &&
++    else if (activeImage && rc_displayImage && !rc_useExtImageViewer &&
+ 	     !(w3m_dump & ~DUMP_FRAME) && !strncasecmp(t, "image/", 6)) {
+ 	buf = loadImageBuffer(&uf, t_buf);
+ 	buf->type = "text/html";
+@@ -7907,7 +7908,7 @@ getNextPage(Buffer *buf, int plen)
+     URLFile uf;
+ #ifdef USE_M17N
+     wc_ces charset;
+-    wc_ces volatile doc_charset = DocumentCharset;
++    wc_ces volatile doc_charset = rc_DocumentCharset;
+     wc_uint8 old_auto_detect = WcOption.auto_detect;
+ #endif
+     int volatile squeeze_flag = FALSE;
+@@ -7987,7 +7988,7 @@ getNextPage(Buffer *buf, int plen)
+ 	    cur = top;
+ 	}
+ 	if (buf->lastLine->real_linenumber - buf->firstLine->real_linenumber
+-	    >= PagerMax) {
++	    >= rc_PagerMax) {
+ 	    Line *l = buf->firstLine;
+ 	    do {
+ 		if (top == l)
+@@ -8122,7 +8123,7 @@ doExternal(URLFile uf, const char *type,
+ 
+ #ifdef HAVE_SETPGRP
+     if (!(mcap->flags & (MAILCAP_HTMLOUTPUT | MAILCAP_COPIOUSOUTPUT)) &&
+-	!(mcap->flags & MAILCAP_NEEDSTERMINAL) && BackgroundExtViewer) {
++	!(mcap->flags & MAILCAP_NEEDSTERMINAL) && rc_BackgroundExtViewer) {
+ 	flush_tty();
+ 	if (!fork()) {
+ 	    setup_child(FALSE, 0, UFfileno(&uf));
+@@ -8167,7 +8168,7 @@ doExternal(URLFile uf, const char *type,
+ 	}
+     }
+     else {
+-	if (mcap->flags & MAILCAP_NEEDSTERMINAL || !BackgroundExtViewer) {
++	if (mcap->flags & MAILCAP_NEEDSTERMINAL || !rc_BackgroundExtViewer) {
+ 	    fmTerm();
+ 	    err = mySystem(command->ptr, 0);
+ 	    fmInit();
+@@ -8297,7 +8298,7 @@ _doFileCopy(char *tmpf, char *defstr, in
+ 	pid = fork();
+ 	if (!pid) {
+ 	    setup_child(FALSE, 0, -1);
+-	    if (!_MoveFile(tmpf, p) && PreserveTimestamp && !is_pipe &&
++	    if (!_MoveFile(tmpf, p) && rc_PreserveTimestamp && !is_pipe &&
+ 		!stat(tmpf, &st))
+ 		setModtime(p, st.st_mtime);
+ 	    unlink(lock);
+@@ -8340,7 +8341,7 @@ _doFileCopy(char *tmpf, char *defstr, in
+ 	    printf("Can't save to %s\n", p);
+ 	    return -1;
+ 	}
+-	if (PreserveTimestamp && !is_pipe && !stat(tmpf, &st))
++	if (rc_PreserveTimestamp && !is_pipe && !stat(tmpf, &st))
+ 	    setModtime(p, st.st_mtime);
+     }
+ #endif /* __MINGW32_VERSION */
+@@ -8368,8 +8369,8 @@ doFileSave(URLFile uf, const char *defst
+     FILE *f;
+ #endif
+ 
+-    if (param_dl_dir) {
+-	filen = Strnew_charp(expandPath(param_dl_dir));
++    if (rc_param_dl_dir) {
++	filen = Strnew_charp(expandPath(rc_param_dl_dir));
+ 	if (Strlastchar(filen) != '/')
+ 	    Strcat_char(filen, '/');
+ 	Strcat_charp(filen, defstr);
+@@ -8407,11 +8408,11 @@ doFileSave(URLFile uf, const char *defst
+ 	pid = fork();
+ 	if (!pid) {
+ 	    int err;
+-	    if ((uf.content_encoding != CMP_NOCOMPRESS) && AutoUncompress)
++	    if ((uf.content_encoding != CMP_NOCOMPRESS) && rc_AutoUncompress)
+ 		uncompress_stream(&uf, NULL);
+ 	    setup_child(FALSE, 0, UFfileno(&uf));
+ 	    err = save2tmp(uf, p);
+-	    if (err == 0 && PreserveTimestamp && uf.modtime != -1)
++	    if (err == 0 && rc_PreserveTimestamp && uf.modtime != -1)
+ 		setModtime(p, uf.modtime);
+ 	    UFclose(&uf);
+ 	    unlink(lock);
+@@ -8444,14 +8445,14 @@ doFileSave(URLFile uf, const char *defst
+ 	    printf("Can't save. Load file and %s are identical.", p);
+ 	    return -1;
+ 	}
+-	if (uf.content_encoding != CMP_NOCOMPRESS && AutoUncompress)
++	if (uf.content_encoding != CMP_NOCOMPRESS && rc_AutoUncompress)
+ 	    uncompress_stream(&uf, NULL);
+ 	if (save2tmp(uf, p) < 0) {
+ 	    /* FIXME: gettextize? */
+ 	    printf("Can't save to %s\n", p);
+ 	    return -1;
+ 	}
+-	if (PreserveTimestamp && uf.modtime != -1)
++	if (rc_PreserveTimestamp && uf.modtime != -1)
+ 	    setModtime(p, uf.modtime);
+     }
+ #endif /* __MINGW32_VERSION */
+--- a/fm.h
++++ b/fm.h
+@@ -304,8 +304,8 @@ extern int REV_LB[];
+ #define bpcmp(a,b) \
+   (((a).line - (b).line) ? ((a).line - (b).line) : ((a).pos - (b).pos))
+ 
+-#define RELATIVE_WIDTH(w)   (((w)>=0)?(int)((w)/pixel_per_char):(w))
+-#define REAL_WIDTH(w,limit) (((w)>=0)?(int)((w)/pixel_per_char):-(w)*(limit)/100)
++#define RELATIVE_WIDTH(w)   (((w)>=0)?(int)((w)/rc_pixel_per_char):(w))
++#define REAL_WIDTH(w,limit) (((w)>=0)?(int)((w)/rc_pixel_per_char):-(w)*(limit)/100)
+ 
+ #define EOL(l) (&(l)->ptr[(l)->length])
+ #define IS_EOL(p,l) ((p)==&(l)->ptr[(l)->length])
+@@ -579,9 +579,9 @@ typedef struct _DownloadList {
+ #define FONTSTAT_SIZE 7
+ #define FONTSTAT_MAX 127
+ 
+-#define _INIT_BUFFER_WIDTH (COLS - (showLineNum ? 6 : 1))
++#define _INIT_BUFFER_WIDTH (COLS - (rc_showLineNum ? 6 : 1))
+ #define INIT_BUFFER_WIDTH ((_INIT_BUFFER_WIDTH > 0) ? _INIT_BUFFER_WIDTH : 0)
+-#define FOLD_BUFFER_WIDTH (FoldLine ? (INIT_BUFFER_WIDTH + 1) : -1)
++#define FOLD_BUFFER_WIDTH (rc_FoldLine ? (INIT_BUFFER_WIDTH + 1) : -1)
+ 
+ struct input_alt_attr {
+   int hseq;
+@@ -818,24 +818,11 @@ extern int LASTLINE;
+ #define LASTLINE (LINES-1)
+ #endif				/* not defined(__CYGWIN__) */
+ 
+-global int Tabstop init(8);
+-global int IndentIncr init(4);
+-global int MaxCols init(0);
+ global int ShowEffect init(TRUE);
+-global int PagerMax init(PAGER_MAX_LINE);
+-global int MessageDelay init(2);
+ 
+ global char SearchHeader init(FALSE);
+ global char *DefaultType init(NULL);
+-global char RenderFrame init(FALSE);
+-global char TargetSelf init(FALSE);
+ global char PermitSaveToPipe init(FALSE);
+-global char DecodeCTE init(FALSE);
+-global char AutoUncompress init(FALSE);
+-global char PreserveTimestamp init(TRUE);
+-global char ArgvIsURL init(TRUE);
+-global char MetaRefresh init(FALSE);
+-global char LocalhostOnly init(FALSE);
+ global char* HostName init(NULL);
+ 
+ global char fmInitialized init(FALSE);
+@@ -862,14 +849,6 @@ extern unsigned char PcKeymap[];
+ #endif
+ extern FuncList w3mFuncList[];
+ 
+-global char *HTTP_proxy init(NULL);
+-#ifdef USE_SSL
+-global char *HTTPS_proxy init(NULL);
+-#endif				/* USE_SSL */
+-#ifdef USE_GOPHER
+-global char *GOPHER_proxy init(NULL);
+-#endif				/* USE_GOPHER */
+-global char *FTP_proxy init(NULL);
+ global ParsedURL HTTP_proxy_parsed;
+ #ifdef USE_SSL
+ global ParsedURL HTTPS_proxy_parsed;
+@@ -878,32 +857,17 @@ global ParsedURL HTTPS_proxy_parsed;
+ global ParsedURL GOPHER_proxy_parsed;
+ #endif				/* USE_GOPHER */
+ global ParsedURL FTP_proxy_parsed;
+-global char *NO_proxy init(NULL);
+-global int NOproxy_netaddr init(TRUE);
+ #ifdef INET6
+ #define DNS_ORDER_UNSPEC     0
+ #define DNS_ORDER_INET_INET6 1
+ #define DNS_ORDER_INET6_INET 2
+ #define DNS_ORDER_INET_ONLY  4
+ #define DNS_ORDER_INET6_ONLY 6
+-global int DNS_order init(DNS_ORDER_UNSPEC);
+ extern int ai_family_order_table[7][3];	/* XXX */
+ #endif				/* INET6 */
+ global TextList *NO_proxy_domains;
+-global char NoCache init(FALSE);
+-global char use_proxy init(TRUE);
+-#define Do_not_use_proxy (!use_proxy)
++#define Do_not_use_proxy (!rc_use_proxy)
+ global int Do_not_use_ti_te init(FALSE);
+-#ifdef USE_NNTP
+-global char *NNTP_server init(NULL);
+-global char *NNTP_mode init(NULL);
+-global int MaxNewsMessage init(50);
+-#endif
+-
+-global char *document_root init(NULL);
+-global char *personal_document_root init(NULL);
+-global char *cgi_bin init(NULL);
+-global char *index_file init(NULL);
+ 
+ global char *CurrentDir;
+ global int CurrentPid;
+@@ -913,9 +877,6 @@ global char *MyProgramName init("w3m");
+ global TabBuffer *CurrentTab;
+ global TabBuffer *FirstTab;
+ global TabBuffer *LastTab;
+-global int open_tab_blank init(FALSE);
+-global int open_tab_dl_list init(FALSE);
+-global int close_tab_back init(FALSE);
+ global int nTab;
+ global int TabCols init(10);
+ #define NO_TABBUFFER ((TabBuffer *)1)
+@@ -928,7 +889,6 @@ global char *CurrentKeyData;
+ global char *CurrentCmdData;
+ global char *w3m_reqlog;
+ extern char *w3m_version;
+-extern int enable_inline_image;
+ 
+ #define DUMP_BUFFER   0x01
+ #define DUMP_HEAD     0x02
+@@ -944,117 +904,28 @@ global Str header_string init(NULL);
+ global int override_content_type init(FALSE);
+ global int override_user_agent init(FALSE);
+ 
+-#ifdef USE_COLOR
+-global int useColor init(TRUE);
+-global int highIntensityColors init(FALSE);
+-global int basic_color init(8);	/* don't change */
+-global int anchor_color init(4);	/* blue  */
+-global int image_color init(2);	/* green */
+-global int form_color init(1);	/* red   */
+-#ifdef USE_BG_COLOR
+-global int bg_color init(8);	/* don't change */
+-global int mark_color init(6);	/* cyan */
+-#endif				/* USE_BG_COLOR */
+-global int useActiveColor init(FALSE);
+-global int active_color init(6);	/* cyan */
+-global int useVisitedColor init(FALSE);
+-global int visited_color init(5);	/* magenta  */
+-#endif				/* USE_COLOR */
+-global int confirm_on_quit init(TRUE);
+-global int exit_on_last init(FALSE);
+-#ifdef USE_MARK
+-global int use_mark init(FALSE);
+-#endif
+-global int emacs_like_lineedit init(FALSE);
+-global int space_autocomplete init(FALSE);
+-global int vi_prec_num init(FALSE);
+-global int label_topline init(FALSE);
+-global int nextpage_topline init(FALSE);
+ global char *displayTitleTerm init(NULL);
+-global int displayLink init(FALSE);
+-global int displayLinkNumber init(FALSE);
+-global int zeroBasedLinkNo init(FALSE);
+-global int displayLineInfo init(FALSE);
+-global int displayColumnNumber init(FALSE);
+-global int DecodeURL init(FALSE);
+-global int retryAsHttp init(TRUE);
+-global int showLineNum init(FALSE);
+-global int show_srch_str init(TRUE);
+ #ifdef USE_IMAGE
+-global char *Imgdisplay init(IMGDISPLAY);
+ global int activeImage init(FALSE);
+-global int displayImage init(TRUE);
+-global int autoImage init(TRUE);
+-global int useExtImageViewer init(TRUE);
+-global int maxLoadImage init(4);
+-global int image_map_list init(TRUE);
+-#else
+-global int displayImage init(FALSE);	/* XXX: emacs-w3m use display_image=off */
+-#endif
+-global int pseudoInlines init(TRUE);
+-global const char *Editor init(DEF_EDITOR);
+-#ifdef USE_W3MMAILER
+-global char *Mailer init(NULL);
+-#else
+-global char *Mailer init(DEF_MAILER);
+ #endif
+ #ifdef USE_W3MMAILER
+ #define MAILTO_OPTIONS_USE_W3MMAILER 0
+ #endif
+ #define MAILTO_OPTIONS_IGNORE 1
+ #define MAILTO_OPTIONS_USE_MAILTO_URL 2
+-global int MailtoOptions init(MAILTO_OPTIONS_IGNORE);
+-global char *ExtBrowser init(DEF_EXT_BROWSER);
+-global char *ExtBrowser2 init(NULL);
+-global char *ExtBrowser3 init(NULL);
+-global char *ExtBrowser4 init(NULL);
+-global char *ExtBrowser5 init(NULL);
+-global char *ExtBrowser6 init(NULL);
+-global char *ExtBrowser7 init(NULL);
+-global char *ExtBrowser8 init(NULL);
+-global char *ExtBrowser9 init(NULL);
+-global int BackgroundExtViewer init(TRUE);
+-global int disable_secret_security_check init(FALSE);
+-global char *passwd_file init(PASSWD_FILE);
+-global char *pre_form_file init(PRE_FORM_FILE);
+-global char *siteconf_file init(SITECONF_FILE);
+-global char *ftppasswd init(NULL);
+-global int ftppass_hostnamegen init(TRUE);
+ global int do_download init(FALSE);
+ #ifdef USE_IMAGE
+ global char *image_source init(NULL);
+ #endif
+-global char *UserAgent init(NULL);
+-global int NoSendReferer init(FALSE);
+-global int CrossOriginReferer init(TRUE);
+-global char *AcceptLang init(NULL);
+-global char *AcceptEncoding init(NULL);
+-global char *AcceptMedia init(NULL);
+-global int WrapDefault init(FALSE);
+-global int IgnoreCase init(TRUE);
+ global int WrapSearch init(FALSE);
+ global int squeezeBlankLine init(FALSE);
+ global char *BookmarkFile init(NULL);
+-global int UseExternalDirBuffer init(TRUE);
+-global const char *DirBufferCommand init("file:///$LIB/dirlist" CGI_EXTENSION);
+-#ifdef USE_DICT
+-global int UseDictCommand init(TRUE);
+-global const char *DictCommand init("file:///$LIB/w3mdict" CGI_EXTENSION);
+-global const char *DictPrompt init("(dictionary)!");
+-#endif				/* USE_DICT */
+-global int ignore_null_img_alt init(TRUE);
+ #define DISPLAY_INS_DEL_SIMPLE	0
+ #define DISPLAY_INS_DEL_NORMAL	1
+ #define DISPLAY_INS_DEL_FONTIFY	2
+-global int displayInsDel init(DISPLAY_INS_DEL_NORMAL);
+-global int FoldTextarea init(FALSE);
+-global int FoldPre init(FALSE);
+-global int FoldLine init(FALSE);
+ #define DEFAULT_URL_EMPTY	0
+ #define DEFAULT_URL_CURRENT	1
+ #define DEFAULT_URL_LINK	2
+-global int DefaultURLString init(DEFAULT_URL_CURRENT);
+-global int MarkAllPages init(FALSE);
+ 
+ #ifdef USE_MIGEMO
+ global int use_migemo init(FALSE);
+@@ -1067,12 +938,6 @@ global struct auth_cookie *Auth_cookie i
+ global struct cookie *First_cookie init(NULL);
+ #endif				/* USE_COOKIE */
+ 
+-global char *mailcap_files init(USER_MAILCAP ", " SYS_MAILCAP);
+-global char *mimetypes_files init(USER_MIMETYPES ", " SYS_MIMETYPES);
+-#ifdef USE_EXTERNAL_URI_LOADER
+-global char *urimethodmap_files init(USER_URIMETHODMAP ", " SYS_URIMETHODMAP);
+-#endif
+-
+ global TextList *fileToDelete;
+ 
+ extern Hist *LoadHist;
+@@ -1080,30 +945,19 @@ extern Hist *SaveHist;
+ extern Hist *URLHist;
+ extern Hist *ShellHist;
+ extern Hist *TextHist;
+-#ifdef USE_HISTORY
+-global int UseHistory init(TRUE);
+-global int URLHistSize init(100);
+-global int SaveURLHist init(TRUE);
+-#endif				/* USE_HISTORY */
+-global int StoreSession init(FALSE);
+-global int multicolList init(FALSE);
+ 
+ #ifdef USE_M17N
+ global wc_ces InnerCharset init(WC_CES_WTF);	/* Don't change */
+-global wc_ces DisplayCharset init(DISPLAY_CHARSET);
+-global wc_ces DocumentCharset init(DOCUMENT_CHARSET);
+-global wc_ces SystemCharset init(SYSTEM_CHARSET);
+ global wc_ces BookmarkCharset init(SYSTEM_CHARSET);
+-global char ExtHalfdump init(FALSE);
+-global char FollowLocale init(TRUE);
+ global char UseContentCharset init(TRUE);
+-global char SearchConv init(TRUE);
+-global char SimplePreserveSpace init(FALSE);
+-#define Str_conv_from_system(x) wc_Str_conv((x), SystemCharset, InnerCharset)
+-#define Str_conv_to_system(x) wc_Str_conv_strict((x), InnerCharset, SystemCharset)
+-#define Str_conv_to_halfdump(x) (ExtHalfdump ? wc_Str_conv((x), InnerCharset, DisplayCharset) : (x))
+-#define conv_from_system(x) wc_conv((x), SystemCharset, InnerCharset)->ptr
+-#define conv_to_system(x) wc_conv_strict((x), InnerCharset, SystemCharset)->ptr
++extern char rc_ExtHalfdump;
++extern wc_ces rc_DisplayCharset;
++extern wc_ces rc_SystemCharset;
++#define Str_conv_from_system(x) wc_Str_conv((x), rc_SystemCharset, InnerCharset)
++#define Str_conv_to_system(x) wc_Str_conv_strict((x), InnerCharset, rc_SystemCharset)
++#define Str_conv_to_halfdump(x) (rc_ExtHalfdump ? wc_Str_conv((x), InnerCharset, rc_DisplayCharset) : (x))
++#define conv_from_system(x) wc_conv((x), rc_SystemCharset, InnerCharset)->ptr
++#define conv_to_system(x) wc_conv_strict((x), InnerCharset, rc_SystemCharset)->ptr
+ #define url_quote_conv(x,c) url_quote(wc_conv_strict((x), InnerCharset, (c))->ptr)
+ #else
+ #define Str_conv_from_system(x) (x)
+@@ -1115,13 +969,9 @@ global char SimplePreserveSpace init(FAL
+ #define wc_Str_conv(x,charset0,charset1) (x)
+ #define wc_Str_conv_strict(x,charset0,charset1) (x)
+ #endif
+-global char UseAltEntity init(FALSE);
+ #define GRAPHIC_CHAR_ASCII 2
+ #define GRAPHIC_CHAR_DEC 1
+ #define GRAPHIC_CHAR_CHARSET 0
+-global char UseGraphicChar init(GRAPHIC_CHAR_CHARSET);
+-global char DisplayBorders init(FALSE);
+-global char DisableCenter init(FALSE);
+ extern char *graph_symbol[];
+ extern char *graph2_symbol[];
+ extern int symbol_width;
+@@ -1132,19 +982,12 @@ extern int symbol_width0;
+ global int no_rc_dir init(FALSE);
+ global char *rc_dir init(NULL);
+ global char *tmp_dir;
+-global char *param_tmp_dir init(NULL);
+-global char *param_dl_dir init(NULL);
+ #ifdef HAVE_MKDTEMP
+ global char *mkd_tmp_dir init(NULL);
+ #endif
+ global char *config_file init(NULL);
+ 
+ #ifdef USE_MOUSE
+-global int use_mouse init(TRUE);
+-global int reverse_mouse init(FALSE);
+-global int relative_wheel_scroll init(FALSE);
+-global int fixed_wheel_scroll_count init(5);
+-global int relative_wheel_scroll_ratio init(30);
+ typedef struct _MouseActionMap {
+     void (*func) (void);
+     char *data;
+@@ -1170,63 +1013,27 @@ global MouseAction mouse_action;
+ 
+ #ifdef USE_COOKIE
+ global int default_use_cookie init(TRUE);
+-global int use_cookie init(TRUE);
+-global int show_cookie init(FALSE);
+-global int accept_cookie init(TRUE);
+ #define ACCEPT_BAD_COOKIE_DISCARD	0
+ #define ACCEPT_BAD_COOKIE_ACCEPT	1
+ #define ACCEPT_BAD_COOKIE_ASK		2
+-global int accept_bad_cookie init(ACCEPT_BAD_COOKIE_DISCARD);
+-global char *cookie_reject_domains init(NULL);
+-global char *cookie_accept_domains init(NULL);
+-global char *cookie_avoid_wrong_number_of_dots init(NULL);
+ global TextList *Cookie_reject_domains;
+ global TextList *Cookie_accept_domains;
+ global TextList *Cookie_avoid_wrong_number_of_dots_domains;
+ #endif				/* USE_COOKIE */
+ 
+-#ifdef USE_IMAGE
+-global int view_unseenobject init(FALSE);
+-#else
+-global int view_unseenobject init(TRUE);
+-#endif
+-
+ #if defined(USE_SSL) && defined(USE_SSL_VERIFY)
+-global int ssl_verify_server init(TRUE);
+-global char *ssl_cert_file init(NULL);
+-global char *ssl_key_file init(NULL);
+-global char *ssl_ca_path init(NULL);
+-global char *ssl_ca_file init(DEF_CAFILE);
+-global int ssl_ca_default init(TRUE);
+ global int ssl_path_modified init(FALSE);
+ #endif				/* defined(USE_SSL) &&
+ 				 * defined(USE_SSL_VERIFY) */
+-#ifdef USE_SSL
+-global char *ssl_forbid_method init("2, 3, t, 5");
+-#ifdef SSL_CTX_set_min_proto_version
+-global char *ssl_min_version init(NULL);
+-#endif
+-#if (OPENSSL_VERSION_NUMBER < 0x10100000L) || defined(LIBRESSL_VERSION_NUMBER)
+-global char *ssl_cipher init("DEFAULT:!LOW:!RC4:!EXP");
+-#else
+-global char *ssl_cipher init(NULL);
+-#endif
+-#endif				/* USE_SSL */
+ 
+ global int is_redisplay init(FALSE);
+-global int clear_buffer init(TRUE);
+-global double pixel_per_char init(DEFAULT_PIXEL_PER_CHAR);
+ global int pixel_per_char_i init(DEFAULT_PIXEL_PER_CHAR);
+ global int set_pixel_per_char init(FALSE);
+ #ifdef USE_IMAGE
+-global double pixel_per_line init(DEFAULT_PIXEL_PER_LINE);
+ global int pixel_per_line_i init(DEFAULT_PIXEL_PER_LINE);
+ global int set_pixel_per_line init(FALSE);
+-global double image_scale init(100);
+ #endif
+-global int use_lessopen init(FALSE);
+ 
+-global char *keymap_file init(KEYMAP_FILE);
+ 
+ #ifdef USE_M17N
+ #define get_mctype(c) ((Lineprop)wtf_type((const wc_uchar *)(c)) << 8)
+@@ -1242,7 +1049,6 @@ global char *keymap_file init(KEYMAP_FIL
+ #define get_Str_strwidth(c) ((c)->length)
+ #endif
+ 
+-global int FollowRedirection init(10);
+ 
+ global int w3m_backend init(FALSE);
+ global TextLineList *backend_halfdump_buf;
+--- a/form.c
++++ b/form.c
+@@ -3,6 +3,7 @@
+  * HTML forms
+  */
+ #include "display.h"
++#include "rc.h"
+ #include "fm.h"
+ #include "parsetag.h"
+ #include "parsetagx.h"
+@@ -391,7 +392,7 @@ form_update_line(Line *line, char **str,
+ 	pos++;
+     }
+     if (newline) {
+-	if (!FoldTextarea) {
++	if (!rc_FoldTextarea) {
+ 	    while (*p && *p != '\r' && *p != '\n')
+ 		p++;
+ 	}
+@@ -577,7 +578,7 @@ form_fputs_decode(Str s, FILE * f)
+ 	}
+     }
+ #ifdef USE_M17N
+-    z = wc_Str_conv_strict(z, InnerCharset, DisplayCharset);
++    z = wc_Str_conv_strict(z, InnerCharset, rc_DisplayCharset);
+ #endif
+     Strfputs(z, f);
+ }
+@@ -590,7 +591,7 @@ input_textarea(FormItemList *fi)
+     Str tmp;
+     FILE *f;
+ #ifdef USE_M17N
+-    wc_ces charset = DisplayCharset;
++    wc_ces charset = rc_DisplayCharset;
+     wc_uint8 auto_detect;
+ #endif
+ 
+@@ -604,7 +605,7 @@ input_textarea(FormItemList *fi)
+ 	form_fputs_decode(fi->value, f);
+     fclose(f);
+ 
+-    if (exec_cmd(myEditor(Editor, tmpf, 1)->ptr))
++    if (exec_cmd(myEditor(rc_Editor, tmpf, 1)->ptr))
+ 	    goto input_end;
+ 
+     if (fi->readonly)
+@@ -630,7 +631,7 @@ input_textarea(FormItemList *fi)
+ 	    Strshrink(tmp, 1);
+ 	    Strcat_charp(tmp, "\r\n");
+ 	}
+-	tmp = convertLine(NULL, tmp, RAW_MODE, &charset, DisplayCharset);
++	tmp = convertLine(NULL, tmp, RAW_MODE, &charset, rc_DisplayCharset);
+ 	Strcat(fi->value, tmp);
+     }
+ #ifdef USE_M17N
+@@ -881,7 +882,7 @@ loadPreForm(void)
+     char *name = NULL;
+ 
+     PreForm = NULL;
+-    fp = openSecretFile(pre_form_file);
++    fp = openSecretFile(rc_pre_form_file);
+     if (fp == NULL)
+ 	return;
+     while (1) {
+--- a/frame.c
++++ b/frame.c
+@@ -1,5 +1,6 @@
+ /* vi: set sw=4 ts=8 ai sm noet : */
+ #include "fm.h"
++#include "rc.h"
+ #include "parsetagx.h"
+ #include "myctype.h"
+ #include <signal.h>
+@@ -514,13 +515,13 @@ createFrameFile(struct frameset *f, FILE
+ 		p_target = f->name;
+ 		s_target = frame.body->name;
+ 		t_target = "_blank";
+-		d_target = TargetSelf ? s_target : t_target;
++		d_target = rc_TargetSelf ? s_target : t_target;
+ #ifdef USE_M17N
+ 		charset = WC_CES_US_ASCII;
+ 		if (current->document_charset != WC_CES_US_ASCII)
+ 		    doc_charset = current->document_charset;
+ 		else
+-		    doc_charset = DocumentCharset;
++		    doc_charset = rc_DocumentCharset;
+ #endif
+ 		t_stack = 0;
+ 		if (frame.body->type &&
+@@ -880,7 +881,7 @@ renderFrame(Buffer *Cbuf, int force_relo
+     int flag;
+     struct frameset *fset;
+ #ifdef USE_M17N
+-    wc_ces doc_charset = DocumentCharset;
++    wc_ces doc_charset = rc_DocumentCharset;
+ #endif
+ 
+     tmp = tmpfname(TMPF_FRAME, ".html");
+@@ -899,11 +900,11 @@ renderFrame(Buffer *Cbuf, int force_relo
+     renderFrameSet = Cbuf->frameset;
+     flushFrameSet(renderFrameSet);
+ #ifdef USE_M17N
+-    DocumentCharset = InnerCharset;
++    rc_DocumentCharset = InnerCharset;
+ #endif
+     buf = loadGeneralFile(tmp->ptr, NULL, NULL, flag, NULL);
+ #ifdef USE_M17N
+-    DocumentCharset = doc_charset;
++    rc_DocumentCharset = doc_charset;
+ #endif
+     renderFrameSet = NULL;
+     if (buf == NULL || buf == NO_BUFFER)
+--- a/ftp.c
++++ b/ftp.c
+@@ -9,6 +9,7 @@
+ #include <time.h>
+ 
+ #include "fm.h"
++#include "rc.h"
+ #include "html.h"
+ #include "myctype.h"
+ 
+@@ -129,7 +130,7 @@ ftp_login(FTP ftp)
+     sock = openSocket(ftp->host, "ftp", 21);
+     if (sock < 0)
+ 	goto open_err;
+-    if (ftppass_hostnamegen && !strcmp(ftp->user, "anonymous")) {
++    if (rc_ftppass_hostnamegen && !strcmp(ftp->user, "anonymous")) {
+ 	size_t n = strlen(ftp->pass);
+ 
+ 	if (n > 0 && ftp->pass[n - 1] == '@') {
+@@ -415,8 +416,8 @@ openFTPStream(ParsedURL *pu, URLFile *uf
+ 	}
+ 	pass = pwd->ptr;
+     }
+-    else if (ftppasswd != NULL && *ftppasswd != '\0')
+-	pass = ftppasswd;
++    else if (rc_ftppasswd != NULL && *rc_ftppasswd != '\0')
++	pass = rc_ftppasswd;
+     else {
+ #ifndef __MINGW32_VERSION
+ 	struct passwd *mypw = getpwuid(getuid());
+@@ -480,7 +481,7 @@ loadFTPDir0(ParsedURL *pu)
+     int i, nfile, nfile_max;
+     void (*volatile prevtrap) (SIGNAL_ARG) = NULL;
+ #ifdef USE_M17N
+-    wc_ces doc_charset = DocumentCharset;
++    wc_ces doc_charset = rc_DocumentCharset;
+ 
+     *charset = WC_CES_US_ASCII;
+ #endif
+--- a/history.c
++++ b/history.c
+@@ -1,5 +1,6 @@
+ /* vi: set sw=4 ts=8 ai sm noet : */
+ #include "fm.h"
++#include "rc.h"
+ 
+ #include <errno.h>
+ 
+@@ -12,7 +13,7 @@ historyBuffer(Hist *hist)
+     char n[sizeof("0")];
+     char *p, *q;
+ 
+-    sprintf(n, "%d", !zeroBasedLinkNo);
++    sprintf(n, "%d", !rc_zeroBasedLinkNo);
+     /* FIXME: gettextize? */
+     Strcat_charp(src, "<html>\n<head><title>History Page</title></head>\n");
+     Strcat_charp(src, "<body>\n<h1>History Page</h1>\n<hr>\n");
+@@ -20,7 +21,7 @@ historyBuffer(Hist *hist)
+     if (hist && hist->list) {
+ 	for (item = hist->list->last; item; item = item->prev) {
+ 	    q = html_quote(item->ptr);
+-	    if (DecodeURL)
++	    if (rc_DecodeURL)
+ 		p = html_quote(url_decode2(item->ptr, NULL));
+ 	    else
+ 		p = q;
+@@ -125,7 +126,7 @@ saveUrlHistory(void)
+ 
+     /* Respect URLHistSize before saving */
+     for (item = URLHist->list->first;
+-	 item && URLHist->list->nitem > URLHistSize;
++	 item && URLHist->list->nitem > rc_URLHistSize;
+ 	 item = item->next);
+ 
+     for (; item; item = item->next)
+--- a/image.c
++++ b/image.c
+@@ -1,6 +1,7 @@
+ /* vi: set sw=4 ts=8 ai sm noet : */
+ 
+ #include "fm.h"
++#include "rc.h"
+ #include <sys/types.h>
+ #include <sys/stat.h>
+ #include <signal.h>
+@@ -53,27 +54,27 @@ getCharSize(void)
+ 
+     set_environ("W3M_TTY", ttyname_tty());
+ 
+-    if (enable_inline_image) {
++    if (rc_enable_inline_image) {
+ 	int ppc, ppl;
+ 
+ 	if (get_pixel_per_cell(&ppc,&ppl)) {
+ 	    pixel_per_char_i = ppc ;
+ 	    pixel_per_line_i = ppl ;
+-	    pixel_per_char = (double)ppc;
+-	    pixel_per_line = (double)ppl;
++	    rc_pixel_per_char = (double)ppc;
++	    rc_pixel_per_line = (double)ppl;
+ 	}
+ 	else {
+-	    pixel_per_char_i = (int)pixel_per_char;
+-	    pixel_per_line_i = (int)pixel_per_line;
++	    pixel_per_char_i = (int)rc_pixel_per_char;
++	    pixel_per_line_i = (int)rc_pixel_per_line;
+ 	}
+ 
+ 	return  TRUE;
+     }
+ 
+     tmp = Strnew();
+-    if (!strchr(Imgdisplay, '/'))
++    if (!strchr(rc_Imgdisplay, '/'))
+ 	Strcat_m_charp(tmp, w3m_auxbin_dir(), "/", NULL);
+-    Strcat_m_charp(tmp, Imgdisplay, " -test 2>/dev/null", NULL);
++    Strcat_m_charp(tmp, rc_Imgdisplay, " -test 2>/dev/null", NULL);
+     f = popen(tmp->ptr, "r");
+     if (!f)
+ 	return FALSE;
+@@ -86,9 +87,9 @@ getCharSize(void)
+     if (!(w > 0 && h > 0))
+ 	return FALSE;
+     if (!set_pixel_per_char)
+-	pixel_per_char = (int)(1.0 * w / COLS + 0.5);
++	rc_pixel_per_char = (int)(1.0 * w / COLS + 0.5);
+     if (!set_pixel_per_line)
+-	pixel_per_line = (int)(1.0 * h / LINES + 0.5);
++	rc_pixel_per_line = (int)(1.0 * h / LINES + 0.5);
+     return TRUE;
+ }
+ 
+@@ -110,10 +111,10 @@ openImgdisplay(void)
+ {
+     char *cmd;
+ 
+-    if (!strchr(Imgdisplay, '/'))
+-	cmd = Strnew_m_charp(w3m_auxbin_dir(), "/", Imgdisplay, NULL)->ptr;
++    if (!strchr(rc_Imgdisplay, '/'))
++	cmd = Strnew_m_charp(w3m_auxbin_dir(), "/", rc_Imgdisplay, NULL)->ptr;
+     else
+-	cmd = Imgdisplay;
++	cmd = rc_Imgdisplay;
+     Imgdisplay_pid = open_pipe_rw(&Imgdisplay_rf, &Imgdisplay_wf);
+     if (Imgdisplay_pid < 0)
+ 	goto err0;
+@@ -174,7 +175,7 @@ addImage(ImageCache * cache, int x, int
+ static void
+ syncImage(void)
+ {
+-    if (enable_inline_image) {
++    if (rc_enable_inline_image) {
+ 	return;
+     }
+ 
+@@ -208,7 +209,7 @@ drawImage(void)
+     for (j = 0; j < n_terminal_image; j++) {
+ 	i = &terminal_image[j];
+ 
+-	if (enable_inline_image) {
++	if (rc_enable_inline_image) {
+ 	    /*
+ 	     * So this shouldn't ever happen, but if it does then at least let's
+ 	     * not have external programs fetch images from the Internet...
+@@ -236,16 +237,16 @@ drawImage(void)
+ 	    int sh = (i->height + i->sy % pixel_per_line_i + pixel_per_line_i - 1) /
+ 		      pixel_per_line_i;
+ 
+-	    if (enable_inline_image == INLINE_IMG_SIXEL) {
++	    if (rc_enable_inline_image == INLINE_IMG_SIXEL) {
+ 		w = i->cache->a_width > 0 ? i->width : 0;
+ 		h = i->cache->a_height > 0 ? i->height : 0;
+-		put_image_sixel(url, x, y, w, h, i->sx, i->sy, sw * pixel_per_char, sh * pixel_per_line_i, n_terminal_image);
+-	    } else if (enable_inline_image == INLINE_IMG_OSC5379) {
++		put_image_sixel(url, x, y, w, h, i->sx, i->sy, sw * rc_pixel_per_char, sh * pixel_per_line_i, n_terminal_image);
++	    } else if (rc_enable_inline_image == INLINE_IMG_OSC5379) {
+ 		put_image_osc5379(url, x, y, w, h, sx, sy, sw, sh);
+-	    } else if (enable_inline_image == INLINE_IMG_ITERM2) {
++	    } else if (rc_enable_inline_image == INLINE_IMG_ITERM2) {
+ 		put_image_iterm2(url, x, y, sw, sh);
+-	    } else if (enable_inline_image == INLINE_IMG_KITTY) {
+-		put_image_kitty(url, x, y, i->width, i->height, i->sx, i->sy, sw * pixel_per_char, sh * pixel_per_line_i, sw, sh);
++	    } else if (rc_enable_inline_image == INLINE_IMG_KITTY) {
++		put_image_kitty(url, x, y, i->width, i->height, i->sx, i->sy, sw * rc_pixel_per_char, sh * pixel_per_line_i, sw, sh);
+ 	    }
+ 
+ 	    continue ;
+@@ -275,7 +276,7 @@ drawImage(void)
+ 	draw = TRUE;
+     }
+ 
+-    if (!enable_inline_image) {
++    if (!rc_enable_inline_image) {
+ 	if (!draw)
+ 	    return;
+ 	syncImage();
+@@ -394,7 +395,7 @@ showImageProgress(Buffer *buf)
+ 	}
+     }
+     if (n) {
+-        if (enable_inline_image && n == l)
++        if (rc_enable_inline_image && n == l)
+ 	    drawImage();
+ 	message(Sprintf("%d/%d images loaded", l, n)->ptr,
+ 		buf->cursorX + buf->rootX, buf->cursorY + buf->rootY);
+@@ -413,12 +414,12 @@ loadImage(Buffer *buf, int flag)
+     char *loadargs[7];
+ #endif
+ 
+-    if (maxLoadImage > MAX_LOAD_IMAGE)
+-	maxLoadImage = MAX_LOAD_IMAGE;
+-    else if (maxLoadImage < 1)
+-	maxLoadImage = 1;
++    if (rc_maxLoadImage > MAX_LOAD_IMAGE)
++	rc_maxLoadImage = MAX_LOAD_IMAGE;
++    else if (rc_maxLoadImage < 1)
++	rc_maxLoadImage = 1;
+     if (n_load_image == 0)
+-	n_load_image = maxLoadImage;
++	n_load_image = rc_maxLoadImage;
+     if (!image_cache) {
+ 	image_cache = New_N(ImageCache *, MAX_LOAD_IMAGE);
+ 	bzero(image_cache, sizeof(ImageCache *) * MAX_LOAD_IMAGE);
+@@ -447,7 +448,7 @@ loadImage(Buffer *buf, int flag)
+ 	image_cache[i] = NULL;
+     }
+ 
+-    for (i = (buf != image_buffer) ? 0 : maxLoadImage; i < n_load_image; i++) {
++    for (i = (buf != image_buffer) ? 0 : rc_maxLoadImage; i < n_load_image; i++) {
+ 	cache = image_cache[i];
+ 	if (!cache || !cache->touch)
+ 	    continue;
+@@ -461,13 +462,13 @@ loadImage(Buffer *buf, int flag)
+     if (flag == IMG_FLAG_STOP) {
+ 	image_list = NULL;
+ 	image_file = NULL;
+-	n_load_image = maxLoadImage;
++	n_load_image = rc_maxLoadImage;
+ 	image_buffer = NULL;
+ 	return;
+     }
+ 
+     if (draw && image_buffer) {
+-        if (!enable_inline_image)
++        if (!rc_enable_inline_image)
+ 	    drawImage();
+ 	showImageProgress(image_buffer);
+     }
+@@ -576,7 +577,7 @@ getImage(Image * image, ParsedURL *curre
+ 	cache->pid = 0;
+ 	cache->index = 0;
+ 	cache->loaded = IMG_FLAG_UNLOADED;
+-	if (enable_inline_image == INLINE_IMG_OSC5379) {
++	if (rc_enable_inline_image == INLINE_IMG_OSC5379) {
+ 	    if (image->width > 0 && image->width % pixel_per_char_i > 0)
+ 		image->width += (pixel_per_char_i - image->width % pixel_per_char_i);
+ 
+@@ -699,9 +700,9 @@ getImageSize(ImageCache * cache)
+ 	goto got_image_size;
+ 
+     tmp = Strnew();
+-    if (!strchr(Imgdisplay, '/'))
++    if (!strchr(rc_Imgdisplay, '/'))
+ 	Strcat_m_charp(tmp, w3m_auxbin_dir(), "/", NULL);
+-    Strcat_m_charp(tmp, Imgdisplay, " -size ", shell_quote(cache->file), NULL);
++    Strcat_m_charp(tmp, rc_Imgdisplay, " -size ", shell_quote(cache->file), NULL);
+     f = popen(tmp->ptr, "r");
+     if (!f)
+ 	return FALSE;
+@@ -715,10 +716,10 @@ getImageSize(ImageCache * cache)
+ 	return FALSE;
+ 
+ got_image_size:
+-    w = (int)(w * image_scale / 100 + 0.5);
++    w = (int)(w * rc_image_scale / 100 + 0.5);
+     if (w == 0)
+ 	w = 1;
+-    h = (int)(h * image_scale / 100 + 0.5);
++    h = (int)(h * rc_image_scale / 100 + 0.5);
+     if (h == 0)
+ 	h = 1;
+     if (cache->width < 0 && cache->height < 0) {
+--- a/istream.c
++++ b/istream.c
+@@ -1,5 +1,6 @@
+ /* vi: set sw=4 ts=8 ai sm noet : */
+ #include "fm.h"
++#include "rc.h"
+ #include "myctype.h"
+ #include "istream.h"
+ #include <signal.h>
+@@ -513,7 +514,7 @@ ssl_get_certificate(SSL * ssl, char *hos
+      * The chain length is automatically checked by OpenSSL when we
+      * set the verify depth in the ctx.
+      */
+-    if (ssl_verify_server) {
++    if (rc_ssl_verify_server) {
+ 	long verr;
+ 	if ((verr = SSL_get_verify_result(ssl))
+ 	    != X509_V_OK) {
+--- a/linein.c
++++ b/linein.c
+@@ -1,4 +1,5 @@
+ /* vi: set sw=4 ts=8 ai sm noet : */
++#include "rc.h"
+ #include "fm.h"
+ #include "local.h"
+ #include "myctype.h"
+@@ -145,7 +146,7 @@ inputLineHistSearch(const char *prompt,
+     need_redraw = FALSE;
+ 
+ #ifdef USE_M17N
+-    wc_char_conv_init(wc_guess_8bit_charset(DisplayCharset), InnerCharset);
++    wc_char_conv_init(wc_guess_8bit_charset(rc_DisplayCharset), InnerCharset);
+ #endif
+     do {
+ 	x = calcPosition(strBuf->ptr, strProp, CLen, CPos, 0, CP_FORCE);
+@@ -183,9 +184,9 @@ inputLineHistSearch(const char *prompt,
+ 	cm_clear = TRUE;
+ 	cm_disp_clear = TRUE;
+ 	if (!i_quote &&
+-	    (((cm_mode & CPL_ALWAYS) && (c == CTRL_I || (space_autocomplete && c == ' '))) ||
++	    (((cm_mode & CPL_ALWAYS) && (c == CTRL_I || (rc_space_autocomplete && c == ' '))) ||
+ 	     ((cm_mode & CPL_ON) && (c == CTRL_I)))) {
+-	    if (emacs_like_lineedit && cm_next) {
++	    if (rc_emacs_like_lineedit && cm_next) {
+ 		_dcompl();
+ 		need_redraw = TRUE;
+ 	    }
+@@ -196,7 +197,7 @@ inputLineHistSearch(const char *prompt,
+ 	}
+ 	else if (!i_quote && CLen == CPos &&
+ 		 (cm_mode & CPL_ALWAYS || cm_mode & CPL_ON) && c == CTRL_D) {
+-	    if (!emacs_like_lineedit) {
++	    if (!rc_emacs_like_lineedit) {
+ 		_dcompl();
+ 		need_redraw = TRUE;
+ 	    }
+@@ -436,7 +437,7 @@ _esc(void)
+ 	break;
+     case CTRL_I:
+     case ' ':
+-	if (emacs_like_lineedit) {
++	if (rc_emacs_like_lineedit) {
+ 	    _rdcompl();
+ 	    cm_clear = FALSE;
+ 	    need_redraw = TRUE;
+@@ -445,20 +446,20 @@ _esc(void)
+ 	    _rcompl();
+ 	break;
+     case CTRL_D:
+-	if (!emacs_like_lineedit)
++	if (!rc_emacs_like_lineedit)
+ 	    _rdcompl();
+ 	need_redraw = TRUE;
+ 	break;
+     case 'f':
+-	if (emacs_like_lineedit)
++	if (rc_emacs_like_lineedit)
+ 	    _mvRw();
+ 	break;
+     case 'b':
+-	if (emacs_like_lineedit)
++	if (rc_emacs_like_lineedit)
+ 	    _mvLw();
+ 	break;
+     case CTRL_H:
+-	if (emacs_like_lineedit)
++	if (rc_emacs_like_lineedit)
+ 	    _bsw();
+ 	break;
+ #ifdef USE_M17N
+@@ -835,7 +836,7 @@ next_dcompl(int next)
+ 	move(y, 0);
+ 	clrtoeolx();
+ 	bold();
+-	if (emacs_like_lineedit)
++	if (rc_emacs_like_lineedit)
+ 	    /* FIXME: gettextize? */
+ 	    addstr("----- Press TAB to continue -----");
+ 	else
+@@ -1026,7 +1027,7 @@ _prev(void)
+ 	    return;
+ 	strCurrentBuf = strBuf;
+     }
+-    if (DecodeURL && (cm_mode & CPL_URL) )
++    if (rc_DecodeURL && (cm_mode & CPL_URL) )
+ 	p = url_decode2(p, NULL);
+     strBuf = Strnew_charp(p);
+     CLen = CPos = setStrType(strBuf, strProp);
+@@ -1045,7 +1046,7 @@ _next(void)
+ 	return;
+     p = nextHist(hist);
+     if (p) {
+-	if (DecodeURL && (cm_mode & CPL_URL) )
++	if (rc_DecodeURL && (cm_mode & CPL_URL) )
+ 	    p = url_decode2(p, NULL);
+ 	strBuf = Strnew_charp(p);
+     }
+--- a/local.c
++++ b/local.c
+@@ -1,4 +1,5 @@
+ /* vi: set sw=4 ts=8 ai sm noet : */
++#include "rc.h"
+ #include "fm.h"
+ #include <string.h>
+ #include <stdio.h>
+@@ -97,7 +98,7 @@ loadLocalDir(char *dname)
+ 	    nfile_max *= 2;
+ 	    flist = New_Reuse(char *, flist, nfile_max);
+ 	}
+-	if (multicolList) {
++	if (rc_multicolList) {
+ 	    l = strlen(dir->d_name);
+ 	    if (l > maxlen)
+ 		maxlen = l;
+@@ -106,7 +107,7 @@ loadLocalDir(char *dname)
+     }
+     closedir(d);
+ 
+-    if (multicolList) {
++    if (rc_multicolList) {
+ 	l = COLS / (maxlen + 2);
+ 	if (!l)
+ 	    l = 1;
+@@ -129,7 +130,7 @@ loadLocalDir(char *dname)
+ #endif				/* HAVE_LSTAT */
+ 	if (stat(fbuf->ptr, &st) < 0)
+ 	    continue;
+-	if (multicolList) {
++	if (rc_multicolList) {
+ 	    if (n == 1)
+ 		Strcat_charp(tmp, "<TD><NOBR>");
+ 	}
+@@ -151,7 +152,7 @@ loadLocalDir(char *dname)
+ 	if (S_ISDIR(st.st_mode))
+ 	    Strcat_char(tmp, '/');
+ 	Strcat_charp(tmp, "</A>");
+-	if (multicolList) {
++	if (rc_multicolList) {
+ 	    if (n++ == nrow) {
+ 		Strcat_charp(tmp, "</NOBR></TD>\n");
+ 		n = 1;
+@@ -175,7 +176,7 @@ loadLocalDir(char *dname)
+ 	    Strcat_charp(tmp, "<br>\n");
+ 	}
+     }
+-    if (multicolList) {
++    if (rc_multicolList) {
+ 	Strcat_charp(tmp, "</TR>\n</TABLE>\n");
+     }
+     Strcat_charp(tmp, "</BODY>\n</HTML>\n");
+@@ -301,11 +302,11 @@ cgi_filename(const char *uri, const char
+     *name = uri;
+     *path_info = NULL;
+ 
+-    if (cgi_bin != NULL && strncmp(uri, "/cgi-bin/", 9) == 0) {
++    if (rc_cgi_bin != NULL && strncmp(uri, "/cgi-bin/", 9) == 0) {
+ 	offset = 9;
+ 	if ((*path_info = strchr(uri + offset, '/')))
+ 	    *name = allocStr(uri, *path_info - uri);
+-	tmp = checkPath(*name + offset, cgi_bin);
++	tmp = checkPath(*name + offset, rc_cgi_bin);
+ 	if (tmp == NULL)
+ 	    return CGIFN_NORMAL;
+ 	*fn = tmp->ptr;
+@@ -327,8 +328,8 @@ cgi_filename(const char *uri, const char
+ 	offset = 6;
+     else if (strncmp(uri, tmp->ptr, tmp->length) == 0)
+ 	offset = tmp->length;
+-    else if (*uri == '/' && document_root != NULL) {
+-	Str tmp2 = Strnew_charp(document_root);
++    else if (*uri == '/' && rc_document_root != NULL) {
++	Str tmp2 = Strnew_charp(rc_document_root);
+ 	if (Strlastchar(tmp2) != '/')
+ 	    Strcat_char(tmp2, '/');
+ 	Strcat_charp(tmp2, uri + 1);
+--- a/mailcap.c
++++ b/mailcap.c
+@@ -1,5 +1,6 @@
+ /* vi: set sw=4 ts=8 ai sm noet : */
+ #include "fm.h"
++#include "rc.h"
+ #include "myctype.h"
+ #include <stdio.h>
+ #include <errno.h>
+@@ -225,8 +226,8 @@ initMailcap(void)
+     TextListItem *tl;
+     int i;
+ 
+-    if (non_null(mailcap_files))
+-	mailcap_list = make_domain_list(mailcap_files);
++    if (non_null(rc_mailcap_files))
++	mailcap_list = make_domain_list(rc_mailcap_files);
+     else
+ 	mailcap_list = NULL;
+     if (mailcap_list == NULL)
+--- a/map.c
++++ b/map.c
+@@ -2,6 +2,7 @@
+ /*
+  * client-side image maps
+  */
++#include "rc.h"
+ #include "fm.h"
+ #include <math.h>
+ 
+@@ -76,8 +77,8 @@ nearestMapArea(MapList *ml, int x, int y
+ {
+     ListItem *al;
+     MapArea *a;
+-    int i, l, n = -1, min = -1, limit = pixel_per_char * pixel_per_char
+-	+ pixel_per_line * pixel_per_line;
++    int i, l, n = -1, min = -1, limit = rc_pixel_per_char * rc_pixel_per_char
++	+ rc_pixel_per_line * rc_pixel_per_line;
+ 
+     if (!ml || !ml->area)
+ 	return n;
+@@ -169,9 +170,9 @@ getMapXY(Buffer *buf, Anchor *a, int *x,
+ 	return 0;
+     *x = (int)((buf->currentColumn + buf->cursorX
+ 		- COLPOS(buf->currentLine, a->start.pos) + 0.5)
+-	       * pixel_per_char) - a->image->xoffset;
++	       * rc_pixel_per_char) - a->image->xoffset;
+     *y = (int)((buf->currentLine->linenumber - a->image->y + 0.5)
+-	       * pixel_per_line) - a->image->yoffset;
++	       * rc_pixel_per_line) - a->image->yoffset;
+     if (*x <= 0)
+ 	*x = 1;
+     if (*y <= 0)
+@@ -217,7 +218,7 @@ follow_map_menu(Buffer *buf, char *name,
+     initial = searchMapArea(buf, ml, a_img);
+     if (initial < 0)
+ 	initial = 0;
+-    else if (!image_map_list) {
++    else if (!rc_image_map_list) {
+ 	selected = initial;
+ 	goto map_end;
+     }
+@@ -492,7 +493,7 @@ append_frame_info(Buffer *buf, Str html,
+ 						    buf->document_charset));
+ 		    Strcat_charp(html, p);
+ 		}
+-		if (DecodeURL)
++		if (rc_DecodeURL)
+ 		    p = html_quote(url_decode2(frame.body->url, buf));
+ 		else
+ 		    p = q;
+@@ -580,7 +581,7 @@ page_info_panel(Buffer *buf)
+ 	parseURL2(a->url, &pu, baseURL(buf));
+ 	p = parsedURL2Str(&pu)->ptr;
+ 	q = html_quote(p);
+-	if (DecodeURL)
++	if (rc_DecodeURL)
+ 	    p = html_quote(url_decode2(p, buf));
+ 	else
+ 	    p = q;
+@@ -593,7 +594,7 @@ page_info_panel(Buffer *buf)
+ 	parseURL2(a->url, &pu, baseURL(buf));
+ 	p = parsedURL2Str(&pu)->ptr;
+ 	q = html_quote(p);
+-	if (DecodeURL)
++	if (rc_DecodeURL)
+ 	    p = html_quote(url_decode2(p, buf));
+ 	else
+ 	    p = q;
+--- a/menu.c
++++ b/menu.c
+@@ -5,6 +5,7 @@
+ #include <stdio.h>
+ 
+ #include "fm.h"
++#include "rc.h"
+ #include "menu.h"
+ #include "func.h"
+ #include "myctype.h"
+@@ -693,12 +694,12 @@ menu_dispatch_with_mouse(int (*keymap[12
+     char c;
+ 
+ #ifdef USE_MOUSE
+-    if (use_mouse)
++    if (rc_use_mouse)
+ 	mouse_active();
+ #endif			/* USE_MOUSE */
+     c = getch();
+ #ifdef USE_MOUSE
+-    if (use_mouse)
++    if (rc_use_mouse)
+ 	mouse_inactive();
+ #if defined(USE_GPM) || defined(USE_SYSMOUSE)
+     if (c == X_MOUSE_SELECTED)
+@@ -724,7 +725,7 @@ set_menu_frame(void)
+ 	graph_mode = FALSE;
+ #ifdef USE_M17N
+ 	FRAME_WIDTH = 0;
+-	FRAME = get_symbol(DisplayCharset, &FRAME_WIDTH);
++	FRAME = get_symbol(rc_DisplayCharset, &FRAME_WIDTH);
+ 	if (!WcOption.use_wide)
+ 	    FRAME_WIDTH = 1;
+ #else
+@@ -950,7 +951,7 @@ menuForwardSearch(Menu *menu, const char
+ {
+     int i;
+     const char *p;
+-    if ((p = regexCompile(str, IgnoreCase)) != NULL) {
++    if ((p = regexCompile(str, rc_IgnoreCase)) != NULL) {
+ 	message(p, 0, 0);
+ 	return -1;
+     }
+@@ -974,7 +975,7 @@ menu_search_forward(Menu *menu, int from
+     if (str == NULL || *str == '\0')
+ 	return -1;
+     SearchString = str;
+-    str = conv_search_string(str, DisplayCharset);
++    str = conv_search_string(str, rc_DisplayCharset);
+     menuSearchRoutine = menuForwardSearch;
+     found = menuForwardSearch(menu, str, from + 1);
+     if (WrapSearch && found == -1)
+@@ -1000,7 +1001,7 @@ menuBackwardSearch(Menu *menu, const cha
+ {
+     int i;
+     const char *p;
+-    if ((p = regexCompile(str, IgnoreCase)) != NULL) {
++    if ((p = regexCompile(str, rc_IgnoreCase)) != NULL) {
+ 	message(p, 0, 0);
+ 	return -1;
+     }
+@@ -1024,7 +1025,7 @@ menu_search_backward(Menu *menu, int fro
+     if (str == NULL || *str == '\0')
+ 	return -1;
+     SearchString = str;
+-    str = conv_search_string(str, DisplayCharset);
++    str = conv_search_string(str, rc_DisplayCharset);
+     menuSearchRoutine = menuBackwardSearch;
+     found = menuBackwardSearch(menu, str, from - 1);
+     if (WrapSearch && found == -1)
+@@ -1057,7 +1058,7 @@ menu_search_next_previous(Menu *menu, in
+ 	disp_message("No previous regular expression", TRUE);
+ 	return -1;
+     }
+-    str = conv_search_string(SearchString, DisplayCharset);
++    str = conv_search_string(SearchString, rc_DisplayCharset);
+     if (reverse != 0)
+ 	reverse = 1;
+     if (menuSearchRoutine == menuBackwardSearch)
+@@ -1107,10 +1108,10 @@ static int
+ mMouse_scroll_line(void)
+ {
+     int i = 0;
+-    if (relative_wheel_scroll)
+-	i = (relative_wheel_scroll_ratio * CurrentMenu->height + 99) / 100;
++    if (rc_relative_wheel_scroll)
++	i = (rc_relative_wheel_scroll_ratio * CurrentMenu->height + 99) / 100;
+     else
+-	i = fixed_wheel_scroll_count;
++	i = rc_fixed_wheel_scroll_count;
+     return i ? i : 1;
+ }
+ 
+@@ -1475,7 +1476,7 @@ smChBuf(void)
+ #ifdef USE_IMAGE
+ 	deleteImage(buf);
+ #endif
+-	if (clear_buffer)
++	if (rc_clear_buffer)
+ 	    tmpClearBuffer(buf);
+     }
+ }
+@@ -1697,7 +1698,7 @@ smChTab(void)
+ #ifdef USE_IMAGE
+ 	deleteImage(buf);
+ #endif
+-	if (clear_buffer)
++	if (rc_clear_buffer)
+ 	    tmpClearBuffer(buf);
+     }
+ }
+@@ -1863,7 +1864,7 @@ interpret_menu(FILE * mf)
+     int in_menu = 0, nmenu = 0, nitem = 0, type;
+     MenuItem *item = NULL;
+ #ifdef USE_M17N
+-    wc_ces charset = SystemCharset;
++    wc_ces charset = rc_SystemCharset;
+ #endif
+ 
+     while (!feof(mf)) {
+@@ -1939,7 +1940,7 @@ initMenu(void)
+ 	MenuItem *item;
+ #ifdef ENABLE_NLS
+ 	/* FIXME: charset that gettext(3) returns */
+-	MainMenuCharset = SystemCharset;
++	MainMenuCharset = rc_SystemCharset;
+ #endif
+ 	for (item = MainMenuItem; item->type != MENU_END; item++)
+ 	    item->label =
+--- a/news.c
++++ b/news.c
+@@ -1,5 +1,6 @@
+ /* vi: set sw=4 ts=8 ai sm noet : */
+ #include "fm.h"
++#include "rc.h"
+ #include "myctype.h"
+ #include <stdio.h>
+ #include <stdlib.h>
+@@ -245,7 +246,7 @@ openNewsStream(ParsedURL *pu)
+     if (pu->scheme == SCM_NNTP || pu->scheme == SCM_NNTP_GROUP)
+ 	host = pu->host;
+     else
+-	host = NNTP_server;
++	host = rc_NNTP_server;
+     if (!host || *host == '\0') {
+ 	if (current_news.host)
+ 	    news_quit(&current_news);
+@@ -258,8 +259,8 @@ openNewsStream(ParsedURL *pu)
+     }
+     else
+ 	port = pu->port;
+-    if (NNTP_mode && *NNTP_mode)
+-	mode = NNTP_mode;
++    if (rc_NNTP_mode && *rc_NNTP_mode)
++	mode = rc_NNTP_mode;
+     else
+ 	mode = NULL;
+     if (current_news.host) {
+@@ -325,7 +326,7 @@ loadNewsgroup0(ParsedURL *pu)
+     volatile int flag = 0, start = 0, end = 0;
+     void (*volatile prevtrap) (SIGNAL_ARG) = NULL;
+ #ifdef USE_M17N
+-    wc_ces doc_charset = DocumentCharset, mime_charset;
++    wc_ces doc_charset = rc_DocumentCharset, mime_charset;
+ 
+     *charset = WC_CES_US_ASCII;
+ #endif
+@@ -373,20 +374,20 @@ loadNewsgroup0(ParsedURL *pu)
+ 	    if (start < first)
+ 		start = first;
+ 	    if (end <= 0)
+-		end = start + MaxNewsMessage - 1;
++		end = start + rc_MaxNewsMessage - 1;
+ 	}
+     }
+     if (start <= 0) {
+ 	start = first;
+ 	end = last;
+-	if (end - start > MaxNewsMessage - 1)
+-	    start = end - MaxNewsMessage + 1;
++	if (end - start > rc_MaxNewsMessage - 1)
++	    start = end - rc_MaxNewsMessage + 1;
+     }
+     page = Sprintf("<html>\n<head>\n<base href=\"%s\">\n\
+ <title>Newsgroup: %s %d-%d</title>\n\
+ </head>\n<body>\n<h1>Newsgroup: %s %d-%d</h1>\n<hr>\n", parsedURL2Str(pu)->ptr, qgroup, start, end, qgroup, start, end);
+     if (start > first) {
+-	i = start - MaxNewsMessage;
++	i = start - rc_MaxNewsMessage;
+ 	if (i < first)
+ 	    i = first;
+ 	Strcat(page, Sprintf("<a href=\"%s%s/%d-%d\">[%d-%d]</a>\n", scheme,
+@@ -462,7 +463,7 @@ loadNewsgroup0(ParsedURL *pu)
+     Strcat_charp(page, "</table>\n");
+ 
+     if (end < last) {
+-	i = end + MaxNewsMessage;
++	i = end + rc_MaxNewsMessage;
+ 	if (i > last)
+ 	    i = last;
+ 	Strcat(page, Sprintf("<a href=\"%s%s/%d-%d\">[%d-%d]</a>\n", scheme,
+--- a/rc.h
++++ b/rc.h
+@@ -2,7 +2,248 @@
+ #ifndef RC_H
+ #define RC_H
+ 
++#include "config.h"
++
++#ifdef USE_M17N
++#include "wc.h"
++#include "wtf.h"
++#endif
++
++#include <stdio.h>
++
++#ifdef MAINPROGRAM
++#define global
++#define init(x) =(x)
++#else				/* not MAINPROGRAM */
++#define global extern
++#define init(x)
++#endif				/* not MAINPROGRAM */
++
+ extern void show_params(FILE * fp);
+ extern int str_to_bool(const char *value, int old);
+ 
++global int rc_Tabstop init(8);
++global int rc_IndentIncr init(4);
++global int rc_MaxCols init(0);
++global double rc_pixel_per_char init(DEFAULT_PIXEL_PER_CHAR);
++#ifdef USE_IMAGE
++global double rc_pixel_per_line init(DEFAULT_PIXEL_PER_LINE);
++#endif
++global char rc_RenderFrame init(FALSE);
++global char rc_TargetSelf init(FALSE);
++global int rc_open_tab_blank init(FALSE);
++global int rc_open_tab_dl_list init(FALSE);
++global int rc_displayLink init(FALSE);
++global int rc_displayLinkNumber init(FALSE);
++global int rc_zeroBasedLinkNo init(FALSE);
++global int rc_DecodeURL init(FALSE);
++global int rc_displayLineInfo init(FALSE);
++global int rc_displayColumnNumber init(FALSE);
++global int rc_UseExternalDirBuffer init(TRUE);
++global const char *rc_DirBufferCommand init("file:///$LIB/dirlist" CGI_EXTENSION);
++#ifdef USE_DICT
++global int rc_UseDictCommand init(TRUE);
++global const char *rc_DictCommand init("file:///$LIB/w3mdict" CGI_EXTENSION);
++global const char *rc_DictPrompt init("(dictionary)!");
++#endif				/* USE_DICT */
++global int rc_multicolList init(FALSE);
++global char rc_UseAltEntity init(FALSE);
++global char rc_UseGraphicChar init(GRAPHIC_CHAR_CHARSET);
++global char rc_DisplayBorders init(FALSE);
++global char rc_DisableCenter init(FALSE);
++global int rc_FoldTextarea init(FALSE);
++global int rc_FoldPre init(FALSE);
++global int rc_displayInsDel init(DISPLAY_INS_DEL_NORMAL);
++global int rc_ignore_null_img_alt init(TRUE);
++#ifdef USE_IMAGE
++global int rc_view_unseenobject init(FALSE);
++global int rc_displayImage init(TRUE);
++global int rc_pseudoInlines init(TRUE);
++global char *rc_Imgdisplay init(IMGDISPLAY);
++global int rc_autoImage init(TRUE);
++global int rc_useExtImageViewer init(TRUE);
++global int rc_maxLoadImage init(4);
++global int rc_image_map_list init(TRUE);
++global double rc_image_scale init(100);
++extern int rc_enable_inline_image;
++#else
++global int rc_displayImage init(FALSE);	/* XXX: emacs-w3m use display_image=off */
++global int rc_view_unseenobject init(TRUE);
++#endif
++
++global int rc_FoldLine init(FALSE);
++global int rc_showLineNum init(FALSE);
++global int rc_show_srch_str init(TRUE);
++global int rc_MessageDelay init(2);
++global int rc_label_topline init(FALSE);
++global int rc_nextpage_topline init(FALSE);
++
++#ifdef USE_COLOR
++global int rc_useColor init(TRUE);
++global int rc_highIntensityColors init(FALSE);
++global int rc_basic_color init(8);	/* don't change */
++global int rc_anchor_color init(4);	/* blue  */
++global int rc_image_color init(2);	/* green */
++global int rc_form_color init(1);	/* red   */
++#ifdef USE_BG_COLOR
++global int rc_bg_color init(8);	/* don't change */
++global int rc_mark_color init(6);	/* cyan */
++#endif				/* USE_BG_COLOR */
++global int rc_useActiveColor init(FALSE);
++global int rc_active_color init(6);	/* cyan */
++global int rc_useVisitedColor init(FALSE);
++global int rc_visited_color init(5);	/* magenta  */
++#endif				/* USE_COLOR */
++global int rc_PagerMax init(PAGER_MAX_LINE);
++
++#ifdef USE_HISTORY
++global int rc_UseHistory init(TRUE);
++global int rc_URLHistSize init(100);
++global int rc_SaveURLHist init(TRUE);
++#endif				/* USE_HISTORY */
++global int rc_StoreSession init(FALSE);
++global int rc_confirm_on_quit init(TRUE);
++global int rc_exit_on_last init(FALSE);
++global int rc_close_tab_back init(FALSE);
++
++#ifdef USE_MARK
++global int rc_use_mark init(FALSE);
++#endif
++global int rc_emacs_like_lineedit init(FALSE);
++global int rc_space_autocomplete init(FALSE);
++global int rc_vi_prec_num init(FALSE);
++global int rc_MarkAllPages init(FALSE);
++global int rc_WrapDefault init(FALSE);
++global int rc_IgnoreCase init(TRUE);
++
++#ifdef USE_MOUSE
++global int rc_use_mouse init(TRUE);
++global int rc_reverse_mouse init(FALSE);
++global int rc_relative_wheel_scroll init(FALSE);
++global int rc_relative_wheel_scroll_ratio init(30);
++global int rc_fixed_wheel_scroll_count init(5);
++#endif
++global int rc_clear_buffer init(TRUE);
++global char rc_DecodeCTE init(FALSE);
++global char rc_AutoUncompress init(FALSE);
++global char rc_PreserveTimestamp init(TRUE);
++global char *rc_keymap_file init(KEYMAP_FILE);
++global char rc_use_proxy init(TRUE);
++global char *rc_HTTP_proxy init(NULL);
++
++#ifdef USE_SSL
++global char *rc_HTTPS_proxy init(NULL);
++#endif				/* USE_SSL */
++#ifdef USE_GOPHER
++global char *rc_GOPHER_proxy init(NULL);
++#endif				/* USE_GOPHER */
++global char *rc_FTP_proxy init(NULL);
++global char *rc_NO_proxy init(NULL);
++global int rc_NOproxy_netaddr init(TRUE);
++global char rc_NoCache init(FALSE);
++global char *rc_document_root init(NULL);
++global char *rc_personal_document_root init(NULL);
++
++global char *rc_cgi_bin init(NULL);
++global char *rc_index_file init(NULL);
++global char *rc_param_tmp_dir init(NULL);
++global char *rc_param_dl_dir init(NULL);
++global char *rc_mimetypes_files init(USER_MIMETYPES ", " SYS_MIMETYPES);
++global char *rc_mailcap_files init(USER_MAILCAP ", " SYS_MAILCAP);
++
++#ifdef USE_EXTERNAL_URI_LOADER
++global char *rc_urimethodmap_files init(USER_URIMETHODMAP ", " SYS_URIMETHODMAP);
++#endif
++global const char *rc_Editor init(DEF_EDITOR);
++
++global int rc_MailtoOptions init(MAILTO_OPTIONS_IGNORE);
++#ifdef USE_W3MMAILER
++global char *rc_Mailer init(NULL);
++#else
++global char *rc_Mailer init(DEF_MAILER);
++#endif
++
++global char *rc_ExtBrowser init(DEF_EXT_BROWSER);
++global char *rc_ExtBrowser2 init(NULL);
++global char *rc_ExtBrowser3 init(NULL);
++global char *rc_ExtBrowser4 init(NULL);
++global char *rc_ExtBrowser5 init(NULL);
++global char *rc_ExtBrowser6 init(NULL);
++global char *rc_ExtBrowser7 init(NULL);
++global char *rc_ExtBrowser8 init(NULL);
++global char *rc_ExtBrowser9 init(NULL);
++global int rc_BackgroundExtViewer init(TRUE);
++global int rc_use_lessopen init(FALSE);
++
++#ifdef USE_SSL
++global char *rc_ssl_forbid_method init("2, 3, t, 5");
++#ifdef SSL_CTX_set_min_proto_version
++global char *rc_ssl_min_version init(NULL);
++#endif
++#if (OPENSSL_VERSION_NUMBER < 0x10100000L) || defined(LIBRESSL_VERSION_NUMBER)
++global char *rc_ssl_cipher init("DEFAULT:!LOW:!RC4:!EXP");
++#else
++global char *rc_ssl_cipher init(NULL);
++#endif
++#endif				/* USE_SSL */
++
++#if defined(USE_SSL) && defined(USE_SSL_VERIFY)
++global int rc_ssl_verify_server init(TRUE);
++global char *rc_ssl_cert_file init(NULL);
++global char *rc_ssl_key_file init(NULL);
++global char *rc_ssl_ca_path init(NULL);
++global char *rc_ssl_ca_file init(DEF_CAFILE);
++global int rc_ssl_ca_default init(TRUE);
++#endif				/* defined(USE_SSL) &&
++				 * defined(USE_SSL_VERIFY) */
++
++#ifdef USE_COOKIE
++global int rc_use_cookie init(TRUE);
++global int rc_show_cookie init(FALSE);
++global int rc_accept_cookie init(TRUE);
++global int rc_accept_bad_cookie init(ACCEPT_BAD_COOKIE_DISCARD);
++global char *rc_cookie_reject_domains init(NULL);
++global char *rc_cookie_accept_domains init(NULL);
++global char *rc_cookie_avoid_wrong_number_of_dots init(NULL);
++#endif
++
++global char *rc_passwd_file init(PASSWD_FILE);
++global int rc_disable_secret_security_check init(FALSE);
++global char *rc_ftppasswd init(NULL);
++global int rc_ftppass_hostnamegen init(TRUE);
++global char *rc_pre_form_file init(PRE_FORM_FILE);
++global char *rc_siteconf_file init(SITECONF_FILE);
++global char *rc_UserAgent init(NULL);
++global int rc_NoSendReferer init(FALSE);
++global int rc_CrossOriginReferer init(TRUE);
++global char *rc_AcceptLang init(NULL);
++global char *rc_AcceptEncoding init(NULL);
++global char *rc_AcceptMedia init(NULL);
++global char rc_ArgvIsURL init(TRUE);
++global int rc_retryAsHttp init(TRUE);
++global int rc_DefaultURLString init(DEFAULT_URL_CURRENT);
++global int rc_FollowRedirection init(10);
++global char rc_MetaRefresh init(FALSE);
++global char rc_LocalhostOnly init(FALSE);
++
++#ifdef INET6
++global int rc_DNS_order init(DNS_ORDER_UNSPEC);
++#endif
++
++#ifdef USE_NNTP
++global char *rc_NNTP_server init(NULL);
++global char *rc_NNTP_mode init(NULL);
++global int rc_MaxNewsMessage init(50);
++#endif
++
++#ifdef USE_M17N
++global wc_ces rc_DisplayCharset init(DISPLAY_CHARSET);
++global wc_ces rc_DocumentCharset init(DOCUMENT_CHARSET);
++global wc_ces rc_SystemCharset init(SYSTEM_CHARSET);
++global char rc_FollowLocale init(TRUE);
++global char rc_ExtHalfdump init(FALSE);
++global char rc_SearchConv init(TRUE);
++global char rc_SimplePreserveSpace init(FALSE);
++#endif
++
+ #endif /* RC_H */
+--- a/search.c
++++ b/search.c
+@@ -1,4 +1,5 @@
+ /* vi: set sw=4 ts=8 ai sm noet : */
++#include "rc.h"
+ #include "fm.h"
+ #include "regex.h"
+ #include <signal.h>
+@@ -72,7 +73,7 @@ migemostr(const char *str)
+     Strchop(tmp);
+     if (tmp->length == 0)
+ 	goto err;
+-    return conv_search_string(tmp->ptr, SystemCharset);
++    return conv_search_string(tmp->ptr, rc_SystemCharset);
+   err:
+     /* XXX: backend migemo is not working? */
+     init_migemo();
+@@ -86,7 +87,7 @@ migemostr(const char *str)
+ const char *
+ conv_search_string(const char *str, wc_ces f_ces)
+ {
+-    if (SearchConv && !WcOption.pre_conv &&
++    if (rc_SearchConv && !WcOption.pre_conv &&
+ 	Currentbuf->document_charset != f_ces)
+ 	str = wtf_conv_fit(str, Currentbuf->document_charset);
+     return str;
+@@ -111,7 +112,7 @@ forwardSearch(Buffer *buf, const char *s
+     }
+     else
+ #endif
+-    if ((p = regexCompile(str, IgnoreCase)) != NULL) {
++    if ((p = regexCompile(str, rc_IgnoreCase)) != NULL) {
+ 	message(p, 0, 0);
+ 	return SR_NOTFOUND;
+     }
+@@ -198,15 +199,15 @@ backwardSearch(Buffer *buf, const char *
+ 
+ #ifdef USE_MIGEMO
+     if (migemo_active > 0) {
+-	if (((p = regexCompile(migemostr(str), IgnoreCase)) != NULL)
+-	    && ((p = regexCompile(str, IgnoreCase)) != NULL)) {
++	if (((p = regexCompile(migemostr(str), rc_IgnoreCase)) != NULL)
++	    && ((p = regexCompile(str, rc_IgnoreCase)) != NULL)) {
+ 	    message(p, 0, 0);
+ 	    return SR_NOTFOUND;
+ 	}
+     }
+     else
+ #endif
+-    if ((p = regexCompile(str, IgnoreCase)) != NULL) {
++    if ((p = regexCompile(str, rc_IgnoreCase)) != NULL) {
+ 	message(p, 0, 0);
+ 	return SR_NOTFOUND;
+     }
+--- a/symbol.c
++++ b/symbol.c
+@@ -1,6 +1,7 @@
+ /* vi: set sw=4 ts=8 ai sm noet : */
+ 
+ #include "fm.h"
++#include "rc.h"
+ 
+ #include "Symbols/alt.sym"
+ #include "Symbols/graph.sym"
+@@ -88,7 +89,7 @@ get_symbol(wc_ces charset, int *width)
+     charset_symbol_set *p;
+     symbol_set *s = NULL;
+ 
+-    if (UseGraphicChar != GRAPHIC_CHAR_ASCII) {
++    if (rc_UseGraphicChar != GRAPHIC_CHAR_ASCII) {
+ 	if (charset == save_charset && save_symbol != NULL &&
+ 	    *width == save_symbol->width) {
+ 	    return save_symbol->conved_item;
+--- a/table.c
++++ b/table.c
+@@ -2,6 +2,7 @@
+ /* 
+  * HTML table
+  */
++#include "rc.h"
+ #include <sys/types.h>
+ #include <stdio.h>
+ #include <string.h>
+@@ -477,7 +478,7 @@ visible_length(const char *str)
+ 	    len--;
+ 	    do {
+ 		len++;
+-	    } while ((visible_length_offset + len) % Tabstop != 0);
++	    } while ((visible_length_offset + len) % rc_Tabstop != 0);
+ 	}
+ 	else if (*str == '\r' || *str == '\n') {
+ 	    len--;
+@@ -509,7 +510,7 @@ visible_length_plain(char *str)
+ 	if (*str == '\t') {
+ 	    do {
+ 		len++;
+-	    } while ((visible_length_offset + len) % Tabstop != 0);
++	    } while ((visible_length_offset + len) % rc_Tabstop != 0);
+ 	    str++;
+ 	}
+ 	else if (*str == '\r' || *str == '\n') {
+@@ -607,14 +608,14 @@ print_item(struct table *t, int row, int
+ 	    alignment = ALIGN_RIGHT;
+ 	else if ((t->tabattr[row][col] & HTT_ALIGN) == HTT_CENTER)
+ 	    alignment = ALIGN_CENTER;
+-	if (DisableCenter && alignment == ALIGN_CENTER)
++	if (rc_DisableCenter && alignment == ALIGN_CENTER)
+ 	    alignment = ALIGN_LEFT;
+ 	align(lbuf, width, alignment);
+ 	Strcat(buf, lbuf->line);
+     }
+     else {
+ 	lbuf = newTextLine(NULL, 0);
+-	if (DisableCenter)
++	if (rc_DisableCenter)
+ 	    align(lbuf, width, ALIGN_LEFT);
+ 	else
+ 	    align(lbuf, width, ALIGN_CENTER);
+@@ -2018,8 +2019,8 @@ begin_table(int border, int spacing, int
+     struct table *t;
+     int mincell = minimum_cellspacing(border);
+     int rcellspacing;
+-    int mincell_pixels = round(mincell * pixel_per_char);
+-    int ppc = round(pixel_per_char);
++    int mincell_pixels = round(mincell * rc_pixel_per_char);
++    int ppc = round(rc_pixel_per_char);
+ 
+     t = newTable();
+     t->row = t->col = -1;
+@@ -2319,7 +2320,7 @@ skip_space(struct table *t, char *line,
+ 	    }
+ 	    if (s > 0) {
+ #ifdef USE_M17N
+-		if (!SimplePreserveSpace &&
++		if (!rc_SimplePreserveSpace &&
+ 		    ctype == PC_KANJI1 && prev_ctype == PC_KANJI1)
+ 		    skip += s;
+ 		else
+@@ -2987,7 +2988,7 @@ feed_table_tag(struct table *tbl, char *
+ 	    check_rowcol(tbl, mode);
+ 	    if (i == 0) {
+ 		Str tmp = process_anchor(tag, line);
+-    		if (displayLinkNumber)
++    		if (rc_displayLinkNumber)
+ 		{
+ 			Str t = getLinkNumberStr(-1);
+ 			feed_table_inline_tag(tbl, NULL, mode, t->length);
+@@ -3006,7 +3007,7 @@ feed_table_tag(struct table *tbl, char *
+ 	    suspend_or_pushdata(tbl, line);
+ 	break;
+     case HTML_DEL:
+-	switch (displayInsDel) {
++	switch (rc_displayInsDel) {
+ 	case DISPLAY_INS_DEL_SIMPLE:
+ 	    mode->pre_mode |= TBLM_DEL;
+ 	    break;
+@@ -3019,7 +3020,7 @@ feed_table_tag(struct table *tbl, char *
+ 	}
+ 	break;
+     case HTML_N_DEL:
+-	switch (displayInsDel) {
++	switch (rc_displayInsDel) {
+ 	case DISPLAY_INS_DEL_SIMPLE:
+ 	    mode->pre_mode &= ~TBLM_DEL;
+ 	    break;
+@@ -3032,7 +3033,7 @@ feed_table_tag(struct table *tbl, char *
+ 	}
+ 	break;
+     case HTML_S:
+-	switch (displayInsDel) {
++	switch (rc_displayInsDel) {
+ 	case DISPLAY_INS_DEL_SIMPLE:
+ 	    mode->pre_mode |= TBLM_S;
+ 	    break;
+@@ -3045,7 +3046,7 @@ feed_table_tag(struct table *tbl, char *
+ 	}
+ 	break;
+     case HTML_N_S:
+-	switch (displayInsDel) {
++	switch (rc_displayInsDel) {
+ 	case DISPLAY_INS_DEL_SIMPLE:
+ 	    mode->pre_mode &= ~TBLM_S;
+ 	    break;
+@@ -3059,7 +3060,7 @@ feed_table_tag(struct table *tbl, char *
+ 	break;
+     case HTML_INS:
+     case HTML_N_INS:
+-	switch (displayInsDel) {
++	switch (rc_displayInsDel) {
+ 	case DISPLAY_INS_DEL_SIMPLE:
+ 	    break;
+ 	case DISPLAY_INS_DEL_NORMAL:
+--- a/terms.c
++++ b/terms.c
+@@ -3,6 +3,7 @@
+  * An original curses library for EUC-kanji by Akinori ITO,     December 1989
+  * revised by Akinori ITO, January 1995
+  */
++#include "rc.h"
+ #include <stdio.h>
+ #include <signal.h>
+ #include <sys/types.h>
+@@ -1208,8 +1209,8 @@ setlinescols(void)
+ 	LINES = tgetnum("li");	/* number of line */
+     if (COLS <= 0)
+ 	COLS = tgetnum("co");	/* number of column */
+-    if (MaxCols && COLS > MaxCols)
+-	COLS = MaxCols;
++    if (rc_MaxCols && COLS > rc_MaxCols)
++	COLS = rc_MaxCols;
+     if (opt_cols && COLS > opt_cols)
+ 	COLS = opt_cols;
+ #if defined(__CYGWIN__)
+@@ -1597,7 +1598,7 @@ graphend(void)
+ int
+ graph_ok(void)
+ {
+-    if (UseGraphicChar != GRAPHIC_CHAR_DEC)
++    if (rc_UseGraphicChar != GRAPHIC_CHAR_DEC)
+ 	return 0;
+     return T_as[0] != 0 && T_ae[0] != 0 && T_ac[0] != 0;
+ }
+@@ -1616,7 +1617,7 @@ color_seq(int colmode)
+     int n = 30;
+     static char seqbuf[32];
+ #ifdef USE_COLOR
+-    n = highIntensityColors ? 90 : 30;
++    n = rc_highIntensityColors ? 90 : 30;
+ #endif
+     sprintf(seqbuf, "\033[%dm", ((colmode >> 8) & 7) + n);
+     return seqbuf;
+@@ -1667,7 +1668,7 @@ refresh(void)
+     short *dirty;
+ 
+ #ifdef USE_M17N
+-    wc_putc_init(InnerCharset, DisplayCharset);
++    wc_putc_init(InnerCharset, rc_DisplayCharset);
+ #endif
+     for (line = 0; line <= LASTLINE; line++) {
+ 	dirty = &ScreenImage[line]->isdirty;
+--- a/url.c
++++ b/url.c
+@@ -1,5 +1,6 @@
+ /* vi: set sw=4 ts=8 ai sm noet : */
+ #include "fm.h"
++#include "rc.h"
+ #ifndef __MINGW32_VERSION
+ #include <unistd.h>
+ #include <sys/types.h>
+@@ -209,8 +210,8 @@ initMimeTypes(void)
+     int i;
+     TextListItem *tl;
+ 
+-    if (non_null(mimetypes_files))
+-	mimetypes_list = make_domain_list(mimetypes_files);
++    if (non_null(rc_mimetypes_files))
++	mimetypes_list = make_domain_list(rc_mimetypes_files);
+     else
+ 	mimetypes_list = NULL;
+     if (mimetypes_list == NULL)
+@@ -332,10 +333,10 @@ openSSLHandle(int sock, char *hostname,
+     static int old_ssl_verify_server = -1;
+ #endif
+ 
+-    if (old_ssl_forbid_method != ssl_forbid_method
+-	&& (!old_ssl_forbid_method || !ssl_forbid_method ||
+-	    strcmp(old_ssl_forbid_method, ssl_forbid_method))) {
+-	old_ssl_forbid_method = ssl_forbid_method;
++    if (old_ssl_forbid_method != rc_ssl_forbid_method
++	&& (!old_ssl_forbid_method || !rc_ssl_forbid_method ||
++	    strcmp(old_ssl_forbid_method, rc_ssl_forbid_method))) {
++	old_ssl_forbid_method = rc_ssl_forbid_method;
+ #ifdef USE_SSL_VERIFY
+ 	ssl_path_modified = 1;
+ #else
+@@ -343,8 +344,8 @@ openSSLHandle(int sock, char *hostname,
+ #endif
+     }
+ #ifdef USE_SSL_VERIFY
+-    if (old_ssl_verify_server != ssl_verify_server) {
+-	old_ssl_verify_server = ssl_verify_server;
++    if (old_ssl_verify_server != rc_ssl_verify_server) {
++	old_ssl_verify_server = rc_ssl_verify_server;
+ 	ssl_path_modified = 1;
+     }
+     if (ssl_path_modified) {
+@@ -367,9 +368,9 @@ openSSLHandle(int sock, char *hostname,
+ 	if (!(ssl_ctx = SSL_CTX_new(SSLv23_client_method())))
+ 	    goto eend;
+ #ifdef SSL_CTX_set_min_proto_version
+-	if (ssl_min_version && *ssl_min_version != '\0') {
++	if (rc_ssl_min_version && *rc_ssl_min_version != '\0') {
+ 	    int sslver;
+-	    sslver = str_to_ssl_version(ssl_min_version);
++	    sslver = str_to_ssl_version(rc_ssl_min_version);
+ 	    if (sslver < 0
+ 		|| !SSL_CTX_set_min_proto_version(ssl_ctx, sslver)) {
+ 		free_ssl_ctx();
+@@ -377,33 +378,33 @@ openSSLHandle(int sock, char *hostname,
+ 	    }
+ 	}
+ #endif
+-	if (ssl_cipher && *ssl_cipher != '\0')
+-	    if (!SSL_CTX_set_cipher_list(ssl_ctx, ssl_cipher)) {
++	if (rc_ssl_cipher && *rc_ssl_cipher != '\0')
++	    if (!SSL_CTX_set_cipher_list(ssl_ctx, rc_ssl_cipher)) {
+ 		free_ssl_ctx();
+ 		goto eend;
+ 	    }
+ 	option = SSL_OP_ALL;
+-	if (ssl_forbid_method) {
+-	    if (strchr(ssl_forbid_method, '2'))
++	if (rc_ssl_forbid_method) {
++	    if (strchr(rc_ssl_forbid_method, '2'))
+ 		option |= SSL_OP_NO_SSLv2;
+-	    if (strchr(ssl_forbid_method, '3'))
++	    if (strchr(rc_ssl_forbid_method, '3'))
+ 		option |= SSL_OP_NO_SSLv3;
+-	    if (strchr(ssl_forbid_method, 't'))
++	    if (strchr(rc_ssl_forbid_method, 't'))
+ 		option |= SSL_OP_NO_TLSv1;
+-	    if (strchr(ssl_forbid_method, 'T'))
++	    if (strchr(rc_ssl_forbid_method, 'T'))
+ 		option |= SSL_OP_NO_TLSv1;
+-	    if (strchr(ssl_forbid_method, '4'))
++	    if (strchr(rc_ssl_forbid_method, '4'))
+ 		option |= SSL_OP_NO_TLSv1;
+ #ifdef SSL_OP_NO_TLSv1_1
+-	    if (strchr(ssl_forbid_method, '5'))
++	    if (strchr(rc_ssl_forbid_method, '5'))
+ 		option |= SSL_OP_NO_TLSv1_1;
+ #endif
+ #ifdef SSL_OP_NO_TLSv1_2
+-	    if (strchr(ssl_forbid_method, '6'))
++	    if (strchr(rc_ssl_forbid_method, '6'))
+ 		option |= SSL_OP_NO_TLSv1_2;
+ #endif
+ #ifdef SSL_OP_NO_TLSv1_3
+-	    if (strchr(ssl_forbid_method, '7'))
++	    if (strchr(rc_ssl_forbid_method, '7'))
+ 		option |= SSL_OP_NO_TLSv1_3;
+ #endif
+ 	}
+@@ -420,13 +421,13 @@ openSSLHandle(int sock, char *hostname,
+ 	/* derived from openssl-0.9.5/apps/s_{client,cb}.c */
+ 	/* use SSL_get_verify_result() to verify cert */
+ 	SSL_CTX_set_verify(ssl_ctx, SSL_VERIFY_NONE, NULL);
+-	if (ssl_cert_file != NULL && *ssl_cert_file != '\0') {
++	if (rc_ssl_cert_file != NULL && *rc_ssl_cert_file != '\0') {
+ 	    int ng = 1;
+ 	    if (SSL_CTX_use_certificate_file
+-		(ssl_ctx, ssl_cert_file, SSL_FILETYPE_PEM) > 0) {
+-		char *key_file = (ssl_key_file == NULL
+-				  || *ssl_key_file ==
+-				  '\0') ? ssl_cert_file : ssl_key_file;
++		(ssl_ctx, rc_ssl_cert_file, SSL_FILETYPE_PEM) > 0) {
++		char *key_file = (rc_ssl_key_file == NULL
++				  || *rc_ssl_key_file ==
++				  '\0') ? rc_ssl_cert_file : rc_ssl_key_file;
+ 		if (SSL_CTX_use_PrivateKey_file
+ 		    (ssl_ctx, key_file, SSL_FILETYPE_PEM) > 0)
+ 		    if (SSL_CTX_check_private_key(ssl_ctx))
+@@ -437,16 +438,16 @@ openSSLHandle(int sock, char *hostname,
+ 		goto eend;
+ 	    }
+ 	}
+-	if (ssl_verify_server) {
++	if (rc_ssl_verify_server) {
+ 	    char *file = NULL, *path = NULL;
+-	    if (ssl_ca_file && *ssl_ca_file != '\0') file = ssl_ca_file;
+-	    if (ssl_ca_path && *ssl_ca_path != '\0') path = ssl_ca_path;
++	    if (rc_ssl_ca_file && *rc_ssl_ca_file != '\0') file = rc_ssl_ca_file;
++	    if (rc_ssl_ca_path && *rc_ssl_ca_path != '\0') path = rc_ssl_ca_path;
+ 	    if ((file || path)
+ 		&& !SSL_CTX_load_verify_locations(ssl_ctx, file, path)) {
+ 		free_ssl_ctx();
+ 		goto eend;
+ 	    }
+-	    if (ssl_ca_default)
++	    if (rc_ssl_ca_default)
+ 		SSL_CTX_set_default_verify_paths(ssl_ctx);
+ 	}
+ #endif				/* defined(USE_SSL_VERIFY) */
+@@ -583,7 +584,7 @@ openSocket(char *const hostname,
+ 	if (strspn(hname, "0123456789abcdefABCDEF:.") != strlen(hname))
+ 	    goto error;
+     }
+-    for (af = ai_family_order_table[DNS_order];; af++) {
++    for (af = ai_family_order_table[rc_DNS_order];; af++) {
+ 	memset(&hints, 0, sizeof(hints));
+ 	hints.ai_family = *af;
+ 	hints.ai_socktype = SOCK_STREAM;
+@@ -1420,16 +1421,16 @@ otherinfo(ParsedURL *target, ParsedURL *
+         Strcat_charp(s, "User-Agent: ");
+ 	if (url_user_agent)
+ 	   Strcat_charp(s, url_user_agent);
+-	else if (UserAgent == NULL || *UserAgent == '\0')
++	else if (rc_UserAgent == NULL || *rc_UserAgent == '\0')
+             Strcat_charp(s, w3m_version);
+         else
+-            Strcat_charp(s, UserAgent);
++            Strcat_charp(s, rc_UserAgent);
+         Strcat_charp(s, "\r\n");
+     }
+ 
+-    Strcat_m_charp(s, "Accept: ", AcceptMedia, "\r\n", NULL);
+-    Strcat_m_charp(s, "Accept-Encoding: ", AcceptEncoding, "\r\n", NULL);
+-    Strcat_m_charp(s, "Accept-Language: ", AcceptLang, "\r\n", NULL);
++    Strcat_m_charp(s, "Accept: ", rc_AcceptMedia, "\r\n", NULL);
++    Strcat_m_charp(s, "Accept-Encoding: ", rc_AcceptEncoding, "\r\n", NULL);
++    Strcat_m_charp(s, "Accept-Language: ", rc_AcceptLang, "\r\n", NULL);
+ 
+     if (target->host) {
+ 	Strcat_charp(s, "Host: ");
+@@ -1438,18 +1439,18 @@ otherinfo(ParsedURL *target, ParsedURL *
+ 	    Strcat(s, Sprintf(":%d", target->port));
+ 	Strcat_charp(s, "\r\n");
+     }
+-    if (target->is_nocache || NoCache) {
++    if (target->is_nocache || rc_NoCache) {
+ 	Strcat_charp(s, "Pragma: no-cache\r\n");
+ 	Strcat_charp(s, "Cache-control: no-cache\r\n");
+     }
+-    no_referer = NoSendReferer;
++    no_referer = rc_NoSendReferer;
+     no_referer_ptr = query_SCONF_NO_REFERER_FROM(current);
+     no_referer = no_referer || (no_referer_ptr && *no_referer_ptr);
+     no_referer_ptr = query_SCONF_NO_REFERER_TO(target);
+     no_referer = no_referer || (no_referer_ptr && *no_referer_ptr);
+     if (!no_referer) {
+ 	int cross_origin = FALSE;
+-	if (CrossOriginReferer && current && current->host &&
++	if (rc_CrossOriginReferer && current && current->host &&
+ 	    (!target || !target->host ||
+ 	     strcasecmp(current->host, target->host) != 0 || 
+ 	     current->port != target->port ||
+@@ -1561,7 +1562,7 @@ HTTPrequest(ParsedURL *pu, ParsedURL *cu
+ 
+ #ifdef USE_COOKIE
+     if (hr->command != HR_COMMAND_CONNECT &&
+-	use_cookie && (cookie = find_cookie(pu))) {
++	rc_use_cookie && (cookie = find_cookie(pu))) {
+ 	Strcat_charp(tmp, "Cookie: ");
+ 	Strcat(tmp, cookie);
+ 	Strcat_charp(tmp, "\r\n");
+@@ -1650,7 +1651,7 @@ openURL(char *url, ParsedURL *pu, Parsed
+ 
+     u = url;
+     scheme = getURLScheme(&u);
+-    if (current == NULL && scheme == SCM_MISSING && !ArgvIsURL)
++    if (current == NULL && scheme == SCM_MISSING && !rc_ArgvIsURL)
+ 	u = file_to_url(url);	/* force to local file */
+     else
+ 	u = url;
+@@ -1674,7 +1675,7 @@ openURL(char *url, ParsedURL *pu, Parsed
+ 	}
+     }
+ 
+-    if (LocalhostOnly && pu->host && !is_localhost(pu->host))
++    if (rc_LocalhostOnly && pu->host && !is_localhost(pu->host))
+ 	pu->host = NULL;
+ 
+     uf.scheme = pu->scheme;
+@@ -1712,8 +1713,8 @@ openURL(char *url, ParsedURL *pu, Parsed
+ 		if (uf.stream == NULL)
+ 		    return uf;
+ 	    }
+-	    else if (document_root != NULL) {
+-		tmp = Strnew_charp(document_root);
++	    else if (rc_document_root != NULL) {
++		tmp = Strnew_charp(rc_document_root);
+ 		if (Strlastchar(tmp) != '/' && pu->file[0] != '/')
+ 		    Strcat_char(tmp, '/');
+ 		Strcat_charp(tmp, pu->file);
+@@ -1736,7 +1737,7 @@ openURL(char *url, ParsedURL *pu, Parsed
+ 		}
+ 	    }
+ 	}
+-	if (uf.stream == NULL && retryAsHttp && url[0] != '/') {
++	if (uf.stream == NULL && rc_retryAsHttp && url[0] != '/') {
+ 	    if (scheme == SCM_MISSING || scheme == SCM_UNKNOWN) {
+ #ifdef USE_SSL
+ 		/* retry it as "https://" */
+@@ -1753,7 +1754,7 @@ openURL(char *url, ParsedURL *pu, Parsed
+     case SCM_FTPDIR:
+ 	if (pu->file == NULL)
+ 	    pu->file = allocStr("/", -1);
+-	if (non_null(FTP_proxy) &&
++	if (non_null(rc_FTP_proxy) &&
+ 	    !Do_not_use_proxy &&
+ 	    pu->host != NULL && !check_no_proxy(pu->host)) {
+ 	    hr->flag |= HR_FLAG_PROXY;
+@@ -1785,9 +1786,9 @@ openURL(char *url, ParsedURL *pu, Parsed
+ 	    hr->command = HR_COMMAND_HEAD;
+ 	if ((
+ #ifdef USE_SSL
+-		(pu->scheme == SCM_HTTPS) ? non_null(HTTPS_proxy) :
++		(pu->scheme == SCM_HTTPS) ? non_null(rc_HTTPS_proxy) :
+ #endif				/* USE_SSL */
+-		non_null(HTTP_proxy)) && !Do_not_use_proxy &&
++		non_null(rc_HTTP_proxy)) && !Do_not_use_proxy &&
+ 	    pu->host != NULL && !check_no_proxy(pu->host)) {
+ 	    hr->flag |= HR_FLAG_PROXY;
+ #ifdef USE_SSL
+@@ -1943,7 +1944,7 @@ openURL(char *url, ParsedURL *pu, Parsed
+ 	  Strcat_charp(tmp, pu->query);
+ 	  pu->file = tmp->ptr;
+ 	}
+-	if (non_null(GOPHER_proxy) &&
++	if (non_null(rc_GOPHER_proxy) &&
+ 	    !Do_not_use_proxy &&
+ 	    pu->host != NULL && !check_no_proxy(pu->host)) {
+ 	    hr->flag |= HR_FLAG_PROXY;
+@@ -2030,8 +2031,8 @@ add_index_file(ParsedURL *pu, URLFile *u
+     TextList *index_file_list = NULL;
+     TextListItem *ti;
+ 
+-    if (non_null(index_file))
+-	index_file_list = make_domain_list(index_file);
++    if (non_null(rc_index_file))
++	index_file_list = make_domain_list(rc_index_file);
+     if (index_file_list == NULL) {
+ 	uf->stream = NULL;
+ 	return;
+@@ -2153,7 +2154,7 @@ check_no_proxy(char *domain)
+ 	if (domain_match(tl->ptr, domain))
+ 	    return 1;
+     }
+-    if (!NOproxy_netaddr) {
++    if (!rc_NOproxy_netaddr) {
+ 	return 0;
+     }
+     /* 
+@@ -2197,7 +2198,7 @@ check_no_proxy(char *domain)
+ 	char addr[4 * 16];
+ 	int *af;
+ 
+-	for (af = ai_family_order_table[DNS_order];; af++) {
++	for (af = ai_family_order_table[rc_DNS_order];; af++) {
+ 	    memset(&hints, 0, sizeof(hints));
+ 	    hints.ai_family = *af;
+ 	    error = getaddrinfo(domain, NULL, &hints, &res0);
+@@ -2332,8 +2333,8 @@ initURIMethods(void)
+     TextListItem *tl;
+     int i;
+ 
+-    if (non_null(urimethodmap_files))
+-	methodmap_list = make_domain_list(urimethodmap_files);
++    if (non_null(rc_urimethodmap_files))
++	methodmap_list = make_domain_list(rc_urimethodmap_files);
+     if (methodmap_list == NULL)
+ 	return;
+     urimethods = New_N(struct table2 *, (methodmap_list->nitem + 1));
+@@ -2464,10 +2465,10 @@ url_to_charset(char *url, ParsedURL *bas
+ 	pu = base;
+     }
+     if (pu && (pu->scheme == SCM_LOCAL || pu->scheme == SCM_LOCAL_CGI))
+-	return SystemCharset;
++	return rc_SystemCharset;
+     csptr = query_SCONF_URL_CHARSET(pu);
+     return (csptr && *csptr) ? *csptr :
+-	doc_charset ? doc_charset : DocumentCharset;
++	doc_charset ? doc_charset : rc_DocumentCharset;
+ }
+ 
+ char *
+@@ -2482,7 +2483,7 @@ url_decode2(char *url, Buffer *buf)
+ {
+     wc_ces url_charset;
+ 
+-    if (!DecodeURL)
++    if (!rc_DecodeURL)
+ 	return (char *)url;
+     url_charset = buf ?
+ 	url_to_charset(url, baseURL((Buffer *)buf), buf->document_charset) :
+@@ -2495,7 +2496,7 @@ url_decode2(char *url, Buffer *buf)
+ char *
+ url_decode0(const char *url)
+ {
+-    if (!DecodeURL)
++    if (!rc_DecodeURL)
+ 	return (char *)url;
+     return url_unquote_conv((char *)url, 0);
+ }
+--- a/main.c
++++ b/main.c
+@@ -131,7 +131,7 @@ static int searchKeyNum(void);
+ #define help() fusage(stdout, 0)
+ #define usage() fusage(stderr, 1)
+ 
+-int enable_inline_image;
++int rc_enable_inline_image;
+ extern int opt_cols;
+ int fold_pre;
+ static int deprecated;
+@@ -497,14 +497,14 @@ main(int argc, char **argv)
+     if (non_null(Locale = getenv("LC_ALL")) ||
+ 	non_null(Locale = getenv("LC_CTYPE")) ||
+ 	non_null(Locale = getenv("LANG"))) {
+-	DisplayCharset = wc_guess_locale_charset(Locale, DisplayCharset);
+-	DocumentCharset = wc_guess_locale_charset(Locale, DocumentCharset);
+-	SystemCharset = wc_guess_locale_charset(Locale, SystemCharset);
++	rc_DisplayCharset = wc_guess_locale_charset(Locale, rc_DisplayCharset);
++	rc_DocumentCharset = wc_guess_locale_charset(Locale, rc_DocumentCharset);
++	rc_SystemCharset = wc_guess_locale_charset(Locale, rc_SystemCharset);
+     }
+ #ifdef __EMX__
+     CodePage = wc_guess_charset(getCodePage(), 0);
+     if (CodePage)
+-	DisplayCharset = DocumentCharset = SystemCharset = CodePage;
++	rc_DisplayCharset = DocumentCharset = rc_SystemCharset = CodePage;
+ #endif
+ #endif
+ 
+@@ -519,51 +519,51 @@ main(int argc, char **argv)
+     DictHist = newHist();
+ 
+ #ifdef USE_M17N
+-    if (FollowLocale && Locale) {
+-	DisplayCharset = wc_guess_locale_charset(Locale, DisplayCharset);
+-	SystemCharset = wc_guess_locale_charset(Locale, SystemCharset);
++    if (rc_FollowLocale && Locale) {
++	rc_DisplayCharset = wc_guess_locale_charset(Locale, rc_DisplayCharset);
++	rc_SystemCharset = wc_guess_locale_charset(Locale, rc_SystemCharset);
+     }
+     auto_detect = WcOption.auto_detect;
+-    BookmarkCharset = DocumentCharset;
++    BookmarkCharset = rc_DocumentCharset;
+ #endif
+ 
+-    if (!non_null(HTTP_proxy) &&
++    if (!non_null(rc_HTTP_proxy) &&
+ 	((p = getenv("HTTP_PROXY")) ||
+ 	 (p = getenv("http_proxy")) || (p = getenv("HTTP_proxy"))))
+-	HTTP_proxy = p;
++	rc_HTTP_proxy = p;
+ #ifdef USE_SSL
+-    if (!non_null(HTTPS_proxy) &&
++    if (!non_null(rc_HTTPS_proxy) &&
+ 	((p = getenv("HTTPS_PROXY")) ||
+ 	 (p = getenv("https_proxy")) || (p = getenv("HTTPS_proxy"))))
+-	HTTPS_proxy = p;
+-    if (HTTPS_proxy == NULL && non_null(HTTP_proxy))
+-	HTTPS_proxy = HTTP_proxy;
++	rc_HTTPS_proxy = p;
++    if (rc_HTTPS_proxy == NULL && non_null(rc_HTTP_proxy))
++	rc_HTTPS_proxy = rc_HTTP_proxy;
+ #endif				/* USE_SSL */
+ #ifdef USE_GOPHER
+-    if (!non_null(GOPHER_proxy) &&
++    if (!non_null(rc_GOPHER_proxy) &&
+ 	((p = getenv("GOPHER_PROXY")) ||
+ 	 (p = getenv("gopher_proxy")) || (p = getenv("GOPHER_proxy"))))
+-	GOPHER_proxy = p;
++	rc_GOPHER_proxy = p;
+ #endif				/* USE_GOPHER */
+-    if (!non_null(FTP_proxy) &&
++    if (!non_null(rc_FTP_proxy) &&
+ 	((p = getenv("FTP_PROXY")) ||
+ 	 (p = getenv("ftp_proxy")) || (p = getenv("FTP_proxy"))))
+-	FTP_proxy = p;
+-    if (!non_null(NO_proxy) &&
++	rc_FTP_proxy = p;
++    if (!non_null(rc_NO_proxy) &&
+ 	((p = getenv("NO_PROXY")) ||
+ 	 (p = getenv("no_proxy")) || (p = getenv("NO_proxy"))))
+-	NO_proxy = p;
++	rc_NO_proxy = p;
+ #ifdef USE_NNTP
+-    if (!non_null(NNTP_server) && (p = getenv("NNTPSERVER")) != NULL)
+-	NNTP_server = p;
+-    if (!non_null(NNTP_mode) && (p = getenv("NNTPMODE")) != NULL)
+-	NNTP_mode = p;
++    if (!non_null(rc_NNTP_server) && (p = getenv("NNTPSERVER")) != NULL)
++	rc_NNTP_server = p;
++    if (!non_null(rc_NNTP_mode) && (p = getenv("NNTPMODE")) != NULL)
++	rc_NNTP_mode = p;
+ #endif
+ 
+-    if (!non_null(Editor) && (p = getenv("EDITOR")) != NULL)
+-	Editor = p;
+-    if (!non_null(Mailer) && (p = getenv("MAILER")) != NULL)
+-	Mailer = p;
++    if (!non_null(rc_Editor) && (p = getenv("EDITOR")) != NULL)
++	rc_Editor = p;
++    if (!non_null(rc_Mailer) && (p = getenv("MAILER")) != NULL)
++	rc_Mailer = p;
+ 
+     /* argument search 2 */
+     i = 1;
+@@ -573,7 +573,7 @@ main(int argc, char **argv)
+ 		if (++i >= argc)
+ 		    usage();
+ 		if (atoi(argv[i]) > 0)
+-		    Tabstop = atoi(argv[i]);
++		    rc_Tabstop = atoi(argv[i]);
+ 	    }
+ 	    else if (!strcmp("-r", argv[i]))
+ 		ShowEffect = FALSE;
+@@ -581,7 +581,7 @@ main(int argc, char **argv)
+ 		if (++i >= argc)
+ 		    usage();
+ 		if (atoi(argv[i]) > 0)
+-		    PagerMax = atoi(argv[i]);
++		    rc_PagerMax = atoi(argv[i]);
+ 	    }
+ #ifdef USE_M17N
+ 	    else if (!strncmp("-I", argv[i], 2)) {
+@@ -592,7 +592,7 @@ main(int argc, char **argv)
+ 			usage();
+ 		    p = argv[i];
+ 		}
+-		DocumentCharset = wc_guess_charset_short(p, DocumentCharset);
++		rc_DocumentCharset = wc_guess_charset_short(p, rc_DocumentCharset);
+ 		WcOption.auto_detect = WC_OPT_DETECT_OFF;
+ 		UseContentCharset = FALSE;
+ 	    }
+@@ -604,13 +604,13 @@ main(int argc, char **argv)
+ 			usage();
+ 		    p = argv[i];
+ 		}
+-		DisplayCharset = wc_guess_charset_short(p, DisplayCharset);
++		rc_DisplayCharset = wc_guess_charset_short(p, rc_DisplayCharset);
+ 	    }
+ #endif
+ 	    else if (!strcmp("-graph", argv[i]))
+-		UseGraphicChar = GRAPHIC_CHAR_DEC;
++		rc_UseGraphicChar = GRAPHIC_CHAR_DEC;
+ 	    else if (!strcmp("-no-graph", argv[i]))
+-		UseGraphicChar = GRAPHIC_CHAR_ASCII;
++		rc_UseGraphicChar = GRAPHIC_CHAR_ASCII;
+ 	    else if (!strcmp("-T", argv[i])) {
+ 		if (++i >= argc)
+ 		    usage();
+@@ -624,10 +624,10 @@ main(int argc, char **argv)
+ 		open_new_tab = TRUE;
+ #ifdef USE_COLOR
+ 	    else if (!strcmp("-M", argv[i]))
+-		useColor = FALSE;
++		rc_useColor = FALSE;
+ 	    else if (!strcmp("-H", argv[i])) {
+ 		deprecated = TRUE;
+-		highIntensityColors = TRUE;
++		rc_highIntensityColors = TRUE;
+ 	    }
+ #endif				/* USE_COLOR */
+ 	    else if (!strcmp("-B", argv[i]))
+@@ -652,12 +652,12 @@ main(int argc, char **argv)
+ 		session_file = argv[i];
+ 	    }
+ 	    else if (!strcmp("-F", argv[i]))
+-		RenderFrame = TRUE;
++		rc_RenderFrame = TRUE;
+ 	    else if (!strcmp("-W", argv[i])) {
+-		if (WrapDefault)
+-		    WrapDefault = FALSE;
++		if (rc_WrapDefault)
++		    rc_WrapDefault = FALSE;
+ 		else
+-		    WrapDefault = TRUE;
++		    rc_WrapDefault = TRUE;
+ 	    }
+ 	    else if (!strcmp("-dump", argv[i]))
+ 		w3m_dump = DUMP_BUFFER;
+@@ -699,7 +699,7 @@ main(int argc, char **argv)
+ 		ppc = atof(argv[i]);
+ 		if (ppc >= MINIMUM_PIXEL_PER_CHAR &&
+ 		    ppc <= MAXIMUM_PIXEL_PER_CHAR) {
+-		    pixel_per_char = ppc;
++		    rc_pixel_per_char = ppc;
+ 		    set_pixel_per_char = TRUE;
+ 		}
+ 	    }
+@@ -711,21 +711,21 @@ main(int argc, char **argv)
+ 		ppc = atof(argv[i]);
+ 		if (ppc >= MINIMUM_PIXEL_PER_CHAR &&
+ 		    ppc <= MAXIMUM_PIXEL_PER_CHAR * 2) {
+-		    pixel_per_line = ppc;
++		    rc_pixel_per_line = ppc;
+ 		    set_pixel_per_line = TRUE;
+ 		}
+ 	    }
+ #endif
+ 	    else if (!strcmp("-ri", argv[i])) {
+-	        enable_inline_image = INLINE_IMG_OSC5379;
++	        rc_enable_inline_image = INLINE_IMG_OSC5379;
+ 	    }
+ 	    else if (!strcmp("-sixel", argv[i])) {
+-		enable_inline_image = INLINE_IMG_SIXEL;
++		rc_enable_inline_image = INLINE_IMG_SIXEL;
+ 	    }
+ 	    else if (!strcmp("-num", argv[i]))
+-		showLineNum = TRUE;
++		rc_showLineNum = TRUE;
+ 	    else if (!strcmp("-no-proxy", argv[i]))
+-		use_proxy = FALSE;
++		rc_use_proxy = FALSE;
+ #ifdef INET6
+ 	    else if (!strcmp("-4", argv[i]) || !strcmp("-6", argv[i]))
+ 		set_param_option(Sprintf("dns_order=%c", argv[i][1])->ptr);
+@@ -752,17 +752,17 @@ main(int argc, char **argv)
+ 	    }
+ #ifdef USE_MOUSE
+ 	    else if (!strcmp("-no-mouse", argv[i])) {
+-		use_mouse = FALSE;
++		rc_use_mouse = FALSE;
+ 	    }
+ #endif				/* USE_MOUSE */
+ #ifdef USE_COOKIE
+ 	    else if (!strcmp("-no-cookie", argv[i])) {
+-		use_cookie = FALSE;
+-		accept_cookie = FALSE;
++		rc_use_cookie = FALSE;
++		rc_accept_cookie = FALSE;
+ 	    }
+ 	    else if (!strcmp("-cookie", argv[i])) {
+-		use_cookie = TRUE;
+-		accept_cookie = TRUE;
++		rc_use_cookie = TRUE;
++		rc_accept_cookie = TRUE;
+ 	    }
+ #endif				/* USE_COOKIE */
+ 	    else if (!strcmp("-s", argv[i]))
+@@ -871,7 +871,7 @@ main(int argc, char **argv)
+     if (!isatty(1) && !w3m_dump) /* redirected output */
+ 	w3m_dump = DUMP_BUFFER;
+     if (w3m_dump)
+-	COLS = opt_cols ? opt_cols : MaxCols ? MaxCols : DEFAULT_COLS;
++	COLS = opt_cols ? opt_cols : rc_MaxCols ? rc_MaxCols : DEFAULT_COLS;
+ 
+ #ifdef USE_BINMODE_STREAM
+     setmode(fileno(stdout), O_BINARY);
+@@ -886,7 +886,7 @@ main(int argc, char **argv)
+ #endif				/* not SIGWINCH */
+     }
+ #ifdef USE_IMAGE
+-    else if (w3m_halfdump && displayImage)
++    else if (w3m_halfdump && rc_displayImage)
+ 	activeImage = TRUE;
+ #endif
+ 
+@@ -895,7 +895,7 @@ main(int argc, char **argv)
+     initCookie();
+ #endif				/* USE_COOKIE */
+ #ifdef USE_HISTORY
+-    if (UseHistory)
++    if (rc_UseHistory)
+ 	loadUrlHistory();
+ #endif				/* not USE_HISTORY */
+ 
+@@ -1061,7 +1061,7 @@ main(int argc, char **argv)
+ 	    }
+ 
+ 	    url = load_argv[i];
+-	    if (getURLScheme(&url) == SCM_MISSING && !ArgvIsURL)
++	    if (getURLScheme(&url) == SCM_MISSING && !rc_ArgvIsURL)
+ 	  retry_as_local_file:
+ 		url = file_to_url(load_argv[i]);
+ 	    else
+@@ -1101,7 +1101,7 @@ main(int argc, char **argv)
+ 		newbuf = loadGeneralFile(url, NULL, NO_REFERER, 0, request);
+ 	    }
+ 	    if (newbuf == NULL) {
+-		if (ArgvIsURL && !retry) {
++		if (rc_ArgvIsURL && !retry) {
+ 		    retry = 1;
+ 		    goto retry_as_local_file;
+ 		}
+@@ -1149,7 +1149,7 @@ main(int argc, char **argv)
+ 	    Currentbuf = newbuf;
+ 	}
+ 	if (!w3m_dump || w3m_dump == DUMP_BUFFER) {
+-	    if (Currentbuf->frameset != NULL && RenderFrame)
++	    if (Currentbuf->frameset != NULL && rc_RenderFrame)
+ 		rFrame();
+ 	}
+ 	if (w3m_dump)
+@@ -1266,7 +1266,7 @@ main(int argc, char **argv)
+ #endif
+ #ifdef USE_MOUSE
+ 	mouse_action.in_action = FALSE;
+-	if (use_mouse)
++	if (rc_use_mouse)
+ 	    mouse_active();
+ #endif				/* USE_MOUSE */
+ #ifdef USE_ALARM
+@@ -1279,7 +1279,7 @@ main(int argc, char **argv)
+ 	mySignal(SIGWINCH, resize_hook);
+ #endif
+ #ifdef USE_IMAGE
+-	if (activeImage && displayImage && Currentbuf->img &&
++	if (activeImage && rc_displayImage && Currentbuf->img &&
+ 	    !Currentbuf->image_loaded) {
+ 	    do {
+ #ifdef SIGWINCH
+@@ -1308,7 +1308,7 @@ main(int argc, char **argv)
+ 	}
+ #endif
+ #ifdef USE_MOUSE
+-	if (use_mouse)
++	if (rc_use_mouse)
+ 	    mouse_inactive();
+ #endif				/* USE_MOUSE */
+ 	if (IS_ASCII(c)) {	/* Ascii */
+@@ -1445,7 +1445,7 @@ do_dump(Buffer *buf)
+     if (w3m_dump == DUMP_BUFFER) {
+ 	int i;
+ 	saveBuffer(buf, stdout, FALSE);
+-	if (displayLinkNumber && buf->href) {
++	if (rc_displayLinkNumber && buf->href) {
+ 	    int nanchor = buf->href->nanchor;
+ 	    printf("\nReferences:\n\n");
+ 	    Anchor **in_order = New_N(Anchor *, buf->href->nanchor);
+@@ -1515,12 +1515,12 @@ DEFUN(escmap, ESCMAP, "ESC map")
+ {
+     char c;
+ #ifdef USE_MOUSE
+-    if (use_mouse)
++    if (rc_use_mouse)
+ 	mouse_active();
+ #endif
+     c = getch();
+ #ifdef USE_MOUSE
+-    if (use_mouse)
++    if (rc_use_mouse)
+ 	mouse_inactive();
+ #endif
+     if (IS_ASCII(c))
+@@ -1600,7 +1600,7 @@ pushBuffer(Buffer *buf)
+ #ifdef USE_IMAGE
+     deleteImage(Currentbuf);
+ #endif
+-    if (clear_buffer)
++    if (rc_clear_buffer)
+ 	tmpClearBuffer(Currentbuf);
+     if (Firstbuf == Currentbuf) {
+ 	buf->nextBuffer = Firstbuf;
+@@ -1698,7 +1698,7 @@ nscroll(int n, int mode)
+     else {
+ 	tlnum = buf->topLine->linenumber;
+ 	llnum = buf->topLine->linenumber + buf->LINES - 1;
+-	if (nextpage_topline)
++	if (rc_nextpage_topline)
+ 	    diff_n = 0;
+ 	else
+ 	    diff_n = n - (tlnum - top->linenumber);
+@@ -1737,7 +1737,7 @@ nscroll(int n, int mode)
+ /* Move page forward */
+ DEFUN(pgFore, NEXT_PAGE, "Scroll down one page")
+ {
+-    if (vi_prec_num)
++    if (rc_vi_prec_num)
+ 	nscroll(searchKeyNum() * (Currentbuf->LINES - 1), B_NORMAL);
+     else
+ 	nscroll(prec_num ? searchKeyNum() : searchKeyNum()
+@@ -1747,7 +1747,7 @@ DEFUN(pgFore, NEXT_PAGE, "Scroll down on
+ /* Move page backward */
+ DEFUN(pgBack, PREV_PAGE, "Scroll up one page")
+ {
+-    if (vi_prec_num)
++    if (rc_vi_prec_num)
+ 	nscroll(-searchKeyNum() * (Currentbuf->LINES - 1), B_NORMAL);
+     else
+ 	nscroll(-(prec_num ? searchKeyNum() : searchKeyNum()
+@@ -1836,7 +1836,7 @@ srchcore(const char *str, int (*func) (B
+     if (SearchString == NULL || *SearchString == '\0')
+ 	return SR_NOTFOUND;
+ 
+-    str = conv_search_string(SearchString, DisplayCharset);
++    str = conv_search_string(SearchString, rc_DisplayCharset);
+     prevtrap = mySignal(SIGINT, intTrap);
+     crmode();
+     if (SETJMP(IntReturn) == 0) {
+@@ -1860,7 +1860,7 @@ disp_srchresult(int result, const char *
+ 	disp_message(Sprintf("Not found: %s", str)->ptr, TRUE);
+     else if (result & SR_WRAPPED)
+ 	disp_message(Sprintf("Search wrapped: %s", str)->ptr, TRUE);
+-    else if (show_srch_str)
++    else if (rc_show_srch_str)
+ 	disp_message(Sprintf("%s%s", prompt, str)->ptr, TRUE);
+ }
+ 
+@@ -2313,7 +2313,7 @@ DEFUN(ldhelp, HELP, "Show help panel")
+     int n;
+     Str tmp;
+ 
+-    lang = AcceptLang;
++    lang = rc_AcceptLang;
+     n = strcspn(lang, ";, \t");
+     tmp = Sprintf("file:///$LIB/" HELP_CGI CGI_EXTENSION "?version=%s&lang=%s",
+ 		  Str_form_quote(Strnew_charp(w3m_version))->ptr,
+@@ -2337,7 +2337,7 @@ cmd_loadfile(char *fn)
+     }
+     else if (buf != NO_BUFFER) {
+ 	pushBuffer(buf);
+-	if (RenderFrame && Currentbuf->frameset != NULL)
++	if (rc_RenderFrame && Currentbuf->frameset != NULL)
+ 	    rFrame();
+     }
+     displayBuffer(Currentbuf, B_NORMAL);
+@@ -2617,10 +2617,10 @@ _quitfm(int confirm)
+     save_cookies();
+ #endif				/* USE_COOKIE */
+ #ifdef USE_HISTORY
+-    if (UseHistory && SaveURLHist)
++    if (rc_UseHistory && rc_SaveURLHist)
+ 	saveUrlHistory();
+ #endif				/* USE_HISTORY */
+-    if (StoreSession)
++    if (rc_StoreSession)
+ 	_strSession(NULL);
+     if (unlink_session)
+ 	unlink(rcFile(SESSION_FILE));
+@@ -2641,7 +2641,7 @@ DEFUN(quitfm, ABORT EXIT, "Quit without
+ /* Question and Quit */
+ DEFUN(qquitfm, QUIT, "Quit with confirmation request")
+ {
+-    _quitfm(confirm_on_quit);
++    _quitfm(rc_confirm_on_quit);
+ }
+ 
+ /* Select buffer */
+@@ -2686,7 +2686,7 @@ DEFUN(selBuf, SELECT, "Display buffer-st
+ #ifdef USE_IMAGE
+ 	deleteImage(buf);
+ #endif
+-	if (clear_buffer)
++	if (rc_clear_buffer)
+ 	    tmpClearBuffer(buf);
+     }
+     displayBuffer(Currentbuf, B_FORCE_REDRAW);
+@@ -2833,7 +2833,7 @@ DEFUN(editBf, EDIT, "Edit local source")
+ 	cmd = unquote_mailcap(Currentbuf->edit, Currentbuf->real_type, fn,
+ 			      checkHeader(Currentbuf, "Content-Type:"), NULL);
+     else
+-	cmd = myEditor(Editor, shell_quote(fn),
++	cmd = myEditor(rc_Editor, shell_quote(fn),
+ 		       cur_real_linenumber(Currentbuf));
+     exec_cmd(cmd->ptr);
+ 
+@@ -2856,7 +2856,7 @@ DEFUN(editScr, EDIT_SCREEN, "Edit render
+     }
+     saveBuffer(Currentbuf, f, TRUE);
+     fclose(f);
+-    exec_cmd(myEditor(Editor, shell_quote(tmpf),
++    exec_cmd(myEditor(rc_Editor, shell_quote(tmpf),
+ 		   cur_real_linenumber(Currentbuf))->ptr);
+     unlink(tmpf);
+     displayBuffer(Currentbuf, B_FORCE_REDRAW);
+@@ -2868,7 +2868,7 @@ DEFUN(editScr, EDIT_SCREEN, "Edit render
+ DEFUN(_mark, MARK, "Set/unset mark")
+ {
+     Line *l;
+-    if (!use_mark)
++    if (!rc_use_mark)
+ 	return;
+     if (Currentbuf->firstLine == NULL)
+ 	return;
+@@ -2883,7 +2883,7 @@ DEFUN(nextMk, NEXT_MARK, "Go to the next
+     Line *l;
+     int i;
+ 
+-    if (!use_mark)
++    if (!rc_use_mark)
+ 	return;
+     if (Currentbuf->firstLine == NULL)
+ 	return;
+@@ -2916,7 +2916,7 @@ DEFUN(prevMk, PREV_MARK, "Go to the prev
+     Line *l;
+     int i;
+ 
+-    if (!use_mark)
++    if (!rc_use_mark)
+ 	return;
+     if (Currentbuf->firstLine == NULL)
+ 	return;
+@@ -2952,7 +2952,7 @@ DEFUN(reMark, REG_MARK, "Mark all occure
+     const char *str;
+     const char *p, *p1, *p2;
+ 
+-    if (!use_mark)
++    if (!rc_use_mark)
+ 	return;
+     str = searchKeyData();
+     if (str == NULL || *str == '\0') {
+@@ -2962,7 +2962,7 @@ DEFUN(reMark, REG_MARK, "Mark all occure
+ 	    return;
+ 	}
+     }
+-    str = conv_search_string(str, DisplayCharset);
++    str = conv_search_string(str, rc_DisplayCharset);
+     if ((str = regexCompile(str, 1)) != NULL) {
+ 	disp_message(str, TRUE);
+ 	return;
+@@ -2989,7 +2989,7 @@ static Buffer *
+ loadNormalBuf(Buffer *buf, int renderframe)
+ {
+     pushBuffer(buf);
+-    if (renderframe && RenderFrame && Currentbuf->frameset != NULL)
++    if (renderframe && rc_RenderFrame && Currentbuf->frameset != NULL)
+ 	rFrame();
+     return buf;
+ }
+@@ -3076,7 +3076,7 @@ loadLink(char *url, char *target, char *
+ 	}
+ 	if (al) {
+ 	    gotoLine(Currentbuf, al->start.line);
+-	    if (label_topline)
++	    if (rc_label_topline)
+ 		Currentbuf->topLine = lineSkip(Currentbuf, Currentbuf->topLine,
+ 					       Currentbuf->currentLine->
+ 					       linenumber -
+@@ -3112,7 +3112,7 @@ gotoLabel(char *label)
+     (*buf->clone)++;
+     pushBuffer(buf);
+     gotoLine(Currentbuf, al->start.line);
+-    if (label_topline)
++    if (rc_label_topline)
+ 	Currentbuf->topLine = lineSkip(Currentbuf, Currentbuf->topLine,
+ 				       Currentbuf->currentLine->linenumber
+ 				       - Currentbuf->topLine->linenumber,
+@@ -3132,10 +3132,10 @@ handleMailto(char *url)
+     if (strncasecmp(url, "mailto:", 7))
+ 	return 0;
+ #ifdef USE_W3MMAILER
+-    if (! non_null(Mailer) || MailtoOptions == MAILTO_OPTIONS_USE_W3MMAILER)
++    if (! non_null(rc_Mailer) || rc_MailtoOptions == MAILTO_OPTIONS_USE_W3MMAILER)
+ 	return 0;
+ #else
+-    if (!non_null(Mailer)) {
++    if (!non_null(rc_Mailer)) {
+ 	/* FIXME: gettextize? */
+ 	disp_err_message("no mailer is specified", TRUE);
+ 	return 1;
+@@ -3143,14 +3143,14 @@ handleMailto(char *url)
+ #endif
+ 
+     /* invoke external mailer */
+-    if (MailtoOptions == MAILTO_OPTIONS_USE_MAILTO_URL) {
++    if (rc_MailtoOptions == MAILTO_OPTIONS_USE_MAILTO_URL) {
+ 	to = Strnew_charp(html_unquote(url));
+     } else {
+ 	to = Strnew_charp(url + 7);
+ 	if ((pos = strchr(to->ptr, '?')) != NULL)
+ 	    Strtruncate(to, pos - to->ptr);
+     }
+-    exec_cmd(myExtCommand(Mailer, shell_quote(file_unquote(to->ptr)),
++    exec_cmd(myExtCommand(rc_Mailer, shell_quote(file_unquote(to->ptr)),
+ 			FALSE)->ptr);
+     displayBuffer(Currentbuf, B_FORCE_REDRAW);
+     pushHashHist(URLHist, url);
+@@ -3212,7 +3212,7 @@ DEFUN(followA, GOTO_LINK, "Follow curren
+ 	url = Sprintf("%s?%d,%d", a->url, x, y)->ptr;
+ #endif
+ 
+-    if (check_target && open_tab_blank && a->target &&
++    if (check_target && rc_open_tab_blank && a->target &&
+ 	(!strcasecmp(a->target, "_new") || !strcasecmp(a->target, "_blank"))) {
+ 	Buffer *buf;
+ 
+@@ -3340,7 +3340,7 @@ save_submit_formlist(FormItemList *src)
+ static Str
+ conv_form_encoding(Str val, FormItemList *fi, Buffer *buf)
+ {
+-    wc_ces charset = SystemCharset;
++    wc_ces charset = rc_SystemCharset;
+ 
+     if (fi->parent->charset)
+ 	charset = fi->parent->charset;
+@@ -3696,7 +3696,7 @@ DEFUN(topA, LINK_BEGIN, "Move to the fir
+     if (prec_num > hl->nmark)
+ 	hseq = hl->nmark - 1;
+     else if (prec_num > 0)
+-	hseq = prec_num - 1 + !!zeroBasedLinkNo;
++	hseq = prec_num - 1 + !!rc_zeroBasedLinkNo;
+     do {
+ 	if (hseq >= hl->nmark)
+ 	    return;
+@@ -4256,7 +4256,7 @@ checkBackBuffer(Buffer *buf)
+ 	    return TRUE;	/* Currentbuf has stacked frames */
+ 	/* when no frames stacked and next is frame source, try next's
+ 	 * nextBuffer */
+-	if (RenderFrame && fbuf == buf->nextBuffer) {
++	if (rc_RenderFrame && fbuf == buf->nextBuffer) {
+ 	    if (fbuf->nextBuffer != NULL)
+ 		return TRUE;
+ 	    else
+@@ -4276,9 +4276,9 @@ DEFUN(backBf, BACK, "Close current buffe
+     Buffer *buf = Currentbuf->linkBuffer[LB_N_FRAME];
+ 
+     if (!checkBackBuffer(Currentbuf)) {
+-	if (exit_on_last && nTab == 1)
++	if (rc_exit_on_last && nTab == 1)
+ 	    _quitfm(FALSE);
+-	else if (close_tab_back || exit_on_last) {
++	else if (rc_close_tab_back || rc_exit_on_last) {
+ 	    deleteTab(CurrentTab);
+ 	    displayBuffer(Currentbuf, B_FORCE_REDRAW);
+ 	}
+@@ -4314,7 +4314,7 @@ DEFUN(backBf, BACK, "Close current buffe
+ 		formResetBuffer(Currentbuf, formitem);
+ 	    }
+ 	}
+-	else if (RenderFrame && buf == Currentbuf) {
++	else if (rc_RenderFrame && buf == Currentbuf) {
+ 	    delBuffer(Currentbuf);
+ 	}
+     }
+@@ -4345,7 +4345,7 @@ cmd_loadURL(char *url, ParsedURL *curren
+     }
+     else if (buf != NO_BUFFER) {
+ 	pushBuffer(buf);
+-	if (RenderFrame && Currentbuf->frameset != NULL)
++	if (rc_RenderFrame && Currentbuf->frameset != NULL)
+ 	    rFrame();
+     }
+     displayBuffer(Currentbuf, B_NORMAL);
+@@ -4369,7 +4369,7 @@ goURL0(const char *prompt, int relative)
+ 	current = baseURL(Currentbuf);
+ 	if (current) {
+ 	    char *c_url = parsedURL2Str(current)->ptr;
+-	    if (DefaultURLString == DEFAULT_URL_CURRENT)
++	    if (rc_DefaultURLString == DEFAULT_URL_CURRENT)
+ 		url = url_decode2(c_url, NULL);
+ 	    else
+ 		pushHist(hist, c_url);
+@@ -4379,7 +4379,7 @@ goURL0(const char *prompt, int relative)
+ 	    char *a_url;
+ 	    parseURL2(a->url, &p_url, current);
+ 	    a_url = parsedURL2Str(&p_url)->ptr;
+-	    if (DefaultURLString == DEFAULT_URL_LINK)
++	    if (rc_DefaultURLString == DEFAULT_URL_LINK)
+ 		url = url_decode2(a_url, Currentbuf);
+ 	    else
+ 		pushHist(hist, a_url);
+@@ -4642,7 +4642,7 @@ follow_map(struct parsed_tagarg *arg)
+     }
+     parseURL2(a->url, &p_url, baseURL(Currentbuf));
+     pushHashHist(URLHist, parsedURL2Str(&p_url)->ptr);
+-    if (check_target && open_tab_blank && a->target &&
++    if (check_target && rc_open_tab_blank && a->target &&
+ 	(!strcasecmp(a->target, "_new") || !strcasecmp(a->target, "_blank"))) {
+ 	Buffer *buf;
+ 
+@@ -4884,7 +4884,7 @@ _peekURL(int only_img)
+ 	parseURL2(a->url, &pu, baseURL(Currentbuf));
+ 	s = parsedURL2Str(&pu);
+     }
+-    if (DecodeURL)
++    if (rc_DecodeURL)
+ 	s = Strnew_charp(url_decode2(s->ptr, Currentbuf));
+ #ifdef USE_M17N
+     s = checkType(s, &pp, NULL);
+@@ -4943,7 +4943,7 @@ DEFUN(curURL, PEEK, "Show current addres
+     else {
+ 	offset = 0;
+ 	s = currentURL();
+-	if (DecodeURL)
++	if (rc_DecodeURL)
+ 	    s = Strnew_charp(url_decode2(s->ptr, NULL));
+ #ifdef USE_M17N
+ 	s = checkType(s, &pp, NULL);
+@@ -4987,15 +4987,15 @@ DEFUN(vwSrc, SOURCE VIEW, "Toggle betwee
+ 	    if (f == NULL)
+ 		return;
+ #ifdef USE_M17N
+-	    old_charset = DisplayCharset;
++	    old_charset = rc_DisplayCharset;
+ 	    old_fix_width_conv = WcOption.fix_width_conv;
+-	    DisplayCharset = (Currentbuf->document_charset != WC_CES_US_ASCII)
++	    rc_DisplayCharset = (Currentbuf->document_charset != WC_CES_US_ASCII)
+ 		? Currentbuf->document_charset : 0;
+ 	    WcOption.fix_width_conv = WC_FALSE;
+ #endif
+ 	    saveBufferBody(Currentbuf, f, TRUE);
+ #ifdef USE_M17N
+-	    DisplayCharset = old_charset;
++	    rc_DisplayCharset = old_charset;
+ 	    WcOption.fix_width_conv = old_fix_width_conv;
+ #endif
+ 	    fclose(f);
+@@ -5056,7 +5056,7 @@ DEFUN(foldPre, FOLD_PRE, "Fold long line
+     fold_pre = 1;
+     Currentbuf->need_reshape = TRUE;
+     displayBuffer(Currentbuf, B_FORCE_REDRAW);
+-    fold_pre = FoldPre;
++    fold_pre = rc_FoldPre;
+ }
+ 
+ /* reload */
+@@ -5086,7 +5086,7 @@ DEFUN(reload, RELOAD, "Load current docu
+ 	disp_err_message("Can't reload stdin", TRUE);
+ 	return;
+     }
+-    fold_pre = FoldPre;
++    fold_pre = rc_FoldPre;
+     copyBuffer(&sbuf, Currentbuf);
+     if (Currentbuf->bufferprop & BP_FRAME &&
+ 	(fbuf = Currentbuf->linkBuffer[LB_N_FRAME])) {
+@@ -5140,15 +5140,15 @@ DEFUN(reload, RELOAD, "Load current docu
+     message("Reloading...", 0, 0);
+     refresh();
+ #ifdef USE_M17N
+-    old_charset = DocumentCharset;
++    old_charset = rc_DocumentCharset;
+     if (Currentbuf->document_charset != WC_CES_US_ASCII)
+-	DocumentCharset = Currentbuf->document_charset;
++	rc_DocumentCharset = Currentbuf->document_charset;
+ #endif
+     SearchHeader = Currentbuf->search_header;
+     DefaultType = Currentbuf->real_type;
+     buf = loadGeneralFile(url->ptr, NULL, NO_REFERER, RG_NOCACHE, request);
+ #ifdef USE_M17N
+-    DocumentCharset = old_charset;
++    rc_DocumentCharset = old_charset;
+ #endif
+     SearchHeader = FALSE;
+     DefaultType = NULL;
+@@ -5183,7 +5183,7 @@ DEFUN(reload, RELOAD, "Load current docu
+ 	restorePosition(Currentbuf, &sbuf);
+     }
+     displayBuffer(Currentbuf, B_FORCE_REDRAW);
+-    fold_pre = FoldPre;
++    fold_pre = rc_FoldPre;
+ }
+ 
+ /* reshape */
+@@ -5255,10 +5255,10 @@ DEFUN(defCSet, DEFAULT_CHARSET, "Change
+     if (cs == NULL || *cs == '\0')
+ 	/* FIXME: gettextize? */
+ 	cs = inputStr("Default document charset: ",
+-		      wc_ces_to_charset(DocumentCharset));
++		      wc_ces_to_charset(rc_DocumentCharset));
+     charset = wc_guess_charset_short(cs, 0);
+     if (charset != 0)
+-	DocumentCharset = charset;
++	rc_DocumentCharset = charset;
+     displayBuffer(Currentbuf, B_NORMAL);
+ }
+ #endif
+@@ -5383,31 +5383,31 @@ invoke_browser(const char *url)
+ 	switch (prec_num) {
+ 	case 0:
+ 	case 1:
+-	    browser = ExtBrowser;
++	    browser = rc_ExtBrowser;
+ 	    break;
+ 	case 2:
+-	    browser = ExtBrowser2;
++	    browser = rc_ExtBrowser2;
+ 	    break;
+ 	case 3:
+-	    browser = ExtBrowser3;
++	    browser = rc_ExtBrowser3;
+ 	    break;
+ 	case 4:
+-	    browser = ExtBrowser4;
++	    browser = rc_ExtBrowser4;
+ 	    break;
+ 	case 5:
+-	    browser = ExtBrowser5;
++	    browser = rc_ExtBrowser5;
+ 	    break;
+ 	case 6:
+-	    browser = ExtBrowser6;
++	    browser = rc_ExtBrowser6;
+ 	    break;
+ 	case 7:
+-	    browser = ExtBrowser7;
++	    browser = rc_ExtBrowser7;
+ 	    break;
+ 	case 8:
+-	    browser = ExtBrowser8;
++	    browser = rc_ExtBrowser8;
+ 	    break;
+ 	case 9:
+-	    browser = ExtBrowser9;
++	    browser = rc_ExtBrowser9;
+ 	    break;
+ 	}
+ 	if (browser == NULL || *browser == '\0') {
+@@ -5503,11 +5503,11 @@ DEFUN(curlno, LINE_INFO, "Display curren
+ #ifdef USE_IMAGE
+ DEFUN(dispI, DISPLAY_IMAGE, "Restart loading and drawing of images")
+ {
+-    if (!displayImage)
++    if (!rc_displayImage)
+ 	initImage();
+     if (!activeImage)
+ 	return;
+-    displayImage = TRUE;
++    rc_displayImage = TRUE;
+     Currentbuf->image_flag = IMG_FLAG_AUTO;
+     Currentbuf->need_reshape = TRUE;
+     displayBuffer(Currentbuf, B_REDRAW_IMAGE);
+@@ -5527,10 +5527,10 @@ DEFUN(stopI, STOP_IMAGE, "Stop loading a
+ static int
+ mouse_scroll_line(void)
+ {
+-    if (relative_wheel_scroll)
+-	return (relative_wheel_scroll_ratio * LASTLINE + 99) / 100;
++    if (rc_relative_wheel_scroll)
++	return (rc_relative_wheel_scroll_ratio * LASTLINE + 99) / 100;
+     else
+-	return fixed_wheel_scroll_count;
++	return rc_fixed_wheel_scroll_count;
+ }
+ 
+ static TabBuffer *
+@@ -5696,7 +5696,7 @@ process_mouse(int btn, int x, int y)
+ 		    delta_x = 0;
+ 		if (abs(delta_y) < abs(delta_x) / 3)
+ 		    delta_y = 0;
+-		if (reverse_mouse) {
++		if (rc_reverse_mouse) {
+ 		    delta_y = -delta_y;
+ 		    delta_x = -delta_x;
+ 		}
+@@ -5754,11 +5754,11 @@ process_mouse(int btn, int x, int y)
+ 
+ DEFUN(msToggle, MOUSE_TOGGLE, "Toggle mouse support")
+ {
+-    if (use_mouse) {
+-	use_mouse = FALSE;
++    if (rc_use_mouse) {
++	rc_use_mouse = FALSE;
+     }
+     else {
+-	use_mouse = TRUE;
++	rc_use_mouse = TRUE;
+     }
+     displayBuffer(Currentbuf, B_FORCE_REDRAW);
+ }
+@@ -6031,7 +6031,7 @@ execdict(char *word)
+     char *w, *dictcmd;
+     Buffer *buf;
+ 
+-    if (!UseDictCommand || word == NULL || *word == '\0') {
++    if (!rc_UseDictCommand || word == NULL || *word == '\0') {
+ 	displayBuffer(Currentbuf, B_NORMAL);
+ 	return;
+     }
+@@ -6040,7 +6040,7 @@ execdict(char *word)
+ 	displayBuffer(Currentbuf, B_NORMAL);
+ 	return;
+     }
+-    dictcmd = Sprintf("%s?%s", DictCommand,
++    dictcmd = Sprintf("%s?%s", rc_DictCommand,
+ 		      Str_form_quote(Strnew_charp(w))->ptr)->ptr;
+     buf = loadGeneralFile(dictcmd, NULL, NO_REFERER, 0, NULL);
+     if (buf == NULL) {
+@@ -6059,7 +6059,7 @@ execdict(char *word)
+ 
+ DEFUN(dictword, DICT_WORD, "Execute dictionary command (see README.dict)")
+ {
+-    execdict(inputStrHist(DictPrompt, "", DictHist));
++    execdict(inputStrHist(rc_DictPrompt, "", DictHist));
+ }
+ 
+ DEFUN(dictwordat, DICT_WORD_AT,
+@@ -6189,7 +6189,7 @@ deleteFiles(void)
+     }
+     while ((f = popText(fileToDelete)) != NULL) {
+ 	unlink(f);
+-	if (enable_inline_image == INLINE_IMG_SIXEL && strcmp(f+strlen(f)-4, ".gif") == 0) {
++	if (rc_enable_inline_image == INLINE_IMG_SIXEL && strcmp(f+strlen(f)-4, ".gif") == 0) {
+ 	    Str firstframe = Strnew_charp(f);
+ 	    Strcat_charp(firstframe, "-1");
+ 	    unlink(firstframe->ptr);
+@@ -6256,12 +6256,12 @@ DEFUN(execCmd, COMMAND, "Invoke w3m func
+ 	CurrentKey = -1;
+ 	CurrentCmdData = *p ? p : NULL;
+ #ifdef USE_MOUSE
+-	if (use_mouse)
++	if (rc_use_mouse)
+ 	    mouse_inactive();
+ #endif
+ 	w3mFuncList[cmd].func();
+ #ifdef USE_MOUSE
+-	if (use_mouse)
++	if (rc_use_mouse)
+ 	    mouse_active();
+ #endif
+ 	CurrentCmdData = NULL;
+@@ -6277,12 +6277,12 @@ SigAlarm(SIGNAL_ARG)
+ 	CurrentKey = -1;
+ 	CurrentCmdData = (char *)CurrentAlarm->data;
+ #ifdef USE_MOUSE
+-	if (use_mouse)
++	if (rc_use_mouse)
+ 	    mouse_inactive();
+ #endif
+ 	w3mFuncList[CurrentAlarm->cmd].func();
+ #ifdef USE_MOUSE
+-	if (use_mouse)
++	if (rc_use_mouse)
+ 	    mouse_active();
+ #endif
+ 	CurrentCmdData = NULL;
+@@ -7026,7 +7026,7 @@ DEFUN(ldDL, DOWNLOAD_LIST, "Display down
+ 	COPY_BUFROOT(buf, Currentbuf);
+ 	restorePosition(buf, Currentbuf);
+     }
+-    if (!replace && open_tab_dl_list) {
++    if (!replace && rc_open_tab_dl_list) {
+ 	_newT();
+ 	new_tab = TRUE;
+     }
+@@ -7153,5 +7153,5 @@ DEFUN(userMessage, MESSAGE , "Display a
+ 	return;
+     }
+ 
+-    disp_message_nsec(msg, FALSE, MessageDelay, FALSE, TRUE);
++    disp_message_nsec(msg, FALSE, rc_MessageDelay, FALSE, TRUE);
+ }
+--- a/rc.c
++++ b/rc.c
+@@ -359,9 +359,9 @@ static struct sel_c mailtooptionsstr[] =
+ };
+ 
+ #ifdef USE_M17N
+-static wc_ces_list *display_charset_str = NULL;
+-static wc_ces_list *document_charset_str = NULL;
+-static wc_ces_list *system_charset_str = NULL;
++static wc_ces_list *rc_display_charset_str = NULL;
++static wc_ces_list *rc_document_charset_str = NULL;
++static wc_ces_list *rc_system_charset_str = NULL;
+ static struct sel_c auto_detect_str[] = {
+     {N_S(WC_OPT_DETECT_OFF), N_("OFF")},
+     {N_S(WC_OPT_DETECT_ISO_2022), N_("Only ISO 2022")},
+@@ -389,279 +389,279 @@ static struct sel_c inlineimgstr[] = {
+ #endif				/* USE_IMAGE */
+ 
+ struct param_ptr params1[] = {
+-    {"tabstop", P_NZINT, PI_TEXT, (void *)&Tabstop, CMT_TABSTOP, NULL},
+-    {"indent_incr", P_NZINT, PI_TEXT, (void *)&IndentIncr, CMT_INDENT_INCR,
++    {"tabstop", P_NZINT, PI_TEXT, &rc_Tabstop, CMT_TABSTOP, NULL},
++    {"indent_incr", P_NZINT, PI_TEXT, &rc_IndentIncr, CMT_INDENT_INCR,
+      NULL},
+-    {"maxcols", P_INT, PI_TEXT, (void *)&MaxCols, CMT_MAXCOLS, NULL},
+-    {"pixel_per_char", P_PIXELS, PI_TEXT, (void *)&pixel_per_char,
++    {"maxcols", P_INT, PI_TEXT, &rc_MaxCols, CMT_MAXCOLS, NULL},
++    {"pixel_per_char", P_PIXELS, PI_TEXT, &rc_pixel_per_char,
+      CMT_PIXEL_PER_CHAR, NULL},
+ #ifdef USE_IMAGE
+-    {"pixel_per_line", P_PIXELS, PI_TEXT, (void *)&pixel_per_line,
++    {"pixel_per_line", P_PIXELS, PI_TEXT, &rc_pixel_per_line,
+      CMT_PIXEL_PER_LINE, NULL},
+ #endif
+-    {"frame", P_CHARINT, PI_ONOFF, (void *)&RenderFrame, CMT_FRAME, NULL},
+-    {"target_self", P_CHARINT, PI_ONOFF, (void *)&TargetSelf, CMT_TSELF, NULL},
+-    {"open_tab_blank", P_INT, PI_ONOFF, (void *)&open_tab_blank,
++    {"frame", P_CHARINT, PI_ONOFF, &rc_RenderFrame, CMT_FRAME, NULL},
++    {"target_self", P_CHARINT, PI_ONOFF, &rc_TargetSelf, CMT_TSELF, NULL},
++    {"open_tab_blank", P_INT, PI_ONOFF, &rc_open_tab_blank,
+      CMT_OPEN_TAB_BLANK, NULL},
+-    {"open_tab_dl_list", P_INT, PI_ONOFF, (void *)&open_tab_dl_list,
++    {"open_tab_dl_list", P_INT, PI_ONOFF, &rc_open_tab_dl_list,
+      CMT_OPEN_TAB_DL_LIST, NULL},
+-    {"display_link", P_INT, PI_ONOFF, (void *)&displayLink, CMT_DISPLINK,
++    {"display_link", P_INT, PI_ONOFF, &rc_displayLink, CMT_DISPLINK,
+      NULL},
+-    {"display_link_number", P_INT, PI_ONOFF, (void *)&displayLinkNumber,
++    {"display_link_number", P_INT, PI_ONOFF, &rc_displayLinkNumber,
+      CMT_DISPLINKNUMBER, NULL},
+-    {"zero_based_link_no", P_INT, PI_ONOFF, (void *)&zeroBasedLinkNo,
++    {"zero_based_link_no", P_INT, PI_ONOFF, &rc_zeroBasedLinkNo,
+      CMT_ZEROBASEDLINKNO, NULL},
+-    {"decode_url", P_INT, PI_ONOFF, (void *)&DecodeURL, CMT_DECODE_URL, NULL},
+-    {"display_lineinfo", P_INT, PI_ONOFF, (void *)&displayLineInfo,
++    {"decode_url", P_INT, PI_ONOFF, &rc_DecodeURL, CMT_DECODE_URL, NULL},
++    {"display_lineinfo", P_INT, PI_ONOFF, &rc_displayLineInfo,
+      CMT_DISPLINEINFO, NULL},
+-    {"display_column_number", P_INT, PI_ONOFF, (void *)&displayColumnNumber,
++    {"display_column_number", P_INT, PI_ONOFF, &rc_displayColumnNumber,
+      CMT_DISP_COLUMN_NUMBER, NULL},
+-    {"ext_dirlist", P_INT, PI_ONOFF, (void *)&UseExternalDirBuffer,
++    {"ext_dirlist", P_INT, PI_ONOFF, &rc_UseExternalDirBuffer,
+      CMT_EXT_DIRLIST, NULL},
+-    {"dirlist_cmd", P_STRING, PI_TEXT, (void *)&DirBufferCommand,
++    {"dirlist_cmd", P_STRING, PI_TEXT, &rc_DirBufferCommand,
+      CMT_DIRLIST_CMD, NULL},
+ #ifdef USE_DICT
+-    {"use_dictcommand", P_INT, PI_ONOFF, (void *)&UseDictCommand,
++    {"use_dictcommand", P_INT, PI_ONOFF, &rc_UseDictCommand,
+      CMT_USE_DICTCOMMAND, NULL},
+-    {"dictcommand", P_STRING, PI_TEXT, (void *)&DictCommand,
++    {"dictcommand", P_STRING, PI_TEXT, &rc_DictCommand,
+      CMT_DICTCOMMAND, NULL},
+-    {"dictprompt", P_STRING, PI_TEXT, (void *)&DictPrompt, CMT_DICTPROMPT, NULL},
++    {"dictprompt", P_STRING, PI_TEXT, &rc_DictPrompt, CMT_DICTPROMPT, NULL},
+ #endif				/* USE_DICT */
+-    {"multicol", P_INT, PI_ONOFF, (void *)&multicolList, CMT_MULTICOL, NULL},
+-    {"alt_entity", P_CHARINT, PI_ONOFF, (void *)&UseAltEntity, CMT_ALT_ENTITY,
++    {"multicol", P_INT, PI_ONOFF, &rc_multicolList, CMT_MULTICOL, NULL},
++    {"alt_entity", P_CHARINT, PI_ONOFF, &rc_UseAltEntity, CMT_ALT_ENTITY,
+      NULL},
+-    {"graphic_char", P_CHARINT, PI_SEL_C, (void *)&UseGraphicChar,
+-     CMT_GRAPHIC_CHAR, (void *)graphic_char_str},
+-    {"display_borders", P_CHARINT, PI_ONOFF, (void *)&DisplayBorders,
++    {"graphic_char", P_CHARINT, PI_SEL_C, &rc_UseGraphicChar,
++     CMT_GRAPHIC_CHAR, graphic_char_str},
++    {"display_borders", P_CHARINT, PI_ONOFF, &rc_DisplayBorders,
+      CMT_DISP_BORDERS, NULL},
+-    {"disable_center", P_CHARINT, PI_ONOFF, (void *)&DisableCenter,
++    {"disable_center", P_CHARINT, PI_ONOFF, &rc_DisableCenter,
+      CMT_DISABLE_CENTER, NULL},
+-    {"fold_textarea", P_CHARINT, PI_ONOFF, (void *)&FoldTextarea,
++    {"fold_textarea", P_CHARINT, PI_ONOFF, &rc_FoldTextarea,
+      CMT_FOLD_TEXTAREA, NULL},
+-    {"fold_pre", P_CHARINT, PI_ONOFF, (void *)&FoldPre,
++    {"fold_pre", P_CHARINT, PI_ONOFF, &rc_FoldPre,
+      CMT_FOLD_PRE, NULL},
+-    {"display_ins_del", P_INT, PI_SEL_C, (void *)&displayInsDel,
++    {"display_ins_del", P_INT, PI_SEL_C, &rc_displayInsDel,
+      CMT_DISP_INS_DEL, displayinsdel},
+-    {"ignore_null_img_alt", P_INT, PI_ONOFF, (void *)&ignore_null_img_alt,
++    {"ignore_null_img_alt", P_INT, PI_ONOFF, &rc_ignore_null_img_alt,
+      CMT_IGNORE_NULL_IMG_ALT, NULL},
+-    {"view_unseenobject", P_INT, PI_ONOFF, (void *)&view_unseenobject,
++    {"view_unseenobject", P_INT, PI_ONOFF, &rc_view_unseenobject,
+      CMT_VIEW_UNSEENOBJECTS, NULL},
+     /* XXX: emacs-w3m force to off display_image even if image options off */
+-    {"display_image", P_INT, PI_ONOFF, (void *)&displayImage, CMT_DISP_IMAGE,
++    {"display_image", P_INT, PI_ONOFF, &rc_displayImage, CMT_DISP_IMAGE,
+      NULL},
+-    {"pseudo_inlines", P_INT, PI_ONOFF, (void *)&pseudoInlines,
++    {"pseudo_inlines", P_INT, PI_ONOFF, &rc_pseudoInlines,
+      CMT_PSEUDO_INLINES, NULL},
+ #ifdef USE_IMAGE
+-    {"auto_image", P_INT, PI_ONOFF, (void *)&autoImage, CMT_AUTO_IMAGE, NULL},
+-    {"max_load_image", P_INT, PI_TEXT, (void *)&maxLoadImage,
++    {"auto_image", P_INT, PI_ONOFF, &rc_autoImage, CMT_AUTO_IMAGE, NULL},
++    {"max_load_image", P_INT, PI_TEXT, &rc_maxLoadImage,
+      CMT_MAX_LOAD_IMAGE, NULL},
+-    {"ext_image_viewer", P_INT, PI_ONOFF, (void *)&useExtImageViewer,
++    {"ext_image_viewer", P_INT, PI_ONOFF, &rc_useExtImageViewer,
+      CMT_EXT_IMAGE_VIEWER, NULL},
+-    {"image_scale", P_SCALE, PI_TEXT, (void *)&image_scale, CMT_IMAGE_SCALE,
++    {"image_scale", P_SCALE, PI_TEXT, &rc_image_scale, CMT_IMAGE_SCALE,
+      NULL},
+-    {"inline_img_protocol", P_INT, PI_SEL_C, (void *)&enable_inline_image,
+-     CMT_INLINE_IMG_PROTOCOL, (void *)inlineimgstr},
+-    {"imgdisplay", P_STRING, PI_TEXT, (void *)&Imgdisplay, CMT_IMGDISPLAY,
++    {"inline_img_protocol", P_INT, PI_SEL_C, &rc_enable_inline_image,
++     CMT_INLINE_IMG_PROTOCOL, inlineimgstr},
++    {"imgdisplay", P_STRING, PI_TEXT, &rc_Imgdisplay, CMT_IMGDISPLAY,
+      NULL},
+-    {"image_map_list", P_INT, PI_ONOFF, (void *)&image_map_list,
++    {"image_map_list", P_INT, PI_ONOFF, &rc_image_map_list,
+      CMT_IMAGE_MAP_LIST, NULL},
+ #endif
+-    {"fold_line", P_INT, PI_ONOFF, (void *)&FoldLine, CMT_FOLD_LINE, NULL},
+-    {"show_lnum", P_INT, PI_ONOFF, (void *)&showLineNum, CMT_SHOW_NUM, NULL},
+-    {"show_srch_str", P_INT, PI_ONOFF, (void *)&show_srch_str,
++    {"fold_line", P_INT, PI_ONOFF, &rc_FoldLine, CMT_FOLD_LINE, NULL},
++    {"show_lnum", P_INT, PI_ONOFF, &rc_showLineNum, CMT_SHOW_NUM, NULL},
++    {"show_srch_str", P_INT, PI_ONOFF, &rc_show_srch_str,
+      CMT_SHOW_SRCH_STR, NULL},
+-    {"message_delay", P_NZINT, PI_TEXT, (void *)&MessageDelay, CMT_MESSAGE_DELAY,
++    {"message_delay", P_NZINT, PI_TEXT, &rc_MessageDelay, CMT_MESSAGE_DELAY,
+      NULL},
+-    {"label_topline", P_INT, PI_ONOFF, (void *)&label_topline,
++    {"label_topline", P_INT, PI_ONOFF, &rc_label_topline,
+      CMT_LABEL_TOPLINE, NULL},
+-    {"nextpage_topline", P_INT, PI_ONOFF, (void *)&nextpage_topline,
++    {"nextpage_topline", P_INT, PI_ONOFF, &rc_nextpage_topline,
+      CMT_NEXTPAGE_TOPLINE, NULL},
+     {NULL, 0, 0, NULL, NULL, NULL},
+ };
+ 
+ #ifdef USE_COLOR
+ struct param_ptr params2[] = {
+-    {"color", P_INT, PI_ONOFF, (void *)&useColor, CMT_COLOR, NULL},
+-    {"high-intensity", P_INT, PI_ONOFF, (void *)&highIntensityColors, CMT_HINTENSITY_COLOR, NULL},
+-    {"basic_color", P_COLOR, PI_SEL_C, (void *)&basic_color, CMT_B_COLOR,
+-     (void *)colorstr},
+-    {"anchor_color", P_COLOR, PI_SEL_C, (void *)&anchor_color, CMT_A_COLOR,
+-     (void *)colorstr},
+-    {"image_color", P_COLOR, PI_SEL_C, (void *)&image_color, CMT_I_COLOR,
+-     (void *)colorstr},
+-    {"form_color", P_COLOR, PI_SEL_C, (void *)&form_color, CMT_F_COLOR,
+-     (void *)colorstr},
++    {"color", P_INT, PI_ONOFF, &rc_useColor, CMT_COLOR, NULL},
++    {"high-intensity", P_INT, PI_ONOFF, &rc_highIntensityColors, CMT_HINTENSITY_COLOR, NULL},
++    {"basic_color", P_COLOR, PI_SEL_C, &rc_basic_color, CMT_B_COLOR,
++     colorstr},
++    {"anchor_color", P_COLOR, PI_SEL_C, &rc_anchor_color, CMT_A_COLOR,
++     colorstr},
++    {"image_color", P_COLOR, PI_SEL_C, &rc_image_color, CMT_I_COLOR,
++     colorstr},
++    {"form_color", P_COLOR, PI_SEL_C, &rc_form_color, CMT_F_COLOR,
++     colorstr},
+ #ifdef USE_BG_COLOR
+-    {"mark_color", P_COLOR, PI_SEL_C, (void *)&mark_color, CMT_MARK_COLOR,
+-     (void *)colorstr},
+-    {"bg_color", P_COLOR, PI_SEL_C, (void *)&bg_color, CMT_BG_COLOR,
+-     (void *)colorstr},
++    {"mark_color", P_COLOR, PI_SEL_C, &rc_mark_color, CMT_MARK_COLOR,
++     colorstr},
++    {"bg_color", P_COLOR, PI_SEL_C, &rc_bg_color, CMT_BG_COLOR,
++     colorstr},
+ #endif				/* USE_BG_COLOR */
+-    {"active_style", P_INT, PI_ONOFF, (void *)&useActiveColor,
++    {"active_style", P_INT, PI_ONOFF, &rc_useActiveColor,
+      CMT_ACTIVE_STYLE, NULL},
+-    {"active_color", P_COLOR, PI_SEL_C, (void *)&active_color, CMT_C_COLOR,
+-     (void *)colorstr},
+-    {"visited_anchor", P_INT, PI_ONOFF, (void *)&useVisitedColor,
++    {"active_color", P_COLOR, PI_SEL_C, &rc_active_color, CMT_C_COLOR,
++     colorstr},
++    {"visited_anchor", P_INT, PI_ONOFF, &rc_useVisitedColor,
+      CMT_VISITED_ANCHOR, NULL},
+-    {"visited_color", P_COLOR, PI_SEL_C, (void *)&visited_color, CMT_V_COLOR,
+-     (void *)colorstr},
++    {"visited_color", P_COLOR, PI_SEL_C, &rc_visited_color, CMT_V_COLOR,
++     colorstr},
+     {NULL, 0, 0, NULL, NULL, NULL},
+ };
+ #endif				/* USE_COLOR */
+ 
+ 
+ struct param_ptr params3[] = {
+-    {"pagerline", P_NZINT, PI_TEXT, (void *)&PagerMax, CMT_PAGERLINE, NULL},
++    {"pagerline", P_NZINT, PI_TEXT, &rc_PagerMax, CMT_PAGERLINE, NULL},
+ #ifdef USE_HISTORY
+-    {"use_history", P_INT, PI_ONOFF, (void *)&UseHistory, CMT_HISTORY, NULL},
+-    {"history", P_INT, PI_TEXT, (void *)&URLHistSize, CMT_HISTSIZE, NULL},
+-    {"save_hist", P_INT, PI_ONOFF, (void *)&SaveURLHist, CMT_SAVEHIST, NULL},
++    {"use_history", P_INT, PI_ONOFF, &rc_UseHistory, CMT_HISTORY, NULL},
++    {"history", P_INT, PI_TEXT, &rc_URLHistSize, CMT_HISTSIZE, NULL},
++    {"save_hist", P_INT, PI_ONOFF, &rc_SaveURLHist, CMT_SAVEHIST, NULL},
+ #endif				/* USE_HISTORY */
+-    {"save_sess", P_INT, PI_ONOFF, (void *)&StoreSession, CMT_SAVESESS, NULL},
+-    {"confirm_qq", P_INT, PI_ONOFF, (void *)&confirm_on_quit, CMT_CONFIRM_QQ,
++    {"save_sess", P_INT, PI_ONOFF, &rc_StoreSession, CMT_SAVESESS, NULL},
++    {"confirm_qq", P_INT, PI_ONOFF, &rc_confirm_on_quit, CMT_CONFIRM_QQ,
+      NULL},
+-    {"exit_on_last", P_INT, PI_ONOFF, (void *)&exit_on_last, CMT_EXIT_ON_LAST,
++    {"exit_on_last", P_INT, PI_ONOFF, &rc_exit_on_last, CMT_EXIT_ON_LAST,
+      NULL},
+-    {"close_tab_back", P_INT, PI_ONOFF, (void *)&close_tab_back,
++    {"close_tab_back", P_INT, PI_ONOFF, &rc_close_tab_back,
+      CMT_CLOSE_TAB_BACK, NULL},
+ #ifdef USE_MARK
+-    {"mark", P_INT, PI_ONOFF, (void *)&use_mark, CMT_USE_MARK, NULL},
++    {"mark", P_INT, PI_ONOFF, &rc_use_mark, CMT_USE_MARK, NULL},
+ #endif
+-    {"emacs_like_lineedit", P_INT, PI_ONOFF, (void *)&emacs_like_lineedit,
++    {"emacs_like_lineedit", P_INT, PI_ONOFF, &rc_emacs_like_lineedit,
+      CMT_EMACS_LIKE_LINEEDIT, NULL},
+-    {"space_autocomplete", P_INT, PI_ONOFF, (void *)&space_autocomplete,
++    {"space_autocomplete", P_INT, PI_ONOFF, &rc_space_autocomplete,
+      CMT_SPACE_AUTOCOMPLETE, NULL},
+-    {"vi_prec_num", P_INT, PI_ONOFF, (void *)&vi_prec_num, CMT_VI_PREC_NUM,
++    {"vi_prec_num", P_INT, PI_ONOFF, &rc_vi_prec_num, CMT_VI_PREC_NUM,
+      NULL},
+-    {"mark_all_pages", P_INT, PI_ONOFF, (void *)&MarkAllPages,
++    {"mark_all_pages", P_INT, PI_ONOFF, &rc_MarkAllPages,
+      CMT_MARK_ALL_PAGES, NULL},
+-    {"wrap_search", P_INT, PI_ONOFF, (void *)&WrapDefault, CMT_WRAP, NULL},
+-    {"ignorecase_search", P_INT, PI_ONOFF, (void *)&IgnoreCase,
++    {"wrap_search", P_INT, PI_ONOFF, &rc_WrapDefault, CMT_WRAP, NULL},
++    {"ignorecase_search", P_INT, PI_ONOFF, &rc_IgnoreCase,
+      CMT_IGNORE_CASE, NULL},
+ #ifdef USE_MIGEMO
+-    {"use_migemo", P_INT, PI_ONOFF, (void *)&use_migemo, CMT_USE_MIGEMO,
++    {"use_migemo", P_INT, PI_ONOFF, &rc_use_migemo, CMT_USE_MIGEMO,
+      NULL},
+-    {"migemo_command", P_STRING, PI_TEXT, (void *)&migemo_command,
++    {"migemo_command", P_STRING, PI_TEXT, &rc_migemo_command,
+      CMT_MIGEMO_COMMAND, NULL},
+ #endif				/* USE_MIGEMO */
+ #ifdef USE_MOUSE
+-    {"use_mouse", P_INT, PI_ONOFF, (void *)&use_mouse, CMT_MOUSE, NULL},
+-    {"reverse_mouse", P_INT, PI_ONOFF, (void *)&reverse_mouse,
++    {"use_mouse", P_INT, PI_ONOFF, &rc_use_mouse, CMT_MOUSE, NULL},
++    {"reverse_mouse", P_INT, PI_ONOFF, &rc_reverse_mouse,
+      CMT_REVERSE_MOUSE, NULL},
+-    {"relative_wheel_scroll", P_INT, PI_SEL_C, (void *)&relative_wheel_scroll,
+-     CMT_RELATIVE_WHEEL_SCROLL, (void *)wheelmode},
++    {"relative_wheel_scroll", P_INT, PI_SEL_C, &rc_relative_wheel_scroll,
++     CMT_RELATIVE_WHEEL_SCROLL, wheelmode},
+     {"relative_wheel_scroll_ratio", P_INT, PI_TEXT,
+-     (void *)&relative_wheel_scroll_ratio,
++     &rc_relative_wheel_scroll_ratio,
+      CMT_RELATIVE_WHEEL_SCROLL_RATIO, NULL},
+     {"fixed_wheel_scroll_count", P_INT, PI_TEXT,
+-     (void *)&fixed_wheel_scroll_count,
++     &rc_fixed_wheel_scroll_count,
+      CMT_FIXED_WHEEL_SCROLL_COUNT, NULL},
+ #endif				/* USE_MOUSE */
+-    {"clear_buffer", P_INT, PI_ONOFF, (void *)&clear_buffer, CMT_CLEAR_BUF,
++    {"clear_buffer", P_INT, PI_ONOFF, &rc_clear_buffer, CMT_CLEAR_BUF,
+      NULL},
+-    {"decode_cte", P_CHARINT, PI_ONOFF, (void *)&DecodeCTE, CMT_DECODE_CTE,
++    {"decode_cte", P_CHARINT, PI_ONOFF, &rc_DecodeCTE, CMT_DECODE_CTE,
+      NULL},
+-    {"auto_uncompress", P_CHARINT, PI_ONOFF, (void *)&AutoUncompress,
++    {"auto_uncompress", P_CHARINT, PI_ONOFF, &rc_AutoUncompress,
+      CMT_AUTO_UNCOMPRESS, NULL},
+-    {"preserve_timestamp", P_CHARINT, PI_ONOFF, (void *)&PreserveTimestamp,
++    {"preserve_timestamp", P_CHARINT, PI_ONOFF, &rc_PreserveTimestamp,
+      CMT_PRESERVE_TIMESTAMP, NULL},
+-    {"keymap_file", P_STRING, PI_TEXT, (void *)&keymap_file, CMT_KEYMAP_FILE,
++    {"keymap_file", P_STRING, PI_TEXT, &rc_keymap_file, CMT_KEYMAP_FILE,
+      NULL},
+     {NULL, 0, 0, NULL, NULL, NULL},
+ };
+ 
+ struct param_ptr params4[] = {
+-    {"use_proxy", P_CHARINT, PI_ONOFF, (void *)&use_proxy, CMT_USE_PROXY,
++    {"use_proxy", P_CHARINT, PI_ONOFF, &rc_use_proxy, CMT_USE_PROXY,
+      NULL},
+-    {"http_proxy", P_STRING, PI_TEXT, (void *)&HTTP_proxy, CMT_HTTP_PROXY,
++    {"http_proxy", P_STRING, PI_TEXT, &rc_HTTP_proxy, CMT_HTTP_PROXY,
+      NULL},
+ #ifdef USE_SSL
+-    {"https_proxy", P_STRING, PI_TEXT, (void *)&HTTPS_proxy, CMT_HTTPS_PROXY,
++    {"https_proxy", P_STRING, PI_TEXT, &rc_HTTPS_proxy, CMT_HTTPS_PROXY,
+      NULL},
+ #endif				/* USE_SSL */
+ #ifdef USE_GOPHER
+-    {"gopher_proxy", P_STRING, PI_TEXT, (void *)&GOPHER_proxy,
++    {"gopher_proxy", P_STRING, PI_TEXT, &rc_GOPHER_proxy,
+      CMT_GOPHER_PROXY, NULL},
+ #endif				/* USE_GOPHER */
+-    {"ftp_proxy", P_STRING, PI_TEXT, (void *)&FTP_proxy, CMT_FTP_PROXY, NULL},
+-    {"no_proxy", P_STRING, PI_TEXT, (void *)&NO_proxy, CMT_NO_PROXY, NULL},
+-    {"noproxy_netaddr", P_INT, PI_ONOFF, (void *)&NOproxy_netaddr,
++    {"ftp_proxy", P_STRING, PI_TEXT, &rc_FTP_proxy, CMT_FTP_PROXY, NULL},
++    {"no_proxy", P_STRING, PI_TEXT, &rc_NO_proxy, CMT_NO_PROXY, NULL},
++    {"noproxy_netaddr", P_INT, PI_ONOFF, &rc_NOproxy_netaddr,
+      CMT_NOPROXY_NETADDR, NULL},
+-    {"no_cache", P_CHARINT, PI_ONOFF, (void *)&NoCache, CMT_NO_CACHE, NULL},
++    {"no_cache", P_CHARINT, PI_ONOFF, &rc_NoCache, CMT_NO_CACHE, NULL},
+ 
+     {NULL, 0, 0, NULL, NULL, NULL},
+ };
+ 
+ struct param_ptr params5[] = {
+-    {"document_root", P_STRING, PI_TEXT, (void *)&document_root, CMT_DROOT,
++    {"document_root", P_STRING, PI_TEXT, &rc_document_root, CMT_DROOT,
+      NULL},
+     {"personal_document_root", P_STRING, PI_TEXT,
+-     (void *)&personal_document_root, CMT_PDROOT, NULL},
+-    {"cgi_bin", P_STRING, PI_TEXT, (void *)&cgi_bin, CMT_CGIBIN, NULL},
+-    {"index_file", P_STRING, PI_TEXT, (void *)&index_file, CMT_IFILE, NULL},
+-    {"tmp_dir", P_STRING, PI_TEXT, (void *)&param_tmp_dir, CMT_TMP, NULL},
+-    {"dl_dir", P_STRING, PI_TEXT, (void *)&param_dl_dir, CMT_DL_DIR, NULL},
++     &rc_personal_document_root, CMT_PDROOT, NULL},
++    {"cgi_bin", P_STRING, PI_TEXT, &rc_cgi_bin, CMT_CGIBIN, NULL},
++    {"index_file", P_STRING, PI_TEXT, &rc_index_file, CMT_IFILE, NULL},
++    {"tmp_dir", P_STRING, PI_TEXT, &rc_param_tmp_dir, CMT_TMP, NULL},
++    {"dl_dir", P_STRING, PI_TEXT, &rc_param_dl_dir, CMT_DL_DIR, NULL},
+     {NULL, 0, 0, NULL, NULL, NULL},
+ };
+ 
+ struct param_ptr params6[] = {
+-    {"mime_types", P_STRING, PI_TEXT, (void *)&mimetypes_files, CMT_MIMETYPES,
++    {"mime_types", P_STRING, PI_TEXT, &rc_mimetypes_files, CMT_MIMETYPES,
+      NULL},
+-    {"mailcap", P_STRING, PI_TEXT, (void *)&mailcap_files, CMT_MAILCAP, NULL},
++    {"mailcap", P_STRING, PI_TEXT, &rc_mailcap_files, CMT_MAILCAP, NULL},
+ #ifdef USE_EXTERNAL_URI_LOADER
+-    {"urimethodmap", P_STRING, PI_TEXT, (void *)&urimethodmap_files,
++    {"urimethodmap", P_STRING, PI_TEXT, &rc_urimethodmap_files,
+      CMT_URIMETHODMAP, NULL},
+ #endif
+-    {"editor", P_STRING, PI_TEXT, (void *)&Editor, CMT_EDITOR, NULL},
+-    {"mailto_options", P_INT, PI_SEL_C, (void *)&MailtoOptions,
+-     CMT_MAILTO_OPTIONS, (void *)mailtooptionsstr},
+-    {"mailer", P_STRING, PI_TEXT, (void *)&Mailer, CMT_MAILER, NULL},
+-    {"extbrowser", P_STRING, PI_TEXT, (void *)&ExtBrowser, CMT_EXTBRZ, NULL},
+-    {"extbrowser2", P_STRING, PI_TEXT, (void *)&ExtBrowser2, CMT_EXTBRZ2,
++    {"editor", P_STRING, PI_TEXT, &rc_Editor, CMT_EDITOR, NULL},
++    {"mailto_options", P_INT, PI_SEL_C, &rc_MailtoOptions,
++     CMT_MAILTO_OPTIONS, mailtooptionsstr},
++    {"mailer", P_STRING, PI_TEXT, &rc_Mailer, CMT_MAILER, NULL},
++    {"extbrowser", P_STRING, PI_TEXT, &rc_ExtBrowser, CMT_EXTBRZ, NULL},
++    {"extbrowser2", P_STRING, PI_TEXT, &rc_ExtBrowser2, CMT_EXTBRZ2,
+      NULL},
+-    {"extbrowser3", P_STRING, PI_TEXT, (void *)&ExtBrowser3, CMT_EXTBRZ3,
++    {"extbrowser3", P_STRING, PI_TEXT, &rc_ExtBrowser3, CMT_EXTBRZ3,
+      NULL},
+-    {"extbrowser4", P_STRING, PI_TEXT, (void *)&ExtBrowser4, CMT_EXTBRZ4,
++    {"extbrowser4", P_STRING, PI_TEXT, &rc_ExtBrowser4, CMT_EXTBRZ4,
+      NULL},
+-    {"extbrowser5", P_STRING, PI_TEXT, (void *)&ExtBrowser5, CMT_EXTBRZ5,
++    {"extbrowser5", P_STRING, PI_TEXT, &rc_ExtBrowser5, CMT_EXTBRZ5,
+      NULL},
+-    {"extbrowser6", P_STRING, PI_TEXT, (void *)&ExtBrowser6, CMT_EXTBRZ6,
++    {"extbrowser6", P_STRING, PI_TEXT, &rc_ExtBrowser6, CMT_EXTBRZ6,
+      NULL},
+-    {"extbrowser7", P_STRING, PI_TEXT, (void *)&ExtBrowser7, CMT_EXTBRZ7,
++    {"extbrowser7", P_STRING, PI_TEXT, &rc_ExtBrowser7, CMT_EXTBRZ7,
+      NULL},
+-    {"extbrowser8", P_STRING, PI_TEXT, (void *)&ExtBrowser8, CMT_EXTBRZ8,
++    {"extbrowser8", P_STRING, PI_TEXT, &rc_ExtBrowser8, CMT_EXTBRZ8,
+      NULL},
+-    {"extbrowser9", P_STRING, PI_TEXT, (void *)&ExtBrowser9, CMT_EXTBRZ9,
++    {"extbrowser9", P_STRING, PI_TEXT, &rc_ExtBrowser9, CMT_EXTBRZ9,
+      NULL},
+-    {"bgextviewer", P_INT, PI_ONOFF, (void *)&BackgroundExtViewer,
++    {"bgextviewer", P_INT, PI_ONOFF, &rc_BackgroundExtViewer,
+      CMT_BGEXTVIEW, NULL},
+-    {"use_lessopen", P_INT, PI_ONOFF, (void *)&use_lessopen, CMT_USE_LESSOPEN,
++    {"use_lessopen", P_INT, PI_ONOFF, &rc_use_lessopen, CMT_USE_LESSOPEN,
+      NULL},
+     {NULL, 0, 0, NULL, NULL, NULL},
+ };
+ 
+ #ifdef USE_SSL
+ struct param_ptr params7[] = {
+-    {"ssl_forbid_method", P_STRING, PI_TEXT, (void *)&ssl_forbid_method,
++    {"ssl_forbid_method", P_STRING, PI_TEXT, &rc_ssl_forbid_method,
+      CMT_SSL_FORBID_METHOD, NULL},
+ #ifdef SSL_CTX_set_min_proto_version
+-    {"ssl_min_version", P_STRING, PI_TEXT, (void *)&ssl_min_version,
++    {"ssl_min_version", P_STRING, PI_TEXT, &rc_ssl_min_version,
+      CMT_SSL_MIN_VERSION, NULL},
+ #endif
+-    {"ssl_cipher", P_STRING, PI_TEXT, (void *)&ssl_cipher, CMT_SSL_CIPHER,
++    {"ssl_cipher", P_STRING, PI_TEXT, &rc_ssl_cipher, CMT_SSL_CIPHER,
+      NULL},
+ #ifdef USE_SSL_VERIFY
+-    {"ssl_verify_server", P_INT, PI_ONOFF, (void *)&ssl_verify_server,
++    {"ssl_verify_server", P_INT, PI_ONOFF, &rc_ssl_verify_server,
+      CMT_SSL_VERIFY_SERVER, NULL},
+-    {"ssl_cert_file", P_SSLPATH, PI_TEXT, (void *)&ssl_cert_file,
++    {"ssl_cert_file", P_SSLPATH, PI_TEXT, &rc_ssl_cert_file,
+      CMT_SSL_CERT_FILE, NULL},
+-    {"ssl_key_file", P_SSLPATH, PI_TEXT, (void *)&ssl_key_file,
++    {"ssl_key_file", P_SSLPATH, PI_TEXT, &rc_ssl_key_file,
+      CMT_SSL_KEY_FILE, NULL},
+-    {"ssl_ca_path", P_SSLPATH, PI_TEXT, (void *)&ssl_ca_path, CMT_SSL_CA_PATH,
++    {"ssl_ca_path", P_SSLPATH, PI_TEXT, &rc_ssl_ca_path, CMT_SSL_CA_PATH,
+      NULL},
+-    {"ssl_ca_file", P_SSLPATH, PI_TEXT, (void *)&ssl_ca_file, CMT_SSL_CA_FILE,
++    {"ssl_ca_file", P_SSLPATH, PI_TEXT, &rc_ssl_ca_file, CMT_SSL_CA_FILE,
+      NULL},
+-    {"ssl_ca_default", P_INT, PI_ONOFF, (void *)&ssl_ca_default,
++    {"ssl_ca_default", P_INT, PI_ONOFF, &rc_ssl_ca_default,
+      CMT_SSL_CA_DEFAULT, NULL},
+ #endif				/* USE_SSL_VERIFY */
+     {NULL, 0, 0, NULL, NULL, NULL},
+@@ -670,127 +670,127 @@ struct param_ptr params7[] = {
+ 
+ #ifdef USE_COOKIE
+ struct param_ptr params8[] = {
+-    {"use_cookie", P_INT, PI_ONOFF, (void *)&use_cookie, CMT_USECOOKIE, NULL},
+-    {"show_cookie", P_INT, PI_ONOFF, (void *)&show_cookie,
++    {"use_cookie", P_INT, PI_ONOFF, &rc_use_cookie, CMT_USECOOKIE, NULL},
++    {"show_cookie", P_INT, PI_ONOFF, &rc_show_cookie,
+      CMT_SHOWCOOKIE, NULL},
+-    {"accept_cookie", P_INT, PI_ONOFF, (void *)&accept_cookie,
++    {"accept_cookie", P_INT, PI_ONOFF, &rc_accept_cookie,
+      CMT_ACCEPTCOOKIE, NULL},
+-    {"accept_bad_cookie", P_INT, PI_SEL_C, (void *)&accept_bad_cookie,
+-     CMT_ACCEPTBADCOOKIE, (void *)badcookiestr},
++    {"accept_bad_cookie", P_INT, PI_SEL_C, &rc_accept_bad_cookie,
++     CMT_ACCEPTBADCOOKIE, badcookiestr},
+     {"cookie_reject_domains", P_STRING, PI_TEXT,
+-     (void *)&cookie_reject_domains, CMT_COOKIE_REJECT_DOMAINS, NULL},
++     &rc_cookie_reject_domains, CMT_COOKIE_REJECT_DOMAINS, NULL},
+     {"cookie_accept_domains", P_STRING, PI_TEXT,
+-     (void *)&cookie_accept_domains, CMT_COOKIE_ACCEPT_DOMAINS, NULL},
++     &rc_cookie_accept_domains, CMT_COOKIE_ACCEPT_DOMAINS, NULL},
+     {"cookie_avoid_wrong_number_of_dots", P_STRING, PI_TEXT,
+-     (void *)&cookie_avoid_wrong_number_of_dots,
++     &rc_cookie_avoid_wrong_number_of_dots,
+      CMT_COOKIE_AVOID_WONG_NUMBER_OF_DOTS, NULL},
+     {NULL, 0, 0, NULL, NULL, NULL},
+ };
+ #endif
+ 
+ struct param_ptr params9[] = {
+-    {"passwd_file", P_STRING, PI_TEXT, (void *)&passwd_file, CMT_PASSWDFILE,
++    {"passwd_file", P_STRING, PI_TEXT, &rc_passwd_file, CMT_PASSWDFILE,
+      NULL},
+     {"disable_secret_security_check", P_INT, PI_ONOFF,
+-     (void *)&disable_secret_security_check, CMT_DISABLE_SECRET_SECURITY_CHECK,
++     &rc_disable_secret_security_check, CMT_DISABLE_SECRET_SECURITY_CHECK,
+      NULL},
+-    {"ftppasswd", P_STRING, PI_TEXT, (void *)&ftppasswd, CMT_FTPPASS, NULL},
+-    {"ftppass_hostnamegen", P_INT, PI_ONOFF, (void *)&ftppass_hostnamegen,
++    {"ftppasswd", P_STRING, PI_TEXT, &rc_ftppasswd, CMT_FTPPASS, NULL},
++    {"ftppass_hostnamegen", P_INT, PI_ONOFF, &rc_ftppass_hostnamegen,
+      CMT_FTPPASS_HOSTNAMEGEN, NULL},
+-    {"pre_form_file", P_STRING, PI_TEXT, (void *)&pre_form_file,
++    {"pre_form_file", P_STRING, PI_TEXT, &rc_pre_form_file,
+      CMT_PRE_FORM_FILE, NULL},
+-    {"siteconf_file", P_STRING, PI_TEXT, (void *)&siteconf_file,
++    {"siteconf_file", P_STRING, PI_TEXT, &rc_siteconf_file,
+      CMT_SITECONF_FILE, NULL},
+-    {"user_agent", P_STRING, PI_TEXT, (void *)&UserAgent, CMT_USERAGENT, NULL},
+-    {"no_referer", P_INT, PI_ONOFF, (void *)&NoSendReferer, CMT_NOSENDREFERER,
++    {"user_agent", P_STRING, PI_TEXT, &rc_UserAgent, CMT_USERAGENT, NULL},
++    {"no_referer", P_INT, PI_ONOFF, &rc_NoSendReferer, CMT_NOSENDREFERER,
+      NULL},
+-    {"cross_origin_referer", P_INT, PI_ONOFF, (void *)&CrossOriginReferer,
++    {"cross_origin_referer", P_INT, PI_ONOFF, &rc_CrossOriginReferer,
+      CMT_CROSSORIGINREFERER, NULL},
+-    {"accept_language", P_STRING, PI_TEXT, (void *)&AcceptLang, CMT_ACCEPTLANG,
++    {"accept_language", P_STRING, PI_TEXT, &rc_AcceptLang, CMT_ACCEPTLANG,
+      NULL},
+-    {"accept_encoding", P_STRING, PI_TEXT, (void *)&AcceptEncoding,
++    {"accept_encoding", P_STRING, PI_TEXT, &rc_AcceptEncoding,
+      CMT_ACCEPTENCODING,
+      NULL},
+-    {"accept_media", P_STRING, PI_TEXT, (void *)&AcceptMedia, CMT_ACCEPTMEDIA,
++    {"accept_media", P_STRING, PI_TEXT, &rc_AcceptMedia, CMT_ACCEPTMEDIA,
+      NULL},
+-    {"argv_is_url", P_CHARINT, PI_ONOFF, (void *)&ArgvIsURL, CMT_ARGV_IS_URL,
++    {"argv_is_url", P_CHARINT, PI_ONOFF, &rc_ArgvIsURL, CMT_ARGV_IS_URL,
+      NULL},
+-    {"retry_http", P_INT, PI_ONOFF, (void *)&retryAsHttp, CMT_RETRY_HTTP,
++    {"retry_http", P_INT, PI_ONOFF, &rc_retryAsHttp, CMT_RETRY_HTTP,
+      NULL},
+-    {"default_url", P_INT, PI_SEL_C, (void *)&DefaultURLString,
+-     CMT_DEFAULT_URL, (void *)defaulturls},
+-    {"follow_redirection", P_INT, PI_TEXT, &FollowRedirection,
++    {"default_url", P_INT, PI_SEL_C, &rc_DefaultURLString,
++     CMT_DEFAULT_URL, defaulturls},
++    {"follow_redirection", P_INT, PI_TEXT, &rc_FollowRedirection,
+      CMT_FOLLOW_REDIRECTION, NULL},
+-    {"meta_refresh", P_CHARINT, PI_ONOFF, (void *)&MetaRefresh,
++    {"meta_refresh", P_CHARINT, PI_ONOFF, &rc_MetaRefresh,
+      CMT_META_REFRESH, NULL},
+-    {"localhost_only", P_CHARINT, PI_ONOFF, (void *)&LocalhostOnly,
++    {"localhost_only", P_CHARINT, PI_ONOFF, &rc_LocalhostOnly,
+      CMT_LOCALHOST_ONLY, NULL},
+ #ifdef INET6
+-    {"dns_order", P_INT, PI_SEL_C, (void *)&DNS_order, CMT_DNS_ORDER,
+-     (void *)dnsorders},
++    {"dns_order", P_INT, PI_SEL_C, &rc_DNS_order, CMT_DNS_ORDER,
++     dnsorders},
+ #endif				/* INET6 */
+ #ifdef USE_NNTP
+-    {"nntpserver", P_STRING, PI_TEXT, (void *)&NNTP_server, CMT_NNTP_SERVER,
++    {"nntpserver", P_STRING, PI_TEXT, &rc_NNTP_server, CMT_NNTP_SERVER,
+      NULL},
+-    {"nntpmode", P_STRING, PI_TEXT, (void *)&NNTP_mode, CMT_NNTP_MODE, NULL},
+-    {"max_news", P_INT, PI_TEXT, (void *)&MaxNewsMessage, CMT_MAX_NEWS, NULL},
++    {"nntpmode", P_STRING, PI_TEXT, &rc_NNTP_mode, CMT_NNTP_MODE, NULL},
++    {"max_news", P_INT, PI_TEXT, &rc_MaxNewsMessage, CMT_MAX_NEWS, NULL},
+ #endif
+     {NULL, 0, 0, NULL, NULL, NULL},
+ };
+ 
+ #ifdef USE_M17N
+ struct param_ptr params10[] = {
+-    {"display_charset", P_CODE, PI_CODE, (void *)&DisplayCharset,
+-     CMT_DISPLAY_CHARSET, (void *)&display_charset_str},
+-    {"document_charset", P_CODE, PI_CODE, (void *)&DocumentCharset,
+-     CMT_DOCUMENT_CHARSET, (void *)&document_charset_str},
+-    {"auto_detect", P_CHARINT, PI_SEL_C, (void *)&WcOption.auto_detect,
+-     CMT_AUTO_DETECT, (void *)auto_detect_str},
+-    {"system_charset", P_CODE, PI_CODE, (void *)&SystemCharset,
+-     CMT_SYSTEM_CHARSET, (void *)&system_charset_str},
+-    {"follow_locale", P_CHARINT, PI_ONOFF, (void *)&FollowLocale,
++    {"display_charset", P_CODE, PI_CODE, &rc_DisplayCharset,
++     CMT_DISPLAY_CHARSET, &rc_display_charset_str},
++    {"document_charset", P_CODE, PI_CODE, &rc_DocumentCharset,
++     CMT_DOCUMENT_CHARSET, &rc_document_charset_str},
++    {"auto_detect", P_CHARINT, PI_SEL_C, &WcOption.auto_detect,
++     CMT_AUTO_DETECT, auto_detect_str},
++    {"system_charset", P_CODE, PI_CODE, &rc_SystemCharset,
++     CMT_SYSTEM_CHARSET, &rc_system_charset_str},
++    {"follow_locale", P_CHARINT, PI_ONOFF, &rc_FollowLocale,
+      CMT_FOLLOW_LOCALE, NULL},
+-    {"ext_halfdump", P_CHARINT, PI_ONOFF, (void *)&ExtHalfdump,
++    {"ext_halfdump", P_CHARINT, PI_ONOFF, &rc_ExtHalfdump,
+      CMT_EXT_HALFDUMP, NULL},
+-    {"use_wide", P_CHARINT, PI_ONOFF, (void *)&WcOption.use_wide, CMT_USE_WIDE,
++    {"use_wide", P_CHARINT, PI_ONOFF, &WcOption.use_wide, CMT_USE_WIDE,
+      NULL},
+-    {"use_combining", P_CHARINT, PI_ONOFF, (void *)&WcOption.use_combining,
++    {"use_combining", P_CHARINT, PI_ONOFF, &WcOption.use_combining,
+      CMT_USE_COMBINING, NULL},
+ #ifdef USE_UNICODE
+     {"east_asian_width", P_CHARINT, PI_ONOFF,
+-     (void *)&WcOption.east_asian_width, CMT_EAST_ASIAN_WIDTH, NULL},
++     &WcOption.east_asian_width, CMT_EAST_ASIAN_WIDTH, NULL},
+     {"use_language_tag", P_CHARINT, PI_ONOFF,
+-     (void *)&WcOption.use_language_tag, CMT_USE_LANGUAGE_TAG, NULL},
+-    {"ucs_conv", P_CHARINT, PI_ONOFF, (void *)&WcOption.ucs_conv, CMT_UCS_CONV,
++     &WcOption.use_language_tag, CMT_USE_LANGUAGE_TAG, NULL},
++    {"ucs_conv", P_CHARINT, PI_ONOFF, &WcOption.ucs_conv, CMT_UCS_CONV,
+      NULL},
+ #endif
+-    {"pre_conv", P_CHARINT, PI_ONOFF, (void *)&WcOption.pre_conv, CMT_PRE_CONV,
++    {"pre_conv", P_CHARINT, PI_ONOFF, &WcOption.pre_conv, CMT_PRE_CONV,
+      NULL},
+-    {"search_conv", P_CHARINT, PI_ONOFF, (void *)&SearchConv, CMT_SEARCH_CONV,
++    {"search_conv", P_CHARINT, PI_ONOFF, &rc_SearchConv, CMT_SEARCH_CONV,
+      NULL},
+-    {"fix_width_conv", P_CHARINT, PI_ONOFF, (void *)&WcOption.fix_width_conv,
++    {"fix_width_conv", P_CHARINT, PI_ONOFF, &WcOption.fix_width_conv,
+      CMT_FIX_WIDTH_CONV, NULL},
+ #ifdef USE_UNICODE
+-    {"use_gb12345_map", P_CHARINT, PI_ONOFF, (void *)&WcOption.use_gb12345_map,
++    {"use_gb12345_map", P_CHARINT, PI_ONOFF, &WcOption.use_gb12345_map,
+      CMT_USE_GB12345_MAP, NULL},
+ #endif
+-    {"use_jisx0201", P_CHARINT, PI_ONOFF, (void *)&WcOption.use_jisx0201,
++    {"use_jisx0201", P_CHARINT, PI_ONOFF, &WcOption.use_jisx0201,
+      CMT_USE_JISX0201, NULL},
+-    {"use_jisc6226", P_CHARINT, PI_ONOFF, (void *)&WcOption.use_jisc6226,
++    {"use_jisc6226", P_CHARINT, PI_ONOFF, &WcOption.use_jisc6226,
+      CMT_USE_JISC6226, NULL},
+-    {"use_jisx0201k", P_CHARINT, PI_ONOFF, (void *)&WcOption.use_jisx0201k,
++    {"use_jisx0201k", P_CHARINT, PI_ONOFF, &WcOption.use_jisx0201k,
+      CMT_USE_JISX0201K, NULL},
+-    {"use_jisx0212", P_CHARINT, PI_ONOFF, (void *)&WcOption.use_jisx0212,
++    {"use_jisx0212", P_CHARINT, PI_ONOFF, &WcOption.use_jisx0212,
+      CMT_USE_JISX0212, NULL},
+-    {"use_jisx0213", P_CHARINT, PI_ONOFF, (void *)&WcOption.use_jisx0213,
++    {"use_jisx0213", P_CHARINT, PI_ONOFF, &WcOption.use_jisx0213,
+      CMT_USE_JISX0213, NULL},
+-    {"strict_iso2022", P_CHARINT, PI_ONOFF, (void *)&WcOption.strict_iso2022,
++    {"strict_iso2022", P_CHARINT, PI_ONOFF, &WcOption.strict_iso2022,
+      CMT_STRICT_ISO2022, NULL},
+ #ifdef USE_UNICODE
+-    {"gb18030_as_ucs", P_CHARINT, PI_ONOFF, (void *)&WcOption.gb18030_as_ucs,
++    {"gb18030_as_ucs", P_CHARINT, PI_ONOFF, &WcOption.gb18030_as_ucs,
+      CMT_GB18030_AS_UCS, NULL},
+ #endif
+-    {"simple_preserve_space", P_CHARINT, PI_ONOFF, (void *)&SimplePreserveSpace,
++    {"simple_preserve_space", P_CHARINT, PI_ONOFF, &rc_SimplePreserveSpace,
+      CMT_SIMPLE_PRESERVE_SPACE, NULL},
+     {NULL, 0, 0, NULL, NULL, NULL},
+ };
+@@ -920,7 +920,7 @@ show_params(FILE * fp)
+ 
+ #ifdef USE_M17N
+ #ifdef ENABLE_NLS
+-    OptionCharset = SystemCharset;	/* FIXME */
++    OptionCharset = rc_SystemCharset;	/* FIXME */
+ #endif
+ #endif
+ 
+@@ -1204,33 +1204,33 @@ interpret_rc(FILE * f)
+ static void
+ parse_proxy(void)
+ {
+-    if (non_null(HTTP_proxy))
+-	parseURL(HTTP_proxy, &HTTP_proxy_parsed, NULL);
++    if (non_null(rc_HTTP_proxy))
++	parseURL(rc_HTTP_proxy, &HTTP_proxy_parsed, NULL);
+ #ifdef USE_SSL
+-    if (non_null(HTTPS_proxy))
+-	parseURL(HTTPS_proxy, &HTTPS_proxy_parsed, NULL);
++    if (non_null(rc_HTTPS_proxy))
++	parseURL(rc_HTTPS_proxy, &HTTPS_proxy_parsed, NULL);
+ #endif				/* USE_SSL */
+ #ifdef USE_GOPHER
+-    if (non_null(GOPHER_proxy))
+-	parseURL(GOPHER_proxy, &GOPHER_proxy_parsed, NULL);
++    if (non_null(rc_GOPHER_proxy))
++	parseURL(rc_GOPHER_proxy, &GOPHER_proxy_parsed, NULL);
+ #endif
+-    if (non_null(FTP_proxy))
+-	parseURL(FTP_proxy, &FTP_proxy_parsed, NULL);
+-    if (non_null(NO_proxy))
+-	set_no_proxy(NO_proxy);
++    if (non_null(rc_FTP_proxy))
++	parseURL(rc_FTP_proxy, &FTP_proxy_parsed, NULL);
++    if (non_null(rc_NO_proxy))
++	set_no_proxy(rc_NO_proxy);
+ }
+ 
+ #ifdef USE_COOKIE
+ static void
+ parse_cookie(void)
+ {
+-    if (non_null(cookie_reject_domains))
+-	Cookie_reject_domains = make_domain_list(cookie_reject_domains);
+-    if (non_null(cookie_accept_domains))
+-	Cookie_accept_domains = make_domain_list(cookie_accept_domains);
+-    if (non_null(cookie_avoid_wrong_number_of_dots))
++    if (non_null(rc_cookie_reject_domains))
++	Cookie_reject_domains = make_domain_list(rc_cookie_reject_domains);
++    if (non_null(rc_cookie_accept_domains))
++	Cookie_accept_domains = make_domain_list(rc_cookie_accept_domains);
++    if (non_null(rc_cookie_avoid_wrong_number_of_dots))
+ 	Cookie_avoid_wrong_number_of_dots_domains
+-	       	= make_domain_list(cookie_avoid_wrong_number_of_dots);
++	       	= make_domain_list(rc_cookie_avoid_wrong_number_of_dots);
+ }
+ #endif
+ 
+@@ -1313,9 +1313,9 @@ void
+ sync_with_option(void)
+ {
+     init_tmp();
+-    if (PagerMax < LINES)
+-	PagerMax = LINES;
+-    WrapSearch = WrapDefault;
++    if (rc_PagerMax < LINES)
++	rc_PagerMax = LINES;
++    WrapSearch = rc_WrapDefault;
+     parse_proxy();
+ #ifdef USE_COOKIE
+     parse_cookie();
+@@ -1329,7 +1329,7 @@ sync_with_option(void)
+     init_migemo();
+ #endif
+ #ifdef USE_IMAGE
+-    if (fmInitialized && (displayImage || enable_inline_image))
++    if (fmInitialized && (rc_displayImage || rc_enable_inline_image))
+ 	initImage();
+ #else
+     displayImage = FALSE;	/* XXX */
+@@ -1338,23 +1338,23 @@ sync_with_option(void)
+     loadPreForm();
+     loadSiteconf();
+ 
+-    if (AcceptLang == NULL || *AcceptLang == '\0') {
++    if (rc_AcceptLang == NULL || *rc_AcceptLang == '\0') {
+ 	/* TRANSLATORS: 
+ 	 * AcceptLang default: this is used in Accept-Language: HTTP request 
+ 	 * header. For example, ja.po should translate it as
+ 	 * "ja;q=1.0, en;q=0.5" like that.
+ 	 */
+-	AcceptLang = _("en;q=1.0");
++	rc_AcceptLang = _("en;q=1.0");
+     }
+-    if (AcceptEncoding == NULL || *AcceptEncoding == '\0')
+-	AcceptEncoding = acceptableEncoding();
+-    if (AcceptMedia == NULL || *AcceptMedia == '\0')
+-	AcceptMedia = acceptableMimeTypes();
++    if (rc_AcceptEncoding == NULL || *rc_AcceptEncoding == '\0')
++	rc_AcceptEncoding = acceptableEncoding();
++    if (rc_AcceptMedia == NULL || *rc_AcceptMedia == '\0')
++	rc_AcceptMedia = acceptableMimeTypes();
+ #ifdef USE_UNICODE
+     update_utf8_symbol();
+ #endif
+ #ifdef USE_M17N
+-    wtf_init(DocumentCharset, DisplayCharset);
++    wtf_init(rc_DocumentCharset, rc_DisplayCharset);
+ #endif
+     if (fmInitialized) {
+ 	initKeymap(FALSE);
+@@ -1388,9 +1388,9 @@ init_rc(void)
+ 	rc_dir[i - 1] = '\0';
+ 
+ #ifdef USE_M17N
+-    display_charset_str = wc_get_ces_list();
+-    document_charset_str = display_charset_str;
+-    system_charset_str = display_charset_str;
++    rc_display_charset_str = wc_get_ces_list();
++    rc_document_charset_str = rc_display_charset_str;
++    rc_system_charset_str = rc_display_charset_str;
+ #endif
+ 
+     tmp_dir = rc_dir;
+@@ -1432,8 +1432,8 @@ init_tmp(void)
+ {
+     int i;
+ 
+-    if (param_tmp_dir)
+-	tmp_dir = param_tmp_dir;
++    if (rc_param_tmp_dir)
++	tmp_dir = rc_param_tmp_dir;
+     if (*tmp_dir == '\0')
+ 	tmp_dir = rc_dir;
+ 
+@@ -1537,7 +1537,7 @@ load_option_panel(void)
+ 			      html_quote(localCookie()->ptr), _(CMT_HELPER));
+ #ifdef USE_M17N
+ #ifdef ENABLE_NLS
+-    OptionCharset = SystemCharset;	/* FIXME */
++    OptionCharset = rc_SystemCharset;	/* FIXME */
+ #endif
+     if (!OptionEncode) {
+ 	optionpanel_str =
+@@ -1581,7 +1581,7 @@ load_option_panel(void)
+ 	while (p->name) {
+ 	    Strcat_m_charp(src, "<tr><td>", p->comment, NULL);
+ 	    Strcat(src, Sprintf("</td><td width=%d>",
+-				(int)(28 * pixel_per_char)));
++				(int)(28 * rc_pixel_per_char)));
+ 	    switch (p->inputtype) {
+ 	    case PI_TEXT:
+ 		Strcat_m_charp(src, "<input type=text name=",
+@@ -1783,9 +1783,9 @@ loadSiteconf(void)
+     struct siteconf_rec *ent = NULL;
+ 
+     siteconf_head = NULL;
+-    if (!siteconf_file)
++    if (!rc_siteconf_file)
+ 	return;
+-    if ((efname = expandPath(siteconf_file)) == NULL)
++    if ((efname = expandPath(rc_siteconf_file)) == NULL)
+ 	return;
+     fp = fopen(efname, "r");
+     if (fp == NULL)

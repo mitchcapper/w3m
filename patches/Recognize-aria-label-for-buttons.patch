@@ -41,7 +41,7 @@ Patch: patches/Recognize-aria-label-for-buttons.patch
  #define ATTR_XOFFSET		60
 --- a/file.c
 +++ b/file.c
-@@ -3854,7 +3854,7 @@ Str
+@@ -3856,7 +3856,7 @@ Str
  process_button(struct parsed_tag *tag)
  {
      Str tmp = NULL;
@@ -50,7 +50,7 @@ Patch: patches/Recognize-aria-label-for-buttons.patch
      int v;
  
      if (cur_form_id < 0) {
-@@ -3870,6 +3870,9 @@ process_button(struct parsed_tag *tag)
+@@ -3872,6 +3872,9 @@ process_button(struct parsed_tag *tag)
      parsedtag_get_value(tag, ATTR_VALUE, &q);
      r = "";
      parsedtag_get_value(tag, ATTR_NAME, &r);
@@ -60,7 +60,7 @@ Patch: patches/Recognize-aria-label-for-buttons.patch
  
      v = formtype(p);
      if (v == FORM_UNKNOWN)
-@@ -3904,9 +3907,9 @@ process_button(struct parsed_tag *tag)
+@@ -3906,9 +3909,9 @@ process_button(struct parsed_tag *tag)
      if (displayLinkNumber)
  	Strcat(tmp, getLinkNumberStr(0));
      Strcat(tmp, Sprintf("<input_alt hseq=\"%d\" fid=\"%d\" type=\"%s\" "

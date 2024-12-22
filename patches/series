@@ -1,3 +1,10 @@
+# Cookies
+Truncate-cookie-file-if-no-cookies-left.patch
+Move-declarations-to-appropriate-header.patch
+Refactor-load-cookies.patch
+Refactor-get_cookie_info.patch
+Merge-cookies-if-modified-after-start.patch
+Add-option-to-provide-cookie-jar.patch
 # gemini
 gemini.patch
 # WARNINGS
@@ -18,13 +25,7 @@ Use-gettext-for-user-facing-strings.patch
 Add-cd-command.patch
 do_download.patch
 gophertmp.patch
-# Cookies
-Truncate-cookie-file-if-no-cookies-left.patch
-Move-declarations-to-appropriate-header.patch
-Refactor-load-cookies.patch
-Refactor-get_cookie_info.patch
-Merge-cookies-if-modified-after-start.patch
-Add-option-to-provide-cookie-jar.patch
+# readline
 Add-key-binding-to-insert-word-under-cursor.patch
 Add-smartcase-option-for-search.patch
 Make-CTRL-Y-insert-deleted-text.patch
@@ -60,8 +61,10 @@ Add-command-to-protect-buffers.patch
 Improve-protected-buffers.patch
 Fix-link-numbers-in-tables.patch
 Change-filename-when-saving-compressed-source.patch
+libcurl.patch
 lto.patch
 # BORKED
+rc.patch
 Refactor-regex-library.patch
 Enable-command-completion.patch
 Add-option-to-auto-accept-self-signed.patch

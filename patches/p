@@ -1,0 +1,532 @@
+From 26d5ed7fcc2bcb47fea14b569dc87f43a2373495 Mon Sep 17 00:00:00 2001
+From: lesssalt <lesssalt@proton.me>
+Date: Fri, 6 Dec 2024 23:23:13 +0000
+Subject: [PATCH] Add link hint functionality
+
+This patch provides link hint functionality requested in Github issue
+#188 by introducing several commands. It uses the existing
+getLinkNumberStr function and adds the option to display and input link
+numbers using alpha characters, with the new displayLinkAlpha option.
+Updates manual and README.func.
+
+When a command is called:
+* link numbers are displayed if not already
+* w3m prompts the user to input the number of the target link
+* the user inputs the link number or cancels input
+* if a valid link number, the program will act on that hyperlink
+* if an invalid link number, the program will display error message
+* after action, link numbers are toggled off if not on previously
+
+Commands:
+* MOVE_LINK_NUM moves the cursor to the position of the hyperlink
+* GOTO_LINK_NUM follows the hyperlink
+* TAB_LINK_NUM follows link in tab; the tab number can be prefixed
+* MENU_LINK_NUM opens default menu or a named menu on top of the link
+
+These commands temporarily disable marked urls while displaying link
+numbers to avoid confusion seen in Github issues #180 and #298.
+Add commands to the manual and update README.func
+
+Example keymap configuration:
+```
+keymap  f GOTO_LINK_NUM
+keymap  F TAB_LINK_NUM
+keymap  m MOVE_LINK_NUM
+keymap  M MENU_LINK_NUM
+```
+---
+ doc/MANUAL.html        |   60 ++++++++++++++
+ doc/README.func        |    4 
+ file.c                 |   77 +++++++++++++++++
+ fm.h                   |    1 
+ main.c                 |  210 +++++++++++++++++++++++++++++++++++++++++++++++++
+ proto.h                |    5 +
+ rc.c                   |    3 
+ scripts/w3mhelp.cgi.in |    6 -
+ 8 files changed, 362 insertions(+), 4 deletions(-)
+
+--- a/doc/MANUAL.html
++++ b/doc/MANUAL.html
+@@ -2281,6 +2281,66 @@ LINEEDIT:ACCEPT
+   </p>
+  </h2>
+ -->
++  <p>
++	 w3m offers several commands that allow the user to target specific links
++	 when performing an action. When one of these commands is invoked, w3m will
++	 display a temporary label for each hyperlink in a buffer (if not already
++	 displayed). w3m will prompt the user to input the label for the hyperlink to
++	 be selected. Upon selection the action will be performed on the hyperlink,
++	 and the labels will be removed (if previously not displayed) The labels are
++	 numbers by default. This behavior can be changed in the user configuration
++	 file or options setting panel.
++  </p>
++  <p>
++   The following functions are not bound to any keys by default. To use them
++   define a binding in a ~/.w3m/keymap file or invoke using COMMAND.
++  </p>
++  <table border="1">
++    <colgroup>
++      <col width="20%">
++      <col width="80%">
++    </colgroup>
++    <tr>
++      <th>Operation
++      </th>
++      <th>Description
++      </th>
++    </tr>
++    <tr>
++    <td>
++     MOVE_LINK_NUM
++    </td>
++    <td>
++     Move the cursor to selected hyperlink.
++    </td>
++   </tr>
++   <tr>
++    <td>
++     GOTO_LINK_NUM
++    </td>
++    <td>
++     Move the cursor to selected hyperlink and follow it in a new buffer.
++    </td>
++   </tr>
++   <tr>
++    <td>
++     TAB_LINK_NUM
++    </td>
++    <td>
++     Move the cursor to selected hyperlink and then follow it in a new tab. A
++     tab number can be input before invoking the command.
++    </td>
++   </tr>
++   <tr>
++    <td>
++     MENU_LINK_NUM
++    </td>
++    <td>
++     Move cursor to selected hyperlink and open a pop-up menu on top of it. The name
++     of the menu can be specified. If it is not, the default menu is opened.
++    </td>
++   </tr>
++  </table>
+   <hr>
+   <h2 id="Mouse">
+    Mouse Operation
+--- a/doc/README.func
++++ b/doc/README.func
+@@ -38,6 +38,7 @@ GOTO		Open specified document in a new b
+ GOTO_HOME	Return to the homepage (specified HTTP_HOME or WWW_HOME variable)
+ GOTO_LINE	Go to the specified line
+ GOTO_LINK	Follow current hyperlink in a new buffer
++GOTO_LINK_NUM	Follow the input hyperlink in a new buffer
+ GOTO_RELATIVE	Go to relative address
+ HELP		Show help panel
+ HISTORY		Show browsing history
+@@ -61,6 +62,7 @@ MARK_MID	Turn Message-ID-like strings in
+ MARK_URL	Turn URL-like strings into hyperlinks
+ MARK_WORD	Turn current word into hyperlink
+ MENU		Pop up menu
++MENU_LINK_NUM	Pop up menu at the input hyperlink
+ MENU_MOUSE	Pop up menu at mouse pointer
+ MESSAGE	Display a message
+ MOUSE_TOGGLE	Toggle mouse support
+@@ -68,6 +70,7 @@ MOVE_DOWN	Cursor down
+ MOVE_DOWN1	Cursor down. With edge touched, slide
+ MOVE_LEFT	Cursor left
+ MOVE_LEFT1	Cursor left. With edge touched, slide
++MOVE_LINK_NUM	Move cursor to input hyperlink
+ MOVE_LIST_MENU	Pop up menu to navigate between hyperlinks
+ MOVE_MOUSE	Move cursor to mouse pointer
+ MOVE_RIGHT	Cursor right
+@@ -145,6 +148,7 @@ TAB_GOTO	Open specified document in a ne
+ TAB_GOTO_RELATIVE	Open relative address in a new tab
+ TAB_LEFT	Move left along the tab bar
+ TAB_LINK	Follow current hyperlink in a new tab
++TAB_LINK_NUM	Follow the input hyperlink in a new tab
+ TAB_MENU	Pop up tab selection menu
+ TAB_MOUSE	Select tab by mouse action
+ TAB_RIGHT	Move right along the tab bar
+--- a/file.c
++++ b/file.c
+@@ -3,6 +3,7 @@
+ #include "fm.h"
+ #include <sys/types.h>
+ #include "myctype.h"
++#include "proto.h"
+ #include <signal.h>
+ #include <setjmp.h>
+ #if defined(HAVE_WAITPID)
+@@ -1673,10 +1674,84 @@ checkRedirection(ParsedURL *pu)
+     return TRUE;
+ }
+ 
++const char alpha_lower_keymap[] = "abcdefghijklmnopqrstuvwxyz";
++
++#define ALPHA_MAP_SIZE sizeof(alpha_lower_keymap)
++#define ALPHA_KEY_SIZE 4
++
++int
++numberFromAlphaStr(Str str)
++{
++    int key, result = 0;
++    int invalid = -1;
++    int a = ALPHA_MAP_SIZE - 1;
++    int pow[6] = {0, 1, a, a * a, a * a * a, a * a * a * a};
++    int pow_size = sizeof(pow) / sizeof(pow[0]);
++
++    key = str->length;
++
++    if (key < 1 || key > ALPHA_KEY_SIZE)
++	return invalid;
++    if (str->ptr[0] == alpha_lower_keymap[0] && !zeroBasedLinkNo)
++	return invalid;
++
++    for (int i = 0; i < key; i++)
++	    result += (strchr(alpha_lower_keymap, str->ptr[i]) -
++		    alpha_lower_keymap) * pow[key - i];
++
++    if (result > pow[pow_size - 1] - 1)
++	return invalid;
++    return result;
++}
++
++static Str
++alphaStrFromInt(int n)
++{
++    char c;
++    int max, a = ALPHA_MAP_SIZE - 1;
++    int pow[6] = {0, 1, a, a * a, a * a * a, a * a * a * a};
++    int pow_size = sizeof(pow) / sizeof(pow[0]);
++    Str str;
++
++    if (n == 0 && zeroBasedLinkNo)
++	return Sprintf("%c", alpha_lower_keymap[n]);
++    if (n <= 0 || n >= pow[pow_size - 1])
++	return NULL;
++
++    str = Strnew();
++
++    for (int i = 1; i < pow_size; i++) {
++	max = pow_size - i;
++	if (n < pow[max])
++	    continue;
++	c = alpha_lower_keymap[n / (pow[max] * 1)];
++	Strcat_char(str, c);
++	break;
++    }
++
++    while(1) {
++	if (max <= 1)
++	    break;
++	else if (max == 2)
++	    c = alpha_lower_keymap[n % pow[max]];
++	else
++	    c = alpha_lower_keymap[n % pow[max] / pow[max - 1]];
++	Strcat_char(str, c);
++	max--;
++    }
++
++    return str;
++}
++
+ Str
+ getLinkNumberStr(int correction)
+ {
+-    return Sprintf("[%d]", cur_hseq + correction - !!zeroBasedLinkNo);
++    Str str;
++
++    if (!displayLinkAlpha)
++	return Sprintf("[%d]", cur_hseq + correction - !!zeroBasedLinkNo);
++    str = alphaStrFromInt(cur_hseq + correction - !!zeroBasedLinkNo);
++    return Sprintf("[%s]", str ? str->ptr : "?");
+ }
+ 
+ /* 
+--- a/fm.h
++++ b/fm.h
+@@ -933,6 +933,7 @@ global char *displayTitleTerm init(NULL)
+ global int displayLink init(FALSE);
+ global int displayLinkNumber init(FALSE);
+ global int zeroBasedLinkNo init(FALSE);
++global int displayLinkAlpha init(FALSE);
+ global int displayLineInfo init(FALSE);
+ global int displayColumnNumber init(FALSE);
+ global int DecodeURL init(FALSE);
+--- a/main.c
++++ b/main.c
+@@ -7493,3 +7493,213 @@ DEFUN(userMessage, MESSAGE , "Display a
+ 
+     disp_message_nsec(msg, FALSE, MessageDelay, FALSE, TRUE);
+ }
++
++#define HINT_MOVE 0
++#define HINT_GOTO 1
++#define HINT_TAB 2
++#define HINT_MENU 3
++#define HINT_INVALID -1
++#define HINT_CANCEL -2
++
++static int
++selectLinkNum(char *input)
++{
++    HmarkerList *hl = Currentbuf->hmarklist;
++    char *endptr = '\0';
++    int link;
++
++    if (!hl || hl->nmark == 0)
++	return HINT_CANCEL;
++    if (input == NULL || *input == '\0')
++	return HINT_CANCEL;
++
++    if (displayLinkAlpha)
++	link = numberFromAlphaStr(Strnew_charp(input));
++    else
++	link = strtol(input, &endptr, 10);
++
++    if (link <= HINT_INVALID || link > hl->nmark - !!zeroBasedLinkNo)
++	return HINT_INVALID;
++    if (link == 0 && !zeroBasedLinkNo)
++	return HINT_INVALID;
++    if (link == 0 && !displayLinkAlpha && *endptr != '\0')
++	return HINT_INVALID;
++
++    return zeroBasedLinkNo ? link : link - 1;
++}
++
++static void
++gotoLinkNum(char *prompt, int operation)
++{
++    Anchor *an;
++    AnchorList *al = Currentbuf->href;
++    BufferPoint *po;
++    HmarkerList *hl;
++    char *url = NULL;
++    int prevLinks, prevMarks, link = HINT_INVALID;
++    int x, y, cursorX, cursorY, ySearch, yStart, yEnd, yDelta = 0;
++
++    if (al == NULL) {
++	al = Currentbuf->formitem;
++	if (al == NULL) {
++	    al = Currentbuf->img;
++	    if (al == NULL)
++		return;
++	}
++    }
++    /* get current position */
++    x = Currentbuf->currentColumn;
++    y = Currentbuf->currentLine->linenumber;
++    cursorX = Currentbuf->cursorX;
++    cursorY = Currentbuf->cursorY;
++    yStart = y;
++    yEnd = y;
++
++    an = closest_next_anchor(al, NULL, x, y);
++    if (an == NULL) {
++	an = closest_prev_anchor(al, NULL, x, y);
++	if (an == NULL) {
++	    an = retrieveAnchor(al, y, x);
++	    if (an == NULL)
++		return;
++	}
++    }
++
++    yStart = an->start.line;
++    url = an->url;
++    /* remember settings to revert */
++    prevLinks = displayLinkNumber;
++    prevMarks = MarkAllPages;
++
++    displayLinkNumber = TRUE;
++    MarkAllPages = FALSE;
++    Currentbuf->check_url = MarkAllPages;
++    reshape();
++
++    al = Currentbuf->href;
++    if (al == NULL) {
++	al = Currentbuf->formitem;
++	if (al == NULL) {
++	    al = Currentbuf->img;
++	    if (al == NULL)  {
++		displayLinkNumber = prevLinks;
++		MarkAllPages = prevMarks;
++		if (MarkAllPages)
++		    chkURLBuffer(Currentbuf); /* marks require reanchoring */
++		reshape();
++		disp_message_nsec(_("No hyperlinks found"), FALSE, 1, TRUE, FALSE);
++		return;
++	    }
++	}
++    }
++
++    cursorXY(Currentbuf, 0, 0);
++
++    /* get ending position */
++    ySearch = yStart - 1;
++    while(1) {
++	if (url == NULL)
++	    break;
++	an = closest_next_anchor(al, NULL, 0, ySearch);
++	if (an == NULL) {
++	    an = closest_prev_anchor(al, NULL, 0, yStart);
++	    break;
++	}
++	if (!strcmp(an->url, url))
++	    break;
++	ySearch++;
++    }
++
++    if (an != NULL)
++	yEnd = an->start.line;
++    yDelta = yEnd - yStart;
++
++    if (yDelta > 0)
++	nscroll(yDelta, B_SCROLL);
++
++    while(link == HINT_INVALID) {
++	link = selectLinkNum(inputStr(prompt, ""));
++	if (link == HINT_INVALID)
++	    disp_message_nsec(_("link invalid"), FALSE, 1, TRUE, FALSE);
++    }
++
++    if (yDelta > 0)
++	nscroll(-yDelta, B_SCROLL);
++
++    displayLinkNumber = prevLinks;
++    MarkAllPages = prevMarks;
++    if (MarkAllPages)
++	chkURLBuffer(Currentbuf); /* marks require reanchoring */
++    reshape();
++
++    cursorXY(Currentbuf, cursorX, cursorY);
++
++    if (link <= HINT_CANCEL)
++	return;
++
++    hl = Currentbuf->hmarklist;
++    if (!hl || hl->nmark == 0)
++	return;
++
++    po = hl->marks + link;
++    an = retrieveAnchor(Currentbuf->href, po->line, po->pos);
++    if (an == NULL) {
++	an = retrieveAnchor(Currentbuf->formitem, po->line, po->pos);
++	if (an == NULL) {
++	    an = retrieveAnchor(Currentbuf->img, po->line, po->pos);
++	    if (an == NULL)
++		 return;
++	}
++    }
++
++    gotoLine(Currentbuf, po->line);
++    Currentbuf->pos = po->pos;
++    arrangeCursor(Currentbuf);
++    if (operation == HINT_MOVE)
++	return;
++    else if (operation == HINT_GOTO)
++	followA();
++    else if (operation == HINT_TAB)
++	followTab(prec_num ? numTab(PREC_NUM) : NULL);
++    else if (operation == HINT_MENU)
++	mainMn();
++}
++
++DEFUN(movANum, MOVE_LINK_NUM, "Move cursor to input hyperlink")
++{
++    char *prompt;
++
++    prompt = "Move To Link: ";
++    gotoLinkNum(prompt, HINT_MOVE);
++}
++
++DEFUN(followANum, GOTO_LINK_NUM, "Follow the input hyperlink")
++{
++    char *prompt;
++
++    prompt = "Goto Link: ";
++    gotoLinkNum(prompt, HINT_GOTO);
++}
++
++DEFUN(tabANum, TAB_LINK_NUM, "Follow the input hyperlink in a new tab")
++{
++    char *prompt;
++
++    if (prec_num)
++	prompt = Sprintf("Tab %d Goto Link: ", prec_num)->ptr;
++    else
++	prompt = "Tab Goto Link: ";
++    gotoLinkNum(prompt, HINT_TAB);
++}
++
++DEFUN(menuANum, MENU_LINK_NUM, "Open menu on input hyperlink")
++{
++    char *prompt, *menu;
++
++    menu = CurrentCmdData;
++    if (menu != NULL && *menu != '\0')
++	prompt = Sprintf("Popup Menu '%s' On Link: ", menu)->ptr;
++    else
++	prompt = "Popup Menu On Link: ";
++    gotoLinkNum(prompt, HINT_MENU);
++}
+--- a/proto.h
++++ b/proto.h
+@@ -66,6 +66,10 @@ extern void topA(void);
+ extern void lastA(void);
+ extern void nthA(void);
+ extern void onA(void);
++extern void movANum(void);
++extern void followANum(void);
++extern void tabANum(void);
++extern void menuANum(void);
+ 
+ extern void nextA(void);
+ extern void prevA(void);
+@@ -785,6 +789,7 @@ extern void wrapToggle(void);
+ extern void saveBufferInfo(void);
+ #endif
+ 
++extern int numberFromAlphaStr(Str str);
+ extern Str getLinkNumberStr(int correction);
+ 
+ extern void dispVer(void);
+--- a/rc.c
++++ b/rc.c
+@@ -84,6 +84,7 @@ static int OptionEncode = FALSE;
+ #define CMT_DISPLINK     N_("Display link URL automatically")
+ #define CMT_DISPLINKNUMBER N_("Display link numbers")
+ #define CMT_ZEROBASEDLINKNO N_("Use 0 as first link number")
++#define CMT_DISPLINKALPHA N_("Display link numbers as alpha characters")
+ #define CMT_DECODE_URL   N_("Display decoded URL")
+ #define CMT_DISPLINEINFO N_("Display current line information")
+ #define CMT_DISP_COLUMN_NUMBER N_("Display column number in line information")
+@@ -418,6 +419,8 @@ struct param_ptr params1[] = {
+      CMT_DISPLINKNUMBER, NULL},
+     {"zero_based_link_no", P_INT, PI_ONOFF, (void *)&zeroBasedLinkNo,
+      CMT_ZEROBASEDLINKNO, NULL},
++    {"display_link_alpha", P_INT, PI_ONOFF, (void *)&displayLinkAlpha,
++     CMT_DISPLINKALPHA, NULL},
+     {"decode_url", P_INT, PI_ONOFF, (void *)&DecodeURL, CMT_DECODE_URL, NULL},
+     {"display_lineinfo", P_INT, PI_ONOFF, (void *)&displayLineInfo,
+      CMT_DISPLINEINFO, NULL},
+--- a/scripts/w3mhelp.cgi.in
++++ b/scripts/w3mhelp.cgi.in
+@@ -136,14 +136,14 @@ print "<P><A HREF=\"$keymap\">$head</A>\
+ 	     split(" ", "pgFore pgBack movR movL movD movU
+ 		movR1 movL1 movD1 movU1 ldown1 lup1
+ 		shiftl shiftr col1L col1R linbeg linend ctrCsrH ctrCsrV
+-		goLine goLineF goLineL movRW movLW
++		goLine goLineF goLineL movRW movLW movANum
+ 		topA lastA nextA prevA movlistMn
+ 		nextR nextL nextD nextU nextRD nextLU nextI prevI
+ 		undoPos redoPos cursorTop cursorMiddle cursorBottom"));
+ 
+ &show_keymap('Hyperlink Operations',
+-	     split(" ", "followA tabA svA followI svI submitForm
+-		curURL peekURL peekIMG pginfo curlno chkURL chkWORD chkNMID
++	     split(" ", "followA followANum tabA tabANum svA followI svI
++		submitForm curURL peekURL peekIMG pginfo curlno chkURL chkWORD chkNMID
+ 		rFrame extbrz linkbrz linkLst listMn linkMn accessKey"));
+ 
+ &show_keymap('File/Stream Operations',

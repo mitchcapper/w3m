@@ -97,7 +97,7 @@
  	disp_message(delayed_msg, FALSE);
 --- a/file.c
 +++ b/file.c
-@@ -1586,12 +1586,11 @@ getAuthCookie(struct http_auth *hauth, c
+@@ -1587,12 +1587,11 @@ getAuthCookie(struct http_auth *hauth, c
  	if (fmInitialized) {
  	    char *pp;
  	    term_raw();
@@ -112,7 +112,7 @@
  				IN_PASSWORD)) == NULL) {
  		*uname = NULL;
  		return;
-@@ -1608,12 +1607,11 @@ getAuthCookie(struct http_auth *hauth, c
+@@ -1609,12 +1608,11 @@ getAuthCookie(struct http_auth *hauth, c
  	     * (This is same behavior as lwp-request.)
  	     */
  	    if (feof(stdin) || ferror(stdin)) {
@@ -127,7 +127,7 @@
  	    /* FIXME: gettextize? */
  	    printf(proxy ? "Proxy Username for %s: " : "Username for %s: ",
  		   realm);
-@@ -1664,8 +1662,7 @@ checkRedirection(ParsedURL *pu)
+@@ -1665,8 +1663,7 @@ checkRedirection(ParsedURL *pu)
      }
  
      if (nredir >= FollowRedirection) {
@@ -137,7 +137,7 @@
  		      FollowRedirection, parsedURL2Str(pu)->ptr);
  	disp_err_message(tmp->ptr, FALSE);
  	return FALSE;
-@@ -1794,8 +1791,7 @@ loadGeneralFile(char *path, ParsedURL *v
+@@ -1795,8 +1792,7 @@ loadGeneralFile(char *path, ParsedURL *v
  		return b;
  	    }
  #endif
@@ -147,7 +147,7 @@
  				     parsedURL2Str(&pu)->ptr)->ptr, FALSE);
  	    break;
  	}
-@@ -1842,8 +1838,7 @@ loadGeneralFile(char *path, ParsedURL *v
+@@ -1843,8 +1839,7 @@ loadGeneralFile(char *path, ParsedURL *v
  
  	if (fmInitialized) {
  	    term_cbreak();
@@ -157,7 +157,7 @@
  		    ptr, 0, 0);
  	    refresh();
  	}
-@@ -8541,8 +8536,7 @@ _doFileCopy(char *tmpf, char *defstr, in
+@@ -8544,8 +8539,7 @@ _doFileCopy(char *tmpf, char *defstr, in
      if (fmInitialized) {
  	p = searchKeyData();
  	if (p == NULL || *p == '\0') {
@@ -167,7 +167,7 @@
  			      defstr, IN_COMMAND, SaveHist);
  	    if (q == NULL || *q == '\0')
  		return FALSE;
-@@ -8560,16 +8554,14 @@ _doFileCopy(char *tmpf, char *defstr, in
+@@ -8563,16 +8557,14 @@ _doFileCopy(char *tmpf, char *defstr, in
  		return -1;
  	}
  	if (checkCopyFile(tmpf, p) < 0) {
@@ -186,7 +186,7 @@
  		disp_err_message(msg->ptr, FALSE);
  	    }
  	    return -1;
-@@ -8599,8 +8591,7 @@ _doFileCopy(char *tmpf, char *defstr, in
+@@ -8602,8 +8594,7 @@ _doFileCopy(char *tmpf, char *defstr, in
      else {
  	q = searchKeyData();
  	if (q == NULL || *q == '\0') {
@@ -196,7 +196,7 @@
  	    fflush(stdout);
  	    filen = Strfgets(stdin);
  	    if (filen->length == 0)
-@@ -8620,13 +8611,11 @@ _doFileCopy(char *tmpf, char *defstr, in
+@@ -8623,13 +8614,11 @@ _doFileCopy(char *tmpf, char *defstr, in
  		return -1;
  	}
  	if (checkCopyFile(tmpf, p) < 0) {
@@ -212,7 +212,7 @@
  	    return -1;
  	}
  	if (PreserveTimestamp && !is_pipe && !stat(tmpf, &st))
-@@ -8668,8 +8657,7 @@ doFileSave(URLFile uf, const char *defst
+@@ -8671,8 +8660,7 @@ doFileSave(URLFile uf, const char *defst
      if (fmInitialized) {
  	p = searchKeyData();
  	if (p == NULL || *p == '\0') {
@@ -222,7 +222,7 @@
  			      defstr, IN_FILENAME, SaveHist);
  	    if (p == NULL || *p == '\0')
  		return -1;
-@@ -8678,8 +8666,7 @@ doFileSave(URLFile uf, const char *defst
+@@ -8681,8 +8669,7 @@ doFileSave(URLFile uf, const char *defst
  	if (checkOverWrite(p) < 0)
  	    return -1;
  	if (checkSaveFile(uf.stream, p) < 0) {
@@ -232,7 +232,7 @@
  			  conv_from_system(p));
  	    disp_err_message(msg->ptr, FALSE);
  	    return -1;
-@@ -8713,8 +8700,7 @@ doFileSave(URLFile uf, const char *defst
+@@ -8716,8 +8703,7 @@ doFileSave(URLFile uf, const char *defst
      else {
  	q = searchKeyData();
  	if (q == NULL || *q == '\0') {
@@ -242,7 +242,7 @@
  	    fflush(stdout);
  	    filen = Strfgets(stdin);
  	    if (filen->length == 0)
-@@ -8729,15 +8715,13 @@ doFileSave(URLFile uf, const char *defst
+@@ -8732,15 +8718,13 @@ doFileSave(URLFile uf, const char *defst
  	if (checkOverWrite(p) < 0)
  	    return -1;
  	if (checkSaveFile(uf.stream, p) < 0) {
@@ -260,7 +260,7 @@
  	    return -1;
  	}
  	if (PreserveTimestamp && uf.modtime != -1)
-@@ -8784,8 +8768,7 @@ checkOverWrite(const char *path)
+@@ -8787,8 +8771,7 @@ checkOverWrite(const char *path)
  
      if (stat(path, &st) < 0)
  	return 0;
@@ -481,7 +481,7 @@
  }
 --- a/main.c
 +++ b/main.c
-@@ -824,8 +824,7 @@ main(int argc, char **argv)
+@@ -838,8 +838,7 @@ main(int argc, char **argv)
  		}
  		if (!set_param_option(argv[i])) {
  		    /* option set failed */
@@ -491,7 +491,7 @@
  		    show_params_p = 1;
  		    usage();
  		}
-@@ -1109,9 +1108,8 @@ main(int argc, char **argv)
+@@ -1130,9 +1129,8 @@ main(int argc, char **argv)
  		    else
  			fp = fopen(post_file, "r");
  		    if (fp == NULL) {
@@ -502,7 +502,7 @@
  			continue;
  		    }
  		    body = Strfgetall(fp);
-@@ -1134,9 +1132,8 @@ main(int argc, char **argv)
+@@ -1155,9 +1153,8 @@ main(int argc, char **argv)
  		    retry = 1;
  		    goto retry_as_local_file;
  		}
@@ -513,7 +513,7 @@
  		continue;
  	    }
  	    else if (newbuf == NO_BUFFER)
-@@ -1220,8 +1217,7 @@ main(int argc, char **argv)
+@@ -1241,8 +1238,7 @@ main(int argc, char **argv)
      if (!FirstTab || !Firstbuf || Firstbuf == NO_BUFFER) {
  	if (newbuf == NO_BUFFER) {
  	    if (fmInitialized)
@@ -523,7 +523,7 @@
  	}
  	if (fmInitialized)
  	    fmTerm();
-@@ -2049,8 +2045,7 @@ srch_nxtprv(int reverse)
+@@ -2070,8 +2066,7 @@ srch_nxtprv(int reverse)
      /* *INDENT-ON* */
  
      if (searchRoutine == NULL) {
@@ -533,7 +533,7 @@
  	return;
      }
      if (reverse != 0)
-@@ -2189,8 +2184,7 @@ DEFUN(pipeBuf, PIPE_BUF, "Pipe current b
+@@ -2210,8 +2205,7 @@ DEFUN(pipeBuf, PIPE_BUF, "Pipe current b
  
      cmd = searchKeyData();
      if (cmd == NULL || *cmd == '\0') {
@@ -543,7 +543,7 @@
      }
      if (cmd != NULL)
  	cmd = conv_to_system(cmd);
-@@ -2201,8 +2195,7 @@ DEFUN(pipeBuf, PIPE_BUF, "Pipe current b
+@@ -2222,8 +2216,7 @@ DEFUN(pipeBuf, PIPE_BUF, "Pipe current b
      tmpf = tmpfname(TMPF_DFL, NULL)->ptr;
      f = fopen(tmpf, "w");
      if (f == NULL) {
@@ -553,7 +553,7 @@
  	return;
      }
      saveBuffer(Currentbuf, f, TRUE);
-@@ -2278,8 +2271,7 @@ DEFUN(readsh, READ_SHELL, "Execute shell
+@@ -2299,8 +2292,7 @@ DEFUN(readsh, READ_SHELL, "Execute shell
      mySignal(SIGINT, prevtrap);
      term_raw();
      if (buf == NULL) {
@@ -563,7 +563,7 @@
  	return;
      }
      else {
-@@ -2306,8 +2298,7 @@ DEFUN(execsh, EXEC_SHELL SHELL, "Execute
+@@ -2327,8 +2319,7 @@ DEFUN(execsh, EXEC_SHELL SHELL, "Execute
  	fmTerm();
  	printf("\n");
  	(void)!system(cmd); /* We do not care about the exit code here! */
@@ -573,7 +573,7 @@
  	fflush(stdout);
  	fmInit();
  	getch();
-@@ -2322,8 +2313,7 @@ DEFUN(ldfile, LOAD, "Open local file in
+@@ -2343,8 +2334,7 @@ DEFUN(ldfile, LOAD, "Open local file in
  
      fn = searchKeyData();
      if (fn == NULL || *fn == '\0') {
@@ -583,7 +583,7 @@
      }
      if (fn != NULL)
  	fn = conv_to_system(fn);
-@@ -2360,8 +2350,7 @@ cmd_loadfile(char *fn)
+@@ -2381,8 +2371,7 @@ cmd_loadfile(char *fn)
  
      buf = loadGeneralFile(file_to_url(fn), NULL, NO_REFERER, 0, NULL);
      if (buf == NULL) {
@@ -593,7 +593,7 @@
  	disp_err_message(emsg, FALSE);
      }
      else if (buf != NO_BUFFER) {
-@@ -2655,8 +2644,7 @@ _quitfm(int confirm)
+@@ -2676,8 +2665,7 @@ _quitfm(int confirm)
  	ans = inputChar("Download process retains. "
  			"Do you want to exit w3m? (y/n)");
      else if (confirm)
@@ -603,7 +603,7 @@
      if (!(ans && TOLOWER(*ans) == 'y')) {
  	displayBuffer(Currentbuf, B_NORMAL);
  	return;
-@@ -2817,8 +2805,7 @@ DEFUN(goLine, GOTO_LINE, "Go to the spec
+@@ -2840,8 +2828,7 @@ DEFUN(goLine, GOTO_LINE, "Go to the spec
      else if (str)
  	_goLine(str);
      else
@@ -613,7 +613,7 @@
  }
  
  
-@@ -2907,8 +2894,7 @@ DEFUN(editScr, EDIT_SCREEN, "Edit render
+@@ -2930,8 +2917,7 @@ DEFUN(editScr, EDIT_SCREEN, "Edit render
      tmpf = tmpfname(TMPF_DFL, NULL)->ptr;
      f = fopen(tmpf, "w");
      if (f == NULL) {
@@ -623,7 +623,7 @@
  	return;
      }
      saveBuffer(Currentbuf, f, TRUE);
-@@ -2963,8 +2949,7 @@ DEFUN(nextMk, NEXT_MARK, "Go to the next
+@@ -2986,8 +2972,7 @@ DEFUN(nextMk, NEXT_MARK, "Go to the next
  	l = l->next;
  	i = 0;
      }
@@ -633,7 +633,7 @@
  }
  
  /* Go to previous mark */
-@@ -2998,8 +2983,7 @@ DEFUN(prevMk, PREV_MARK, "Go to the prev
+@@ -3021,8 +3006,7 @@ DEFUN(prevMk, PREV_MARK, "Go to the prev
  	if (l != NULL)
  	    i = l->len - 1;
      }
@@ -643,7 +643,7 @@
  }
  
  /* Mark place to which the regular expression matches */
-@@ -3156,8 +3140,7 @@ gotoLabel(char *label)
+@@ -3179,8 +3163,7 @@ gotoLabel(char *label)
  
      al = searchURLLabel(Currentbuf, label);
      if (al == NULL) {
@@ -653,7 +653,7 @@
  	return;
      }
      buf = newBuffer(Currentbuf->width);
-@@ -3193,8 +3176,7 @@ handleMailto(char *url)
+@@ -3216,8 +3199,7 @@ handleMailto(char *url)
  	return 0;
  #else
      if (!non_null(Mailer)) {
@@ -663,7 +663,7 @@
  	return 1;
      }
  #endif
-@@ -3299,13 +3281,11 @@ DEFUN(followI, VIEW_IMAGE, "Display imag
+@@ -3322,13 +3304,11 @@ DEFUN(followI, VIEW_IMAGE, "Display imag
      a = retrieveCurrentImg(Currentbuf);
      if (a == NULL)
  	return;
@@ -679,7 +679,7 @@
  	disp_err_message(emsg, FALSE);
      }
      else if (buf != NO_BUFFER) {
-@@ -3557,8 +3537,7 @@ _followForm(int submit)
+@@ -3580,8 +3560,7 @@ _followForm(int submit)
  	if (fi->readonly)
  	    /* FIXME: gettextize? */
  	    disp_message_nsec("Read only field!", FALSE, 1, TRUE, FALSE);
@@ -689,7 +689,7 @@
  	if (p == NULL || fi->readonly)
  	    break;
  	fi->value = Strnew_charp(p);
-@@ -3572,8 +3551,7 @@ _followForm(int submit)
+@@ -3595,8 +3574,7 @@ _followForm(int submit)
  	if (fi->readonly)
  	    /* FIXME: gettextize? */
  	    disp_message_nsec("Read only field!", FALSE, 1, TRUE, FALSE);
@@ -699,7 +699,7 @@
  			      NULL);
  	if (p == NULL || fi->readonly)
  	    break;
-@@ -3590,8 +3568,7 @@ _followForm(int submit)
+@@ -3613,8 +3591,7 @@ _followForm(int submit)
  	    disp_message_nsec("Read only field!", FALSE, 1, TRUE, FALSE);
  	    break;
  	}
@@ -709,7 +709,7 @@
  		      IN_PASSWORD);
  	if (p == NULL)
  	    break;
-@@ -4396,8 +4373,7 @@ cmd_loadURL(char *url, ParsedURL *curren
+@@ -4419,8 +4396,7 @@ cmd_loadURL(char *url, ParsedURL *curren
      refresh();
      buf = loadGeneralFile(url, current, referer, 0, request);
      if (buf == NULL) {
@@ -719,7 +719,7 @@
  	disp_err_message(emsg, FALSE);
      }
      else if (buf != NO_BUFFER) {
-@@ -4842,8 +4818,7 @@ DEFUN(svBuf, PRINT SAVE_SCREEN, "Save re
+@@ -4878,8 +4854,7 @@ DEFUN(svBuf, PRINT SAVE_SCREEN, "Save re
  
      file = searchKeyData();
      if (file == NULL || *file == '\0') {
@@ -729,7 +729,7 @@
  	if (qfile == NULL || *qfile == '\0') {
  	    displayBuffer(Currentbuf, B_NORMAL);
  	    return;
-@@ -4868,8 +4843,7 @@ DEFUN(svBuf, PRINT SAVE_SCREEN, "Save re
+@@ -4904,8 +4879,7 @@ DEFUN(svBuf, PRINT SAVE_SCREEN, "Save re
  	is_pipe = FALSE;
      }
      if (f == NULL) {
@@ -739,7 +739,7 @@
  	disp_err_message(emsg, TRUE);
  	return;
      }
-@@ -5226,15 +5200,13 @@ DEFUN(reload, RELOAD, "Load current docu
+@@ -5272,15 +5246,13 @@ DEFUN(reload, RELOAD, "Load current docu
  	    ldDL();
  	    return;
  	}
@@ -757,7 +757,7 @@
  	return;
      }
      fold_pre = FoldPre;
-@@ -5287,8 +5259,7 @@ DEFUN(reload, RELOAD, "Load current docu
+@@ -5333,8 +5305,7 @@ DEFUN(reload, RELOAD, "Load current docu
  	request = NULL;
      }
      url = parsedURL2Str(&Currentbuf->currentURL);
@@ -767,7 +767,7 @@
      refresh();
  #ifdef USE_M17N
      old_charset = DocumentCharset;
-@@ -5307,8 +5278,7 @@ DEFUN(reload, RELOAD, "Load current docu
+@@ -5353,8 +5324,7 @@ DEFUN(reload, RELOAD, "Load current docu
      if (multipart)
  	unlink(request->body);
      if (buf == NULL) {
@@ -777,7 +777,7 @@
  	return;
      }
      else if (buf == NO_BUFFER) {
-@@ -5386,8 +5356,7 @@ DEFUN(docCSet, CHARSET, "Change the char
+@@ -5432,8 +5402,7 @@ DEFUN(docCSet, CHARSET, "Change the char
  
      cs = searchKeyData();
      if (cs == NULL || *cs == '\0')
@@ -787,7 +787,7 @@
  		      wc_ces_to_charset(Currentbuf->document_charset));
      charset = wc_guess_charset_short(cs, 0);
      if (charset == 0) {
-@@ -5404,8 +5373,7 @@ DEFUN(defCSet, DEFAULT_CHARSET, "Change
+@@ -5450,8 +5419,7 @@ DEFUN(defCSet, DEFAULT_CHARSET, "Change
  
      cs = searchKeyData();
      if (cs == NULL || *cs == '\0')
@@ -797,7 +797,7 @@
  		      wc_ces_to_charset(DocumentCharset));
      charset = wc_guess_charset_short(cs, 0);
      if (charset != 0)
-@@ -5592,15 +5560,13 @@ invoke_browser(const char *url)
+@@ -5638,15 +5606,13 @@ invoke_browser(const char *url)
  DEFUN(extbrz, EXTERN, "Display using an external browser")
  {
      if (Currentbuf->bufferprop & BP_INTERNAL) {
@@ -815,7 +815,7 @@
  	return;
      }
      invoke_browser(parsedURL2Str(&Currentbuf->currentURL)->ptr);
-@@ -6124,13 +6090,11 @@ DEFUN(wrapToggle, WRAP_TOGGLE, "Toggle w
+@@ -6170,13 +6136,11 @@ DEFUN(wrapToggle, WRAP_TOGGLE, "Toggle w
  {
      if (WrapSearch) {
  	WrapSearch = FALSE;
@@ -833,7 +833,7 @@
  
 --- a/url.c
 +++ b/url.c
-@@ -477,9 +477,8 @@ openSSLHandle(int sock, char *hostname,
+@@ -478,9 +478,8 @@ openSSLHandle(int sock, char *hostname,
      close(sock);
      if (handle)
  	SSL_free(handle);
@@ -844,7 +844,7 @@
  		      ERR_error_string(ERR_get_error(), NULL))->ptr, FALSE);
      return NULL;
  }
-@@ -556,8 +555,7 @@ openSocket(char *const hostname,
+@@ -557,8 +556,7 @@ openSocket(char *const hostname,
      void (*volatile prevtrap) (SIGNAL_ARG) = NULL;
  
      if (fmInitialized) {

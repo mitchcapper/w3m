@@ -9,7 +9,7 @@ Patch: patches/Use-prec_num-with-followA.patch
 
 --- a/main.c
 +++ b/main.c
-@@ -3245,6 +3245,9 @@ DEFUN(followA, GOTO_LINK, "Follow curren
+@@ -3250,6 +3250,9 @@ DEFUN(followA, GOTO_LINK, "Follow curren
  #endif
      char *url;
  

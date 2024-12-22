@@ -37,7 +37,7 @@ Patch: patches/Add-keybinding-to-insert-current-search-term.patch
  		tmp = wc_char_conv(c);
  		ins_char(tmp);
  	    }
-@@ -621,6 +621,13 @@ _iword(void)
+@@ -622,6 +622,13 @@ _iword(void)
      ins_char(Strnew_charp(GetWord(Currentbuf)));
  }
  

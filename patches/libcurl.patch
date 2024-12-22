@@ -1,0 +1,530 @@
+From: Rene Kita <mail@rkta.de>
+Date: Thu Dec 19 06:59:22 CET 2024
+
+---
+ Makefile.in |    2 
+ file.c      |  488 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 489 insertions(+), 1 deletion(-)
+
+--- a/file.c
++++ b/file.c
+@@ -23,6 +23,8 @@
+ 
+ #include <assert.h>
+ 
++#include <curl/curl.h>
++
+ #ifndef max
+ #define max(a,b)        ((a) > (b) ? (a) : (b))
+ #endif				/* not max */
+@@ -1679,6 +1681,490 @@ getLinkNumberStr(int correction)
+     return Sprintf("[%d]", cur_hseq + correction - !!zeroBasedLinkNo);
+ }
+ 
++#if 0
++static size_t
++cb(char *data, size_t size, size_t nmemb, void *buf)
++{
++    Str s = (Str)buf;
++    size_t sz = size * nmemb;
++    size_t ns = s->length + sz + 1;
++
++    if (ns > s->area_size) {
++	if (!(s->ptr = GC_REALLOC(s->ptr, ns))) return 0;
++	s->area_size = ns;
++    }
++    memcpy(&s->ptr[s->length], data, sz);
++    s->length += sz;
++    s->ptr[s->length] = '\0';
++
++    return sz;
++}
++#endif
++
++static Buffer *
++loadCurledFile(char *path, ParsedURL *volatile current, char *referer,
++		int flag, FormList *volatile request, /*const*/ char *type)
++{
++    URLFile f, *volatile of = NULL;
++    ParsedURL pu;
++    Buffer *b = NULL;
++    Buffer *(*volatile proc)(URLFile *, Buffer *);
++    char *volatile tpath;
++    char *p;
++    char *t;
++    Buffer *volatile t_buf = NULL;
++    void (*volatile prevtrap) (SIGNAL_ARG) = NULL;
++    TextList *extra_header = newTextList();
++    unsigned char status = HTST_NORMAL;
++    URLOption url_option;
++    HRequest hr;
++
++    tpath = path;
++    prevtrap = NULL;
++
++    checkRedirection(NULL);
++
++    t = type;
++
++    parseURL2(tpath, &pu, current);
++    TRAP_OFF;
++    url_option.referer = referer;
++    url_option.flag = flag;
++    f = openURL(tpath, &pu, current, &url_option, request, extra_header, of,
++		&hr, &status);
++    of = NULL;
++#ifdef USE_M17N
++    content_charset = 0;
++#endif
++    assert(f.stream);
++
++    /* openURL() succeeded */
++    if (SETJMP(AbortLoading) != 0) {
++	/* transfer interrupted */
++	TRAP_OFF;
++	if (b)
++	    discardBuffer(b);
++	UFclose(&f);
++	return NULL;
++    }
++
++    b = NULL;
++    if (header_string)
++	header_string = NULL;
++    TRAP_ON;
++
++    f.guess_type = t;
++
++    current_content_length = 0;
++    if ((p = checkHeader(t_buf, "Content-Length:")) != NULL)
++	current_content_length = strtoclen(p);
++
++    if ((f.content_encoding != CMP_NOCOMPRESS) && AutoUncompress
++	&& !(w3m_dump & DUMP_EXTRA)) {
++	uncompress_stream(&f, &pu.real_file);
++    }
++    else if (f.compression != CMP_NOCOMPRESS) {
++	if (!(w3m_dump & DUMP_SOURCE) &&
++	    (w3m_dump & ~DUMP_FRAME || is_text_type(t)
++	     || searchExtViewer(t))) {
++	    if (t_buf == NULL)
++		t_buf = newBuffer(INIT_BUFFER_WIDTH);
++	    uncompress_stream(&f, &t_buf->sourcefile);
++	    uncompressed_file_type(pu.file, &f.ext);
++	}
++	else {
++	    t = compress_application_type(f.compression);
++	    f.compression = CMP_NOCOMPRESS;
++	}
++    }
++#ifdef USE_IMAGE
++    if (image_source) {
++	Buffer *b = NULL;
++	if (IStype(f.stream) != IST_ENCODED)
++	    f.stream = newEncodedStream(f.stream, f.encoding);
++	if (save2tmp(f, image_source) == 0) {
++	    b = newBuffer(INIT_BUFFER_WIDTH);
++	    b->sourcefile = image_source;
++	    b->real_type = t;
++	}
++	UFclose(&f);
++	TRAP_OFF;
++	return b;
++    }
++#endif
++
++    if (is_html_type(t))
++	proc = loadHTMLBuffer;
++    else if (!strcmp(t, "text/gemini"))
++	proc = loadGeminiBuffer;
++    else if (is_plain_text_type(t))
++	proc = loadBuffer;
++#ifdef USE_IMAGE
++    else if (activeImage && displayImage && !useExtImageViewer &&
++	     !(w3m_dump & ~DUMP_FRAME) && !strncasecmp(t, "image/", 6))
++	proc = loadImageBuffer;
++#endif
++    else if (w3m_backend) ;
++    else if (!(w3m_dump & ~DUMP_FRAME) || is_dump_text_type(t)) {
++	if (searchExtViewer(t) != NULL) {
++	    proc = NULL;
++	}
++	else {
++	    TRAP_OFF;
++	    if (pu.scheme == SCM_LOCAL) {
++		UFclose(&f);
++		_doFileCopy(pu.real_file,
++			    conv_from_system(guess_save_name
++					     (NULL, pu.real_file)), TRUE);
++	    }
++	    else {
++		if (DecodeCTE && IStype(f.stream) != IST_ENCODED)
++		    f.stream = newEncodedStream(f.stream, f.encoding);
++		if (doFileSave(f, guess_save_name(t_buf, pu.file)) == 0)
++		    UFhalfclose(&f);
++		else
++		    UFclose(&f);
++	    }
++	    return NO_BUFFER;
++	}
++    }
++    else if (w3m_dump & DUMP_FRAME)
++	return NULL;
++
++    if (t_buf == NULL)
++	t_buf = newBuffer(INIT_BUFFER_WIDTH);
++    copyParsedURL(&t_buf->currentURL, &pu);
++    t_buf->filename = pu.real_file ? pu.real_file :
++	pu.file ? conv_to_system(pu.file) : NULL;
++    if (flag & RG_FRAME) {
++	t_buf->bufferprop |= BP_FRAME;
++    }
++#ifdef USE_SSL
++    t_buf->ssl_certificate = f.ssl_certificate;
++#endif
++    frame_source = flag & RG_FRAME_SRC;
++    if (proc == NULL) {
++	b = doExternal(f, t, t_buf);
++    } else {
++	b = loadSomething(&f, proc, t_buf);
++    }
++    UFclose(&f);
++    frame_source = 0;
++    if (b && b != NO_BUFFER) {
++	b->real_scheme = f.scheme;
++	b->real_type = t;
++	if (w3m_backend)
++	    b->type = allocStr(t, -1);
++	if (pu.label) {
++	    if (proc == loadHTMLBuffer) {
++		Anchor *a;
++		a = searchURLLabel(b, pu.label);
++		if (a != NULL) {
++		    gotoLine(b, a->start.line);
++		    if (label_topline)
++			b->topLine = lineSkip(b, b->topLine,
++					      b->currentLine->linenumber
++					      - b->topLine->linenumber, FALSE);
++		    b->pos = a->start.pos;
++		    arrangeCursor(b);
++		}
++	    }
++	    else {		/* plain text */
++		int l = atoi(pu.label);
++		gotoRealLine(b, l);
++		b->pos = 0;
++		arrangeCursor(b);
++	    }
++	}
++    }
++    if (header_string)
++	header_string = NULL;
++#ifdef USE_NNTP
++    if (b && b != NO_BUFFER && (f.scheme == SCM_NNTP || f.scheme == SCM_NEWS))
++	reAnchorNewsheader(b);
++#endif
++    if (b && b != NO_BUFFER)
++	preFormUpdateBuffer(b);
++    TRAP_OFF;
++    return b;
++}
++
++static TextList *
++readCurlHeader(CURL *curl)
++{
++    ParsedURL *pu, _pu;
++    Str tmp, lineBuf2 = NULL;
++    TextList *headerlist;
++    char *p, *q, *url;
++    long code, http_version;
++    struct curl_header *head, *prev = NULL;
++
++#ifdef USE_COOKIE
++    const char *emsg;
++#endif
++
++    if (curl_easy_getinfo(curl, CURLINFO_EFFECTIVE_URL, &url)) exit(1);
++    pu = &_pu;
++    parseURL2(url, pu, NULL);
++
++    headerlist = newTextList();
++    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &code);
++    curl_easy_getinfo(curl, CURLINFO_HTTP_VERSION, &http_version);
++    http_response_code = (int)code;
++    Str http_response = Sprintf("HTTP/%ld %d", http_version,
++				http_response_code);
++
++    if (fmInitialized) {
++	message(http_response->ptr, 0, 0);
++	refresh();
++    }
++
++    while((head = curl_easy_nextheader(curl, CURLH_HEADER, 0, prev))) {
++	prev = head;
++	tmp = Sprintf("%s: %s", head->name, head->value);
++
++	if (!(w3m_dump & DUMP_HEAD)) {
++	    if (lineBuf2) {
++		Strcat(lineBuf2, tmp);
++	    }
++	    else {
++		lineBuf2 = tmp;
++	    }
++#if 0
++	    /* TODO(rkta):  handle later */
++	    c = UFgetc(uf);
++	    UFundogetc(uf);
++	    if (c == ' ' || c == '\t')
++		/* header line is continued */
++		continue;
++#endif
++	}
++	else {
++	    lineBuf2 = tmp;
++	}
++#ifdef USE_COOKIE
++	if (use_cookie && accept_cookie &&
++		 pu && check_cookie_accept_domain(pu->host) &&
++		 (!strncasecmp(lineBuf2->ptr, "Set-Cookie:", 11) ||
++		  !strncasecmp(lineBuf2->ptr, "Set-Cookie2:", 12))) {
++	    Str name = Strnew(), value = Strnew(), domain = NULL, path = NULL,
++		comment = NULL, commentURL = NULL, port = NULL, tmp2;
++	    int version, quoted, flag = 0;
++	    time_t expires = (time_t) - 1;
++
++	    q = NULL;
++	    if (lineBuf2->ptr[10] == '2') {
++		p = lineBuf2->ptr + 12;
++		version = 1;
++	    }
++	    else {
++		p = lineBuf2->ptr + 11;
++		version = 0;
++	    }
++#ifdef DEBUG
++	    fprintf(stderr, "Set-Cookie: [%s]\n", p);
++#endif				/* DEBUG */
++	    SKIP_BLANKS(p);
++	    while (*p != '=' && !IS_ENDT(*p))
++		Strcat_char(name, *(p++));
++	    Strremovetrailingspaces(name);
++	    if (*p == '=') {
++		p++;
++		SKIP_BLANKS(p);
++		quoted = 0;
++		while (!IS_ENDL(*p) && (quoted || *p != ';')) {
++		    if (!IS_SPACE(*p))
++			q = p;
++		    if (*p == '"')
++			quoted = (quoted) ? 0 : 1;
++		    Strcat_char(value, *(p++));
++		}
++		if (q)
++		    Strshrink(value, p - q - 1);
++	    }
++	    while (*p == ';') {
++		p++;
++		SKIP_BLANKS(p);
++		if (matchattr(p, "expires", 7, &tmp2)) {
++		    /* version 0 */
++		    expires = mymktime(tmp2->ptr);
++		}
++		else if (matchattr(p, "max-age", 7, &tmp2)) {
++		    /* XXX Is there any problem with max-age=0? (RFC 2109 ss. 4.2.1, 4.2.2 */
++		    expires = time(NULL) + atol(tmp2->ptr);
++		}
++		else if (matchattr(p, "domain", 6, &tmp2)) {
++		    domain = tmp2;
++		}
++		else if (matchattr(p, "path", 4, &tmp2)) {
++		    path = tmp2;
++		}
++		else if (matchattr(p, "secure", 6, NULL)) {
++		    flag |= COO_SECURE;
++		}
++		else if (matchattr(p, "comment", 7, &tmp2)) {
++		    comment = tmp2;
++		}
++		else if (matchattr(p, "version", 7, &tmp2)) {
++		    version = atoi(tmp2->ptr);
++		}
++		else if (matchattr(p, "port", 4, &tmp2)) {
++		    /* version 1, Set-Cookie2 */
++		    port = tmp2;
++		}
++		else if (matchattr(p, "commentURL", 10, &tmp2)) {
++		    /* version 1, Set-Cookie2 */
++		    commentURL = tmp2;
++		}
++		else if (matchattr(p, "discard", 7, NULL)) {
++		    /* version 1, Set-Cookie2 */
++		    flag |= COO_DISCARD;
++		}
++		quoted = 0;
++		while (!IS_ENDL(*p) && (quoted || *p != ';')) {
++		    if (*p == '"')
++			quoted = (quoted) ? 0 : 1;
++		    p++;
++		}
++	    }
++	    if (pu && name->length > 0) {
++		int err;
++		if (show_cookie) {
++		    if (flag & COO_SECURE)
++		        disp_message_nsec("Received a secured cookie", FALSE, 1,
++				      TRUE, FALSE);
++		    else
++		        disp_message_nsec(Sprintf("Received cookie: %s=%s",
++					      name->ptr, value->ptr)->ptr,
++				      FALSE, 1, TRUE, FALSE);
++		}
++		err =
++		    add_cookie(pu, name, value, expires, domain, path, flag,
++			       comment, version, port, commentURL);
++		if (err) {
++		    int ans = (accept_bad_cookie == ACCEPT_BAD_COOKIE_ACCEPT);
++		    if (fmInitialized && (err & COO_OVERRIDE_OK) &&
++			accept_bad_cookie == ACCEPT_BAD_COOKIE_ASK) {
++			Str msg = Sprintf("Accept bad cookie from %s for %s?",
++					  pu->host,
++					  ((domain && domain->ptr)
++					   ? domain->ptr : "<localdomain>"));
++			if (msg->length > COLS - 10)
++			    Strshrink(msg, msg->length - (COLS - 10));
++			ans = confirm(msg);
++		    }
++		    if (!ans ||
++			(err =
++			 add_cookie(pu, name, value, expires, domain, path,
++				    flag | COO_OVERRIDE, comment, version,
++				    port, commentURL))) {
++			err = (err & ~COO_OVERRIDE_OK) - 1;
++			if (err >= 0 && err < COO_EMAX)
++			    emsg = Sprintf("This cookie was rejected "
++					   "to prevent security violation. [%s]",
++					   violations[err])->ptr;
++			else
++			    emsg =
++				"This cookie was rejected to prevent security violation.";
++			record_err_message(emsg);
++			if (show_cookie)
++			    disp_message_nsec(emsg, FALSE, 1, TRUE, FALSE);
++		    }
++		    else
++			if (show_cookie)
++			    disp_message_nsec(Sprintf
++					  ("Accepting invalid cookie: %s=%s",
++					   name->ptr, value->ptr)->ptr, FALSE,
++					  1, TRUE, FALSE);
++		}
++	    }
++	}
++#endif				/* USE_COOKIE */
++	pushText(headerlist, lineBuf2->ptr);
++	Strfree(lineBuf2);
++	lineBuf2 = NULL;
++    }
++
++    return headerlist;
++}
++
++
++static Buffer *
++do_curl(ParsedURL *url)
++{
++    char *u;
++    ParsedURL pu;
++    Buffer *buf;
++    CURL *curl;
++    CURLHcode h;
++    CURLcode res;
++    FILE *fp;
++    Str fn, s, type;
++    struct curl_header *head;
++    TextList *headerlist;
++    char *p, *q;
++    wc_ces charset;
++
++    curl = curl_easy_init();
++    s = Strnew();
++
++    if (!curl || !s) return NULL;
++
++    /* send all data to this function  */
++    //curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, cb);
++
++    /* we pass our 'chunk' struct to the callback function */
++    //curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)s);
++
++    fn = tmpfname(TMPF_SRC, NULL);
++    fp = fopen(fn->ptr, "w");
++
++#define VERSION "w3m/0.5.3+rkta (libcurl)"
++    curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
++    curl_easy_setopt(curl, CURLOPT_URL, parsedURL2Str(url)->ptr);
++    curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp) ;
++    curl_easy_setopt(curl, CURLOPT_USERAGENT, VERSION);
++
++    /* send a request */
++    if ((res = curl_easy_perform(curl)))
++	return NULL;
++    fclose(fp);
++
++    h = curl_easy_header(curl, "Content-Type", 0, CURLH_HEADER, -1, &head);
++    if (h != CURLHE_OK) exit(1);
++
++    type = Strnew_charp(head->value);
++    if ((p = q = strchr(type->ptr, ';'))) {
++	*p = '\0';
++	q = p + 1;
++	SKIP_BLANKS(q);
++	if (!strncmp(q, "charset=", 8)) {
++	    q += 8;
++	    charset = wc_charset_to_ces(q);
++	    q = p;
++	}
++    }
++
++    buf = loadCurledFile(file_to_url(fn->ptr), NULL, NO_REFERER,
++			  0, NULL, type->ptr);
++    headerlist = readCurlHeader(curl);
++
++    if (curl_easy_getinfo(curl, CURLINFO_EFFECTIVE_URL, &u)) exit(1);
++    parseURL2(u, &pu, NULL);
++    copyParsedURL(&buf->currentURL, &pu);
++
++    if (q && q == p)
++	buf->document_charset = charset;
++    buf->document_header = headerlist;
++    buf->filename = Strnew_charp(url->file)->ptr;
++    buf->real_scheme = url->scheme;
++    /* TODO(rkta): Add cert info */
++
++    curl_easy_cleanup(curl);
++
++    return buf;
++}
++
+ /* 
+  * loadGeneralFile: load file to buffer
+  */
+@@ -1734,6 +2220,8 @@ loadGeneralFile(char *path, ParsedURL *v
+ 	    goto load_doc;
+ 	}
+     }
++    if ((pu.scheme == SCM_HTTPS || pu.scheme == SCM_HTTP) && !request)
++	return do_curl(&pu);
+     TRAP_OFF;
+     url_option.referer = referer;
+     url_option.flag = flag;
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -68,7 +68,7 @@ DEFS = @DEFS@ -DAUXBIN_DIR=\"$(AUXBIN_DI
+ 	-DRC_DIR=\"$(RC_DIR)\" \
+         -DLOCALEDIR=\"$(localedir)\"
+ LDFLAGS = @LDFLAGS@
+-LIBS = @LIBS@
++LIBS = -lcurl @LIBS@
+ GC_LIBS = @LIBGC@
+ EXT_LIBS = -L. -lindep @LIBINTL@ $(GC_LIBS)
+ W3M_LIBS = @W3M_LIBS@

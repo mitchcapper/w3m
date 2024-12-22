@@ -13,7 +13,7 @@ Patch: patches/scan-build-issues.patch
 
 --- a/file.c
 +++ b/file.c
-@@ -1882,7 +1882,7 @@ loadGeneralFile(char *path, ParsedURL *v
+@@ -1884,7 +1884,7 @@ loadGeneralFile(char *path, ParsedURL *v
  				  0);
  	    add_auth_cookie_flag = 0;
  	}
@@ -22,7 +22,7 @@ Patch: patches/scan-build-issues.patch
  	    http_response_code == 401) {
  	    /* Authentication needed */
  	    struct http_auth hauth;
-@@ -1902,7 +1902,7 @@ loadGeneralFile(char *path, ParsedURL *v
+@@ -1904,7 +1904,7 @@ loadGeneralFile(char *path, ParsedURL *v
  		goto load_doc;
  	    }
  	}

@@ -5,9 +5,9 @@ Patch: patches/Make-CTRL-Y-insert-deleted-text.patch
 
 ---
  fm.h     |    1 +
- linein.c |   45 ++++++++++++++++++++++++++++++++++++++-------
+ linein.c |   46 +++++++++++++++++++++++++++++++++++++++-------
  rc.c     |    3 +++
- 3 files changed, 42 insertions(+), 7 deletions(-)
+ 3 files changed, 43 insertions(+), 7 deletions(-)
 
 --- a/linein.c
 +++ b/linein.c
@@ -61,7 +61,7 @@ Patch: patches/Make-CTRL-Y-insert-deleted-text.patch
  }
  #endif
  
-@@ -483,23 +487,50 @@ insC(void)
+@@ -483,23 +487,51 @@ insC(void)
  static void
  delC(void)
  {
@@ -108,6 +108,7 @@ Patch: patches/Make-CTRL-Y-insert-deleted-text.patch
 +static void
 +_paste(void)
 +{
++    if (!ynkBuf) return;
 +    ins_char(ynkBuf);
 +}
 +

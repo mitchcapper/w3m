@@ -124,7 +124,7 @@ Patch: patches/Add-option-to-provide-cookie-jar.patch
  #endif				/* USE_COOKIE */
      PUT("-graph", "use DEC special graphics for border of table and menu");
      PUT("-no-graph", "use ASCII character for border of table and menu");
-@@ -791,6 +792,18 @@ main(int argc, char **argv)
+@@ -765,6 +766,18 @@ main(int argc, char **argv)
  		use_cookie = TRUE;
  		accept_cookie = TRUE;
  	    }
@@ -143,7 +143,7 @@ Patch: patches/Add-option-to-provide-cookie-jar.patch
  #endif				/* USE_COOKIE */
  	    else if (!strcmp("-s", argv[i]))
  		squeezeBlankLine = TRUE;
-@@ -893,6 +906,10 @@ main(int argc, char **argv)
+@@ -868,6 +881,10 @@ main(int argc, char **argv)
      CurrentKey = -1;
      if (BookmarkFile == NULL)
  	BookmarkFile = rcFile(BOOKMARK);

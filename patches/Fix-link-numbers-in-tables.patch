@@ -23,7 +23,7 @@ need_number include.
  
  static char *guess_filename(const char *file);
  static int _MoveFile(const char *path1, const char *path2);
-@@ -3732,13 +3732,17 @@ process_input(struct parsed_tag *tag)
+@@ -3734,13 +3734,17 @@ process_input(struct parsed_tag *tag)
      case FORM_INPUT_TEXT:
      case FORM_INPUT_FILE:
      case FORM_INPUT_CHECKBOX:
@@ -43,7 +43,7 @@ need_number include.
  	Strcat_char(tmp, '(');
      }
      Strcat(tmp, Sprintf("<input_alt hseq=\"%d\" fid=\"%d\" type=\"%s\" "
-@@ -3780,8 +3784,10 @@ process_input(struct parsed_tag *tag)
+@@ -3782,8 +3786,10 @@ process_input(struct parsed_tag *tag)
  	case FORM_INPUT_SUBMIT:
  	case FORM_INPUT_BUTTON:
  	case FORM_INPUT_RESET:
@@ -55,7 +55,7 @@ need_number include.
  	    Strcat_charp(tmp, "[");
  	    break;
  	}
-@@ -6606,6 +6612,12 @@ HTMLlineproc0(char *line, struct html_fe
+@@ -6608,6 +6614,12 @@ HTMLlineproc0(char *line, struct html_fe
  	     * are fed to the table renderer, and then the renderer
  	     * makes HTML output.
  	     */
