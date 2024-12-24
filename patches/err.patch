@@ -1,0 +1,27 @@
+From: Rene Kita <mail@rkta.de>
+Date: Tue Dec 24 11:54:43 CET 2024
+
+---
+ libwc/charset.c |    3 +++
+ 1 file changed, 3 insertions(+)
+
+--- a/libwc/charset.c
++++ b/libwc/charset.c
+@@ -112,14 +112,17 @@ wc_charset_to_ces(const char *charset)
+     char buf[16];
+     int n;
+ 
++    // return 0; /* Works */
+     if ((*p == 'x' || *p == 'X') && *(p+1) == '-')
+ 	p += 2;
+     for (n = 0; *p && n < 15; p++) {
+ 	if ((unsigned char)*p > 0x20 && *p != '_' && *p != '-')
+ 	    buf[n++] = *p | 32; /* tolower(*p); */
+     }
++    // return 0; /* Works */
+     buf[n] = 0;
+     p = buf;
++    return 0; /* Linker error with -flto */
+     switch (*p) {
+     case 'e':
+ 	if (! strncmp(p, "euc", 3)) {

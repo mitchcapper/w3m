@@ -64,6 +64,7 @@ Change-filename-when-saving-compressed-source.patch
 libcurl.patch
 lto.patch
 # BORKED
+err.patch
 rc.patch
 Refactor-regex-library.patch
 Enable-command-completion.patch
