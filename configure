@@ -654,7 +654,7 @@ RC_DIR
 HELP_DIR
 HAVE_SIGSETJMP
 USE_BINMODE_STREAM
-LIBGC
+GC_LIBS
 AUXBIN_TARGETS
 USE_SYSMOUSE
 USE_W3M
@@ -9934,7 +9934,7 @@ fi
 printf "%s\n" "$ac_cv_lib_gc_GC_init" >&6; }
 if test "x$ac_cv_lib_gc_GC_init" = xyes
 then :
-  LIBGC="-lgc"
+  GC_LIBS="-lgc"
 fi
 
  if test x"$ac_cv_lib_gc_GC_init" = xno; then
@@ -9986,7 +9986,7 @@ fi
 printf "%s\n" "$ac_cv_lib_gc_GC_init" >&6; }
 if test "x$ac_cv_lib_gc_GC_init" = xyes
 then :
-  gclibdir="$dir/lib"; LIBGC="-L$dir/lib -lgc"; break
+  gclibdir="$dir/lib"; GC_LIBS="-L$dir/lib -lgc"; break
 fi
 
       LDFLAGS="$ldflags"
