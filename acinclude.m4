@@ -402,6 +402,7 @@ AC_DEFUN([AC_W3M_W3MMAILER],
 # ----------------------------------------------------------------
 AC_DEFUN([AC_W3M_EXTLIBS],
 [lib=$1
+ PKG_CHECK_MODULES(EXT, $lib,,[
  AC_MSG_CHECKING(for -l$lib)
  extlib="not found"
  for dir in /lib /usr/lib /usr/local/lib /usr/ucblib /usr/ccslib /usr/ccs/lib /lib64 /usr/lib64
@@ -412,7 +413,9 @@ AC_DEFUN([AC_W3M_EXTLIBS],
     break
    fi
  done
- AC_MSG_RESULT($extlib)])
+ AC_MSG_RESULT($extlib)
+ ])
+])
 #
 # ----------------------------------------------------------------
 # AC_W3M_TERMLIB
