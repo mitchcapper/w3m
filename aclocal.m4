@@ -22,10 +22,7 @@ dnl From Bruno Haible.
 AC_DEFUN([AM_LANGINFO_CODESET],
 [
   AC_CACHE_CHECK([for nl_langinfo and CODESET], [am_cv_langinfo_codeset],
-    [AC_TRY_LINK([#include <langinfo.h>],
-      [char* cs = nl_langinfo(CODESET); return !cs;],
-      [am_cv_langinfo_codeset=yes],
-      [am_cv_langinfo_codeset=no])
+    [AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <langinfo.h>]], [[char* cs = nl_langinfo(CODESET); return !cs;]])],[am_cv_langinfo_codeset=yes],[am_cv_langinfo_codeset=no])
     ])
   if test $am_cv_langinfo_codeset = yes; then
     AC_DEFINE([HAVE_LANGINFO_CODESET], [1],
@@ -96,7 +93,7 @@ AC_DEFUN([AM_GNU_GETTEXT],
     [errprint([ERROR: invalid first argument to AM_GNU_GETTEXT
 ])])])])])
   ifelse(ifelse([$1], [], [old])[]ifelse([$1], [no-libtool], [old]), [old],
-    [AC_DIAGNOSE([obsolete], [Use of AM_GNU_GETTEXT without [external] argument is deprecated.])])
+    [m4_warn([obsolete],[Use of AM_GNU_GETTEXT without [external] argument is deprecated.])])
   ifelse([$2], [], , [ifelse([$2], [need-ngettext], , [ifelse([$2], [need-formatstring-macros], ,
     [errprint([ERROR: invalid second argument to AM_GNU_GETTEXT
 ])])])])
@@ -192,14 +189,11 @@ changequote([,])dnl
         fi
 
         AC_CACHE_CHECK([for GNU gettext in libc], [$gt_func_gnugettext_libc],
-         [AC_TRY_LINK([#include <libintl.h>
+         [AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <libintl.h>
 $gt_revision_test_code
 extern int _nl_msg_cat_cntr;
-extern int *_nl_domain_bindings;],
-            [bindtextdomain ("", "");
-return * gettext ("")$gt_expression_test_code + _nl_msg_cat_cntr + *_nl_domain_bindings],
-            [eval "$gt_func_gnugettext_libc=yes"],
-            [eval "$gt_func_gnugettext_libc=no"])])
+extern int *_nl_domain_bindings;]], [[bindtextdomain ("", "");
+return * gettext ("")$gt_expression_test_code + _nl_msg_cat_cntr + *_nl_domain_bindings]])],[eval "$gt_func_gnugettext_libc=yes"],[eval "$gt_func_gnugettext_libc=no"])])
 
         if { eval "gt_val=\$$gt_func_gnugettext_libc"; test "$gt_val" != "yes"; }; then
           dnl Sometimes libintl requires libiconv, so first search for libiconv.
@@ -218,35 +212,30 @@ return * gettext ("")$gt_expression_test_code + _nl_msg_cat_cntr + *_nl_domain_b
             gt_save_LIBS="$LIBS"
             LIBS="$LIBS $LIBINTL"
             dnl Now see whether libintl exists and does not depend on libiconv.
-            AC_TRY_LINK([#include <libintl.h>
+            AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <libintl.h>
 $gt_revision_test_code
 extern int _nl_msg_cat_cntr;
 extern
 #ifdef __cplusplus
 "C"
 #endif
-const char *_nl_expand_alias (const char *);],
-              [bindtextdomain ("", "");
-return * gettext ("")$gt_expression_test_code + _nl_msg_cat_cntr + *_nl_expand_alias ("")],
-              [eval "$gt_func_gnugettext_libintl=yes"],
-              [eval "$gt_func_gnugettext_libintl=no"])
+const char *_nl_expand_alias (const char *);]], [[bindtextdomain ("", "");
+return * gettext ("")$gt_expression_test_code + _nl_msg_cat_cntr + *_nl_expand_alias ("")]])],[eval "$gt_func_gnugettext_libintl=yes"],[eval "$gt_func_gnugettext_libintl=no"])
             dnl Now see whether libintl exists and depends on libiconv.
             if { eval "gt_val=\$$gt_func_gnugettext_libintl"; test "$gt_val" != yes; } && test -n "$LIBICONV"; then
               LIBS="$LIBS $LIBICONV"
-              AC_TRY_LINK([#include <libintl.h>
+              AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <libintl.h>
 $gt_revision_test_code
 extern int _nl_msg_cat_cntr;
 extern
 #ifdef __cplusplus
 "C"
 #endif
-const char *_nl_expand_alias (const char *);],
-                [bindtextdomain ("", "");
-return * gettext ("")$gt_expression_test_code + _nl_msg_cat_cntr + *_nl_expand_alias ("")],
-               [LIBINTL="$LIBINTL $LIBICONV"
+const char *_nl_expand_alias (const char *);]], [[bindtextdomain ("", "");
+return * gettext ("")$gt_expression_test_code + _nl_msg_cat_cntr + *_nl_expand_alias ("")]])],[LIBINTL="$LIBINTL $LIBICONV"
                 LTLIBINTL="$LTLIBINTL $LTLIBICONV"
                 eval "$gt_func_gnugettext_libintl=yes"
-               ])
+               ],[])
             fi
             CPPFLAGS="$gt_save_CPPFLAGS"
             LIBS="$gt_save_LIBS"])
@@ -449,29 +438,25 @@ AC_DEFUN([AM_ICONV_LINK],
   dnl Add $INCICONV to CPPFLAGS before performing the following checks,
   dnl because if the user has installed libiconv and not disabled its use
   dnl via --without-libiconv-prefix, he wants to use it. The first
-  dnl AC_TRY_LINK will then fail, the second AC_TRY_LINK will succeed.
+  dnl AC_LINK_IFELSE([AC_LANG_PROGRAM([[]], [[]])],[],[]) will then fail, the second AC_LINK_IFELSE([AC_LANG_PROGRAM([[]], [[]])],[],[]) will succeed.
   am_save_CPPFLAGS="$CPPFLAGS"
   AC_LIB_APPENDTOVAR([CPPFLAGS], [$INCICONV])
 
   AC_CACHE_CHECK([for iconv], [am_cv_func_iconv], [
     am_cv_func_iconv="no, consider installing GNU libiconv"
     am_cv_lib_iconv=no
-    AC_TRY_LINK([#include <stdlib.h>
-#include <iconv.h>],
-      [iconv_t cd = iconv_open("","");
+    AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <stdlib.h>
+#include <iconv.h>]], [[iconv_t cd = iconv_open("","");
        iconv(cd,NULL,NULL,NULL,NULL);
-       iconv_close(cd);],
-      [am_cv_func_iconv=yes])
+       iconv_close(cd);]])],[am_cv_func_iconv=yes],[])
     if test "$am_cv_func_iconv" != yes; then
       am_save_LIBS="$LIBS"
       LIBS="$LIBS $LIBICONV"
-      AC_TRY_LINK([#include <stdlib.h>
-#include <iconv.h>],
-        [iconv_t cd = iconv_open("","");
+      AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <stdlib.h>
+#include <iconv.h>]], [[iconv_t cd = iconv_open("","");
          iconv(cd,NULL,NULL,NULL,NULL);
-         iconv_close(cd);],
-        [am_cv_lib_iconv=yes]
-        [am_cv_func_iconv=yes])
+         iconv_close(cd);]])],[am_cv_lib_iconv=yes
+        am_cv_func_iconv=yes],[])
       LIBS="$am_save_LIBS"
     fi
   ])
@@ -482,7 +467,7 @@ AC_DEFUN([AM_ICONV_LINK],
       if test $am_cv_lib_iconv = yes; then
         LIBS="$LIBS $LIBICONV"
       fi
-      AC_TRY_RUN([
+      AC_RUN_IFELSE([AC_LANG_SOURCE([[
 #include <iconv.h>
 #include <string.h>
 int main ()
@@ -557,8 +542,7 @@ int main ()
       && iconv_open ("utf8", "eucJP") == (iconv_t)(-1))
     return 1;
   return 0;
-}], [am_cv_func_iconv_works=yes], [am_cv_func_iconv_works=no],
-        [case "$host_os" in
+}]])],[am_cv_func_iconv_works=yes],[am_cv_func_iconv_works=no],[case "$host_os" in
            aix* | hpux*) am_cv_func_iconv_works="guessing no" ;;
            *)            am_cv_func_iconv_works="guessing yes" ;;
          esac])
@@ -610,7 +594,7 @@ gl_iconv_AC_DEFUN([AM_ICONV],
   if test "$am_cv_func_iconv" = yes; then
     AC_MSG_CHECKING([for iconv declaration])
     AC_CACHE_VAL([am_cv_proto_iconv], [
-      AC_TRY_COMPILE([
+      AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
 #include <stdlib.h>
 #include <iconv.h>
 extern
@@ -622,7 +606,7 @@ size_t iconv (iconv_t cd, char * *inbuf, size_t *inbytesleft, char * *outbuf, si
 #else
 size_t iconv();
 #endif
-], [], [am_cv_proto_iconv_arg1=""], [am_cv_proto_iconv_arg1="const"])
+]], [[]])],[am_cv_proto_iconv_arg1=""],[am_cv_proto_iconv_arg1="const"])
       am_cv_proto_iconv="extern size_t iconv (iconv_t cd, $am_cv_proto_iconv_arg1 char * *inbuf, size_t *inbytesleft, char * *outbuf, size_t *outbytesleft);"])
     am_cv_proto_iconv=`echo "[$]am_cv_proto_iconv" | tr -s ' ' | sed -e 's/( /(/'`
     AC_MSG_RESULT([
@@ -656,10 +640,7 @@ AC_DEFUN([gt_INTL_MACOSX],
     [gt_cv_func_CFPreferencesCopyAppValue],
     [gt_save_LIBS="$LIBS"
      LIBS="$LIBS -Wl,-framework -Wl,CoreFoundation"
-     AC_TRY_LINK([#include <CoreFoundation/CFPreferences.h>],
-       [CFPreferencesCopyAppValue(NULL, NULL)],
-       [gt_cv_func_CFPreferencesCopyAppValue=yes],
-       [gt_cv_func_CFPreferencesCopyAppValue=no])
+     AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <CoreFoundation/CFPreferences.h>]], [[CFPreferencesCopyAppValue(NULL, NULL)]])],[gt_cv_func_CFPreferencesCopyAppValue=yes],[gt_cv_func_CFPreferencesCopyAppValue=no])
      LIBS="$gt_save_LIBS"])
   if test $gt_cv_func_CFPreferencesCopyAppValue = yes; then
     AC_DEFINE([HAVE_CFPREFERENCESCOPYAPPVALUE], [1],
@@ -669,9 +650,7 @@ AC_DEFUN([gt_INTL_MACOSX],
   AC_CACHE_CHECK([for CFLocaleCopyCurrent], [gt_cv_func_CFLocaleCopyCurrent],
     [gt_save_LIBS="$LIBS"
      LIBS="$LIBS -Wl,-framework -Wl,CoreFoundation"
-     AC_TRY_LINK([#include <CoreFoundation/CFLocale.h>], [CFLocaleCopyCurrent();],
-       [gt_cv_func_CFLocaleCopyCurrent=yes],
-       [gt_cv_func_CFLocaleCopyCurrent=no])
+     AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <CoreFoundation/CFLocale.h>]], [[CFLocaleCopyCurrent();]])],[gt_cv_func_CFLocaleCopyCurrent=yes],[gt_cv_func_CFLocaleCopyCurrent=no])
      LIBS="$gt_save_LIBS"])
   if test $gt_cv_func_CFLocaleCopyCurrent = yes; then
     AC_DEFINE([HAVE_CFLOCALECOPYCURRENT], [1],
@@ -803,7 +782,7 @@ dnl with or without modifications, as long as this notice is preserved.
 
 dnl From Bruno Haible.
 
-AC_PREREQ([2.54])
+AC_PREREQ([2.71])
 
 dnl AC_LIB_LINKFLAGS(name [, dependencies]) searches for libname and
 dnl the libraries corresponding to explicit and implicit dependencies.
@@ -882,9 +861,7 @@ AC_DEFUN([AC_LIB_HAVE_LINKFLAGS],
       *" -l"*) LIBS="$LIBS $LIB[]NAME" ;;
       *)       LIBS="$LIB[]NAME $LIBS" ;;
     esac
-    AC_TRY_LINK([$3], [$4],
-      [ac_cv_lib[]Name=yes],
-      [ac_cv_lib[]Name='m4_if([$5], [], [no], [[$5]])'])
+    AC_LINK_IFELSE([AC_LANG_PROGRAM([[$3]], [[$4]])],[ac_cv_lib[]Name=yes],[ac_cv_lib[]Name='m4_if([$5], [], [no], [[$5]])'])
     LIBS="$ac_save_LIBS"
   ])
   if test "$ac_cv_lib[]Name" = yes; then
@@ -1581,7 +1558,7 @@ dnl From Bruno Haible.
 dnl AC_LIB_ARG_WITH is synonymous to AC_ARG_WITH in autoconf-2.13, and
 dnl similar to AC_ARG_WITH in autoconf 2.52...2.57 except that is doesn't
 dnl require excessive bracketing.
-ifdef([AC_HELP_STRING],
+ifdef([AS_HELP_STRING],
 [AC_DEFUN([AC_LIB_ARG_WITH], [AC_ARG_WITH([$1],[[$2]],[$3],[$4])])],
 [AC_DEFUN([AC_][LIB_ARG_WITH], [AC_ARG_WITH([$1],[$2],[$3],[$4])])])
 
@@ -1815,7 +1792,7 @@ dnl Authors:
 dnl   Ulrich Drepper <drepper@cygnus.com>, 1995-2000.
 dnl   Bruno Haible <haible@clisp.cons.org>, 2000-2003.
 
-AC_PREREQ([2.50])
+AC_PREREQ([2.71])
 
 AC_DEFUN([AM_NLS],
 [
@@ -2005,7 +1982,7 @@ dnl Authors:
 dnl   Ulrich Drepper <drepper@cygnus.com>, 1995-2000.
 dnl   Bruno Haible <haible@clisp.cons.org>, 2000-2003.
 
-AC_PREREQ([2.50])
+AC_PREREQ([2.71])
 
 dnl Checks for all prerequisites of the po subdirectory.
 AC_DEFUN([AM_PO_SUBDIRS],
@@ -2454,7 +2431,7 @@ dnl They are *not* in the public domain.
 dnl Authors:
 dnl   Ulrich Drepper <drepper@cygnus.com>, 1996.
 
-AC_PREREQ([2.50])
+AC_PREREQ([2.71])
 
 # Search path for a program which passes the given test.
 
@@ -2539,7 +2516,7 @@ AC_SUBST([$1])dnl
 # ---------------
 # Check for `mkdir -p'.
 AC_DEFUN([AM_PROG_MKDIR_P],
-[AC_PREREQ([2.60])dnl
+[AC_PREREQ([2.71])dnl
 AC_REQUIRE([AC_PROG_MKDIR_P])dnl
 dnl Automake 1.8 to 1.9.6 used to define mkdir_p.  We now use MKDIR_P,
 dnl while keeping a definition of mkdir_p for backward compatibility.
