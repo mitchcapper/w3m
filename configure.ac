@@ -82,12 +82,6 @@ AC_W3M_EDITOR
 AC_W3M_MAILER
 AC_W3M_EXT_BROWSER
 
-dnl Checks for ext libs
-for lib in bsd BSD 44bsd socket nsl dld dl
-do
- AC_W3M_EXTLIBS($lib)
-done
-
 AC_W3M_IPv6
 AC_W3M_SSL_DIGEST_AUTH
 

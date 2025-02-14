@@ -663,15 +663,13 @@ USE_DIGEST_AUTH
 DEF_CAFILE
 SSL_LIBS
 SSL_CFLAGS
+PKG_CONFIG_LIBDIR
+PKG_CONFIG_PATH
+PKG_CONFIG
 USE_SSL_VERIFY
 USE_SSL
 HAVE_OLD_SS_FAMILY
 INET6
-EXT_LIBS
-EXT_CFLAGS
-PKG_CONFIG_LIBDIR
-PKG_CONFIG_PATH
-PKG_CONFIG
 DEF_EXT_BROWSER
 DEF_MAILER
 DEF_EDITOR
@@ -886,8 +884,6 @@ XMKMF
 PKG_CONFIG
 PKG_CONFIG_PATH
 PKG_CONFIG_LIBDIR
-EXT_CFLAGS
-EXT_LIBS
 SSL_CFLAGS
 SSL_LIBS
 GC_CFLAGS
@@ -1587,8 +1583,6 @@ Some influential environment variables:
               directories to add to pkg-config's search path
   PKG_CONFIG_LIBDIR
               path overriding pkg-config's built-in search path
-  EXT_CFLAGS  C compiler flags for EXT, overriding pkg-config
-  EXT_LIBS    linker flags for EXT, overriding pkg-config
   SSL_CFLAGS  C compiler flags for SSL, overriding pkg-config
   SSL_LIBS    linker flags for SSL, overriding pkg-config
   GC_CFLAGS   C compiler flags for GC, overriding pkg-config
@@ -9141,8 +9135,127 @@ printf "%s\n" "$w3m_browser" >&6; }
 printf "%s\n" "#define DEF_EXT_BROWSER \"$w3m_browser\"" >>confdefs.h
 
 
-for lib in bsd BSD 44bsd socket nsl dld dl
-do
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking if IPv6 support is enabled" >&5
+printf %s "checking if IPv6 support is enabled... " >&6; }
+# Check whether --enable-ipv6 was given.
+if test ${enable_ipv6+y}
+then :
+  enableval=$enable_ipv6;
+else $as_nop
+  enable_ipv6="yes"
+fi
+
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $enable_ipv6" >&5
+printf "%s\n" "$enable_ipv6" >&6; }
+
+if test x"$enable_ipv6" = xyes; then
+ { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking if IPv6 API available" >&5
+printf %s "checking if IPv6 API available... " >&6; }
+
+ ac_fn_c_check_func "$LINENO" "getaddrinfo" "ac_cv_func_getaddrinfo"
+if test "x$ac_cv_func_getaddrinfo" = xyes
+then :
+  enable_ipv6="yes"
+else $as_nop
+  enable_ipv6="no"
+fi
+
+ if test x"$enable_ipv6" = xno; then
+    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for libinet6" >&5
+printf %s "checking for libinet6... " >&6; }
+    for dir in /usr/local/v6/lib /usr/local/lib /usr/lib
+    do
+	if test -f $dir/libinet6.a; then
+	  if test $dir != "/usr/lib"; then
+		W3M_LIBS="$W3M_LIBS -L$dir"
+	  fi
+	  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for getaddrinfo in -linet6" >&5
+printf %s "checking for getaddrinfo in -linet6... " >&6; }
+if test ${ac_cv_lib_inet6_getaddrinfo+y}
+then :
+  printf %s "(cached) " >&6
+else $as_nop
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-linet6  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+char getaddrinfo ();
+int
+main (void)
+{
+return getaddrinfo ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"
+then :
+  ac_cv_lib_inet6_getaddrinfo=yes
+else $as_nop
+  ac_cv_lib_inet6_getaddrinfo=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_inet6_getaddrinfo" >&5
+printf "%s\n" "$ac_cv_lib_inet6_getaddrinfo" >&6; }
+if test "x$ac_cv_lib_inet6_getaddrinfo" = xyes
+then :
+  enable_ipv6="yes"
+	         use_libinet6="found"; W3M_LIBS="$W3M_LIBS -linet6"; break
+else $as_nop
+  use_libinet6="not found"
+fi
+
+	fi
+    done
+    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $use_libinet6" >&5
+printf "%s\n" "$use_libinet6" >&6; }
+ fi
+ if test x"$enable_ipv6" = xyes; then
+
+    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking if struct sockaddr_storage has an ss_family member" >&5
+printf %s "checking if struct sockaddr_storage has an ss_family member... " >&6; }
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+#include <sys/types.h>
+#include <sys/socket.h>
+
+int
+main (void)
+{
+
+	struct sockaddr_storage ss;
+	int i = ss.ss_family;
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"
+then :
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+printf "%s\n" "yes" >&6; }
+else $as_nop
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf "%s\n" "no" >&6; }
+      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: WARNING: IPv6 support is disabled" >&5
+printf "%s\n" "$as_me: WARNING: IPv6 support is disabled" >&2;}
+      enable_ipv6="no"
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
+ fi
+ if test x"$enable_ipv6" = xyes; then
+    printf "%s\n" "#define INET6 1" >>confdefs.h
+
+ fi
+fi
 
 
 
@@ -9271,228 +9384,6 @@ printf "%s\n" "yes" >&6; }
 printf "%s\n" "no" >&6; }
 		PKG_CONFIG=""
 	fi
-fi
-lib=$lib
-
-pkg_failed=no
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for EXT" >&5
-printf %s "checking for EXT... " >&6; }
-
-if test -n "$EXT_CFLAGS"; then
-    pkg_cv_EXT_CFLAGS="$EXT_CFLAGS"
- elif test -n "$PKG_CONFIG"; then
-    if test -n "$PKG_CONFIG" && \
-    { { printf "%s\n" "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"\$lib\""; } >&5
-  ($PKG_CONFIG --exists --print-errors "$lib") 2>&5
-  ac_status=$?
-  printf "%s\n" "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; }; then
-  pkg_cv_EXT_CFLAGS=`$PKG_CONFIG --cflags "$lib" 2>/dev/null`
-else
-  pkg_failed=yes
-fi
- else
-    pkg_failed=untried
-fi
-if test -n "$EXT_LIBS"; then
-    pkg_cv_EXT_LIBS="$EXT_LIBS"
- elif test -n "$PKG_CONFIG"; then
-    if test -n "$PKG_CONFIG" && \
-    { { printf "%s\n" "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"\$lib\""; } >&5
-  ($PKG_CONFIG --exists --print-errors "$lib") 2>&5
-  ac_status=$?
-  printf "%s\n" "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; }; then
-  pkg_cv_EXT_LIBS=`$PKG_CONFIG --libs "$lib" 2>/dev/null`
-else
-  pkg_failed=yes
-fi
- else
-    pkg_failed=untried
-fi
-
-
-
-if test $pkg_failed = yes; then
-   	{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
-printf "%s\n" "no" >&6; }
-
-if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
-        _pkg_short_errors_supported=yes
-else
-        _pkg_short_errors_supported=no
-fi
-        if test $_pkg_short_errors_supported = yes; then
-	        EXT_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors "$lib" 2>&1`
-        else
-	        EXT_PKG_ERRORS=`$PKG_CONFIG --print-errors "$lib" 2>&1`
-        fi
-	# Put the nasty error message in config.log where it belongs
-	echo "$EXT_PKG_ERRORS" >&5
-
-
- { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for -l$lib" >&5
-printf %s "checking for -l$lib... " >&6; }
- extlib="not found"
- for dir in /lib /usr/lib /usr/local/lib /usr/ucblib /usr/ccslib /usr/ccs/lib /lib64 /usr/lib64
- do
-   if test -f $dir/lib$lib.a -o -f $dir/lib$lib.so ; then
-    LIBS="$LIBS -l$lib"
-    extlib="found at $dir"
-    break
-   fi
- done
- { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $extlib" >&5
-printf "%s\n" "$extlib" >&6; }
-
-elif test $pkg_failed = untried; then
-     	{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
-printf "%s\n" "no" >&6; }
-
- { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for -l$lib" >&5
-printf %s "checking for -l$lib... " >&6; }
- extlib="not found"
- for dir in /lib /usr/lib /usr/local/lib /usr/ucblib /usr/ccslib /usr/ccs/lib /lib64 /usr/lib64
- do
-   if test -f $dir/lib$lib.a -o -f $dir/lib$lib.so ; then
-    LIBS="$LIBS -l$lib"
-    extlib="found at $dir"
-    break
-   fi
- done
- { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $extlib" >&5
-printf "%s\n" "$extlib" >&6; }
-
-else
-	EXT_CFLAGS=$pkg_cv_EXT_CFLAGS
-	EXT_LIBS=$pkg_cv_EXT_LIBS
-        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-printf "%s\n" "yes" >&6; }
-
-fi
-
-done
-
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking if IPv6 support is enabled" >&5
-printf %s "checking if IPv6 support is enabled... " >&6; }
-# Check whether --enable-ipv6 was given.
-if test ${enable_ipv6+y}
-then :
-  enableval=$enable_ipv6;
-else $as_nop
-  enable_ipv6="yes"
-fi
-
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $enable_ipv6" >&5
-printf "%s\n" "$enable_ipv6" >&6; }
-
-if test x"$enable_ipv6" = xyes; then
- { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking if IPv6 API available" >&5
-printf %s "checking if IPv6 API available... " >&6; }
-
- ac_fn_c_check_func "$LINENO" "getaddrinfo" "ac_cv_func_getaddrinfo"
-if test "x$ac_cv_func_getaddrinfo" = xyes
-then :
-  enable_ipv6="yes"
-else $as_nop
-  enable_ipv6="no"
-fi
-
- if test x"$enable_ipv6" = xno; then
-    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for libinet6" >&5
-printf %s "checking for libinet6... " >&6; }
-    for dir in /usr/local/v6/lib /usr/local/lib /usr/lib
-    do
-	if test -f $dir/libinet6.a; then
-	  if test $dir != "/usr/lib"; then
-		W3M_LIBS="$W3M_LIBS -L$dir"
-	  fi
-	  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for getaddrinfo in -linet6" >&5
-printf %s "checking for getaddrinfo in -linet6... " >&6; }
-if test ${ac_cv_lib_inet6_getaddrinfo+y}
-then :
-  printf %s "(cached) " >&6
-else $as_nop
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-linet6  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-char getaddrinfo ();
-int
-main (void)
-{
-return getaddrinfo ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_link "$LINENO"
-then :
-  ac_cv_lib_inet6_getaddrinfo=yes
-else $as_nop
-  ac_cv_lib_inet6_getaddrinfo=no
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_inet6_getaddrinfo" >&5
-printf "%s\n" "$ac_cv_lib_inet6_getaddrinfo" >&6; }
-if test "x$ac_cv_lib_inet6_getaddrinfo" = xyes
-then :
-  enable_ipv6="yes"
-	         use_libinet6="found"; W3M_LIBS="$W3M_LIBS -linet6"; break
-else $as_nop
-  use_libinet6="not found"
-fi
-
-	fi
-    done
-    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $use_libinet6" >&5
-printf "%s\n" "$use_libinet6" >&6; }
- fi
- if test x"$enable_ipv6" = xyes; then
-
-    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking if struct sockaddr_storage has an ss_family member" >&5
-printf %s "checking if struct sockaddr_storage has an ss_family member... " >&6; }
-    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-#include <sys/types.h>
-#include <sys/socket.h>
-
-int
-main (void)
-{
-
-	struct sockaddr_storage ss;
-	int i = ss.ss_family;
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"
-then :
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-printf "%s\n" "yes" >&6; }
-else $as_nop
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
-printf "%s\n" "no" >&6; }
-      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: WARNING: IPv6 support is disabled" >&5
-printf "%s\n" "$as_me: WARNING: IPv6 support is disabled" >&2;}
-      enable_ipv6="no"
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
- fi
- if test x"$enable_ipv6" = xyes; then
-    printf "%s\n" "#define INET6 1" >>confdefs.h
-
- fi
 fi
 
 
