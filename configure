@@ -654,6 +654,7 @@ RC_DIR
 HELP_DIR
 HAVE_SIGSETJMP
 USE_BINMODE_STREAM
+GC_CFLAGS
 GC_LIBS
 AUXBIN_TARGETS
 USE_SYSMOUSE
@@ -884,7 +885,9 @@ PKG_CONFIG
 PKG_CONFIG_PATH
 PKG_CONFIG_LIBDIR
 SSL_CFLAGS
-SSL_LIBS'
+SSL_LIBS
+GC_CFLAGS
+GC_LIBS'
 
 
 # Initialize some variables set by options.
@@ -1582,6 +1585,8 @@ Some influential environment variables:
               path overriding pkg-config's built-in search path
   SSL_CFLAGS  C compiler flags for SSL, overriding pkg-config
   SSL_LIBS    linker flags for SSL, overriding pkg-config
+  GC_CFLAGS   C compiler flags for GC, overriding pkg-config
+  GC_LIBS     linker flags for GC, overriding pkg-config
 
 Use these variables to override the choices made by `configure' or to help
 it to find libraries and programs with nonstandard names/locations.
@@ -9859,6 +9864,65 @@ fi
 
  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $with_gc" >&5
 printf "%s\n" "$with_gc" >&6; }
+if test x"$with_gc" != xno; then
+
+pkg_failed=no
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for GC" >&5
+printf %s "checking for GC... " >&6; }
+
+if test -n "$GC_CFLAGS"; then
+    pkg_cv_GC_CFLAGS="$GC_CFLAGS"
+ elif test -n "$PKG_CONFIG"; then
+    if test -n "$PKG_CONFIG" && \
+    { { printf "%s\n" "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"bdw-gc\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "bdw-gc") 2>&5
+  ac_status=$?
+  printf "%s\n" "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; then
+  pkg_cv_GC_CFLAGS=`$PKG_CONFIG --cflags "bdw-gc" 2>/dev/null`
+else
+  pkg_failed=yes
+fi
+ else
+    pkg_failed=untried
+fi
+if test -n "$GC_LIBS"; then
+    pkg_cv_GC_LIBS="$GC_LIBS"
+ elif test -n "$PKG_CONFIG"; then
+    if test -n "$PKG_CONFIG" && \
+    { { printf "%s\n" "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"bdw-gc\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "bdw-gc") 2>&5
+  ac_status=$?
+  printf "%s\n" "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; then
+  pkg_cv_GC_LIBS=`$PKG_CONFIG --libs "bdw-gc" 2>/dev/null`
+else
+  pkg_failed=yes
+fi
+ else
+    pkg_failed=untried
+fi
+
+
+
+if test $pkg_failed = yes; then
+   	{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf "%s\n" "no" >&6; }
+
+if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
+        _pkg_short_errors_supported=yes
+else
+        _pkg_short_errors_supported=no
+fi
+        if test $_pkg_short_errors_supported = yes; then
+	        GC_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors "bdw-gc" 2>&1`
+        else
+	        GC_PKG_ERRORS=`$PKG_CONFIG --print-errors "bdw-gc" 2>&1`
+        fi
+	# Put the nasty error message in config.log where it belongs
+	echo "$GC_PKG_ERRORS" >&5
+
+
  test x"$with_gc" = xyes && with_gc="/usr /usr/local ${HOME}"
  unset ac_cv_header_gc_h
  ac_fn_c_check_header_compile "$LINENO" "gc.h" "ac_cv_header_gc_h" "$ac_includes_default"
@@ -9995,6 +10059,156 @@ fi
       as_fn_error $? "libgc not found" "$LINENO" 5
     fi
  fi
+
+elif test $pkg_failed = untried; then
+     	{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf "%s\n" "no" >&6; }
+
+ test x"$with_gc" = xyes && with_gc="/usr /usr/local ${HOME}"
+ unset ac_cv_header_gc_h
+ ac_fn_c_check_header_compile "$LINENO" "gc.h" "ac_cv_header_gc_h" "$ac_includes_default"
+if test "x$ac_cv_header_gc_h" = xyes
+then :
+
+fi
+
+ if test x"$ac_cv_header_gc_h" = xno; then
+   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking GC header location" >&5
+printf %s "checking GC header location... " >&6; }
+   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $with_gc" >&5
+printf "%s\n" "$with_gc" >&6; }
+   gcincludedir=no
+   for dir in $with_gc; do
+     for inc in include include/gc; do
+       cppflags="$CPPFLAGS"
+       CPPFLAGS="$CPPFLAGS -I$dir/$inc"
+       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking $dir/$inc" >&5
+printf %s "checking $dir/$inc... " >&6; }
+       unset ac_cv_header_gc_h
+       ac_fn_c_check_header_compile "$LINENO" "gc.h" "ac_cv_header_gc_h" "$ac_includes_default"
+if test "x$ac_cv_header_gc_h" = xyes
+then :
+  gcincludedir="$dir/$inc"; CFLAGS="$CFLAGS -I$dir/$inc"; break
+fi
+
+       CPPFLAGS="$cppflags"
+     done
+     if test x"$gcincludedir" != xno; then
+       break;
+     fi
+   done
+   if test x"$gcincludedir" = xno; then
+     as_fn_error $? "gc.h not found" "$LINENO" 5
+   fi
+ fi
+ unset ac_cv_lib_gc_GC_init
+ { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for GC_init in -lgc" >&5
+printf %s "checking for GC_init in -lgc... " >&6; }
+if test ${ac_cv_lib_gc_GC_init+y}
+then :
+  printf %s "(cached) " >&6
+else $as_nop
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lgc  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+char GC_init ();
+int
+main (void)
+{
+return GC_init ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"
+then :
+  ac_cv_lib_gc_GC_init=yes
+else $as_nop
+  ac_cv_lib_gc_GC_init=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_gc_GC_init" >&5
+printf "%s\n" "$ac_cv_lib_gc_GC_init" >&6; }
+if test "x$ac_cv_lib_gc_GC_init" = xyes
+then :
+  GC_LIBS="-lgc"
+fi
+
+ if test x"$ac_cv_lib_gc_GC_init" = xno; then
+    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking GC library location" >&5
+printf %s "checking GC library location... " >&6; }
+    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $with_gc" >&5
+printf "%s\n" "$with_gc" >&6; }
+    gclibdir=no
+    for dir in $with_gc; do
+      ldflags="$LDFLAGS"
+      LDFLAGS="$LDFLAGS -L$dir/lib"
+      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking $dir" >&5
+printf %s "checking $dir... " >&6; }
+      unset ac_cv_lib_gc_GC_init
+      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for GC_init in -lgc" >&5
+printf %s "checking for GC_init in -lgc... " >&6; }
+if test ${ac_cv_lib_gc_GC_init+y}
+then :
+  printf %s "(cached) " >&6
+else $as_nop
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lgc  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+char GC_init ();
+int
+main (void)
+{
+return GC_init ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"
+then :
+  ac_cv_lib_gc_GC_init=yes
+else $as_nop
+  ac_cv_lib_gc_GC_init=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_gc_GC_init" >&5
+printf "%s\n" "$ac_cv_lib_gc_GC_init" >&6; }
+if test "x$ac_cv_lib_gc_GC_init" = xyes
+then :
+  gclibdir="$dir/lib"; GC_LIBS="-L$dir/lib -lgc"; break
+fi
+
+      LDFLAGS="$ldflags"
+    done
+    if test x"$gclibdir" = xno; then
+      as_fn_error $? "libgc not found" "$LINENO" 5
+    fi
+ fi
+
+else
+	GC_CFLAGS=$pkg_cv_GC_CFLAGS
+	GC_LIBS=$pkg_cv_GC_LIBS
+        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+printf "%s\n" "yes" >&6; }
+
+fi
+fi
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for zError in -lz" >&5
 printf %s "checking for zError in -lz... " >&6; }
 if test ${ac_cv_lib_z_zError+y}

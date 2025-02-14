@@ -42,9 +42,9 @@ WARNINGS += -Wimplicit-function-declaration
 WARNINGS += -Wimplicit-int
 WARNINGS += -Wstrict-prototypes
 
-CFLAGS = $(WARNINGS) -I. -I$(top_srcdir) @CFLAGS@ $(CPPFLAGS) $(DEFS) $(OPTS)
+CFLAGS = $(WARNINGS) -I. -I$(top_srcdir) @CFLAGS@ @GC_CFLAGS@ $(CPPFLAGS) $(DEFS) $(OPTS)
 WCCFLAGS = @WCCFLAGS@
-CPPFLAGS = @CPPFLAGS@
+CPPFLAGS = @CPPFLAGS@ @GC_CFLAGS@
 DEFS = @DEFS@ -DAUXBIN_DIR=\"$(AUXBIN_DIR)\" \
 	-DCGIBIN_DIR=\"$(CGIBIN_DIR)\" -DHELP_DIR=\"$(HELP_DIR)\" \
 	-DETC_DIR=\"$(ETC_DIR)\" -DCONF_DIR=\"$(CONF_DIR)\" \

@@ -442,6 +442,8 @@ AC_ARG_WITH(gc,
  [test x"$with_gc" = xno && AC_MSG_ERROR([You can not build w3m without GC])],
  [with_gc="yes"])
  AC_MSG_RESULT($with_gc)
+if test x"$with_gc" != xno; then
+  PKG_CHECK_MODULES(GC, bdw-gc,,[
  test x"$with_gc" = xyes && with_gc="/usr /usr/local ${HOME}"
  unset ac_cv_header_gc_h
  AC_CHECK_HEADER(gc.h)
@@ -483,7 +485,9 @@ AC_ARG_WITH(gc,
     if test x"$gclibdir" = xno; then
       AC_MSG_ERROR([libgc not found])
     fi
- fi])
+ fi
+ ])
+fi])
 #
 # ----------------------------------------------------------------
 # AC_W3M_SSL_DIGEST_AUTH
