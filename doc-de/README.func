@@ -133,7 +133,6 @@ SHIFT_LEFT	Anzeigebereich nach links versetzen
 SHIFT_RIGHT	Anzeigebereich nach rechts versetzen
 SOURCE		Wechsle zwischen HTML-Wiedergabe und -Verarbeitung
 STOP_IMAGE	Bilder nicht mehr laden und anzeigen
-STORE		Speichere Session
 SUBMIT		Formular übermitteln
 SUSPEND 	w3m zum Hintergrundprozess machen
 TAB_GOTO	Öffne das angegebene Dokument in einem neuen Reiter

@@ -1085,7 +1085,6 @@ global int UseHistory init(TRUE);
 global int URLHistSize init(100);
 global int SaveURLHist init(TRUE);
 #endif				/* USE_HISTORY */
-global int StoreSession init(FALSE);
 global int multicolList init(FALSE);
 
 #ifdef USE_M17N

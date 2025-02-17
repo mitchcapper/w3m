@@ -87,7 +87,6 @@ extern void goMain(void);
 extern void gorURL(void);
 extern void ldBmark(void);
 extern void adBmark(void);
-extern void strSession(void);
 extern void ldOpt(void);
 extern void setOpt(void);
 extern void pginfo(void);

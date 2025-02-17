@@ -22,7 +22,6 @@
 #define MOUSE_FILE   "mouse"
 #define COOKIE_FILE  "cookie"
 #define HISTORY_FILE "history"
-#define SESSION_FILE "session"
 
 #define PASSWD_FILE	RC_DIR "/passwd"
 #define PRE_FORM_FILE	RC_DIR "/pre_form"

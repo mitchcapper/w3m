@@ -71,8 +71,6 @@ static int OptionEncode = FALSE;
 #define CMT_HISTORY	 N_("Use URL history")
 #define CMT_HISTSIZE     N_("Number of remembered URL")
 #define CMT_SAVEHIST     N_("Save URL history")
-#define CMT_LOADSESS	 N_("Restore session on start")
-#define CMT_STORE	 N_("Store session on quit")
 #define CMT_FRAME        N_("Render frames automatically")
 #define CMT_ARGV_IS_URL  N_("Treat argument without scheme as URL")
 #define CMT_TSELF        N_("Use _self as default target")
@@ -517,7 +515,6 @@ struct param_ptr params3[] = {
     {"history", P_INT, PI_TEXT, (void *)&URLHistSize, CMT_HISTSIZE, NULL},
     {"save_hist", P_INT, PI_ONOFF, (void *)&SaveURLHist, CMT_SAVEHIST, NULL},
 #endif				/* USE_HISTORY */
-    {"store_session", P_INT, PI_ONOFF, (void *)&StoreSession, CMT_STORE, NULL},
     {"confirm_qq", P_INT, PI_ONOFF, (void *)&confirm_on_quit, CMT_CONFIRM_QQ,
      NULL},
     {"exit_on_last", P_INT, PI_ONOFF, (void *)&exit_on_last, CMT_EXIT_ON_LAST,
