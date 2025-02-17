@@ -428,7 +428,6 @@ Date: Thu Dec 19 06:59:22 CET 2024
 +    return headerlist;
 +}
 +
-+
 +static Buffer *
 +do_curl(ParsedURL *url)
 +{
@@ -444,6 +443,7 @@ Date: Thu Dec 19 06:59:22 CET 2024
 +    TextList *headerlist;
 +    char *p, *q;
 +    wc_ces charset;
++    int cs = 0;
 +
 +    curl = curl_easy_init();
 +    s = Strnew();
@@ -481,7 +481,7 @@ Date: Thu Dec 19 06:59:22 CET 2024
 +	if (!strncmp(q, "charset=", 8)) {
 +	    q += 8;
 +	    charset = wc_charset_to_ces(q);
-+	    q = p;
++	    cs = 1;
 +	}
 +    }
 +
@@ -493,7 +493,7 @@ Date: Thu Dec 19 06:59:22 CET 2024
 +    parseURL2(u, &pu, NULL);
 +    copyParsedURL(&buf->currentURL, &pu);
 +
-+    if (q && q == p)
++    if (cs)
 +	buf->document_charset = charset;
 +    buf->document_header = headerlist;
 +    buf->filename = Strnew_charp(url->file)->ptr;

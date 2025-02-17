@@ -1,4 +1,5 @@
 # Cookies
+0001-Add-session-store-and-restore-feature.patch
 Truncate-cookie-file-if-no-cookies-left.patch
 Move-declarations-to-appropriate-header.patch
 Refactor-load-cookies.patch
@@ -60,6 +61,7 @@ Use-confirm-in-quitfm.patch
 Add-command-to-protect-buffers.patch
 Improve-protected-buffers.patch
 Fix-link-numbers-in-tables.patch
+Fix-default-dl-dir.patch
 Change-filename-when-saving-compressed-source.patch
 libcurl.patch
 lto.patch

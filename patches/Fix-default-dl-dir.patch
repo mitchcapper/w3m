@@ -1,0 +1,18 @@
+From: Rene Kita <mail@rkta.de>
+Date: Mon Feb 17 10:34:31 CET 2025
+
+---
+ file.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+--- a/file.c
++++ b/file.c
+@@ -8654,7 +8654,7 @@ doFileSave(URLFile uf, const char *defst
+     FILE *f;
+ #endif
+ 
+-    if (param_dl_dir) {
++    if (param_dl_dir && *param_dl_dir) {
+ 	filen = Strnew_charp(expandPath(param_dl_dir));
+ 	if (Strlastchar(filen) != '/')
+ 	    Strcat_char(filen, '/');
