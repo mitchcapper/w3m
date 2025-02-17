@@ -8370,7 +8370,7 @@ doFileSave(URLFile uf, const char *defstr)
     FILE *f;
 #endif
 
-    if (param_dl_dir) {
+    if (param_dl_dir && *param_dl_dir) {
 	filen = Strnew_charp(expandPath(param_dl_dir));
 	if (Strlastchar(filen) != '/')
 	    Strcat_char(filen, '/');
