@@ -2123,6 +2123,7 @@ loadGeneralFile(char *path, ParsedURL *volatile current, char *referer,
 
     if (real_type == NULL)
 	real_type = t;
+    proc = loadBuffer;
 
     current_content_length = 0;
     if ((p = checkHeader(t_buf, "Content-Length:")) != NULL)
