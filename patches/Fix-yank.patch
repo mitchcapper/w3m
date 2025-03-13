@@ -4,8 +4,8 @@ Subject: Fix yank
 Patch: patches/Fix-yank.patch
 
 ---
- linein.c |   31 +++++++++++++++++++++++++------
- 1 file changed, 25 insertions(+), 6 deletions(-)
+ linein.c |   32 +++++++++++++++++++++++++-------
+ 1 file changed, 25 insertions(+), 7 deletions(-)
 
 --- a/linein.c
 +++ b/linein.c
@@ -33,16 +33,17 @@ Patch: patches/Fix-yank.patch
  	    insC();
  	    strBuf->ptr[CPos] = c;
  	    if (!is_passwd && get_mctype(&c) == PC_CTRL)
-@@ -413,8 +416,6 @@ ins_char(Str str)
+@@ -413,9 +416,6 @@ ins_char(Str str)
  	    }
  	}
      }
--    Strfree(ynkBuf);
+-    if (ynkBuf)
+-	Strfree(ynkBuf);
 -    ynkBuf = NULL;
  }
  #endif
  
-@@ -495,8 +496,6 @@ delC(void)
+@@ -496,8 +496,6 @@ delC(void)
  
      if (CLen == CPos)
  	return;
@@ -51,7 +52,7 @@ Patch: patches/Fix-yank.patch
  #ifdef USE_M17N
      while (CPos + delta < CLen && strProp[CPos + delta] & PC_WCHAR2)
  	delta++;
-@@ -504,8 +503,14 @@ delC(void)
+@@ -505,8 +503,14 @@ delC(void)
      for (int i = CPos; i < CLen; i++)
  	strProp[i] = strProp[i + delta];
  
@@ -67,7 +68,7 @@ Patch: patches/Fix-yank.patch
      Strdelete(strBuf, CPos, delta);
      CLen -= delta;
  }
-@@ -524,6 +529,7 @@ _paste(void)
+@@ -525,6 +529,7 @@ _paste(void)
  {
      if (!ynkBuf) return;
      ins_char(ynkBuf);
@@ -75,7 +76,7 @@ Patch: patches/Fix-yank.patch
  }
  
  static void
-@@ -535,6 +541,7 @@ _mvL(void)
+@@ -536,6 +541,7 @@ _mvL(void)
      while (CPos > 0 && strProp[CPos] & PC_WCHAR2)
  	CPos--;
  #endif
@@ -83,7 +84,7 @@ Patch: patches/Fix-yank.patch
  }
  
  static void
-@@ -551,6 +558,7 @@ _mvLw(void)
+@@ -552,6 +558,7 @@ _mvLw(void)
  	if (!move_word)
  	    break;
      }
@@ -91,7 +92,7 @@ Patch: patches/Fix-yank.patch
  }
  
  static void
-@@ -567,6 +575,7 @@ _mvRw(void)
+@@ -568,6 +575,7 @@ _mvRw(void)
  	if (!move_word)
  	    break;
      }
@@ -99,7 +100,7 @@ Patch: patches/Fix-yank.patch
  }
  
  static void
-@@ -578,13 +587,18 @@ _mvR(void)
+@@ -579,13 +587,18 @@ _mvR(void)
      while (CPos < CLen && strProp[CPos] & PC_WCHAR2)
  	CPos++;
  #endif
@@ -118,7 +119,7 @@ Patch: patches/Fix-yank.patch
  	delC();
      }
  }
-@@ -592,9 +606,12 @@ _bs(void)
+@@ -593,9 +606,12 @@ _bs(void)
  static void
  _bsw(void)
  {
@@ -132,7 +133,7 @@ Patch: patches/Fix-yank.patch
  	t = (move_word && terminated(strBuf->ptr[CPos - 1]));
  	delC();
      }
-@@ -630,12 +647,14 @@ static void
+@@ -631,12 +647,14 @@ static void
  _mvB(void)
  {
      CPos = 0;

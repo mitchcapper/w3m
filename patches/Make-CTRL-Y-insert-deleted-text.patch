@@ -3,11 +3,13 @@ Date: Sat Aug 24 13:53:29 CEST 2024
 Subject: Make CTRL Y insert deleted text
 Patch: patches/Make-CTRL-Y-insert-deleted-text.patch
 
+WIP Needs Strfree fix and Fix-yank.patch(?)
+
 ---
  fm.h     |    1 +
- linein.c |   46 +++++++++++++++++++++++++++++++++++++++-------
+ linein.c |   47 ++++++++++++++++++++++++++++++++++++++++-------
  rc.c     |    3 +++
- 3 files changed, 43 insertions(+), 7 deletions(-)
+ 3 files changed, 44 insertions(+), 7 deletions(-)
 
 --- a/linein.c
 +++ b/linein.c
@@ -52,16 +54,17 @@ Patch: patches/Make-CTRL-Y-insert-deleted-text.patch
  	     ((cm_mode & CPL_ON) && (c == CTRL_I)))) {
  	    if (emacs_like_lineedit && cm_next) {
  		_dcompl();
-@@ -407,6 +409,8 @@ ins_char(Str str)
+@@ -407,6 +409,9 @@ ins_char(Str str)
  	    }
  	}
      }
-+    Strfree(ynkBuf);
++    if (ynkBuf)
++	Strfree(ynkBuf);
 +    ynkBuf = NULL;
  }
  #endif
  
-@@ -483,23 +487,51 @@ insC(void)
+@@ -483,23 +488,51 @@ insC(void)
  static void
  delC(void)
  {

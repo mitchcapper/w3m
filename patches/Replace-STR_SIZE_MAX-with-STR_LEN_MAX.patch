@@ -92,7 +92,7 @@ Use a STR_LEN_MAX to avoid dealing with of by errors.
  #define Strcasecmp(x,y)              strcasecmp((x)->ptr,(y)->ptr)
 --- a/linein.c
 +++ b/linein.c
-@@ -506,7 +506,7 @@ delC(void)
+@@ -507,7 +507,7 @@ delC(void)
  
      if (!is_passwd) {
  	while (ynkBuf->length + delta > ynkBuf->area_size) {

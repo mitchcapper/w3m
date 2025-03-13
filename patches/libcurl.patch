@@ -3,8 +3,9 @@ Date: Thu Dec 19 06:59:22 CET 2024
 
 ---
  Makefile.in |    2 
- file.c      |  488 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 489 insertions(+), 1 deletion(-)
+ cookie.c    |   52 +++++
+ file.c      |  536 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 589 insertions(+), 1 deletion(-)
 
 --- a/file.c
 +++ b/file.c
@@ -17,7 +18,7 @@ Date: Thu Dec 19 06:59:22 CET 2024
  #ifndef max
  #define max(a,b)        ((a) > (b) ? (a) : (b))
  #endif				/* not max */
-@@ -1679,6 +1681,490 @@ getLinkNumberStr(int correction)
+@@ -1679,6 +1681,538 @@ getLinkNumberStr(int correction)
      return Sprintf("[%d]", cur_hseq + correction - !!zeroBasedLinkNo);
  }
  
@@ -232,20 +233,15 @@ Date: Thu Dec 19 06:59:22 CET 2024
 +static TextList *
 +readCurlHeader(CURL *curl)
 +{
-+    ParsedURL *pu, _pu;
++    ParsedURL pu;
 +    Str tmp, lineBuf2 = NULL;
 +    TextList *headerlist;
-+    char *p, *q, *url;
++    char *url;
 +    long code, http_version;
 +    struct curl_header *head, *prev = NULL;
 +
-+#ifdef USE_COOKIE
-+    const char *emsg;
-+#endif
-+
 +    if (curl_easy_getinfo(curl, CURLINFO_EFFECTIVE_URL, &url)) exit(1);
-+    pu = &_pu;
-+    parseURL2(url, pu, NULL);
++    parseURL2(url, &pu, NULL);
 +
 +    headerlist = newTextList();
 +    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &code);
@@ -258,6 +254,32 @@ Date: Thu Dec 19 06:59:22 CET 2024
 +	message(http_response->ptr, 0, 0);
 +	refresh();
 +    }
++
++#if 0
++    Str
++	domain,
++	/* include subdomains */
++	path,
++	name,
++	value;
++    int flag = 0;
++    time_t expires = (time_t) - 1;
++    CURLHcode h;
++    struct curl_slist *cookies = NULL;
++    h = curl_easy_getinfo(curl, CURLINFO_COOKIELIST, &cookies);
++    if (h != CURLHE_OK) exit(1);
++    for (struct curl_slist *c = cookies; c; c = c->next) {
++	domain = Strnew_charp(strtok(Strnew_charp(c->data)->ptr, "\t"));
++	strtok(NULL, "\t"); /* include subdomains */
++	path = Strnew_charp(strtok(NULL, "\t"));
++	!strcmp(strtok(NULL, "\t"), "TRUE") ? flag |= COO_SECURE : 0 ;
++	expires = atoi(Strnew_charp(strtok(NULL, "\t"))->ptr);
++	name = Strnew_charp(strtok(NULL, "\t"));
++	value = Strnew_charp(strtok(NULL, "\t"));
++	add_cookie(&pu, name, value, expires, domain, path, flag,
++		   NULL, 0, NULL, NULL);
++    }
++#endif
 +
 +    while((head = curl_easy_nextheader(curl, CURLH_HEADER, 0, prev))) {
 +	prev = head;
@@ -283,14 +305,16 @@ Date: Thu Dec 19 06:59:22 CET 2024
 +	    lineBuf2 = tmp;
 +	}
 +#ifdef USE_COOKIE
++	const char *emsg;
 +	if (use_cookie && accept_cookie &&
-+		 pu && check_cookie_accept_domain(pu->host) &&
++		 check_cookie_accept_domain(pu.host) &&
 +		 (!strncasecmp(lineBuf2->ptr, "Set-Cookie:", 11) ||
 +		  !strncasecmp(lineBuf2->ptr, "Set-Cookie2:", 12))) {
 +	    Str name = Strnew(), value = Strnew(), domain = NULL, path = NULL,
 +		comment = NULL, commentURL = NULL, port = NULL, tmp2;
 +	    int version, quoted, flag = 0;
 +	    time_t expires = (time_t) - 1;
++	    char *p, *q;
 +
 +	    q = NULL;
 +	    if (lineBuf2->ptr[10] == '2') {
@@ -301,9 +325,6 @@ Date: Thu Dec 19 06:59:22 CET 2024
 +		p = lineBuf2->ptr + 11;
 +		version = 0;
 +	    }
-+#ifdef DEBUG
-+	    fprintf(stderr, "Set-Cookie: [%s]\n", p);
-+#endif				/* DEBUG */
 +	    SKIP_BLANKS(p);
 +	    while (*p != '=' && !IS_ENDT(*p))
 +		Strcat_char(name, *(p++));
@@ -367,7 +388,7 @@ Date: Thu Dec 19 06:59:22 CET 2024
 +		    p++;
 +		}
 +	    }
-+	    if (pu && name->length > 0) {
++	    if (name->length > 0) {
 +		int err;
 +		if (show_cookie) {
 +		    if (flag & COO_SECURE)
@@ -379,14 +400,14 @@ Date: Thu Dec 19 06:59:22 CET 2024
 +				      FALSE, 1, TRUE, FALSE);
 +		}
 +		err =
-+		    add_cookie(pu, name, value, expires, domain, path, flag,
++		    add_cookie(&pu, name, value, expires, domain, path, flag,
 +			       comment, version, port, commentURL);
 +		if (err) {
 +		    int ans = (accept_bad_cookie == ACCEPT_BAD_COOKIE_ACCEPT);
 +		    if (fmInitialized && (err & COO_OVERRIDE_OK) &&
 +			accept_bad_cookie == ACCEPT_BAD_COOKIE_ASK) {
 +			Str msg = Sprintf("Accept bad cookie from %s for %s?",
-+					  pu->host,
++					  pu.host,
 +					  ((domain && domain->ptr)
 +					   ? domain->ptr : "<localdomain>"));
 +			if (msg->length > COLS - 10)
@@ -395,7 +416,7 @@ Date: Thu Dec 19 06:59:22 CET 2024
 +		    }
 +		    if (!ans ||
 +			(err =
-+			 add_cookie(pu, name, value, expires, domain, path,
++			 add_cookie(&pu, name, value, expires, domain, path,
 +				    flag | COO_OVERRIDE, comment, version,
 +				    port, commentURL))) {
 +			err = (err & ~COO_OVERRIDE_OK) - 1;
@@ -420,6 +441,7 @@ Date: Thu Dec 19 06:59:22 CET 2024
 +	    }
 +	}
 +#endif				/* USE_COOKIE */
++
 +	pushText(headerlist, lineBuf2->ptr);
 +	Strfree(lineBuf2);
 +	lineBuf2 = NULL;
@@ -438,11 +460,11 @@ Date: Thu Dec 19 06:59:22 CET 2024
 +    CURLHcode h;
 +    CURLcode res;
 +    FILE *fp;
-+    Str fn, s, type;
++    Str cookie, fn, s, type;
 +    struct curl_header *head;
 +    TextList *headerlist;
 +    char *p, *q;
-+    wc_ces charset;
++    wc_ces charset = 0;
 +    int cs = 0;
 +
 +    curl = curl_easy_init();
@@ -464,6 +486,33 @@ Date: Thu Dec 19 06:59:22 CET 2024
 +    curl_easy_setopt(curl, CURLOPT_URL, parsedURL2Str(url)->ptr);
 +    curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp) ;
 +    curl_easy_setopt(curl, CURLOPT_USERAGENT, VERSION);
++
++#ifdef USE_COOKIE
++    /* Enable cookie engine by setting an empty file */
++    if (use_cookie)
++	curl_easy_setopt(curl, CURLOPT_COOKIEFILE, "");
++#endif
++
++#if 0
++#define SEP  "\t"  /* Tab separates the fields */
++    const char *my_cookie =
++	"localhost"    /* Hostname */
++	SEP "FALSE"      /* Include subdomains */
++	SEP "/"          /* Path */
++	SEP "FALSE"      /* Secure */
++	SEP "0"          /* Expiry in epoch time format. 0 == Session */
++	SEP "foo"        /* Name */
++	SEP "bar";       /* Value */
++
++    h = curl_easy_setopt(curl, CURLOPT_COOKIELIST, my_cookie);
++#endif
++
++#ifdef USE_COOKIE
++    if (use_cookie && (cookie = find_cookie(url)) && cookie->ptr) {
++	h = curl_easy_setopt(curl, CURLOPT_COOKIE, cookie->ptr);
++	if (h != CURLHE_OK) exit(1);
++    }
++#endif				/* USE_COOKIE */
 +
 +    /* send a request */
 +    if ((res = curl_easy_perform(curl)))
@@ -508,7 +557,7 @@ Date: Thu Dec 19 06:59:22 CET 2024
  /* 
   * loadGeneralFile: load file to buffer
   */
-@@ -1734,6 +2220,8 @@ loadGeneralFile(char *path, ParsedURL *v
+@@ -1734,6 +2268,8 @@ loadGeneralFile(char *path, ParsedURL *v
  	    goto load_doc;
  	}
      }
@@ -528,3 +577,64 @@ Date: Thu Dec 19 06:59:22 CET 2024
  GC_LIBS = @LIBGC@
  EXT_LIBS = -L. -lindep @LIBINTL@ $(GC_LIBS)
  W3M_LIBS = @W3M_LIBS@
+--- a/cookie.c
++++ b/cookie.c
+@@ -209,6 +209,58 @@ get_cookie_info(struct cookie *first_nod
+     return NULL;
+ }
+ 
++#if 0
++Str
++curl_cookie(ParsedURL *pu)
++{
++    Str tmp;
++    struct cookie *p, *p1, *fco = NULL;
++    int version = 0;
++    char *fq_domainname, *domainname;
++
++    fq_domainname = FQDN(pu->host);
++    check_expired_cookies();
++    for (p = First_cookie; p; p = p->next) {
++	domainname = (p->version == 0) ? fq_domainname : pu->host;
++	if (p->flag & COO_USE && match_cookie(pu, p, domainname)) {
++	    for (p1 = fco; p1 && Strcasecmp(p1->name, p->name);
++		 p1 = p1->next) ;
++	    if (p1)
++		continue;
++	    p1 = New(struct cookie);
++	    memmove(p1, p, sizeof(struct cookie));
++	    p1->next = fco;
++	    fco = p1;
++	    if (p1->version > version)
++		version = p1->version;
++	}
++    }
++
++    if (!fco)
++	return NULL;
++
++    tmp = Strnew();
++    if (version > 0)
++	Strcat(tmp, Sprintf("$Version=\"%d\"; ", version));
++
++    Strcat(tmp, make_cookie(fco));
++    for (p1 = fco->next; p1; p1 = p1->next) {
++	Strcat_charp(tmp, "; ");
++	Strcat(tmp, make_cookie(p1));
++	if (version > 0) {
++	    if (p1->flag & COO_PATH)
++		Strcat(tmp, Sprintf("; $Path=\"%s\"", p1->path->ptr));
++	    if (p1->flag & COO_DOMAIN)
++		Strcat(tmp, Sprintf("; $Domain=\"%s\"", p1->domain->ptr));
++	    if (p1->portl)
++		Strcat(tmp,
++		       Sprintf("; $Port=\"%s\"", portlist2str(p1->portl)->ptr));
++	}
++    }
++    return tmp;
++}
++#endif
++
+ Str
+ find_cookie(ParsedURL *pu)
+ {

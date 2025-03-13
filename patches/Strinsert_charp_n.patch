@@ -11,7 +11,7 @@ Patch: patches/Strinsert_charp_n.patch
 
 --- a/linein.c
 +++ b/linein.c
-@@ -504,17 +504,8 @@ delC(void)
+@@ -505,17 +505,8 @@ delC(void)
      for (int i = CPos; i < CLen; i++)
  	strProp[i] = strProp[i + delta];
  

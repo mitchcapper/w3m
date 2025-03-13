@@ -61,7 +61,6 @@ Use-confirm-in-quitfm.patch
 Add-command-to-protect-buffers.patch
 Improve-protected-buffers.patch
 Fix-link-numbers-in-tables.patch
-Fix-default-dl-dir.patch
 Change-filename-when-saving-compressed-source.patch
 libcurl.patch
 lto.patch

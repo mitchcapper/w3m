@@ -46,7 +46,7 @@ Patch: patches/scan-build-issues.patch
  		else
 --- a/linein.c
 +++ b/linein.c
-@@ -422,7 +422,7 @@ _esc(void)
+@@ -423,7 +423,7 @@ _esc(void)
      switch (c = getch()) {
      case '[':
      case 'O':
