@@ -6,7 +6,7 @@ packages:
   - gettext-tools
 triggers:
   - action: email
-    condition: failure
+    condition: always
     to: mail@rkta.de
 environment:
   OPTS: '-Werror -flto -Wno-invalid-source-encoding'
