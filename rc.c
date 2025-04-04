@@ -407,8 +407,6 @@ struct param_ptr params1[] = {
      NULL},
     {"display_link_number", P_INT, PI_ONOFF, (void *)&displayLinkNumber,
      CMT_DISPLINKNUMBER, NULL},
-    {"zero_based_link_no", P_INT, PI_ONOFF, (void *)&zeroBasedLinkNo,
-     CMT_ZEROBASEDLINKNO, NULL},
     {"decode_url", P_INT, PI_ONOFF, (void *)&DecodeURL, CMT_DECODE_URL, NULL},
     {"display_lineinfo", P_INT, PI_ONOFF, (void *)&displayLineInfo,
      CMT_DISPLINEINFO, NULL},
@@ -793,6 +791,12 @@ struct param_ptr params10[] = {
 };
 #endif
 
+struct param_ptr params11[] = {	/* experimental */
+    {"zero_based_link_no", P_INT, PI_ONOFF, (void *)&zeroBasedLinkNo,
+     CMT_ZEROBASEDLINKNO, NULL},
+    {NULL, 0, 0, NULL, NULL, NULL}
+};
+
 struct param_section sections[] = {
     {N_("Display Settings"), params1},
 #ifdef USE_COLOR
@@ -812,6 +816,7 @@ struct param_section sections[] = {
 #ifdef USE_M17N
     {N_("Charset Settings"), params10},
 #endif
+    {N_("Experimental Features"), params11},
     {NULL, NULL}
 };
 
