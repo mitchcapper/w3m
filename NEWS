@@ -24,12 +24,14 @@ Unreleased
   - Add option exit_on_last to close the last buffer with BACK(B)
   - Add gophers support
   - Display an error if the users enters an unknown command via COMMAND
-  - Add option for zero based link numbers (zero_based_link_no)
   - Prepend https instead of http if the URL has no scheme
   - Add option to change the dictionary prompt (dictprompt)
   - Add command to jump to the line which contains the <main> tag (MAIN)
   - Enable using 'skip to content' links
   - Improved image documentation
+
+* new experimental features
+  - Add option for zero based link numbers (zero_based_link_no)
 
 * bug fixes
   - Create history file if it does not exist
