@@ -46,9 +46,12 @@ syncUrlHistory(void)
     HistItem *item;
     struct stat st;
 
-    if (stat(rcFile(HISTORY_FILE), &st))
-	if (errno != ENOENT)
+    if (stat(rcFile(HISTORY_FILE), &st)) {
+	if (errno == ENOENT)
+	    return 0;
+	else
 	    goto err;
+    }
 
     if (URLHist->mtime == (long long)st.st_mtime)
 	return 0;
