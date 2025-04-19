@@ -2123,6 +2123,7 @@ loadGeneralFile(char *path, ParsedURL *volatile current, char *referer,
 
     if (real_type == NULL)
 	real_type = t;
+    proc = loadBuffer;
 
     current_content_length = 0;
     if ((p = checkHeader(t_buf, "Content-Length:")) != NULL)
@@ -4314,6 +4315,14 @@ process_idattr(struct readbuffer *obuf, int cmd, struct parsed_tag *tag)
     if (h_env->envc_real-- < h_env->nenv) \
       h_env->envc--;
 
+#define CLOSE_DD do { \
+    if (h_env->envc > 0 && envs[h_env->envc].env == HTML_DD) { \
+	flushline(h_env, obuf, envs[h_env->envc - 1].indent, 0, \
+		  h_env->limit); \
+	POP_ENV; \
+    } \
+} while (0)
+
 static int
 ul_type(struct parsed_tag *tag, int default_type)
 {
@@ -4551,6 +4560,8 @@ HTMLtagproc1(struct parsed_tag *tag, struct html_feed_environ *h_env)
     case HTML_N_BLQ:
     case HTML_N_DD:
 	CLOSE_DT;
+	if (cmd == HTML_N_DL)
+	    CLOSE_DD;
 	CLOSE_A;
 	if (h_env->envc > 0) {
 	    flushline(h_env, obuf, envs[h_env->envc - 1].indent, 0,
@@ -4667,6 +4678,7 @@ HTMLtagproc1(struct parsed_tag *tag, struct html_feed_environ *h_env)
 	return 1;
     case HTML_DT:
 	CLOSE_A;
+	CLOSE_DD;
 	if (h_env->envc == 0 ||
 	    (h_env->envc_real < h_env->nenv &&
 	     envs[h_env->envc].env != HTML_DL &&
@@ -4701,12 +4713,9 @@ HTMLtagproc1(struct parsed_tag *tag, struct html_feed_environ *h_env)
 	    PUSH_ENV(HTML_DD);
 	}
 
-	if (h_env->envc > 0 && envs[h_env->envc - 1].env == HTML_DL_COMPACT) {
-	    if (obuf->pos > envs[h_env->envc].indent)
-		flushline(h_env, obuf, envs[h_env->envc].indent, 0,
-			  h_env->limit);
-	    else
-		push_spaces(obuf, 1, envs[h_env->envc].indent - obuf->pos);
+	if (h_env->envc > 0 && envs[h_env->envc - 1].env == HTML_DL_COMPACT
+	    && obuf->pos <= envs[h_env->envc].indent) {
+	    push_spaces(obuf, 1, envs[h_env->envc].indent - obuf->pos);
 	}
 	else
 	    flushline(h_env, obuf, envs[h_env->envc].indent, 0, h_env->limit);

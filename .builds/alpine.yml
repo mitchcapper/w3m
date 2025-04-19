@@ -16,7 +16,7 @@ packages:
   - tcc-libs-static
 triggers:
   - action: email
-    condition: failure
+    condition: always
     to: mail@rkta.de
 environment:
   OPTS: '-Werror -flto -Wno-stringop-overflow'

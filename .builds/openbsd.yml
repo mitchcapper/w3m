@@ -7,7 +7,7 @@ packages:
   - quilt
 triggers:
   - action: email
-    condition: failure
+    condition: always
     to: mail@rkta.de
 environment:
   OPTS: '-Werror -flto -Wno-invalid-source-encoding -Wno-error=unknown-warning-option'
