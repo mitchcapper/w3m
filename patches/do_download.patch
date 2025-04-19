@@ -155,7 +155,7 @@ Next step: use 'flags' parameter for all options, include do_download.
  	    char *file;
  	    if (!src)
  		return NULL;
-@@ -2287,11 +2286,7 @@ fail:
+@@ -2288,11 +2287,7 @@ fail:
      current_content_length = 0;
      if ((p = checkHeader(t_buf, "Content-Length:")) != NULL)
  	current_content_length = strtoclen(p);
@@ -168,7 +168,7 @@ Next step: use 'flags' parameter for all options, include do_download.
  	/* download only */
  	char *file;
  	TRAP_OFF;
-@@ -2359,11 +2354,7 @@ fail:
+@@ -2360,11 +2355,7 @@ fail:
  #endif
      else if (w3m_backend) ;
      else if (!(w3m_dump & ~DUMP_FRAME) || is_dump_text_type(t)) {
@@ -285,7 +285,7 @@ Next step: use 'flags' parameter for all options, include do_download.
      if (buf == NULL) {
  	char *emsg = Sprintf(_("%s not found"), conv_from_system(fn))->ptr;
  	disp_err_message(emsg, FALSE);
-@@ -3089,7 +3092,8 @@ loadLink(char *url, char *target, char *
+@@ -3083,7 +3086,8 @@ loadLink(char *url, char *target, char *
  	referer = NO_REFERER;
      if (referer == NULL)
  	referer = parsedURL2RefererStr(&Currentbuf->currentURL)->ptr;
@@ -295,7 +295,7 @@ Next step: use 'flags' parameter for all options, include do_download.
      if (buf == NULL) {
  	char *emsg = Sprintf("Can't load %s", url)->ptr;
  	disp_err_message(emsg, FALSE);
-@@ -3316,7 +3320,7 @@ DEFUN(followI, VIEW_IMAGE, "Display imag
+@@ -3310,7 +3314,7 @@ DEFUN(followI, VIEW_IMAGE, "Display imag
  	return;
      message(Sprintf(_("loading %s"), a->url)->ptr, 0, 0);
      refresh();
@@ -304,7 +304,7 @@ Next step: use 'flags' parameter for all options, include do_download.
      if (buf == NULL) {
  	char *emsg = Sprintf(_("Can't load %s"), a->url)->ptr;
  	disp_err_message(emsg, FALSE);
-@@ -4404,7 +4408,7 @@ cmd_loadURL(char *url, ParsedURL *curren
+@@ -4398,7 +4402,7 @@ cmd_loadURL(char *url, ParsedURL *curren
  	return;
  
      refresh();
@@ -313,7 +313,7 @@ Next step: use 'flags' parameter for all options, include do_download.
      if (buf == NULL) {
  	char *emsg = Sprintf(_("Can't load %s"), conv_from_system(url))->ptr;
  	disp_err_message(emsg, FALSE);
-@@ -5324,7 +5328,8 @@ DEFUN(reload, RELOAD, "Load current docu
+@@ -5318,7 +5322,8 @@ DEFUN(reload, RELOAD, "Load current docu
  #endif
      SearchHeader = Currentbuf->search_header;
      DefaultType = Currentbuf->real_type;
@@ -323,7 +323,7 @@ Next step: use 'flags' parameter for all options, include do_download.
  #ifdef USE_M17N
      DocumentCharset = old_charset;
  #endif
-@@ -6216,7 +6221,7 @@ execdict(char *word)
+@@ -6210,7 +6215,7 @@ execdict(char *word)
      }
      dictcmd = Sprintf("%s?%s", DictCommand,
  		      Str_form_quote(Strnew_charp(w))->ptr)->ptr;

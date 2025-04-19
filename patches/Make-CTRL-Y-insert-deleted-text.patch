@@ -131,7 +131,7 @@ WIP Needs Strfree fix and Fix-yank.patch(?)
  global int label_topline init(FALSE);
 --- a/rc.c
 +++ b/rc.c
-@@ -148,6 +148,7 @@ static int OptionEncode = FALSE;
+@@ -146,6 +146,7 @@ static int OptionEncode = FALSE;
  #define CMT_USE_MARK	N_("Enable mark operations")
  #endif
  #define CMT_EMACS_LIKE_LINEEDIT	N_("Enable Emacs-style line editing")
@@ -139,7 +139,7 @@ WIP Needs Strfree fix and Fix-yank.patch(?)
  #define CMT_SPACE_AUTOCOMPLETE  N_("Space key triggers file completion while editing URLs")
  #define CMT_VI_PREC_NUM	 N_("Enable vi-like numeric prefix")
  #define CMT_LABEL_TOPLINE N_("Move cursor to top line when going to label")
-@@ -534,6 +535,8 @@ struct param_ptr params3[] = {
+@@ -529,6 +530,8 @@ struct param_ptr params3[] = {
  #endif
      {"emacs_like_lineedit", P_INT, PI_ONOFF, (void *)&emacs_like_lineedit,
       CMT_EMACS_LIKE_LINEEDIT, NULL},

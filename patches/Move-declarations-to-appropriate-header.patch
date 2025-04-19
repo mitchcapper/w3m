@@ -148,7 +148,7 @@ Move declarations, delete unused auth_cookie.
  global char *mailcap_files init(USER_MAILCAP ", " SYS_MAILCAP);
  global char *mimetypes_files init(USER_MIMETYPES ", " SYS_MIMETYPES);
  #ifdef USE_EXTERNAL_URI_LOADER
-@@ -1168,23 +1120,6 @@ global MouseAction mouse_action;
+@@ -1167,23 +1119,6 @@ global MouseAction mouse_action;
  #define LIMIT_MOUSE_MENU 100
  #endif				/* USE_MOUSE */
  

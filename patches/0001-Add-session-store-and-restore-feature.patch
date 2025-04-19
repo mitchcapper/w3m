@@ -4,32 +4,26 @@ Date: Sun, 24 Nov 2024 15:10:00 +0100
 Subject: [PATCH] Add session store and restore feature
 
 ---
- NEWS                   |   1 +
- config.h.in            |   1 +
- doc-de/README.func     |   1 +
- doc/README.func        |   1 +
- doc/w3m.1              |  15 ++++
- fm.h                   |   1 +
- main.c                 | 158 ++++++++++++++++++++++++++++++++++++++++-
- proto.h                |   1 +
- rc.c                   |   3 +
- scripts/w3mhelp.cgi.in |   3 +-
- 10 files changed, 181 insertions(+), 4 deletions(-)
+ NEWS                   |    1 
+ config.h.in            |    1 
+ doc-de/README.func     |    1 
+ doc/README.func        |    1 
+ doc/w3m.1              |   13 ++++
+ main.c                 |  152 ++++++++++++++++++++++++++++++++++++++++++++++++-
+ proto.h                |    1 
+ scripts/w3mhelp.cgi.in |    3 
+ 8 files changed, 169 insertions(+), 4 deletions(-)
 
-diff --git a/NEWS b/NEWS
-index 136a79f8..bb044546 100644
 --- a/NEWS
 +++ b/NEWS
 @@ -7,6 +7,7 @@ Unreleased
  * new features
    - Add command to save the history (SAVE_HISTORY)
    - Add option to set a default download directory (dl_dir)
-+  - Add feature to store and restore sessions (STORE, -o store_session, -R)
++  - Add feature to store and restore sessions (STORE, -R)
    - Add command to navigate between image links directly (NEXT_IMAGE,
      PREV_IMAGE)
    - Add command to display user-defined messages (MESSAGE),
-diff --git a/config.h.in b/config.h.in
-index f004f88a..bde5564a 100644
 --- a/config.h.in
 +++ b/config.h.in
 @@ -22,6 +22,7 @@
@@ -40,11 +34,9 @@ index f004f88a..bde5564a 100644
  
  #define PASSWD_FILE	RC_DIR "/passwd"
  #define PRE_FORM_FILE	RC_DIR "/pre_form"
-diff --git a/doc-de/README.func b/doc-de/README.func
-index f8f139bb..8f127f5c 100644
 --- a/doc-de/README.func
 +++ b/doc-de/README.func
-@@ -133,6 +133,7 @@ SHIFT_LEFT	Anzeigebereich nach links versetzen
+@@ -133,6 +133,7 @@ SHIFT_LEFT	Anzeigebereich nach links ver
  SHIFT_RIGHT	Anzeigebereich nach rechts versetzen
  SOURCE		Wechsle zwischen HTML-Wiedergabe und -Verarbeitung
  STOP_IMAGE	Bilder nicht mehr laden und anzeigen
@@ -52,8 +44,6 @@ index f8f139bb..8f127f5c 100644
  SUBMIT		Formular übermitteln
  SUSPEND 	w3m zum Hintergrundprozess machen
  TAB_GOTO	Öffne das angegebene Dokument in einem neuen Reiter
-diff --git a/doc/README.func b/doc/README.func
-index 37752a16..b833444f 100644
 --- a/doc/README.func
 +++ b/doc/README.func
 @@ -136,6 +136,7 @@ SHIFT_LEFT	Shift screen left
@@ -64,8 +54,6 @@ index 37752a16..b833444f 100644
  SUBMIT		Submit form
  SUSPEND 	Suspend w3m to background
  TAB_GOTO	Open specified document in a new tab
-diff --git a/doc/w3m.1 b/doc/w3m.1
-index 0ae07248..1b947a04 100644
 --- a/doc/w3m.1
 +++ b/doc/w3m.1
 @@ -62,6 +62,9 @@ use -o high-intensity=true instead
@@ -78,7 +66,7 @@ index 0ae07248..1b947a04 100644
  \fB\-no-mouse\fP
  deactivate mouse support
  .TP
-@@ -204,6 +207,9 @@ use \fIfile\fR instead of the default bookmark.html file
+@@ -204,6 +207,9 @@ use \fIfile\fR instead of the default bo
  \fB\-config \fIfile\fR
  use \fIfile\fR instead of the default configuration file
  .TP
@@ -88,7 +76,7 @@ index 0ae07248..1b947a04 100644
  \fB\-o \fIoption=value\fR
  modify one configuration item with an explicitly given value;
  without \fIoption=value\fR, equivalent to \fB\-show-option\fR
-@@ -213,6 +219,15 @@ use debug mode (only for debugging)
+@@ -213,6 +219,13 @@ use debug mode (only for debugging)
  .TP
  \fB\-reqlog\fP
  log headers of HTTP communication in file \f(CW~/.w3m/request.log\fP
@@ -97,27 +85,11 @@ index 0ae07248..1b947a04 100644
 +If no session file is provided with \fB\-session\fR the default session file is used.
 +The default session file will be deleted after restoring a session when exiting w3m.
 +If a session file is given it will not be deleted.
-+Without a given session file, when manually storing a session, w3m will ask for a filename.
-+Automatic session storing can be configured via the options.
 +If URLs or files were given as parameters they will be loaded after restoring the session and added to the first tab.
 +If \-N and \-R are given the old session is restored as is and any new buffer are opened in separate tabs.
  .SH EXAMPLES
  .SS Pager-like usage
  .TP
-diff --git a/fm.h b/fm.h
-index e2a32db9..f9092a14 100644
---- a/fm.h
-+++ b/fm.h
-@@ -1085,6 +1085,7 @@ global int UseHistory init(TRUE);
- global int URLHistSize init(100);
- global int SaveURLHist init(TRUE);
- #endif				/* USE_HISTORY */
-+global int StoreSession init(FALSE);
- global int multicolList init(FALSE);
- 
- #ifdef USE_M17N
-diff --git a/main.c b/main.c
-index 534c06d8..c65671fa 100644
 --- a/main.c
 +++ b/main.c
 @@ -1,5 +1,6 @@
@@ -279,27 +251,7 @@ index 534c06d8..c65671fa 100644
  	}
  	else {
  	    Currentbuf->nextBuffer = newbuf;
-@@ -2533,6 +2610,10 @@ _quitfm(int confirm)
- 	return;
-     }
- 
-+    if (StoreSession)
-+	if (_strSession(NULL))
-+	    return;
-+
-     term_title("");		/* XXX */
- #ifdef USE_IMAGE
-     if (activeImage)
-@@ -2546,6 +2627,8 @@ _quitfm(int confirm)
-     if (UseHistory && SaveURLHist)
- 	saveUrlHistory();
- #endif				/* USE_HISTORY */
-+    if (session_bak)
-+	unlink(session_bak);
-     if (deprecated)
- 	fprintf(stderr, "%s\n%s\n%s\n",
- 		"DEPRECATION WARNING",
-@@ -4427,6 +4510,75 @@ DEFUN(adBmark, ADD_BOOKMARK, "Add current page to bookmarks")
+@@ -4427,6 +4504,75 @@ DEFUN(adBmark, ADD_BOOKMARK, "Add curren
  		request);
  }
  
@@ -316,7 +268,7 @@ index 534c06d8..c65671fa 100644
 +	sf = session_file ? session_file : rcFile(SESSION_FILE);
 +
 +    while (stat(sf, &st) == 0) {
-+	Str msg = Strnew_m_charp(_("Session file exists. Overwrite? [N]"));
++	Str msg = Strnew_charp(_("Session file exists. Overwrite? [N]"));
 +	ans = inputAnswer(msg->ptr);
 +	if (ans && TOLOWER(*ans) == 'y')
 +	    break;
@@ -375,8 +327,6 @@ index 534c06d8..c65671fa 100644
  /* option setting */
  DEFUN(ldOpt, OPTIONS, "Display options setting panel")
  {
-diff --git a/proto.h b/proto.h
-index 25af9fbf..327b6275 100644
 --- a/proto.h
 +++ b/proto.h
 @@ -87,6 +87,7 @@ extern void goMain(void);
@@ -387,32 +337,9 @@ index 25af9fbf..327b6275 100644
  extern void ldOpt(void);
  extern void setOpt(void);
  extern void pginfo(void);
-diff --git a/rc.c b/rc.c
-index 70c2dd75..4f420e39 100644
---- a/rc.c
-+++ b/rc.c
-@@ -71,6 +71,8 @@ static int OptionEncode = FALSE;
- #define CMT_HISTORY	 N_("Use URL history")
- #define CMT_HISTSIZE     N_("Number of remembered URL")
- #define CMT_SAVEHIST     N_("Save URL history")
-+#define CMT_LOADSESS	 N_("Restore session on start")
-+#define CMT_STORE	 N_("Store session on quit")
- #define CMT_FRAME        N_("Render frames automatically")
- #define CMT_ARGV_IS_URL  N_("Treat argument without scheme as URL")
- #define CMT_TSELF        N_("Use _self as default target")
-@@ -515,6 +517,7 @@ struct param_ptr params3[] = {
-     {"history", P_INT, PI_TEXT, (void *)&URLHistSize, CMT_HISTSIZE, NULL},
-     {"save_hist", P_INT, PI_ONOFF, (void *)&SaveURLHist, CMT_SAVEHIST, NULL},
- #endif				/* USE_HISTORY */
-+    {"store_session", P_INT, PI_ONOFF, (void *)&StoreSession, CMT_STORE, NULL},
-     {"confirm_qq", P_INT, PI_ONOFF, (void *)&confirm_on_quit, CMT_CONFIRM_QQ,
-      NULL},
-     {"exit_on_last", P_INT, PI_ONOFF, (void *)&exit_on_last, CMT_EXIT_ON_LAST,
-diff --git a/scripts/w3mhelp.cgi.in b/scripts/w3mhelp.cgi.in
-index 4744ee0f..266e8482 100644
 --- a/scripts/w3mhelp.cgi.in
 +++ b/scripts/w3mhelp.cgi.in
-@@ -170,7 +170,8 @@ print "<P><A HREF=\"$keymap\">$head</A>\n";
+@@ -170,7 +170,8 @@ print "<P><A HREF=\"$keymap\">$head</A>\
  	     split(" ", "_mark nextMk prevMk reMark"));
  
  &show_keymap('Miscellaneous',
@@ -422,6 +349,3 @@ index 4744ee0f..266e8482 100644
  		docCSet defCSet msgs userMessage
  		msToggle wrapToggle execCmd setAlarm setOpt setEnv defKey
  		reinit execsh susp qquitfm quitfm"));
--- 
-2.47.0.rc0
-

@@ -36,9 +36,9 @@ Patch: patches/Use-confirm-in-quitfm.patch
 +    else if (ask && !confirm(Strnew_charp(_("Do you want to exit w3m?"))))
 +	goto nope;
  
-     if (StoreSession)
- 	if (_strSession(NULL))
-@@ -2718,6 +2713,9 @@ _quitfm(int confirm)
+     term_title("");		/* XXX */
+ #ifdef USE_IMAGE
+@@ -2712,6 +2707,9 @@ _quitfm(int confirm)
  		"-H is deprecated and will be removed in the future.",
  		"Use -o highIntensityColors=true instead.");
      w3m_exit(0);

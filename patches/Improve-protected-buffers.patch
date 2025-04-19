@@ -85,7 +85,7 @@ Patch: patches/Improve-protected-buffers.patch
  	    switch (newbuf->real_scheme) {
  	    case SCM_MAILTO:
  		break;
-@@ -4544,17 +4568,20 @@ static void
+@@ -4538,17 +4562,20 @@ static void
  cmd_loadURL(char *url, ParsedURL *current, char *referer, FormList *request)
  {
      Buffer *buf;
@@ -106,7 +106,7 @@ Patch: patches/Improve-protected-buffers.patch
  	pushBuffer(buf);
  	if (RenderFrame && Currentbuf->frameset != NULL)
  	    rFrame();
-@@ -4626,8 +4653,6 @@ goURL0(const char *prompt, int relative)
+@@ -4620,8 +4647,6 @@ goURL0(const char *prompt, int relative)
  	gotoLabel(url + 1);
  	return;
      }
@@ -115,7 +115,7 @@ Patch: patches/Improve-protected-buffers.patch
      cmd_loadURL(url, current, referer, NULL);
      if (Currentbuf != cur_buf)	/* success */
  	pushHashHist(URLHist, parsedURL2Str(&Currentbuf->currentURL)->ptr);
-@@ -4746,7 +4771,9 @@ _strSession(char *sf)
+@@ -4740,7 +4765,9 @@ _strSession(char *sf)
  	    if (buf->bufferprop & BP_INTERNAL)
  		continue;
  	    if ((url = baseURL(buf)))

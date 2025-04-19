@@ -36,9 +36,9 @@ Protected buffers cannot be deleted with BACK.
      int err = 0;
  
      if (checkDownloadList()
-@@ -2690,6 +2691,10 @@ _quitfm(int ask)
- 	if (_strSession(NULL))
- 	    return;
+@@ -2686,6 +2687,10 @@ _quitfm(int ask)
+     else if (ask && !confirm(Strnew_charp(_("Do you want to exit w3m?"))))
+ 	goto nope;
  
 +    for (buf = Currentbuf; buf && !buf->protected; buf = buf->nextBuffer);
 +    if (buf && !confirm(Strnew_charp(_("Protected buffers, really quit?"))))
@@ -47,7 +47,7 @@ Protected buffers cannot be deleted with BACK.
      term_title("");		/* XXX */
  #ifdef USE_IMAGE
      if (activeImage)
-@@ -4470,15 +4475,20 @@ DEFUN(backBf, BACK, "Close current buffe
+@@ -4464,15 +4469,20 @@ DEFUN(backBf, BACK, "Close current buffe
  {
      Buffer *buf = Currentbuf->linkBuffer[LB_N_FRAME];
  
@@ -71,7 +71,7 @@ Protected buffers cannot be deleted with BACK.
  	return;
      }
  
-@@ -4523,6 +4533,13 @@ DEFUN(deletePrevBuf, DELETE_PREVBUF, "De
+@@ -4517,6 +4527,13 @@ DEFUN(deletePrevBuf, DELETE_PREVBUF, "De
  	delBuffer(buf);
  }
  
@@ -85,7 +85,7 @@ Protected buffers cannot be deleted with BACK.
  static void
  cmd_loadURL(char *url, ParsedURL *current, char *referer, FormList *request)
  {
-@@ -6253,6 +6270,7 @@ DEFUN(tabMs, TAB_MOUSE, "Select tab by m
+@@ -6247,6 +6264,7 @@ DEFUN(tabMs, TAB_MOUSE, "Select tab by m
  
  DEFUN(closeTMs, CLOSE_TAB_MOUSE, "Close tab at mouse pointer")
  {
@@ -93,7 +93,7 @@ Protected buffers cannot be deleted with BACK.
      TabBuffer *tab;
  
      if (!mouse_action.in_action)
-@@ -6260,6 +6278,14 @@ DEFUN(closeTMs, CLOSE_TAB_MOUSE, "Close
+@@ -6254,6 +6272,14 @@ DEFUN(closeTMs, CLOSE_TAB_MOUSE, "Close
      tab = posTab(mouse_action.cursorX, mouse_action.cursorY);
      if (!tab || tab == NO_TABBUFFER)
  	return;
@@ -108,7 +108,7 @@ Protected buffers cannot be deleted with BACK.
      deleteTab(tab);
      displayBuffer(Currentbuf, B_FORCE_REDRAW);
  }
-@@ -6890,16 +6916,25 @@ deleteTab(TabBuffer * tab)
+@@ -6884,16 +6910,25 @@ deleteTab(TabBuffer * tab)
  
  DEFUN(closeT, CLOSE_TAB, "Close tab")
  {
