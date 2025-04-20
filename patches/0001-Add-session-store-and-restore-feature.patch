@@ -8,11 +8,11 @@ Subject: [PATCH] Add session store and restore feature
  config.h.in            |    1 
  doc-de/README.func     |    1 
  doc/README.func        |    1 
- doc/w3m.1              |   13 ++++
+ doc/w3m.1              |   18 +++++
  main.c                 |  152 ++++++++++++++++++++++++++++++++++++++++++++++++-
  proto.h                |    1 
  scripts/w3mhelp.cgi.in |    3 
- 8 files changed, 169 insertions(+), 4 deletions(-)
+ 8 files changed, 174 insertions(+), 4 deletions(-)
 
 --- a/NEWS
 +++ b/NEWS
@@ -56,30 +56,19 @@ Subject: [PATCH] Add session store and restore feature
  TAB_GOTO	Open specified document in a new tab
 --- a/doc/w3m.1
 +++ b/doc/w3m.1
-@@ -62,6 +62,9 @@ use -o high-intensity=true instead
- \fB\-M\fP
- monochrome display
- .TP
-+\fB\-R\fP
-+restore session
-+.TP
- \fB\-no-mouse\fP
- deactivate mouse support
- .TP
-@@ -204,6 +207,9 @@ use \fIfile\fR instead of the default bo
- \fB\-config \fIfile\fR
- use \fIfile\fR instead of the default configuration file
- .TP
-+\fB\-session \fIfile\fR
-+use \fIfile\fR instead of the default session file
-+.TP
- \fB\-o \fIoption=value\fR
- modify one configuration item with an explicitly given value;
- without \fIoption=value\fR, equivalent to \fB\-show-option\fR
-@@ -213,6 +219,13 @@ use debug mode (only for debugging)
+@@ -213,6 +213,24 @@ use debug mode (only for debugging)
  .TP
  \fB\-reqlog\fP
  log headers of HTTP communication in file \f(CW~/.w3m/request.log\fP
++.SS Experimental options
++Experimental options might change in the future or even be removed.
++Feedback to the author is highly welcome.
++.TP
++\fB\-R\fP
++restore session
++.TP
++\fB\-session \fIfile\fR
++use \fIfile\fR instead of the default session file
 +.SH Session management
 +If \fB\-R\fP is given, w3m will restore a session from a session file.
 +If no session file is provided with \fB\-session\fR the default session file is used.
@@ -87,6 +76,8 @@ Subject: [PATCH] Add session store and restore feature
 +If a session file is given it will not be deleted.
 +If URLs or files were given as parameters they will be loaded after restoring the session and added to the first tab.
 +If \-N and \-R are given the old session is restored as is and any new buffer are opened in separate tabs.
++\fBNote:\fP
++Session management is still an experimental feature and might change in the future!
  .SH EXAMPLES
  .SS Pager-like usage
  .TP
