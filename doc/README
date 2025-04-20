@@ -109,5 +109,6 @@ Initial author:
 	Faculty of Engineering, Tohoku University
 	aito@fw.ipsj.or.jp
 
-This package is maintained for Debian <https://www.debian.org>,
-forked from the original version <https://sourceforge.net/projects/w3m/>.
+This package <https://sr.ht/~rkta/w3m> is forked from the Debian version
+<https://github.com/tats/w3m>, which was forked from the original version
+<https://sourceforge.net/projects/w3m/>.
