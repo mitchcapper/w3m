@@ -66,10 +66,6 @@ static int isWinConsole = 0;
 #define TERM_CYGWIN_RESERVE_IME 2
 static int isLocalConsole = 0;
 
-#if CYGWIN_VERSION_DLL_MAJOR < 1005 && defined(USE_MOUSE)
-int cygwin_mouse_btn_swapped = 0;
-#endif
-
 #if defined(SUPPORT_WIN9X_CONSOLE_MBCS)
 static HANDLE hConIn = INVALID_HANDLE_VALUE;
 static int isWin95 = 0;
@@ -204,20 +200,6 @@ GetConsoleHwnd(void)
     return (hwndFound);
 }
 
-#if CYGWIN_VERSION_DLL_MAJOR < 1005 && defined(USE_MOUSE)
-static unsigned long
-cygwin_version(void)
-{
-    struct per_process *p;
-
-    p = (struct per_process *)cygwin_internal(CW_USER_DATA);
-    if (p != NULL) {
-	return (p->dll_major * 1000) + p->dll_minor;
-    }
-    return 0;
-}
-#endif
-
 static void
 check_cygwin_console(void)
 {
@@ -249,12 +231,6 @@ check_cygwin_console(void)
 	}
 #endif
     }
-#if CYGWIN_VERSION_DLL_MAJOR < 1005 && defined(USE_MOUSE)
-    if (cygwin_version() <= 1003015) {
-	/* cygwin DLL 1.3.15 or earler */
-	cygwin_mouse_btn_swapped = 1;
-    }
-#endif
 }
 #endif				/* __CYGWIN__ */
 

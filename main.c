@@ -5808,14 +5808,6 @@ DEFUN(mouse, MOUSE, "mouse operation")
     int btn, x, y;
 
     btn = (unsigned char)getch() - 32;
-#if defined(__CYGWIN__) && CYGWIN_VERSION_DLL_MAJOR < 1005
-    if (cygwin_mouse_btn_swapped) {
-	if (btn == MOUSE_BTN2_DOWN)
-	    btn = MOUSE_BTN3_DOWN;
-	else if (btn == MOUSE_BTN3_DOWN)
-	    btn = MOUSE_BTN2_DOWN;
-    }
-#endif
     x = (unsigned char)getch() - 33;
     if (x < 0)
 	x += 0x100;
@@ -5842,15 +5834,6 @@ DEFUN(sgrmouse, SGRMOUSE, "SGR 1006 mouse operation")
 	else
 	    return;
     } while (1);
-
-#if defined(__CYGWIN__) && CYGWIN_VERSION_DLL_MAJOR < 1005
-    if (cygwin_mouse_btn_swapped) {
-	if (btn == MOUSE_BTN2_DOWN)
-	    btn = MOUSE_BTN3_DOWN;
-	else if (btn == MOUSE_BTN3_DOWN)
-	    btn = MOUSE_BTN2_DOWN;
-    };
-#endif
 
     do {
 	c = getch();
