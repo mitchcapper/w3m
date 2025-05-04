@@ -133,9 +133,6 @@ AC_CHECK_HEADER([locale.h], [AC_DEFINE(HAVE_LOCALE_H)])
 AC_CHECK_HEADER([stdint.h], [AC_DEFINE(HAVE_STDINT_H)])
 AC_CHECK_HEADER([inttypes.h], [AC_DEFINE(HAVE_INTTYPES_H)])
 
-dnl Checks for typedefs, structures, and compiler characteristics.
-AC_CHECK_SIZEOF(long long, 0)
-
 dnl Checks for library functions.
 AC_CHECK_FUNCS(strcasecmp strcasestr strchr memcpy strerror setpgrp chdir mkdtemp faccessat getcwd getwd readlink setenv putenv strtoll stroq atoll atoq symlink readlink lstat srand48 srandom getpassphrase waitpid setlocale)
 AC_FUNC_STRFTIME

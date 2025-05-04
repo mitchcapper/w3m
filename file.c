@@ -123,7 +123,7 @@ static int forms_size = 0;
 #define cur_form_id ((form_sp >= 0)? form_stack[form_sp] : -1)
 static int form_sp = 0;
 
-static clen_t current_content_length;
+static size_t current_content_length;
 
 static int cur_hseq;
 #ifdef USE_IMAGE
@@ -6831,7 +6831,7 @@ static const char *_size_unit[] = { "b", "kb", "Mb", "Gb", "Tb",
 };
 
 char *
-convert_size(clen_t size, int usefloat)
+convert_size(size_t size, int usefloat)
 {
     float csize;
     int sizepos = 0;
@@ -6847,7 +6847,7 @@ convert_size(clen_t size, int usefloat)
 }
 
 char *
-convert_size2(clen_t size1, clen_t size2, int usefloat)
+convert_size2(size_t size1, size_t size2, int usefloat)
 {
     const char **sizes = _size_unit;
     float csize, factor = 1;
@@ -6865,7 +6865,7 @@ convert_size2(clen_t size1, clen_t size2, int usefloat)
 }
 
 void
-showProgress(clen_t * linelen, clen_t * trbyte)
+showProgress(size_t * linelen, size_t * trbyte)
 {
     int i, j, rate, duration, eta, pos;
     static time_t last_time, start_time;
@@ -7118,8 +7118,8 @@ void
 loadHTMLstream(URLFile *f, Buffer *newBuf, FILE * src, int internal)
 {
     struct environment envs[MAX_ENV_LEVEL];
-    clen_t linelen = 0;
-    clen_t trbyte = 0;
+    size_t linelen = 0;
+    size_t trbyte = 0;
     Str lineBuf2;
 #ifdef USE_M17N
     wc_ces charset = WC_CES_US_ASCII;
@@ -7505,7 +7505,7 @@ loadBuffer(URLFile *uf, Buffer *volatile newBuf)
     volatile char pre_lbuf = '\0';
     int nlines;
     Str tmpf;
-    clen_t linelen = 0, trbyte = 0;
+    size_t linelen = 0, trbyte = 0;
     Lineprop *propBuffer = NULL;
 #ifdef USE_ANSI_COLOR
     Linecolor *colorBuffer = NULL;
@@ -7912,7 +7912,7 @@ getNextPage(Buffer *buf, int plen)
 	*volatile cur = buf->currentLine;
     int i;
     int volatile nlines = 0;
-    clen_t linelen = 0, trbyte = buf->trbyte;
+    size_t linelen = 0, trbyte = buf->trbyte;
     Str lineBuf2;
     char volatile pre_lbuf = '\0';
     URLFile uf;
@@ -8035,7 +8035,7 @@ int
 save2tmp(URLFile uf, const char *tmpf)
 {
     FILE *ff;
-    clen_t linelen = 0, trbyte = 0;
+    size_t linelen = 0, trbyte = 0;
     void (*volatile prevtrap) (SIGNAL_ARG) = NULL;
     static JMP_BUF env_bak;
     volatile int retval = 0;
@@ -8209,7 +8209,7 @@ _MoveFile(const char *path1, const char *path2)
     InputStream f1;
     FILE *f2;
     int is_pipe;
-    clen_t linelen = 0, trbyte = 0;
+    size_t linelen = 0, trbyte = 0;
     unsigned char *buf = NULL;
     int count;
 
@@ -8257,7 +8257,7 @@ _doFileCopy(char *tmpf, char *defstr, int download)
     FILE *f;
 #endif
     struct stat st;
-    clen_t size = 0;
+    size_t size = 0;
     int is_pipe = FALSE;
 
     if (fmInitialized) {

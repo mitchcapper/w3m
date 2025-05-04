@@ -52,7 +52,7 @@ char *HTML_QUOTE_MAP[] = {
     NULL,
 };
 
-clen_t
+size_t
 strtoclen(const char *s)
 {
 #ifdef HAVE_STRTOLL
