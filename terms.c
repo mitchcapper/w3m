@@ -27,6 +27,7 @@
 #include <gpm.h>
 #endif				/* USE_GPM */
 #ifdef USE_SYSMOUSE
+static int is_xterm = 0;
 #include <osreldate.h>
 #if (__FreeBSD_version >= 400017) || (__FreeBSD_kernel_version >= 400017)
 #include <sys/consio.h>
@@ -39,13 +40,11 @@ static int cwidth = 8, cheight = 16;
 static int xpix, ypix, nbs, obs = 0;
 #endif				/* use_SYSMOUSE */
 
-static int is_xterm = 0;
-
 static void mouse_init(void);
 int mouseActive = 0;
 #endif				/* USE_MOUSE */
 
-static char *title_str = NULL;
+static const char *title_str;
 
 static int tty;
 
@@ -830,45 +829,8 @@ get_pixel_per_cell(int *ppc, int *ppl)
 }
 #endif				/* USE_IMAGE */
 
-#ifdef USE_MOUSE
-#define W3M_TERM_INFO(name, title, mouse)	name, title, mouse
-#define NEED_XTERM_ON   (1)
-#define NEED_XTERM_OFF  (1<<1)
-#ifdef __CYGWIN__
-#define NEED_CYGWIN_ON  (1<<2)
-#define NEED_CYGWIN_OFF (1<<3)
-#endif
-#else
-#define W3M_TERM_INFO(name, title, mouse)	name, title
-#endif
-
-static char XTERM_TITLE[] = "\033]0;w3m: %s\007";
-static char SCREEN_TITLE[] = "\033k%s\033\134";
-#ifdef __CYGWIN__
-static char CYGWIN_TITLE[] = "w3m: %s";
-#endif
-
-/* *INDENT-OFF* */
-static struct w3m_term_info {
-    char *term;
-    char *title_str;
-#ifdef USE_MOUSE
-    int mouse_flag;
-#endif
-} w3m_term_info_list[] = {
-    {W3M_TERM_INFO("xterm", XTERM_TITLE, (NEED_XTERM_ON|NEED_XTERM_OFF))},
-    {W3M_TERM_INFO("kterm", XTERM_TITLE, (NEED_XTERM_ON|NEED_XTERM_OFF))},
-    {W3M_TERM_INFO("rxvt", XTERM_TITLE, (NEED_XTERM_ON|NEED_XTERM_OFF))},
-    {W3M_TERM_INFO("Eterm", XTERM_TITLE, (NEED_XTERM_ON|NEED_XTERM_OFF))},
-    {W3M_TERM_INFO("mlterm", XTERM_TITLE, (NEED_XTERM_ON|NEED_XTERM_OFF))},
-    {W3M_TERM_INFO("screen", SCREEN_TITLE, 0)},
-#ifdef __CYGWIN__
-    {W3M_TERM_INFO("cygwin", CYGWIN_TITLE, (NEED_CYGWIN_ON|NEED_CYGWIN_OFF))},
-#endif
-    {W3M_TERM_INFO(NULL, NULL, 0)}
-};
-#undef W3M_TERM_INFO
-/* *INDENT-ON * */
+static const char *title_str_common = "\033]0;w3m: %s\007",
+    *title_str_screen = "\033k%s\033\134";
 
 int
 set_tty(void)
@@ -889,28 +851,17 @@ set_tty(void)
     check_cygwin_console();
 #endif
     TerminalGet(tty, &d_ioval);
-    if (displayTitleTerm != NULL) {
-	struct w3m_term_info *p;
-	for (p = w3m_term_info_list; p->term != NULL; p++) {
-	    if (!strncmp(displayTitleTerm, p->term, strlen(p->term))) {
-		title_str = p->title_str;
-		break;
-	    }
+    if (displayTitleTerm) {
+	if (!strncmp(displayTitleTerm, "screen", 6)) {
+	    title_str = title_str_screen;
+	} else {
+	    title_str = title_str_common;
 	}
     }
-#ifdef USE_MOUSE
-    {
-	char *term = getenv("TERM");
-	if (term != NULL) {
-	    struct w3m_term_info *p;
-	    for (p = w3m_term_info_list; p->term != NULL; p++) {
-		if (!strncmp(term, p->term, strlen(p->term))) {
-			is_xterm = p->mouse_flag;
-			break;
-		    }
-		}
+#ifdef USE_SYSMOUSE
+	if (!strncmp(getenv("TERM"), "screen", 6)){
+	    is_xterm = 0;
 	}
-    }
 #endif
     return 0;
 }
@@ -2155,6 +2106,12 @@ term_title(const char *s)
     if (!fmInitialized)
         return;
     if (title_str != NULL) {
+/*
+ * TODO(chimera lover):
+ * broken, should rm once SUPPORT_WIN9X_CONSOLE_MBCS and
+ * TERM=cygwin special handle announced deprecation and
+ * no one complains
+ */
 #ifdef __CYGWIN__
 	if (isLocalConsole && title_str == CYGWIN_TITLE) {
 	    Str buff;
@@ -2212,10 +2169,7 @@ wgetch(void *p)
 int
 do_getch(void)
 {
-    if (is_xterm || !gpm_handler)
 	return getch();
-    else
-	return Gpm_Getch();
 }
 #endif				/* USE_GPM */
 
@@ -2285,11 +2239,11 @@ skip_escseq(void)
     if (c == '[' || c == 'O') {
 	c = getch();
 #ifdef USE_MOUSE
-	if (is_xterm && c == 'M') {
+	if (c == 'M') {
 	    getch();
 	    getch();
 	    getch();
-	} else if (is_xterm && c == '<') {
+	} else if (c == '<') {
 	    c = getch();
 	    while (IS_DIGIT(c) || c == ';')
 		c = getch();
@@ -2333,12 +2287,8 @@ sleep_till_anykey(int sec, int purge)
 }
 
 #ifdef USE_MOUSE
-
-#define XTERM_ON   {fputs("\033[?1001s\033[?1000h\033[?1006h",ttyf); flush_tty();}
-#define XTERM_OFF  {fputs("\033[?1006l\033[?1000l\033[?1001r",ttyf); flush_tty();}
-#define CYGWIN_ON  {fputs("\033[?1000h",ttyf); flush_tty();}
-#define CYGWIN_OFF {fputs("\033[?1000l",ttyf); flush_tty();}
-
+#define MOUSE_ON  {fputs("\033[?1001s\033[?1000h\033[?1006h",ttyf); flush_tty();}
+#define MOUSE_OFF {fputs("\033[?1006l\033[?1000l\033[?1001r",ttyf); flush_tty();}
 #ifdef USE_GPM
 /* Linux console with GPM support */
 
@@ -2366,16 +2316,12 @@ mouse_init(void)
 	 * xterm is being left in the mode where the mouse clicks are
 	 * passed through to the application.
 	 */
-	Gpm_Close();
-	is_xterm = (NEED_XTERM_ON | NEED_XTERM_OFF);
     }
     else if (r >= 0) {
 	gpm_handler = gpm_process_mouse;
-	is_xterm = 0;
     }
-    if (is_xterm) {
-	XTERM_ON;
-    }
+    Gpm_Close();
+    MOUSE_ON;
     mouseActive = 1;
 }
 
@@ -2384,11 +2330,7 @@ mouse_end(void)
 {
     if (mouseActive == 0)
 	return;
-    if (is_xterm) {
-	XTERM_OFF;
-    }
-    else
-	Gpm_Close();
+    MOUSE_OFF;
     mouseActive = 0;
 }
 
@@ -2403,7 +2345,7 @@ mouse_init(void)
     if (mouseActive)
 	return;
     if (is_xterm) {
-	XTERM_ON;
+	MOUSE_ON;
     }
     else {
 #if defined(FBIO_MODEINFO) || defined(CONS_MODEINFO)	/* FreeBSD > 2.x */
@@ -2441,7 +2383,7 @@ mouse_end(void)
     if (mouseActive == 0)
 	return;
     if (is_xterm) {
-	XTERM_OFF;
+	MOUSE_OFF;
     }
     else {
 	mouse_info_t mi;
@@ -2461,14 +2403,7 @@ mouse_init(void)
 {
     if (mouseActive)
 	return;
-    if (is_xterm & NEED_XTERM_ON) {
-	XTERM_ON;
-    }
-#ifdef __CYGWIN__
-    else if (is_xterm & NEED_CYGWIN_ON) {
-	CYGWIN_ON;
-    }
-#endif
+    MOUSE_ON;
     mouseActive = 1;
 }
 
@@ -2477,14 +2412,7 @@ mouse_end(void)
 {
     if (mouseActive == 0)
 	return;
-    if (is_xterm & NEED_XTERM_OFF) {
-	XTERM_OFF;
-    }
-#ifdef __CYGWIN__
-    else if (is_xterm & NEED_CYGWIN_OFF) {
-	CYGWIN_OFF;
-    }
-#endif
+    MOUSE_OFF;
     mouseActive = 0;
 }
 
@@ -2501,7 +2429,7 @@ mouse_active(void)
 void
 mouse_inactive(void)
 {
-    if (mouseActive && is_xterm)
+    if (mouseActive)
 	mouse_end();
 }
 
