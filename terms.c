@@ -207,8 +207,6 @@ check_cygwin_console(void)
     char *ctype;
     HANDLE hWnd;
 
-    if (term == NULL)
-	term = DEFAULT_TERM;
     if (term && strncmp(term, "cygwin", 6) == 0) {
 	isWinConsole = TERM_CYGWIN;
     }
@@ -1085,8 +1083,7 @@ getTCstr(void)
     char *pt = funcstr;
     int r;
 
-    ent = getenv("TERM") ? getenv("TERM") : DEFAULT_TERM;
-    if (ent == NULL) {
+    if (!(ent = getenv("TERM"))) {
 	fprintf(stderr, "TERM is not set\n");
 	reset_error_exit(SIGNAL_ARGLIST);
     }
