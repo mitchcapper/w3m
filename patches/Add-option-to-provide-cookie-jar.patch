@@ -13,7 +13,7 @@ Patch: patches/Add-option-to-provide-cookie-jar.patch
 
 --- a/cookie.c
 +++ b/cookie.c
-@@ -438,7 +438,7 @@ sync_cookies(void)
+@@ -454,7 +454,7 @@ sync_cookies(void)
      if (!First_cookie)
  	return 0;
  
@@ -22,7 +22,7 @@ Patch: patches/Add-option-to-provide-cookie-jar.patch
  	is_saved = 0;
  	if (errno == ENOENT)
  	    return 0;
-@@ -507,7 +507,6 @@ void
+@@ -499,7 +499,6 @@ void
  save_cookies(void)
  {
      struct cookie *p;
@@ -30,7 +30,7 @@ Patch: patches/Add-option-to-provide-cookie-jar.patch
      FILE *fp;
  
      if (no_rc_dir)
-@@ -519,13 +518,12 @@ save_cookies(void)
+@@ -511,13 +510,12 @@ save_cookies(void)
      if (is_saved)
  	return;
  
@@ -46,7 +46,7 @@ Patch: patches/Add-option-to-provide-cookie-jar.patch
  	return;
  
      for (p = First_cookie; p; p = p->next) {
-@@ -540,7 +538,7 @@ save_cookies(void)
+@@ -532,7 +530,7 @@ save_cookies(void)
  		str2charp(p->commentURL));
      }
      fclose(fp);
@@ -55,7 +55,7 @@ Patch: patches/Add-option-to-provide-cookie-jar.patch
  }
  #undef str2charp
  
-@@ -565,7 +563,7 @@ load_cookies(struct cookie **cookie)
+@@ -557,7 +555,7 @@ load_cookies(struct cookie **cookie)
      struct stat st;
  
      *cookie = p = NULL;
@@ -66,7 +66,7 @@ Patch: patches/Add-option-to-provide-cookie-jar.patch
      if (fstat(fileno(fp), &st) == -1) {
 --- a/cookie.h
 +++ b/cookie.h
-@@ -49,14 +49,15 @@ struct cookie {
+@@ -50,14 +50,15 @@ struct cookie {
  };
  global struct cookie *First_cookie init(NULL);
  
