@@ -20,7 +20,6 @@ Makefile
 /w3mbookmark
 /w3mhelperpanel
 /w3mimgdisplay
-/version.c
 /w3mhelp-lynx_*.html
 /w3mhelp-w3m_*.html
 /posubst

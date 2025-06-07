@@ -103,10 +103,9 @@ OBJS=main.o file.o buffer.o display.o etc.o search.o linein.o table.o local.o\
 	func.o cookie.o history.o backend.o util.o $(KEYBIND_OBJ)
 LSRCS=anchor.c parsetagx.c tagtable.c istream.c
 LOBJS=anchor.o parsetagx.o tagtable.o istream.o
-LLOBJS=version.o
 ALIBOBJS=Str.o indep.o regex.o textlist.o parsetag.o myctype.o hash.o
 ALIB=libindep.a
-ALLOBJS=$(OBJS) $(LOBJS) $(LLOBJS)
+ALLOBJS=$(OBJS) $(LOBJS)
 
 EXT=@EXEEXT@
 
@@ -317,7 +316,6 @@ distclean: clean
 	-$(RM) -f config.cache config.log config.status
 	-$(RM) -f w3mhelp-w3m_en.html w3mhelp-w3m_ja.html
 	-$(RM) -f w3mhelp-lynx_en.html w3mhelp-lynx_ja.html
-	-$(RM) -f version.c
 	-$(RM) -f posubst
 	-$(RM) -f config.h Makefile
 	-$(RM) -f *core

@@ -1,4 +1,4 @@
-Unreleased
+w3m 0.5.4
 
 * deprecated
   - option -H Users should use -o high-intensity=true instead

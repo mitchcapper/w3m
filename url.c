@@ -1,5 +1,7 @@
 /* vi: set sw=4 ts=8 ai sm noet : */
 #include "fm.h"
+#include "version.h"
+
 #ifndef __MINGW32_VERSION
 #include <unistd.h>
 #include <sys/types.h>
@@ -1422,7 +1424,7 @@ otherinfo(ParsedURL *target, ParsedURL *current, char *referer)
 	if (url_user_agent)
 	   Strcat_charp(s, url_user_agent);
 	else if (UserAgent == NULL || *UserAgent == '\0')
-            Strcat_charp(s, w3m_version);
+            Strcat_charp(s, W3M_VERSION);
         else
             Strcat_charp(s, UserAgent);
         Strcat_charp(s, "\r\n");

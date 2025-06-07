@@ -2,6 +2,7 @@
 #define MAINPROGRAM
 #include <errno.h>
 #include "fm.h"
+#include "version.h"
 #include <stdio.h>
 #include <signal.h>
 #include <setjmp.h>
@@ -140,7 +141,7 @@ static int deprecated;
 static void
 fversion(FILE * f)
 {
-    fprintf(f, "w3m version %s, options %s\n", w3m_version,
+    fprintf(f, "w3m version %s, options %s\n", W3M_VERSION,
 #if LANG == JA
 	    "lang=ja"
 #else
@@ -1033,7 +1034,7 @@ main(int argc, char **argv)
 	    Strcat_charp(s_page, "<a href='http://w3m.sourceforge.net/'>");
 	    Strcat_m_charp(s_page,
 			   "w3m</a>!<p><p>This is w3m version ",
-			   w3m_version,
+			   W3M_VERSION,
 			   "<br>Written by <a href='mailto:aito@fw.ipsj.or.jp'>Akinori Ito</a>",
 			   NULL);
 	    newbuf = loadHTMLString(s_page);
@@ -2337,7 +2338,7 @@ DEFUN(ldhelp, HELP, "Show help panel")
     lang = AcceptLang;
     n = strcspn(lang, ";, \t");
     tmp = Sprintf("file:///$LIB/" HELP_CGI CGI_EXTENSION "?version=%s&lang=%s",
-		  Str_form_quote(Strnew_charp(w3m_version))->ptr,
+		  Str_form_quote(Strnew_charp(W3M_VERSION))->ptr,
 		  Str_form_quote(Strnew_charp_n(lang, n))->ptr);
     cmd_loadURL(tmp->ptr, NULL, NO_REFERER, NULL);
 #else
@@ -5986,7 +5987,7 @@ DEFUN(closeTMs, CLOSE_TAB_MOUSE, "Close tab at mouse pointer")
 
 DEFUN(dispVer, VERSION, "Display the version of w3m")
 {
-    disp_message(Sprintf("w3m version %s", w3m_version)->ptr, TRUE);
+    disp_message(Sprintf("w3m version %s", W3M_VERSION)->ptr, TRUE);
 }
 
 DEFUN(wrapToggle, WRAP_TOGGLE, "Toggle wrapping mode in searches")
