@@ -2,6 +2,7 @@ image: archlinux
 sources:
   - https://git.sr.ht/~rkta/w3m
 packages:
+  - ed
   - imlib2
   - gdk-pixbuf-xlib
   - tcc
