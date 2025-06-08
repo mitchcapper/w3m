@@ -18,7 +18,7 @@ triggers:
     condition: always
     to: mail@rkta.de
 environment:
-  OPTS: '-Werror -flto -Wno-stringop-overflow'
+  OPTS: '-Werror -Wno-stringop-overflow'
 tasks:
   - default: |
       cd w3m
@@ -148,6 +148,16 @@ tasks:
         --with-ssl \
         --with-termlib \
         --with-x
+      make -j4
+      test -x w3m
+      cd t
+      sh run
+
+  - lto: |
+      export OPTS='-flto -Werror -Wno-stringop-overflow'
+      cd w3m
+      make distclean || :
+      ./configure
       make -j4
       test -x w3m
       cd t

@@ -9,7 +9,7 @@ triggers:
     condition: always
     to: mail@rkta.de
 environment:
-  OPTS: '-Werror -flto -Wno-invalid-source-encoding'
+  OPTS: '-Werror -Wno-invalid-source-encoding'
 tasks:
   - default: |
       cd w3m
@@ -100,3 +100,13 @@ tasks:
         --without-ssl
       make -j4
       test -x w3m
+
+  - lto: |
+      export OPTS='-flto -Werror -Wno-invalid-source-encoding'
+      cd w3m
+      make distclean || :
+      ./configure
+      make -j4
+      test -x w3m
+      cd t
+      sh run
