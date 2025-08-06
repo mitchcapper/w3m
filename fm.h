@@ -538,7 +538,7 @@ typedef struct _DownloadList {
     char *url;
     char *save;
     char *lock;
-    clen_t size;
+    size_t size;
     time_t time;
     int running;
     int err;
@@ -722,49 +722,6 @@ struct html_feed_environ {
     int blank_lines;
 };
 
-#ifdef USE_COOKIE
-struct portlist {
-    unsigned short port;
-    struct portlist *next;
-};
-
-struct cookie {
-    ParsedURL url;
-    Str name;
-    Str value;
-    time_t expires;
-    Str path;
-    Str domain;
-    Str comment;
-    Str commentURL;
-    struct portlist *portl;
-    char version;
-    char flag;
-    struct cookie *next;
-};
-#define COO_USE		1
-#define COO_SECURE	2
-#define COO_DOMAIN	4
-#define COO_PATH	8
-#define COO_DISCARD	16
-#define COO_OVERRIDE	32	/* user chose to override security checks */
-
-#define COO_OVERRIDE_OK	32	/* flag to specify that an error is overridable */
-						/* version 0 refers to the original cookie_spec.html */
-						/* version 1 refers to RFC 2109 */
-						/* version 1' refers to the Internet draft to obsolete RFC 2109 */
-#define COO_EINTERNAL	(1)	/* unknown error; probably forgot to convert "return 1" in cookie.c */
-#define COO_ETAIL	(2 | COO_OVERRIDE_OK)	/* tail match failed (version 0) */
-#define COO_ESPECIAL	(3)	/* special domain check failed (version 0) */
-#define COO_EPATH	(4)	/* Path attribute mismatch (version 1 case 1) */
-#define COO_ENODOT	(5 | COO_OVERRIDE_OK)	/* no embedded dots in Domain (version 1 case 2.1) */
-#define COO_ENOTV1DOM	(6 | COO_OVERRIDE_OK)	/* Domain does not start with a dot (version 1 case 2.2) */
-#define COO_EDOM	(7 | COO_OVERRIDE_OK)	/* domain-match failed (version 1 case 3) */
-#define COO_EBADHOST	(8 | COO_OVERRIDE_OK)	/* dot in matched host name in FQDN (version 1 case 4) */
-#define COO_EPORT	(9)	/* Port match failed (version 1' case 5) */
-#define COO_EMAX	COO_EPORT
-#endif				/* USE_COOKIE */
-
 /* modes for align() */
 
 #define ALIGN_CENTER 0
@@ -927,7 +884,6 @@ global int CurrentKey;
 global char *CurrentKeyData;
 global char *CurrentCmdData;
 global char *w3m_reqlog;
-extern char *w3m_version;
 extern int enable_inline_image;
 
 #define DUMP_BUFFER   0x01
@@ -1062,11 +1018,6 @@ global int migemo_active init(0);
 global char *migemo_command init(DEF_MIGEMO_COMMAND);
 #endif				/* USE_MIGEMO */
 
-global struct auth_cookie *Auth_cookie init(NULL);
-#ifdef USE_COOKIE
-global struct cookie *First_cookie init(NULL);
-#endif				/* USE_COOKIE */
-
 global char *mailcap_files init(USER_MAILCAP ", " SYS_MAILCAP);
 global char *mimetypes_files init(USER_MIMETYPES ", " SYS_MIMETYPES);
 #ifdef USE_EXTERNAL_URI_LOADER
@@ -1166,23 +1117,6 @@ typedef struct _MouseAction {
 global MouseAction mouse_action;
 #define LIMIT_MOUSE_MENU 100
 #endif				/* USE_MOUSE */
-
-#ifdef USE_COOKIE
-global int default_use_cookie init(TRUE);
-global int use_cookie init(TRUE);
-global int show_cookie init(FALSE);
-global int accept_cookie init(TRUE);
-#define ACCEPT_BAD_COOKIE_DISCARD	0
-#define ACCEPT_BAD_COOKIE_ACCEPT	1
-#define ACCEPT_BAD_COOKIE_ASK		2
-global int accept_bad_cookie init(ACCEPT_BAD_COOKIE_DISCARD);
-global char *cookie_reject_domains init(NULL);
-global char *cookie_accept_domains init(NULL);
-global char *cookie_avoid_wrong_number_of_dots init(NULL);
-global TextList *Cookie_reject_domains;
-global TextList *Cookie_accept_domains;
-global TextList *Cookie_avoid_wrong_number_of_dots_domains;
-#endif				/* USE_COOKIE */
 
 #ifdef USE_IMAGE
 global int view_unseenobject init(FALSE);

@@ -3,6 +3,7 @@ sources:
   - https://git.sr.ht/~rkta/w3m
 packages:
   - ed
+  - imlib2
   - gdk-pixbuf-xlib
   - imlib2
   - quilt
@@ -12,7 +13,7 @@ triggers:
     condition: always
     to: mail@rkta.de
 environment:
-  OPTS: '-Werror -flto -Wno-stringop-overflow'
+  OPTS: '-Werror -Wno-stringop-overflow'
 tasks:
   - patches: |
       cd w3m
@@ -129,6 +130,16 @@ tasks:
       printf "%s\n" "/FORTIFY_SOURCE/d" "w" "q" | ed -s w3mimg/Makefile
       printf "%s\n" "/FORTIFY_SOURCE/d" "w" "q" | ed -s libwc/Makefile
       printf "%s\n" "/FORTIFY_SOURCE/d" "w" "q" | ed -s Makefile
+      make -j4
+      test -x w3m
+      cd t
+      sh run
+
+  - lto: |
+      export OPTS='-Werror -flto -Wno-stringop-overflow'
+      cd w3m
+      make distclean || :
+      ./configure
       make -j4
       test -x w3m
       cd t

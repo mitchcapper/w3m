@@ -87,6 +87,7 @@ extern void goMain(void);
 extern void gorURL(void);
 extern void ldBmark(void);
 extern void adBmark(void);
+extern void strSession(void);
 extern void ldOpt(void);
 extern void setOpt(void);
 extern void pginfo(void);
@@ -244,9 +245,9 @@ extern void HTMLlineproc0(char *istr, struct html_feed_environ *h_env,
 			  int internal);
 #define HTMLlineproc1(x,y) HTMLlineproc0(x,y,TRUE)
 extern Buffer *loadHTMLBuffer(URLFile *f, Buffer *newBuf);
-extern char *convert_size(clen_t size, int usefloat);
-extern char *convert_size2(clen_t size1, clen_t size2, int usefloat);
-extern void showProgress(clen_t * linelen, clen_t * trbyte);
+extern char *convert_size(size_t size, int usefloat);
+extern char *convert_size2(size_t size1, size_t size2, int usefloat);
+extern void showProgress(size_t * linelen, size_t * trbyte);
 extern void init_henv(struct html_feed_environ *, struct readbuffer *,
 		      struct environment *, int, TextLineList *, int, int);
 extern void completeHTMLstream(struct html_feed_environ *,
@@ -293,7 +294,7 @@ extern TabBuffer *newTab(void);
 extern void calcTabPos(void);
 extern TabBuffer *deleteTab(TabBuffer * tab);
 extern void addDownloadList(pid_t pid, char *url, char *save, char *lock,
-			    clen_t size);
+			    size_t size);
 extern void stopDownload(void);
 extern int checkDownloadList(void);
 extern void download_action(struct parsed_tagarg *arg);
@@ -613,7 +614,7 @@ extern char *rcFile(char *base);
 extern char *etcFile(const char *base);
 extern char *confFile(const char *base);
 extern char *auxbinFile(const char *base);
-extern char *helpFile(char *base);
+extern char *helpFile(const char *base);
 extern void *querySiteconf(ParsedURL *query_pu, int field);
 extern Str localCookie(void);
 extern Str loadLocalDir(char *dirname);
@@ -656,7 +657,6 @@ extern int add_cookie(ParsedURL *pu, Str name, Str value, time_t expires,
 		      Str domain, Str path, int flag, Str comment, int version,
 		      Str port, Str commentURL);
 extern void save_cookies(void);
-extern void load_cookies(void);
 extern void initCookie(void);
 extern void cooLst(void);
 extern Buffer *cookie_list_panel(void);

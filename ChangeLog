@@ -1,3 +1,8 @@
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+This file is deprecated, see NEWS for noteworthy updates and the git log
+for all the details.
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 2023-07-18  Rene Kita  <mail@rkta.de>
 
 	* etc.c: Fix OOB access due to multiple backspaces.

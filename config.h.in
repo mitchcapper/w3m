@@ -22,6 +22,7 @@
 #define MOUSE_FILE   "mouse"
 #define COOKIE_FILE  "cookie"
 #define HISTORY_FILE "history"
+#define SESSION_FILE "session"
 
 #define PASSWD_FILE	RC_DIR "/passwd"
 #define PRE_FORM_FILE	RC_DIR "/pre_form"
@@ -113,12 +114,6 @@
 #undef HAVE_LOCALE_H
 #undef HAVE_STDINT_H
 #undef HAVE_INTTYPES_H
-#define SIZEOF_LONG_LONG 8
-#if SIZEOF_LONG_LONG > 0
-typedef long long clen_t;
-#else
-typedef long clen_t;
-#endif
 #undef HAVE_STRTOLL
 #undef HAVE_STROQ
 #undef HAVE_ATOLL
@@ -208,12 +203,6 @@ typedef long clen_t;
 
 #if defined(__CYGWIN__) && defined(__x86_64__)
 #define DONT_CALL_GC_AFTER_FORK
-#endif
-
-#if defined(__DJGPP__)
-#define DEFAULT_TERM	"dosansi"
-#else
-#define DEFAULT_TERM	0	/* XXX */
 #endif
 
 #if defined(__EMX__) /* use $extension? */

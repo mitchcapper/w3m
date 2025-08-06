@@ -1,8 +1,8 @@
 dnl w3m autoconf
 dnl Process this file with autoconf to produce a configure script.
-AC_INIT([w3m],[0.5.3])
+AC_INIT([w3m],[0.5.4])
 PACKAGE=w3m
-VERSION=0.5.3
+VERSION=0.5.4
 AC_DEFINE_UNQUOTED(PACKAGE, "$PACKAGE")
 AC_DEFINE_UNQUOTED(VERSION, "$VERSION")
 AC_SUBST(PACKAGE)
@@ -132,9 +132,6 @@ AC_CHECK_HEADER([sys/select.h], [AC_DEFINE(HAVE_SYS_SELECT_H)])
 AC_CHECK_HEADER([locale.h], [AC_DEFINE(HAVE_LOCALE_H)])
 AC_CHECK_HEADER([stdint.h], [AC_DEFINE(HAVE_STDINT_H)])
 AC_CHECK_HEADER([inttypes.h], [AC_DEFINE(HAVE_INTTYPES_H)])
-
-dnl Checks for typedefs, structures, and compiler characteristics.
-AC_CHECK_SIZEOF(long long, 0)
 
 dnl Checks for library functions.
 AC_CHECK_FUNCS(strcasecmp strcasestr strchr memcpy strerror setpgrp chdir mkdtemp faccessat getcwd getwd readlink setenv putenv strtoll stroq atoll atoq symlink readlink lstat srand48 srandom getpassphrase waitpid setlocale)

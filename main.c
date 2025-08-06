@@ -1,6 +1,8 @@
 /* vi: set sw=4 ts=8 ai sm noet : */
 #define MAINPROGRAM
+#include <errno.h>
 #include "fm.h"
+#include "version.h"
 #include <stdio.h>
 #include <signal.h>
 #include <setjmp.h>
@@ -37,6 +39,7 @@ extern int do_getch(void);
 #endif				/* defined(USE_GPM) || defined(USE_SYSMOUSE) */
 #endif
 
+#include "cookie.h"
 #include "util.h"
 
 #ifdef __MINGW32_VERSION
@@ -108,6 +111,9 @@ int prec_num = 0;
 int prev_key = -1;
 int on_target = 1;
 static int add_download_list = FALSE;
+static char *session_file;
+static char *session_bak;
+static int _strSession(char *sf);
 
 void set_buffer_environ(Buffer *);
 static void save_buffer_position(Buffer *buf);
@@ -135,7 +141,7 @@ static int deprecated;
 static void
 fversion(FILE * f)
 {
-    fprintf(f, "w3m version %s, options %s\n", w3m_version,
+    fprintf(f, "w3m version %s, options %s\n", W3M_VERSION,
 #if LANG == JA
 	    "lang=ja"
 #else
@@ -217,6 +223,8 @@ fusage(FILE * f, int err)
 #endif
     PUT("-B", "load bookmark");
     PUT("-bookmark file", "specify bookmark file");
+    PUT("-R", "restore from session file");
+    PUT("-session file", "specify session file");
     PUT("-T type", "specify content-type");
     PUT("-m", "internet message mode");
     PUT("-v", "visual startup mode");
@@ -253,6 +261,7 @@ fusage(FILE * f, int err)
 #endif				/* USE_MOUSE */
 #ifdef USE_COOKIE
     PUT("-cookie", "use cookie (-no-cookie: don't use cookie)");
+    PUT("-cookie-jar file", "use file instead of default cookie file");
 #endif				/* USE_COOKIE */
     PUT("-graph", "use DEC special graphics for border of table and menu");
     PUT("-no-graph", "use ASCII character for border of table and menu");
@@ -410,6 +419,7 @@ main(int argc, char **argv)
     char *default_type = NULL;
     char *post_file = NULL;
     Str err_msg;
+    int opt_restore = FALSE;
 #ifdef USE_M17N
     char *Locale = NULL;
     wc_uint8 auto_detect;
@@ -439,7 +449,11 @@ main(int argc, char **argv)
     NO_proxy_domains = newTextList();
     fileToDelete = newTextList();
 
-    load_argv = New_N(char *, argc - 1);
+    /*
+     * An empty URL means to open a new tab. If -N was provided we need
+     * to double the size.
+     */
+    load_argv = New_N(char *, (argc - 1) * (1 + !!open_new_tab));
     load_argc = 0;
 
     CurrentDir = currentdir();
@@ -633,6 +647,13 @@ main(int argc, char **argv)
 		    BookmarkFile = cleanupName(tmp->ptr);
 		}
 	    }
+	    else if (!strcmp("-R", argv[i]))
+		opt_restore = TRUE;
+	    else if (!strcmp("-session", argv[i])) {
+		if (++i >= argc)
+		    usage();
+		session_file = argv[i];
+	    }
 	    else if (!strcmp("-F", argv[i]))
 		RenderFrame = TRUE;
 	    else if (!strcmp("-W", argv[i])) {
@@ -746,6 +767,18 @@ main(int argc, char **argv)
 		use_cookie = TRUE;
 		accept_cookie = TRUE;
 	    }
+	    else if (!strcmp("-cookie-jar", argv[i])) {
+		if (++i >= argc)
+		    usage();
+		CookieFile = argv[i];
+		if (CookieFile[0] != '~' && CookieFile[0] != '/') {
+		    Str tmp = Strnew_charp(CurrentDir);
+		    if (Strlastchar(tmp) != '/')
+			Strcat_char(tmp, '/');
+		    Strcat_charp(tmp, CookieFile);
+		    CookieFile = cleanupName(tmp->ptr);
+		}
+	    }
 #endif				/* USE_COOKIE */
 	    else if (!strcmp("-s", argv[i]))
 		squeezeBlankLine = TRUE;
@@ -812,6 +845,8 @@ main(int argc, char **argv)
 	    line_str = argv[i] + 1;
 	}
 	else {
+	    if (open_new_tab && load_argc)
+		load_argv[load_argc++] = "";
 	    load_argv[load_argc++] = argv[i];
 	}
 	i++;
@@ -847,6 +882,10 @@ main(int argc, char **argv)
     CurrentKey = -1;
     if (BookmarkFile == NULL)
 	BookmarkFile = rcFile(BOOKMARK);
+#ifdef USE_COOKIE
+    if (!CookieFile)
+	CookieFile = rcFile(COOKIE_FILE);
+#endif
 
     if (!isatty(1) && !w3m_dump) /* redirected output */
 	w3m_dump = DUMP_BUFFER;
@@ -879,8 +918,57 @@ main(int argc, char **argv)
 	loadUrlHistory();
 #endif				/* not USE_HISTORY */
 
-#ifdef USE_M17N
-#endif
+    /* Restore a previously saved session */
+    if (opt_restore) {
+	FILE *fp;
+	Str line;
+	char *sf, **session;
+	int max = 16, n = 0;
+
+	sf = session_file ? session_file : rcFile(SESSION_FILE);
+	session = New_N(char *, max);
+	if (!(fp = fopen(sf, "r"))) {
+	    Str err = Sprintf("Cannot restore session %s - %s", sf,
+			      strerror(errno));
+	    disp_err_message(err->ptr, FALSE);
+	    fmTerm();
+	    return 1;
+	}
+
+	for (int i = 0; i < load_argc; i++) {
+	    if (n > max) {
+		max <<= 1;
+		New_Reuse(char *, session, max);
+	    }
+	    session[n++] = load_argv[i];
+	}
+
+	if (open_new_tab) {
+	    if (n > max) {
+		max <<= 1;
+		session = New_Reuse(char *, session, max);
+	    }
+	    session[n++] = "";
+	}
+
+	for (;;) {
+	    line = Strfgets(fp);
+	    if (line->length == 0)
+		break;
+	    Strchop(line);
+	    if (n > max) {
+		max <<= 1;
+		session = New_Reuse(char *, session, max);
+	    }
+	    session[n++] = line->ptr;
+	}
+	load_argv = session;
+	load_argc = n;
+	if (!session_file) {
+	    session_bak = Strnew_m_charp(sf, "~", NULL)->ptr;
+	    rename(sf, session_bak);
+	}
+    }
 
     if (w3m_backend)
 	backend();
@@ -946,7 +1034,7 @@ main(int argc, char **argv)
 	    Strcat_charp(s_page, "<a href='http://w3m.sourceforge.net/'>");
 	    Strcat_m_charp(s_page,
 			   "w3m</a>!<p><p>This is w3m version ",
-			   w3m_version,
+			   W3M_VERSION,
 			   "<br>Written by <a href='mailto:aito@fw.ipsj.or.jp'>Akinori Ito</a>",
 			   NULL);
 	    newbuf = loadHTMLString(s_page);
@@ -980,12 +1068,19 @@ main(int argc, char **argv)
     else {
 	i = 0;
     }
+
+    open_new_tab = FALSE;
     for (; i < load_argc; i++) {
 	if (i >= 0) {
 	    SearchHeader = search_header;
 	    DefaultType = default_type;
 	    char *url;
 	    int retry = 0;
+
+	    if (!*load_argv[i]) {
+		open_new_tab = TRUE;
+		continue;
+	    }
 
 	    url = load_argv[i];
 	    if (getURLScheme(&url) == SCM_MISSING && !ArgvIsURL)
@@ -1069,6 +1164,7 @@ main(int argc, char **argv)
 	    _newT();
 	    Currentbuf->nextBuffer = newbuf;
 	    delBuffer(Currentbuf);
+	    open_new_tab = FALSE;
 	}
 	else {
 	    Currentbuf->nextBuffer = newbuf;
@@ -2242,7 +2338,7 @@ DEFUN(ldhelp, HELP, "Show help panel")
     lang = AcceptLang;
     n = strcspn(lang, ";, \t");
     tmp = Sprintf("file:///$LIB/" HELP_CGI CGI_EXTENSION "?version=%s&lang=%s",
-		  Str_form_quote(Strnew_charp(w3m_version))->ptr,
+		  Str_form_quote(Strnew_charp(W3M_VERSION))->ptr,
 		  Str_form_quote(Strnew_charp_n(lang, n))->ptr);
     cmd_loadURL(tmp->ptr, NULL, NO_REFERER, NULL);
 #else
@@ -4427,6 +4523,75 @@ DEFUN(adBmark, ADD_BOOKMARK, "Add current page to bookmarks")
 		request);
 }
 
+int
+_strSession(char *sf)
+{
+    Buffer *buf;
+    FILE *f;
+    ParsedURL *url;
+    char *ans, *sep;
+    struct stat st;
+
+    if (!sf)
+	sf = session_file ? session_file : rcFile(SESSION_FILE);
+
+    while (stat(sf, &st) == 0) {
+	Str msg = Strnew_charp(_("Session file exists. Overwrite? [N]"));
+	ans = inputAnswer(msg->ptr);
+	if (ans && TOLOWER(*ans) == 'y')
+	    break;
+	sf = inputFilenameHist(_("Session file (empty: Don't store)? "), sf,
+			       LoadHist);
+	if (!*sf)
+	    return 0;
+    }
+    if (!(f = fopen(sf, "w"))) goto fail;
+
+    sep = "";
+    for (TabBuffer *tab = FirstTab; tab; tab = tab->nextTab) {
+	fputs(sep, f);
+	for (buf = tab->firstBuffer; buf; buf = buf->nextBuffer) {
+	    if (buf->bufferprop & BP_INTERNAL)
+		continue;
+	    if ((url = baseURL(buf)))
+		fprintf(f, "%s\n", parsedURL2Str(url)->ptr);
+	    else
+		disp_err_message(buf->buffername, FALSE);
+	}
+	sep = "\n";
+    }
+
+    if ((fclose(f)) == EOF) goto fail;
+    return 0;
+
+fail:
+    disp_err_message(strerror(errno), FALSE);
+    return -1;
+}
+
+/* Store session */
+DEFUN(strSession, STORE, "Store session")
+{
+    char *def, *sf;
+
+#ifdef USE_COOKIE
+    save_cookies();
+#endif
+#ifdef USE_HISTORY
+    saveUrlHistory();
+#endif
+
+    def = session_file ? session_file : rcFile(SESSION_FILE);
+    sf = inputFilenameHist(Strnew_m_charp("Session file [",
+					  def,
+					  "]? ", NULL)->ptr,
+			   NULL, LoadHist);
+    if (!*sf)
+	sf = def;
+    if (_strSession(sf))
+	disp_err_message("Unable to store session", FALSE);
+}
+
 /* option setting */
 DEFUN(ldOpt, OPTIONS, "Display options setting panel")
 {
@@ -5644,14 +5809,6 @@ DEFUN(mouse, MOUSE, "mouse operation")
     int btn, x, y;
 
     btn = (unsigned char)getch() - 32;
-#if defined(__CYGWIN__) && CYGWIN_VERSION_DLL_MAJOR < 1005
-    if (cygwin_mouse_btn_swapped) {
-	if (btn == MOUSE_BTN2_DOWN)
-	    btn = MOUSE_BTN3_DOWN;
-	else if (btn == MOUSE_BTN3_DOWN)
-	    btn = MOUSE_BTN2_DOWN;
-    }
-#endif
     x = (unsigned char)getch() - 33;
     if (x < 0)
 	x += 0x100;
@@ -5678,15 +5835,6 @@ DEFUN(sgrmouse, SGRMOUSE, "SGR 1006 mouse operation")
 	else
 	    return;
     } while (1);
-
-#if defined(__CYGWIN__) && CYGWIN_VERSION_DLL_MAJOR < 1005
-    if (cygwin_mouse_btn_swapped) {
-	if (btn == MOUSE_BTN2_DOWN)
-	    btn = MOUSE_BTN3_DOWN;
-	else if (btn == MOUSE_BTN3_DOWN)
-	    btn = MOUSE_BTN2_DOWN;
-    };
-#endif
 
     do {
 	c = getch();
@@ -5839,7 +5987,7 @@ DEFUN(closeTMs, CLOSE_TAB_MOUSE, "Close tab at mouse pointer")
 
 DEFUN(dispVer, VERSION, "Display the version of w3m")
 {
-    disp_message(Sprintf("w3m version %s", w3m_version)->ptr, TRUE);
+    disp_message(Sprintf("w3m version %s", W3M_VERSION)->ptr, TRUE);
 }
 
 DEFUN(wrapToggle, WRAP_TOGGLE, "Toggle wrapping mode in searches")
@@ -6668,7 +6816,7 @@ DEFUN(tabL, TAB_LEFT, "Move left along the tab bar")
 }
 
 void
-addDownloadList(pid_t pid, char *url, char *save, char *lock, clen_t size)
+addDownloadList(pid_t pid, char *url, char *save, char *lock, size_t size)
 {
     DownloadList *d;
 
@@ -6709,7 +6857,7 @@ checkDownloadList(void)
 }
 
 static char *
-convert_size3(clen_t size)
+convert_size3(size_t size)
 {
     Str tmp = Strnew();
     int n;

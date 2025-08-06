@@ -1,5 +1,7 @@
 /* vi: set sw=4 ts=8 ai sm noet : */
 #include "fm.h"
+#include "version.h"
+
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -255,7 +257,7 @@ set_environ(const char *var, const char *value)
 static void
 set_cgi_environ(const char *name, const char *fn, const char *req_uri)
 {
-    set_environ("SERVER_SOFTWARE", w3m_version);
+    set_environ("SERVER_SOFTWARE", W3M_VERSION);
     set_environ("SERVER_PROTOCOL", "HTTP/1.0");
     set_environ("SERVER_NAME", "localhost");
     set_environ("SERVER_PORT", "80");	/* dummy */

@@ -27,9 +27,6 @@ void mouse_end(void);
 #endif
 
 #ifdef __CYGWIN__
-#if CYGWIN_VERSION_DLL_MAJOR < 1005 && defined(USE_MOUSE)
-extern int cygwin_mouse_btn_swapped;
-#endif
 #ifdef SUPPORT_WIN9X_CONSOLE_MBCS
 extern void enable_win9x_console_input(void);
 extern void disable_win9x_console_input(void);

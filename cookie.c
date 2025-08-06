@@ -9,6 +9,7 @@
  */
 
 #include "fm.h"
+#include "cookie.h"
 #include "html.h"
 
 #ifdef USE_COOKIE
@@ -17,7 +18,12 @@
 #include "regex.h"
 #include "myctype.h"
 
+#include <errno.h>
+
+static long long cf_mtime;
 static int is_saved = 1;
+
+static int load_cookies(struct cookie **cookie);
 
 #define contain_no_dots(p, ep) (total_dot_number((p),(ep),1)==0)
 
@@ -191,11 +197,11 @@ match_cookie(ParsedURL *pu, struct cookie *cookie, char *domainname)
 }
 
 static struct cookie *
-get_cookie_info(Str domain, Str path, Str name)
+get_cookie_info(struct cookie *first_node, Str domain, Str path, Str name)
 {
     struct cookie *p;
 
-    for (p = First_cookie; p; p = p->next) {
+    for (p = first_node; p; p = p->next) {
 	if (Strcasecmp(p->domain, domain) == 0 &&
 	    Strcmp(p->path, path) == 0 && Strcasecmp(p->name, name) == 0)
 	    return p;
@@ -366,7 +372,7 @@ add_cookie(ParsedURL *pu, Str name, Str value,
 	    Strshrink(path, 1);
     }
 
-    p = get_cookie_info(domain, path, name);
+    p = get_cookie_info(First_cookie, domain, path, name);
     if (!p) {
 	p = New(struct cookie);
 	p->flag = 0;
@@ -386,6 +392,7 @@ add_cookie(ParsedURL *pu, Str name, Str value,
     p->version = version;
     p->portl = portlist;
     p->commentURL = commentURL;
+    p->used = 1;
 
     if (flag & COO_SECURE)
 	p->flag |= COO_SECURE;
@@ -423,22 +430,92 @@ nth_cookie(int n)
     return NULL;
 }
 
-#define str2charp(str) ((str)? (str)->ptr : "")
+static void
+unlink_cookie(struct cookie **list, struct cookie *cookie)
+{
+    struct cookie *c;
 
+    if (cookie == *list)
+	*list = (*list)->next;
+    else
+	for (c = *list; c->next; c = c->next)
+	    if (c->next == cookie) {
+		c->next = cookie->next;
+		break;
+	    }
+}
+
+static int
+sync_cookies(void)
+{
+    struct cookie *ck, *nc, *ncs, *oc;
+    struct stat st;
+
+    if (!First_cookie)
+	return 0;
+
+    if (stat(CookieFile, &st)) {
+	is_saved = 0;
+	if (errno == ENOENT)
+	    return 0;
+	else
+	    goto err;
+    }
+
+    if (cf_mtime == (long long)st.st_mtime)
+	return 0;
+
+    load_cookies(&ncs);
+    if (!ncs) return 0;
+    is_saved = 0;
+
+    for (oc = First_cookie; oc; oc = oc->next){
+	if (!(nc = get_cookie_info(ncs, oc->domain, oc->path, oc->name))) {
+	    if (!oc->used)
+		unlink_cookie(&First_cookie, oc);
+	    continue;
+	}
+
+	if (!(nc->expires > oc->expires))
+	    continue;
+
+	for (ck = First_cookie; ck->next != oc; ck = ck->next) ;
+	ck->next = nc;
+	nc->next = oc->next;
+    }
+
+    for (oc = First_cookie; oc->next; oc = oc->next) ;
+    oc->next = ncs;
+
+    return 0;
+
+err:
+    disp_err_message("Can't sync cookies", FALSE);
+    return 1;
+}
+
+#define str2charp(str) ((str)? (str)->ptr : "")
 void
 save_cookies(void)
 {
     struct cookie *p;
-    char *cookie_file;
     FILE *fp;
 
-    check_expired_cookies();
-
-    if (!First_cookie || is_saved || no_rc_dir)
+    if (no_rc_dir)
 	return;
 
-    cookie_file = rcFile(COOKIE_FILE);
-    if (!(fp = fopen(cookie_file, "w")))
+    check_expired_cookies();
+    sync_cookies();
+
+    if (is_saved)
+	return;
+
+    if (!First_cookie) {
+	unlink(CookieFile);
+	return;
+    }
+
+    if (!(fp = fopen(CookieFile, "w")))
 	return;
 
     for (p = First_cookie; p; p = p->next) {
@@ -453,8 +530,9 @@ save_cookies(void)
 		str2charp(p->commentURL));
     }
     fclose(fp);
-    chmod(cookie_file, S_IRUSR | S_IWUSR);
+    chmod(CookieFile, S_IRUSR | S_IWUSR);
 }
+#undef str2charp
 
 static Str
 readcol(char **p)
@@ -467,87 +545,93 @@ readcol(char **p)
     return tmp;
 }
 
-void
-load_cookies(void)
+static int
+load_cookies(struct cookie **cookie)
 {
-    struct cookie *cookie, *p;
     FILE *fp;
     Str line;
     char *str;
+    struct cookie *ck, *p;
+    struct stat st;
 
-    if (!(fp = fopen(rcFile(COOKIE_FILE), "r")))
-	return;
+    *cookie = p = NULL;
+    if (!(fp = fopen(CookieFile, "r")))
+	return errno;
 
-    if (First_cookie) {
-	for (p = First_cookie; p->next; p = p->next) ;
+    if (fstat(fileno(fp), &st) == -1) {
+	fclose(fp);
+	return 1;
     }
-    else {
-	p = NULL;
-    }
+    cf_mtime = (long long)st.st_mtime;
+
     for (;;) {
 	line = Strfgets(fp);
 
 	if (line->length == 0)
 	    break;
 	str = line->ptr;
-	cookie = New(struct cookie);
-	cookie->next = NULL;
-	cookie->flag = 0;
-	cookie->version = 0;
-	cookie->expires = (time_t) - 1;
-	cookie->comment = NULL;
-	cookie->portl = NULL;
-	cookie->commentURL = NULL;
-	parseURL(readcol(&str)->ptr, &cookie->url, NULL);
+	ck = New(struct cookie);
+	ck->next = NULL;
+	ck->flag = 0;
+	ck->version = 0;
+	ck->expires = (time_t) - 1;
+	ck->comment = NULL;
+	ck->portl = NULL;
+	ck->commentURL = NULL;
+	parseURL(readcol(&str)->ptr, &ck->url, NULL);
 	if (!*str)
 	    break;
-	cookie->name = readcol(&str);
+	ck->name = readcol(&str);
 	if (!*str)
 	    break;
-	cookie->value = readcol(&str);
+	ck->value = readcol(&str);
 	if (!*str)
 	    break;
-	cookie->expires = (time_t) atol(readcol(&str)->ptr);
+	ck->expires = (time_t) atol(readcol(&str)->ptr);
 	if (!*str)
 	    break;
-	cookie->domain = readcol(&str);
+	ck->domain = readcol(&str);
 	if (!*str)
 	    break;
-	cookie->path = readcol(&str);
+	ck->path = readcol(&str);
 	if (!*str)
 	    break;
-	cookie->flag = atoi(readcol(&str)->ptr);
+	ck->flag = atoi(readcol(&str)->ptr);
 	if (!*str)
 	    break;
-	cookie->version = atoi(readcol(&str)->ptr);
+	ck->version = atoi(readcol(&str)->ptr);
 	if (!*str)
 	    break;
-	cookie->comment = readcol(&str);
-	if (cookie->comment->length == 0)
-	    cookie->comment = NULL;
+	ck->comment = readcol(&str);
+	if (ck->comment->length == 0)
+	    ck->comment = NULL;
 	if (!*str)
 	    break;
-	cookie->portl = make_portlist(readcol(&str));
+	ck->portl = make_portlist(readcol(&str));
 	if (!*str)
 	    break;
-	cookie->commentURL = readcol(&str);
-	if (cookie->commentURL->length == 0)
-	    cookie->commentURL = NULL;
+	ck->commentURL = readcol(&str);
+	if (ck->commentURL->length == 0)
+	    ck->commentURL = NULL;
 
-	if (p)
-	    p->next = cookie;
+	if (!*cookie)
+	    *cookie = ck;
 	else
-	    First_cookie = cookie;
-	p = cookie;
+	    p->next = ck;
+	p = ck;
     }
 
     fclose(fp);
+    return 0;
 }
 
 void
 initCookie(void)
 {
-    load_cookies();
+    struct cookie **p;
+
+    for (p = &First_cookie; *p && (*p)->next; *p = (*p)->next) ;
+    load_cookies(p);
     check_expired_cookies();
 }
 

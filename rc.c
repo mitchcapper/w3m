@@ -5,6 +5,8 @@
 #include "fm.h"
 #include "myctype.h"
 #include "proto.h"
+#include "version.h"
+
 #include <stdio.h>
 #include <errno.h>
 #include "parsetag.h"
@@ -13,6 +15,7 @@
 #include <stdlib.h>
 #include <stddef.h>
 #include "rc.h"
+#include "cookie.h"
 
 struct param_ptr {
     char *name;
@@ -1535,7 +1538,7 @@ load_option_panel(void)
     Buffer *buf;
 
     if (optionpanel_str == NULL)
-	optionpanel_str = Sprintf(optionpanel_src1, w3m_version,
+	optionpanel_str = Sprintf(optionpanel_src1, W3M_VERSION,
 			      html_quote(localCookie()->ptr), _(CMT_HELPER));
 #ifdef USE_M17N
 #ifdef ENABLE_NLS
