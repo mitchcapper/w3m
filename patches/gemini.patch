@@ -242,7 +242,7 @@ w3m-0.5.3+git20230121.
 +    Str l, line, tmpf;
 +    char *spacer, *p, *q;
 +    int hseq, len, nlines, pre = 0;
-+    clen_t linelen = 0, trbyte = 0;
++    size_t linelen = 0, trbyte = 0;
 +    Lineprop *propBuf = NULL;
 +    void(*volatile prevtrap) (SIGNAL_ARG) = NULL;
 +
@@ -372,7 +372,7 @@ w3m-0.5.3+git20230121.
  #endif				/* _HTML_H */
 --- a/url.c
 +++ b/url.c
-@@ -76,6 +76,7 @@ static int
+@@ -78,6 +78,7 @@ static int
      70,				/* gophers */
  #ifdef USE_SSL
      443,			/* https */
@@ -380,7 +380,7 @@ w3m-0.5.3+git20230121.
  #endif				/* USE_SSL */
  };
  
-@@ -98,6 +99,7 @@ struct cmdtable schemetable[] = {
+@@ -100,6 +101,7 @@ struct cmdtable schemetable[] = {
  #ifdef USE_SSL
      {"https", SCM_HTTPS},
  #endif				/* USE_SSL */
@@ -388,7 +388,7 @@ w3m-0.5.3+git20230121.
      {NULL, SCM_UNKNOWN},
  };
  
-@@ -239,6 +241,7 @@ DefaultFile(int scheme)
+@@ -241,6 +243,7 @@ DefaultFile(int scheme)
      case SCM_LOCAL_CGI:
      case SCM_FTP:
      case SCM_FTPDIR:
@@ -396,7 +396,7 @@ w3m-0.5.3+git20230121.
  	return allocStr("/", -1);
      }
      return NULL;
-@@ -259,7 +262,7 @@ free_ssl_ctx(void)
+@@ -261,7 +264,7 @@ free_ssl_ctx(void)
      if (ssl_ctx != NULL)
  	SSL_CTX_free(ssl_ctx);
      ssl_ctx = NULL;
@@ -405,7 +405,7 @@ w3m-0.5.3+git20230121.
  }
  
  #if SSLEAY_VERSION_NUMBER >= 0x00905100
-@@ -1263,6 +1266,7 @@ _parsedURL2Str(const ParsedURL *pu, int
+@@ -1265,6 +1268,7 @@ _parsedURL2Str(const ParsedURL *pu, int
  	"gophers",
  #ifdef USE_SSL
  	"https",
@@ -413,7 +413,7 @@ w3m-0.5.3+git20230121.
  #endif				/* USE_SSL */
      };
  
-@@ -1986,6 +1990,35 @@ openURL(char *url, ParsedURL *pu, Parsed
+@@ -1988,6 +1992,35 @@ openURL(char *url, ParsedURL *pu, Parsed
  	}
  	return uf;
  #endif				/* USE_GOPHER */
@@ -502,7 +502,7 @@ w3m-0.5.3+git20230121.
      UFclose(&f);
 --- a/main.c
 +++ b/main.c
-@@ -400,6 +400,32 @@ die_oom(size_t bytes)
+@@ -401,6 +401,32 @@ die_oom(size_t bytes)
      return NULL;
  }
  
@@ -535,7 +535,7 @@ w3m-0.5.3+git20230121.
  int
  main(int argc, char **argv)
  {
-@@ -916,6 +942,9 @@ main(int argc, char **argv)
+@@ -917,6 +943,9 @@ main(int argc, char **argv)
      if (UseHistory)
  	loadUrlHistory();
  #endif				/* not USE_HISTORY */
@@ -545,7 +545,7 @@ w3m-0.5.3+git20230121.
  
      /* Restore a previously saved session */
      if (opt_restore) {
-@@ -2611,10 +2640,36 @@ DEFUN(movRW, NEXT_WORD, "Move to the nex
+@@ -2612,10 +2641,36 @@ DEFUN(movRW, NEXT_WORD, "Move to the nex
      displayBuffer(Currentbuf, B_NORMAL);
  }
  
@@ -582,7 +582,7 @@ w3m-0.5.3+git20230121.
  
      if (checkDownloadList())
  	/* FIXME: gettextize? */
-@@ -2641,6 +2696,8 @@ _quitfm(int confirm)
+@@ -2642,6 +2697,8 @@ _quitfm(int confirm)
      if (UseHistory && SaveURLHist)
  	saveUrlHistory();
  #endif				/* USE_HISTORY */
@@ -591,7 +591,7 @@ w3m-0.5.3+git20230121.
      if (deprecated)
  	fprintf(stderr, "%s\n%s\n%s\n",
  		"DEPRECATION WARNING",
-@@ -5014,6 +5071,13 @@ DEFUN(vwSrc, SOURCE VIEW, "Toggle betwee
+@@ -5015,6 +5072,13 @@ DEFUN(vwSrc, SOURCE VIEW, "Toggle betwee
  	displayBuffer(Currentbuf, B_NORMAL);
  	return;
      }
@@ -605,7 +605,7 @@ w3m-0.5.3+git20230121.
      if (Currentbuf->sourcefile == NULL) {
  	if (Currentbuf->pagerSource &&
  	    !strcasecmp(Currentbuf->type, "text/plain")) {
-@@ -5099,6 +5163,93 @@ DEFUN(foldPre, FOLD_PRE, "Fold long line
+@@ -5100,6 +5164,93 @@ DEFUN(foldPre, FOLD_PRE, "Fold long line
      fold_pre = FoldPre;
  }
  
@@ -699,7 +699,7 @@ w3m-0.5.3+git20230121.
  /* reload */
  DEFUN(reload, RELOAD, "Load current document anew")
  {
-@@ -5325,6 +5476,7 @@ chkURLBuffer(Buffer *buf)
+@@ -5326,6 +5477,7 @@ chkURLBuffer(Buffer *buf)
  	"https?://[a-zA-Z0-9:%\\-\\./_@]*\\[[a-fA-F0-9:][a-fA-F0-9:\\.]*\\][a-zA-Z0-9:%\\-\\./?=~_\\&+@#,\\$;]*",
  	"ftp://[a-zA-Z0-9:%\\-\\./_@]*\\[[a-fA-F0-9:][a-fA-F0-9:\\.]*\\][a-zA-Z0-9:%\\-\\./=_+@#,\\$]*",
  #endif				/* INET6 */
@@ -960,7 +960,7 @@ w3m-0.5.3+git20230121.
  
 --- a/rc.c
 +++ b/rc.c
-@@ -37,6 +37,8 @@ struct rc_search_table {
+@@ -39,6 +39,8 @@ struct rc_search_table {
  static struct rc_search_table *RC_search_table;
  static int RC_table_size;
  
@@ -969,7 +969,7 @@ w3m-0.5.3+git20230121.
  #define P_INT      0
  #define P_SHORT    1
  #define P_CHARINT  2
-@@ -222,6 +224,7 @@ static int OptionEncode = FALSE;
+@@ -224,6 +226,7 @@ static int OptionEncode = FALSE;
  #define CMT_SSL_CA_PATH N_("Path to directory for PEM encoded certificates of CAs")
  #define CMT_SSL_CA_FILE N_("File consisting of PEM encoded certificates of CAs")
  #define CMT_SSL_CA_DEFAULT N_("Use default locations for PEM encoded certificates of CAs")

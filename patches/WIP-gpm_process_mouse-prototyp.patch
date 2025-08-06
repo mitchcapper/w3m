@@ -5,7 +5,7 @@
 
 --- a/main.c
 +++ b/main.c
-@@ -6035,6 +6035,8 @@ DEFUN(sgrmouse, SGRMOUSE, "SGR 1006 mous
+@@ -6019,6 +6019,8 @@ DEFUN(sgrmouse, SGRMOUSE, "SGR 1006 mous
  }
  
  #ifdef USE_GPM
@@ -23,8 +23,8 @@
 +extern int gpm_process_mouse(Gpm_Event *, void *); /* TODO(rkta): header */
  #endif				/* USE_GPM */
  #ifdef USE_SYSMOUSE
- #include <osreldate.h>
-@@ -2373,7 +2374,6 @@ void
+ static int is_xterm = 0;
+@@ -2296,7 +2297,6 @@ void
  mouse_init(void)
  {
      Gpm_Connect conn;

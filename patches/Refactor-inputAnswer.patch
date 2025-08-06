@@ -164,7 +164,7 @@ Patch: patches/Refactor-inputAnswer.patch
  extern char *checkHeader(Buffer *buf, const char *field);
 --- a/main.c
 +++ b/main.c
-@@ -4575,16 +4575,15 @@ _strSession(char *sf)
+@@ -4576,16 +4576,15 @@ _strSession(char *sf)
      Buffer *buf;
      FILE *f;
      ParsedURL *url;

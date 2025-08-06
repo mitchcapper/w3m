@@ -121,7 +121,7 @@ WIP Needs Strfree fix and Fix-yank.patch(?)
      if (CPos > 0)
 --- a/fm.h
 +++ b/fm.h
-@@ -923,6 +923,7 @@ global int exit_on_last init(FALSE);
+@@ -922,6 +922,7 @@ global int exit_on_last init(FALSE);
  global int use_mark init(FALSE);
  #endif
  global int emacs_like_lineedit init(FALSE);
@@ -131,7 +131,7 @@ WIP Needs Strfree fix and Fix-yank.patch(?)
  global int label_topline init(FALSE);
 --- a/rc.c
 +++ b/rc.c
-@@ -146,6 +146,7 @@ static int OptionEncode = FALSE;
+@@ -148,6 +148,7 @@ static int OptionEncode = FALSE;
  #define CMT_USE_MARK	N_("Enable mark operations")
  #endif
  #define CMT_EMACS_LIKE_LINEEDIT	N_("Enable Emacs-style line editing")

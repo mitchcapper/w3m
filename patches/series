@@ -1,11 +1,4 @@
 # Cookies
-0001-Add-session-store-and-restore-feature.patch
-Truncate-cookie-file-if-no-cookies-left.patch
-Move-declarations-to-appropriate-header.patch
-Refactor-load-cookies.patch
-Refactor-get_cookie_info.patch
-Merge-cookies-if-modified-after-start.patch
-Add-option-to-provide-cookie-jar.patch
 # gemini
 gemini.patch
 # WARNINGS

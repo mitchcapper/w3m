@@ -53,7 +53,7 @@ Patch: patches/Add-keybinding-to-insert-current-search-term.patch
  {
 --- a/main.c
 +++ b/main.c
-@@ -85,7 +85,7 @@ static void SigPipe(SIGNAL_ARG);
+@@ -86,7 +86,7 @@ static void SigPipe(SIGNAL_ARG);
  #ifdef USE_MARK
  static const char *MarkString = NULL;
  #endif

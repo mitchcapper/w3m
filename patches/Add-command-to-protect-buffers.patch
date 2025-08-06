@@ -28,7 +28,7 @@ Protected buffers cannot be deleted with BACK.
  typedef struct _BufferPos {
 --- a/main.c
 +++ b/main.c
-@@ -2677,6 +2677,7 @@ save_known_hosts(void)
+@@ -2678,6 +2678,7 @@ save_known_hosts(void)
  static void
  _quitfm(int ask)
  {
@@ -36,7 +36,7 @@ Protected buffers cannot be deleted with BACK.
      int err = 0;
  
      if (checkDownloadList()
-@@ -2686,6 +2687,10 @@ _quitfm(int ask)
+@@ -2687,6 +2688,10 @@ _quitfm(int ask)
      else if (ask && !confirm(Strnew_charp(_("Do you want to exit w3m?"))))
  	goto nope;
  
@@ -47,7 +47,7 @@ Protected buffers cannot be deleted with BACK.
      term_title("");		/* XXX */
  #ifdef USE_IMAGE
      if (activeImage)
-@@ -4464,15 +4469,20 @@ DEFUN(backBf, BACK, "Close current buffe
+@@ -4465,15 +4470,20 @@ DEFUN(backBf, BACK, "Close current buffe
  {
      Buffer *buf = Currentbuf->linkBuffer[LB_N_FRAME];
  
@@ -71,7 +71,7 @@ Protected buffers cannot be deleted with BACK.
  	return;
      }
  
-@@ -4517,6 +4527,13 @@ DEFUN(deletePrevBuf, DELETE_PREVBUF, "De
+@@ -4518,6 +4528,13 @@ DEFUN(deletePrevBuf, DELETE_PREVBUF, "De
  	delBuffer(buf);
  }
  
@@ -85,7 +85,7 @@ Protected buffers cannot be deleted with BACK.
  static void
  cmd_loadURL(char *url, ParsedURL *current, char *referer, FormList *request)
  {
-@@ -6247,6 +6264,7 @@ DEFUN(tabMs, TAB_MOUSE, "Select tab by m
+@@ -6231,6 +6248,7 @@ DEFUN(tabMs, TAB_MOUSE, "Select tab by m
  
  DEFUN(closeTMs, CLOSE_TAB_MOUSE, "Close tab at mouse pointer")
  {
@@ -93,7 +93,7 @@ Protected buffers cannot be deleted with BACK.
      TabBuffer *tab;
  
      if (!mouse_action.in_action)
-@@ -6254,6 +6272,14 @@ DEFUN(closeTMs, CLOSE_TAB_MOUSE, "Close
+@@ -6238,6 +6256,14 @@ DEFUN(closeTMs, CLOSE_TAB_MOUSE, "Close
      tab = posTab(mouse_action.cursorX, mouse_action.cursorY);
      if (!tab || tab == NO_TABBUFFER)
  	return;
@@ -108,7 +108,7 @@ Protected buffers cannot be deleted with BACK.
      deleteTab(tab);
      displayBuffer(Currentbuf, B_FORCE_REDRAW);
  }
-@@ -6884,16 +6910,25 @@ deleteTab(TabBuffer * tab)
+@@ -6868,16 +6894,25 @@ deleteTab(TabBuffer * tab)
  
  DEFUN(closeT, CLOSE_TAB, "Close tab")
  {
@@ -194,7 +194,7 @@ Protected buffers cannot be deleted with BACK.
  
  /* --- SelectMenu (END) --- */
  
-@@ -1397,7 +1398,7 @@ initSelectMenu(void)
+@@ -1380,7 +1381,7 @@ initSelectMenu(void)
      char **label;
      char *p;
      static const char *comment =
@@ -203,7 +203,7 @@ Protected buffers cannot be deleted with BACK.
  
      SelectV = -1;
      for (i = 0, buf = Firstbuf; buf != NULL; i++, buf = buf->nextBuffer) {
-@@ -1408,7 +1409,7 @@ initSelectMenu(void)
+@@ -1391,7 +1392,7 @@ initSelectMenu(void)
  
      label = New_N(char *, nitem + 2);
      for (i = 0, buf = Firstbuf; i < nitem; i++, buf = buf->nextBuffer) {
@@ -212,7 +212,7 @@ Protected buffers cannot be deleted with BACK.
  	if (buf->filename != NULL) {
  	    switch (buf->currentURL.scheme) {
  	    case SCM_LOCAL:
-@@ -1454,6 +1455,7 @@ initSelectMenu(void)
+@@ -1437,6 +1438,7 @@ initSelectMenu(void)
      SelectMenu.keymap['D'] = smDelBuf;
      SelectMenu.keymap['>'] = smUpBuf;
      SelectMenu.keymap['<'] = smDnBuf;
@@ -220,7 +220,7 @@ Protected buffers cannot be deleted with BACK.
      SelectMenu.item[nitem].type = MENU_NOP;
  }
  
-@@ -1479,6 +1481,30 @@ smChBuf(void)
+@@ -1462,6 +1464,30 @@ smChBuf(void)
  }
  
  static int
@@ -251,7 +251,7 @@ Protected buffers cannot be deleted with BACK.
  smDelBuf(char c)
  {
      int i, x, y, mselect;
-@@ -1488,6 +1514,13 @@ smDelBuf(char c)
+@@ -1471,6 +1497,13 @@ smDelBuf(char c)
  	return (MENU_NOTHING);
      for (i = 0, buf = Firstbuf; i < CurrentMenu->select;
  	 i++, buf = buf->nextBuffer) ;
