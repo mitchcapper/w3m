@@ -4582,10 +4582,11 @@ DEFUN(strSession, STORE, "Store session")
 #endif
 
     def = session_file ? session_file : rcFile(SESSION_FILE);
-    sf = inputFilenameHist(Strnew_m_charp("Session file [",
-					  def,
-					  "]? ", NULL)->ptr,
-			   NULL, LoadHist);
+    if (!(sf = inputFilenameHist(Strnew_m_charp("Session file [",
+						def,
+						"]? ", NULL)->ptr,
+				 NULL, LoadHist)))
+	return;
     if (!*sf)
 	sf = def;
     if (_strSession(sf))
