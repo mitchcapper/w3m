@@ -130,6 +130,8 @@ static int check_target = TRUE;
 #define PREC_LIMIT 10000
 static int searchKeyNum(void);
 
+static void intTrap(SIGNAL_ARG);
+
 #define help() fusage(stdout, 0)
 #define usage() fusage(stderr, 1)
 

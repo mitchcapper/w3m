@@ -9,7 +9,6 @@
 #define W3M_PROTO_H__
 extern void nulcmd(void);
 extern void pushEvent(int cmd, void *data);
-extern void intTrap(SIGNAL_ARG);
 extern void pgFore(void);
 extern void pgBack(void);
 extern void hpgFore(void);
