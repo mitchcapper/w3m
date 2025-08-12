@@ -9,7 +9,7 @@
 #include <stdlib.h>
 #include "indep.h"
 #include "Str.h"
-#include <gc.h>
+#include <gc/gc.h>
 #include "myctype.h"
 #include "entity.h"
 
