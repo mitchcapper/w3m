@@ -8,17 +8,62 @@
  *   [DRAFT 12] http://www.ics.uci.edu/pub/ietf/http/draft-ietf-http-state-man-mec-12.txt
  */
 
-#include "fm.h"
 #include "cookie.h"
-#include "html.h"
 
-#ifdef USE_COOKIE
-#include <time.h>
-#include "local.h"
-#include "regex.h"
+#include "alloc.h"
+#include "config.h"
+#include "fm.h"
+#include "html.h"
+#include "indep.h"
 #include "myctype.h"
+#include "parsetag.h"
+#include "regex.h"
+#include "textlist.h"
 
 #include <errno.h>
+#include <fcntl.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <strings.h>
+#include <sys/stat.h>
+#include <time.h>
+#include <unistd.h>
+
+#ifdef INET6
+#include <sys/socket.h>
+#endif				/* INET6 */
+#ifndef __MINGW32_VERSION
+#include <netdb.h>
+#else
+#include <winsock.h>
+#endif				/* __MINGW32_VERSION */
+
+struct portlist {
+    unsigned short port;
+    struct portlist *next;
+};
+
+struct cookie {
+    ParsedURL url;
+    Str name;
+    Str value;
+    time_t expires;
+    Str path;
+    Str domain;
+    Str comment;
+    Str commentURL;
+    struct portlist *portl;
+    char version;
+    char flag;
+    struct cookie *next;
+    int used;
+};
+static struct cookie *First_cookie;
+
+static TextList *Cookie_reject_domains;
+static TextList *Cookie_accept_domains;
+static TextList *Cookie_avoid_wrong_number_of_dots_domains;
 
 static long long cf_mtime;
 static int is_saved = 1;
@@ -26,6 +71,83 @@ static int is_saved = 1;
 static int load_cookies(struct cookie **cookie);
 
 #define contain_no_dots(p, ep) (total_dot_number((p),(ep),1)==0)
+
+static char *
+FQDN(char *host)
+{
+    char *p;
+#ifndef INET6
+    struct hostent *entry;
+#else				/* INET6 */
+    int *af;
+#endif				/* INET6 */
+
+    if (host == NULL)
+	return NULL;
+
+    if (strcasecmp(host, "localhost") == 0)
+	return host;
+
+    for (p = host; *p && *p != '.'; p++) ;
+
+    if (*p == '.')
+	return host;
+
+#ifndef INET6
+    if (!(entry = gethostbyname(host)))
+	return NULL;
+
+    return allocStr(entry->h_name, -1);
+#else				/* INET6 */
+    for (af = ai_family_order_table[DNS_order];; af++) {
+	int error;
+	struct addrinfo hints;
+	struct addrinfo *res, *res0;
+	char *namebuf;
+
+	memset(&hints, 0, sizeof(hints));
+	hints.ai_flags = AI_CANONNAME;
+	hints.ai_family = *af;
+	hints.ai_socktype = SOCK_STREAM;
+	error = getaddrinfo(host, NULL, &hints, &res0);
+	if (error) {
+	    if (*af == PF_UNSPEC) {
+		/* all done */
+		break;
+	    }
+	    /* try next address family */
+	    continue;
+	}
+	for (res = res0; res != NULL; res = res->ai_next) {
+	    if (res->ai_canonname) {
+		/* found */
+		namebuf = Strnew_charp(res->ai_canonname)->ptr;
+		freeaddrinfo(res0);
+		return namebuf;
+	    }
+	}
+	freeaddrinfo(res0);
+	if (*af == PF_UNSPEC) {
+	    break;
+	}
+    }
+    /* all failed */
+    return NULL;
+#endif				/* INET6 */
+}
+
+void
+parse_cookie(void)
+{
+    if (non_null(cookie_reject_domains))
+	Cookie_reject_domains = make_domain_list(cookie_reject_domains);
+    if (non_null(cookie_accept_domains))
+	Cookie_accept_domains = make_domain_list(cookie_accept_domains);
+    if (non_null(cookie_avoid_wrong_number_of_dots))
+	Cookie_avoid_wrong_number_of_dots_domains
+	    = make_domain_list(cookie_avoid_wrong_number_of_dots);
+}
+
 
 static unsigned int
 total_dot_number(char *p, char *ep, unsigned int max_count)
@@ -795,4 +917,3 @@ check_cookie_accept_domain(char *domain)
     }
     return 1;
 }
-#endif				/* USE_COOKIE */

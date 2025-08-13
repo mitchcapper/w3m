@@ -2,6 +2,7 @@
 /* 
  * HTML forms
  */
+#include "cookie.h"
 #include "display.h"
 #include "fm.h"
 #include "parsetag.h"

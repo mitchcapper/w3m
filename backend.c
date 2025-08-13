@@ -5,6 +5,7 @@
 #include "fm.h"
 #include <gc/gc.h>
 #include "terms.h"
+#include "cookie.h"
 
 
 /* Prototype declaration of internal functions */

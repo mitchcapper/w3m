@@ -5,11 +5,17 @@
 
 #include <stdio.h>
 
+#include "config.h"
+#include "cookie.h"
 #include "fm.h"
 #include "func.h"
 #include "myctype.h"
 #include "regex.h"
 #include "rc.h"
+
+#ifndef USE_COOKIE
+#define cooLst nulcmd
+#endif				/* not USE_COOKIE */
 
 #include "funcname.c"
 #include "functable.c"
