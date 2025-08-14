@@ -376,8 +376,7 @@ add_cookie(ParsedURL *pu, Str name, Str value,
     if (!p) {
 	p = New(struct cookie);
 	p->flag = 0;
-	if (default_use_cookie)
-	    p->flag |= COO_USE;
+	p->flag |= COO_USE;
 	p->next = First_cookie;
 	First_cookie = p;
     }

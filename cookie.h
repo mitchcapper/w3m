@@ -54,7 +54,6 @@ global char *CookieFile init(NULL);
 global char *cookie_reject_domains init(NULL);
 global char *cookie_accept_domains init(NULL);
 global char *cookie_avoid_wrong_number_of_dots init(NULL);
-global int default_use_cookie init(TRUE);
 global int use_cookie init(TRUE);
 global int show_cookie init(FALSE);
 global int accept_cookie init(TRUE);
