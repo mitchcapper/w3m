@@ -596,8 +596,7 @@ input_textarea(FormItemList *fi)
 
     f = fopen(tmpf, "w");
     if (f == NULL) {
-	/* FIXME: gettextize? */
-	disp_err_message("Can't open temporary file", FALSE);
+	disp_err_message(_("Can't open temporary file"), FALSE);
 	return;
     }
     if (fi->value)
@@ -611,8 +610,7 @@ input_textarea(FormItemList *fi)
 	goto input_end;
     f = fopen(tmpf, "r");
     if (f == NULL) {
-	/* FIXME: gettextize? */
-	disp_err_message("Can't open temporary file", FALSE);
+	disp_err_message(_("Can't open temporary file"), FALSE);
 	goto input_end;
     }
     fi->value = Strnew();

@@ -1583,12 +1583,11 @@ getAuthCookie(struct http_auth *hauth, char *auth_header,
 	if (fmInitialized) {
 	    char *pp;
 	    term_raw();
-	    /* FIXME: gettextize? */
-	    if ((pp = inputStr(Sprintf("Username for %s: ", realm)->ptr,
+	    if ((pp = inputStr(Sprintf(_("Username for %s: "), realm)->ptr,
 			       NULL)) == NULL)
 		return;
 	    *uname = Str_conv_to_system(Strnew_charp(pp));
-	    if ((pp = inputLine(Sprintf("Password for %s: ", realm)->ptr, NULL,
+	    if ((pp = inputLine(Sprintf(_("Password for %s: "), realm)->ptr, NULL,
 				IN_PASSWORD)) == NULL) {
 		*uname = NULL;
 		return;
@@ -1605,12 +1604,11 @@ getAuthCookie(struct http_auth *hauth, char *auth_header,
 	     * (This is same behavior as lwp-request.)
 	     */
 	    if (feof(stdin) || ferror(stdin)) {
-		/* FIXME: gettextize? */
-		fprintf(stderr, "w3m: Authorization required for %s\n",
+		fprintf(stderr, _("w3m: Authorization required for %s\n"),
 			realm);
 		exit(1);
 	    }
-	    
+
 	    /* FIXME: gettextize? */
 	    printf(proxy ? "Proxy Username for %s: " : "Username for %s: ",
 		   realm);
@@ -1661,8 +1659,7 @@ checkRedirection(ParsedURL *pu)
     }
 
     if (nredir >= FollowRedirection) {
-	/* FIXME: gettextize? */
-	tmp = Sprintf("Number of redirections exceeded %d at %s",
+	tmp = Sprintf(_("Number of redirections exceeded %d at %s"),
 		      FollowRedirection, parsedURL2Str(pu)->ptr);
 	disp_err_message(tmp->ptr, FALSE);
 	return FALSE;
@@ -1791,8 +1788,7 @@ loadGeneralFile(char *path, ParsedURL *volatile current, char *referer,
 		return b;
 	    }
 #endif
-	    /* FIXME: gettextize? */
-	    disp_err_message(Sprintf("Unknown URI: %s",
+	    disp_err_message(Sprintf(_("Unknown URI: %s"),
 				     parsedURL2Str(&pu)->ptr)->ptr, FALSE);
 	    break;
 	}
@@ -1839,8 +1835,7 @@ loadGeneralFile(char *path, ParsedURL *volatile current, char *referer,
 
 	if (fmInitialized) {
 	    term_cbreak();
-	    /* FIXME: gettextize? */
-	    message(Sprintf("%s contacted. Waiting for reply...", pu.host)->
+	    message(Sprintf(_("%s contacted. Waiting for reply..."), pu.host)->
 		    ptr, 0, 0);
 	    refresh();
 	}
@@ -8264,8 +8259,7 @@ _doFileCopy(char *tmpf, char *defstr, int download)
     if (fmInitialized) {
 	p = searchKeyData();
 	if (p == NULL || *p == '\0') {
-	    /* FIXME: gettextize? */
-	    q = inputLineHist("(Download)Save file to: ",
+	    q = inputLineHist(_("(Download)Save file to: "),
 			      defstr, IN_COMMAND, SaveHist);
 	    if (q == NULL || *q == '\0')
 		return FALSE;
@@ -8283,16 +8277,14 @@ _doFileCopy(char *tmpf, char *defstr, int download)
 		return -1;
 	}
 	if (checkCopyFile(tmpf, p) < 0) {
-	    /* FIXME: gettextize? */
-	    msg = Sprintf("Can't copy. %s and %s are identical.",
+	    msg = Sprintf(_("Can't copy. %s and %s are identical."),
 			  conv_from_system(tmpf), conv_from_system(p));
 	    disp_err_message(msg->ptr, FALSE);
 	    return -1;
 	}
 	if (!download) {
 	    if (_MoveFile(tmpf, p) < 0) {
-		/* FIXME: gettextize? */
-		msg = Sprintf("Can't save to %s", conv_from_system(p));
+		msg = Sprintf(_("Can't save to %s"), conv_from_system(p));
 		disp_err_message(msg->ptr, FALSE);
 	    }
 	    return -1;
@@ -8322,8 +8314,7 @@ _doFileCopy(char *tmpf, char *defstr, int download)
     else {
 	q = searchKeyData();
 	if (q == NULL || *q == '\0') {
-	    /* FIXME: gettextize? */
-	    printf("(Download)Save file to: ");
+	    printf(_("(Download)Save file to: "));
 	    fflush(stdout);
 	    filen = Strfgets(stdin);
 	    if (filen->length == 0)
@@ -8343,13 +8334,11 @@ _doFileCopy(char *tmpf, char *defstr, int download)
 		return -1;
 	}
 	if (checkCopyFile(tmpf, p) < 0) {
-	    /* FIXME: gettextize? */
-	    printf("Can't copy. %s and %s are identical.", tmpf, p);
+	    printf(_("Can't copy. %s and %s are identical."), tmpf, p);
 	    return -1;
 	}
 	if (_MoveFile(tmpf, p) < 0) {
-	    /* FIXME: gettextize? */
-	    printf("Can't save to %s\n", p);
+	    printf(_("Can't save to %s\n"), p);
 	    return -1;
 	}
 	if (PreserveTimestamp && !is_pipe && !stat(tmpf, &st))
@@ -8391,8 +8380,7 @@ doFileSave(URLFile uf, const char *defstr)
     if (fmInitialized) {
 	p = searchKeyData();
 	if (p == NULL || *p == '\0') {
-	    /* FIXME: gettextize? */
-	    p = inputLineHist("(Download)Save file to: ",
+	    p = inputLineHist(_("(Download)Save file to: "),
 			      defstr, IN_FILENAME, SaveHist);
 	    if (p == NULL || *p == '\0')
 		return -1;
@@ -8401,8 +8389,7 @@ doFileSave(URLFile uf, const char *defstr)
 	if (checkOverWrite(p) < 0)
 	    return -1;
 	if (checkSaveFile(uf.stream, p) < 0) {
-	    /* FIXME: gettextize? */
-	    msg = Sprintf("Can't save. Load file and %s are identical.",
+	    msg = Sprintf(_("Can't save. Load file and %s are identical."),
 			  conv_from_system(p));
 	    disp_err_message(msg->ptr, FALSE);
 	    return -1;
@@ -8436,8 +8423,7 @@ doFileSave(URLFile uf, const char *defstr)
     else {
 	q = searchKeyData();
 	if (q == NULL || *q == '\0') {
-	    /* FIXME: gettextize? */
-	    printf("(Download)Save file to: ");
+	    printf(_("(Download)Save file to: "));
 	    fflush(stdout);
 	    filen = Strfgets(stdin);
 	    if (filen->length == 0)
@@ -8452,15 +8438,13 @@ doFileSave(URLFile uf, const char *defstr)
 	if (checkOverWrite(p) < 0)
 	    return -1;
 	if (checkSaveFile(uf.stream, p) < 0) {
-	    /* FIXME: gettextize? */
-	    printf("Can't save. Load file and %s are identical.", p);
+	    printf(_("Can't save. Load file and %s are identical."), p);
 	    return -1;
 	}
 	if (uf.content_encoding != CMP_NOCOMPRESS && AutoUncompress)
 	    uncompress_stream(&uf, NULL);
 	if (save2tmp(uf, p) < 0) {
-	    /* FIXME: gettextize? */
-	    printf("Can't save to %s\n", p);
+	    printf(_("Can't save to %s\n"), p);
 	    return -1;
 	}
 	if (PreserveTimestamp && uf.modtime != -1)
@@ -8507,8 +8491,7 @@ checkOverWrite(const char *path)
 
     if (stat(path, &st) < 0)
 	return 0;
-    /* FIXME: gettextize? */
-    ans = inputAnswer("File exists. Overwrite? (y/n)");
+    ans = inputAnswer(_("File exists. Overwrite? (y/n)"));
     if (ans && TOLOWER(*ans) == 'y')
 	return 0;
     else

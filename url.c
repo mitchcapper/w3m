@@ -477,9 +477,8 @@ openSSLHandle(int sock, char *hostname, char **p_cert)
     close(sock);
     if (handle)
 	SSL_free(handle);
-    /* FIXME: gettextize? */
     disp_err_message(Sprintf
-		     ("SSL error: %s, a workaround might be: w3m -insecure",
+		     (_("SSL error: %s, a workaround might be: w3m -insecure"),
 		      ERR_error_string(ERR_get_error(), NULL))->ptr, FALSE);
     return NULL;
 }
@@ -556,8 +555,7 @@ openSocket(char *const hostname,
     void (*volatile prevtrap) (SIGNAL_ARG) = NULL;
 
     if (fmInitialized) {
-	/* FIXME: gettextize? */
-	message(Sprintf("Opening socket...")->ptr, 0, 0);
+	message(Sprintf(_("Opening socket..."))->ptr, 0, 0);
 	refresh();
     }
     if (SETJMP(AbortLoading) != 0) {

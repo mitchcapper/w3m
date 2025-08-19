@@ -1,5 +1,8 @@
 Unreleased
 
+* new feature
+  - Use gettext everywhere, allow for more localization
+
 * bug fixes
   - Prevent segfault when user aborts session store command
 

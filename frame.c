@@ -468,8 +468,7 @@ createFrameFile(struct frameset *f, FILE * f1, Buffer *current, int level,
 	    }
 	    switch (frame.element->attr) {
 	    default:
-		/* FIXME: gettextize? */
-		fprintf(f1, "Frameset \"%s\" frame %d: type unrecognized",
+		fprintf(f1, _("Frameset \"%s\" frame %d: type unrecognized"),
 			html_quote(f->name), i + 1);
 		break;
 	    case F_UNLOADED:
@@ -495,12 +494,10 @@ createFrameFile(struct frameset *f, FILE * f1, Buffer *current, int level,
 		if (f2.stream == NULL) {
 		    frame.body->attr = F_UNLOADED;
 		    if (frame.body->flags & FB_NO_BUFFER)
-			/* FIXME: gettextize? */
-			fprintf(f1, "Open %s with other method",
+			fprintf(f1, _("Open %s with other method"),
 				html_quote(frame.body->url));
 		    else if (frame.body->url)
-			/* FIXME: gettextize? */
-			fprintf(f1, "Can't open %s",
+			fprintf(f1, _("Can't open %s"),
 				html_quote(frame.body->url));
 		    else
 			/* FIXME: gettextize? */
