@@ -597,12 +597,15 @@ sync_cookies(void)
 	    continue;
 	}
 
+	unlink_cookie(&ncs, nc);
+	nc->next = NULL;
 	if (!(nc->expires > oc->expires))
 	    continue;
 
-	for (ck = First_cookie; ck->next != oc; ck = ck->next) ;
+	unlink_cookie(&First_cookie, oc);
+
+	for (ck = First_cookie; ck->next; ck = ck->next) ;
 	ck->next = nc;
-	nc->next = oc->next;
     }
 
     for (oc = First_cookie; oc->next; oc = oc->next) ;

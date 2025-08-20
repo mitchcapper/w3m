@@ -5,6 +5,7 @@ Unreleased
 
 * bug fixes
   - Prevent segfault when user aborts session store command
+  - Fix cookie sync logic
 
 w3m 0.5.4 - 2025-08-03
 
