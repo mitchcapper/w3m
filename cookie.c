@@ -68,11 +68,27 @@ static TextList *Cookie_avoid_wrong_number_of_dots_domains;
 static long long cf_mtime;
 static int is_saved = 1;
 
+static Str make_cookie(struct cookie *cookie);
+static Str portlist2str(struct portlist *first);
+static Str readcol(char **p);
+static char *FQDN(char *host);
+static char *domain_match(char *host, char *domain);
+static int check_avoid_wrong_number_of_dots_domain( Str domain );
 static int load_cookies(struct cookie **cookie);
+static int load_cookies(struct cookie **cookie);
+static int match_cookie(ParsedURL *pu, struct cookie *cookie, char *domainname);
+static int port_match(struct portlist *first, int port);
+static int sync_cookies(void);
+static struct cookie * get_cookie(struct cookie *first_node, Str domain, Str path, Str name);
+static struct cookie * nth_cookie(int n);
+static struct portlist * make_portlist(Str port);
+static unsigned int total_dot_number(char *p, char *ep, unsigned int max_count);
+static void check_expired_cookies(void);
+static void unlink_cookie(struct cookie **list, struct cookie *cookie);
 
 #define contain_no_dots(p, ep) (total_dot_number((p),(ep),1)==0)
 
-static char *
+char *
 FQDN(char *host)
 {
     char *p;
@@ -149,7 +165,7 @@ parse_cookie(void)
 }
 
 
-static unsigned int
+unsigned int
 total_dot_number(char *p, char *ep, unsigned int max_count)
 {
     unsigned int count = 0;
@@ -164,7 +180,7 @@ total_dot_number(char *p, char *ep, unsigned int max_count)
 }
 
 
-static char *
+char *
 domain_match(char *host, char *domain)
 {
     int m0, m1;
@@ -211,7 +227,7 @@ domain_match(char *host, char *domain)
 }
 
 
-static struct portlist *
+struct portlist *
 make_portlist(Str port)
 {
     struct portlist *first = NULL, *pl;
@@ -236,7 +252,7 @@ make_portlist(Str port)
     return first;
 }
 
-static Str
+Str
 portlist2str(struct portlist *first)
 {
     struct portlist *pl;
@@ -248,7 +264,7 @@ portlist2str(struct portlist *first)
     return tmp;
 }
 
-static int
+int
 port_match(struct portlist *first, int port)
 {
     struct portlist *pl;
@@ -260,7 +276,7 @@ port_match(struct portlist *first, int port)
     return 0;
 }
 
-static void
+void
 check_expired_cookies(void)
 {
     struct cookie *p, *p1;
@@ -286,7 +302,7 @@ check_expired_cookies(void)
     }
 }
 
-static Str
+Str
 make_cookie(struct cookie *cookie)
 {
     Str tmp = Strdup(cookie->name);
@@ -295,7 +311,7 @@ make_cookie(struct cookie *cookie)
     return tmp;
 }
 
-static int
+int
 match_cookie(ParsedURL *pu, struct cookie *cookie, char *domainname)
 {
     if (!domainname)
@@ -318,7 +334,7 @@ match_cookie(ParsedURL *pu, struct cookie *cookie, char *domainname)
     return 1;
 }
 
-static struct cookie *
+struct cookie *
 get_cookie(struct cookie *first_node, Str domain, Str path, Str name)
 {
     struct cookie *p;
@@ -381,7 +397,7 @@ find_cookie(ParsedURL *pu)
     return tmp;
 }
 
-static int
+int
 check_avoid_wrong_number_of_dots_domain( Str domain )
 {
    TextListItem *tl;
@@ -539,7 +555,7 @@ add_cookie(ParsedURL *pu, Str name, Str value,
     return 0;
 }
 
-static struct cookie *
+struct cookie *
 nth_cookie(int n)
 {
     struct cookie *p;
@@ -551,7 +567,7 @@ nth_cookie(int n)
     return NULL;
 }
 
-static void
+void
 unlink_cookie(struct cookie **list, struct cookie *cookie)
 {
     struct cookie *c;
@@ -566,7 +582,7 @@ unlink_cookie(struct cookie **list, struct cookie *cookie)
 	    }
 }
 
-static int
+int
 sync_cookies(void)
 {
     struct cookie *ck, *nc, *ncs, *oc;
@@ -658,7 +674,7 @@ save_cookies(void)
 }
 #undef str2charp
 
-static Str
+Str
 readcol(char **p)
 {
     Str tmp = Strnew();
@@ -669,7 +685,7 @@ readcol(char **p)
     return tmp;
 }
 
-static int
+int
 load_cookies(struct cookie **cookie)
 {
     FILE *fp;
