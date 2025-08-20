@@ -1,4 +1,9 @@
-w3m 0.5.4
+Unreleased
+
+* bug fixes
+  - Prevent segfault when user aborts session store command
+
+w3m 0.5.4 - 2025-08-03
 
 * deprecated
   - option -H Users should use -o high-intensity=true instead
