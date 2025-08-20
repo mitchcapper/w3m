@@ -319,7 +319,7 @@ match_cookie(ParsedURL *pu, struct cookie *cookie, char *domainname)
 }
 
 static struct cookie *
-get_cookie_info(struct cookie *first_node, Str domain, Str path, Str name)
+get_cookie(struct cookie *first_node, Str domain, Str path, Str name)
 {
     struct cookie *p;
 
@@ -494,7 +494,7 @@ add_cookie(ParsedURL *pu, Str name, Str value,
 	    Strshrink(path, 1);
     }
 
-    p = get_cookie_info(First_cookie, domain, path, name);
+    p = get_cookie(First_cookie, domain, path, name);
     if (!p) {
 	p = New(struct cookie);
 	p->flag = 0;
@@ -591,7 +591,7 @@ sync_cookies(void)
     is_saved = 0;
 
     for (oc = First_cookie; oc; oc = oc->next){
-	if (!(nc = get_cookie_info(ncs, oc->domain, oc->path, oc->name))) {
+	if (!(nc = get_cookie(ncs, oc->domain, oc->path, oc->name))) {
 	    if (!oc->used)
 		unlink_cookie(&First_cookie, oc);
 	    continue;
