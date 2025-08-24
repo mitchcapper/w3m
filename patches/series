@@ -1,10 +1,4 @@
 Remove-islang.c.patch
-Use-gettext-for-user-facing-strings.patch
-Do-not-use-legacy-gc-include.patch
-Make-intTrap-static.patch
-Make-funcname0.awk-a-prerequisite.patch
-Remove-unused-default_use_cookie-variable.patch
-Cleanup-cookie-code.patch
 Add-cd-command.patch
 # readline
 Add-key-binding-to-insert-word-under-cursor.patch

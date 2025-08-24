@@ -579,7 +579,7 @@ Date: Thu Dec 19 06:59:22 CET 2024
  W3M_LIBS = @W3M_LIBS@
 --- a/cookie.c
 +++ b/cookie.c
-@@ -331,6 +331,58 @@ get_cookie_info(struct cookie *first_nod
+@@ -346,6 +346,58 @@ get_cookie(struct cookie *first_node, St
      return NULL;
  }
  

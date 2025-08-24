@@ -85,7 +85,7 @@ Protected buffers cannot be deleted with BACK.
  static void
  cmd_loadURL(char *url, ParsedURL *current, char *referer, FormList *request)
  {
-@@ -6233,6 +6250,7 @@ DEFUN(tabMs, TAB_MOUSE, "Select tab by m
+@@ -6234,6 +6251,7 @@ DEFUN(tabMs, TAB_MOUSE, "Select tab by m
  
  DEFUN(closeTMs, CLOSE_TAB_MOUSE, "Close tab at mouse pointer")
  {
@@ -93,7 +93,7 @@ Protected buffers cannot be deleted with BACK.
      TabBuffer *tab;
  
      if (!mouse_action.in_action)
-@@ -6240,6 +6258,14 @@ DEFUN(closeTMs, CLOSE_TAB_MOUSE, "Close
+@@ -6241,6 +6259,14 @@ DEFUN(closeTMs, CLOSE_TAB_MOUSE, "Close
      tab = posTab(mouse_action.cursorX, mouse_action.cursorY);
      if (!tab || tab == NO_TABBUFFER)
  	return;
@@ -108,7 +108,7 @@ Protected buffers cannot be deleted with BACK.
      deleteTab(tab);
      displayBuffer(Currentbuf, B_FORCE_REDRAW);
  }
-@@ -6870,16 +6896,25 @@ deleteTab(TabBuffer * tab)
+@@ -6871,16 +6897,25 @@ deleteTab(TabBuffer * tab)
  
  DEFUN(closeT, CLOSE_TAB, "Close tab")
  {
