@@ -75,7 +75,6 @@ static char *FQDN(char *host);
 static char *domain_match(char *host, char *domain);
 static int check_avoid_wrong_number_of_dots_domain( Str domain );
 static int load_cookies(struct cookie **cookie);
-static int load_cookies(struct cookie **cookie);
 static int match_cookie(ParsedURL *pu, struct cookie *cookie, char *domainname);
 static int port_match(struct portlist *first, int port);
 static int sync_cookies(void);
