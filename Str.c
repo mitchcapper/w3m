@@ -15,7 +15,7 @@
  */
 #include <stdio.h>
 #include <stdlib.h>
-#include <gc.h>
+#include <gc/gc.h>
 #include <stdarg.h>
 #include <string.h>
 #ifdef __EMX__			/* or include "fm.h" for HAVE_BCOPY? */

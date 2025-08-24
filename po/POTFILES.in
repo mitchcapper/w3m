@@ -1,6 +1,23 @@
 # List of source files containing translatable strings.
-#main.c
 menu.c
 rc.c
-#w3mbookmark.c
-#w3mhelperpanel.c
+anchor.c
+buffer.c
+cookie.c
+display.c
+etc.c
+file.c
+fm.h
+form.c
+frame.c
+func.c
+history.c
+istream.c
+linein.c
+local.c
+main.c
+menu.c
+rc.c
+url.c
+w3mbookmark.c
+w3mhelperpanel.c

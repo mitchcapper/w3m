@@ -5,11 +5,17 @@
 
 #include <stdio.h>
 
+#include "config.h"
+#include "cookie.h"
 #include "fm.h"
 #include "func.h"
 #include "myctype.h"
 #include "regex.h"
 #include "rc.h"
+
+#ifndef USE_COOKIE
+#define cooLst nulcmd
+#endif				/* not USE_COOKIE */
 
 #include "funcname.c"
 #include "functable.c"
@@ -31,11 +37,9 @@ setKeymap(char *p, int lineno, int verbose)
     c = getKey(s);
     if (c < 0) {		/* error */
 	if (lineno > 0)
-	    /* FIXME: gettextize? */
-	    emsg = Sprintf("line %d: unknown key '%s'", lineno, s)->ptr;
+	    emsg = Sprintf(_("line %d: unknown key '%s'"), lineno, s)->ptr;
 	else
-	    /* FIXME: gettextize? */
-	    emsg = Sprintf("defkey: unknown key '%s'", s)->ptr;
+	    emsg = Sprintf(_("defkey: unknown key '%s'"), s)->ptr;
 	record_err_message(emsg);
 	if (verbose)
 	    disp_message_nsec(emsg, FALSE, 1, TRUE, FALSE);
@@ -45,11 +49,9 @@ setKeymap(char *p, int lineno, int verbose)
     f = getFuncList(s);
     if (f < 0) {
 	if (lineno > 0)
-	    /* FIXME: gettextize? */
-	    emsg = Sprintf("line %d: invalid command '%s'", lineno, s)->ptr;
+	    emsg = Sprintf(_("line %d: invalid command '%s'"), lineno, s)->ptr;
 	else
-	    /* FIXME: gettextize? */
-	    emsg = Sprintf("defkey: invalid command '%s'", s)->ptr;
+	    emsg = Sprintf(_("defkey: invalid command '%s'"), s)->ptr;
 	record_err_message(emsg);
 	if (verbose)
 	    disp_message_nsec(emsg, FALSE, 1, TRUE, FALSE);

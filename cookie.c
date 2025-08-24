@@ -8,26 +8,164 @@
  *   [DRAFT 12] http://www.ics.uci.edu/pub/ietf/http/draft-ietf-http-state-man-mec-12.txt
  */
 
-#include "fm.h"
 #include "cookie.h"
-#include "html.h"
 
-#ifdef USE_COOKIE
-#include <time.h>
-#include "local.h"
-#include "regex.h"
+#include "alloc.h"
+#include "config.h"
+#include "fm.h"
+#include "html.h"
+#include "indep.h"
 #include "myctype.h"
+#include "parsetag.h"
+#include "regex.h"
+#include "textlist.h"
 
 #include <errno.h>
+#include <fcntl.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <strings.h>
+#include <sys/stat.h>
+#include <time.h>
+#include <unistd.h>
+
+#ifdef INET6
+#include <sys/socket.h>
+#endif				/* INET6 */
+#ifndef __MINGW32_VERSION
+#include <netdb.h>
+#else
+#include <winsock.h>
+#endif				/* __MINGW32_VERSION */
+
+struct portlist {
+    unsigned short port;
+    struct portlist *next;
+};
+
+struct cookie {
+    ParsedURL url;
+    Str name;
+    Str value;
+    time_t expires;
+    Str path;
+    Str domain;
+    Str comment;
+    Str commentURL;
+    struct portlist *portl;
+    char version;
+    char flag;
+    struct cookie *next;
+    int used;
+};
+static struct cookie *First_cookie;
+
+static TextList *Cookie_reject_domains;
+static TextList *Cookie_accept_domains;
+static TextList *Cookie_avoid_wrong_number_of_dots_domains;
 
 static long long cf_mtime;
 static int is_saved = 1;
 
+static Str make_cookie(struct cookie *cookie);
+static Str portlist2str(struct portlist *first);
+static Str readcol(char **p);
+static char *FQDN(char *host);
+static char *domain_match(char *host, char *domain);
+static int check_avoid_wrong_number_of_dots_domain( Str domain );
 static int load_cookies(struct cookie **cookie);
+static int load_cookies(struct cookie **cookie);
+static int match_cookie(ParsedURL *pu, struct cookie *cookie, char *domainname);
+static int port_match(struct portlist *first, int port);
+static int sync_cookies(void);
+static struct cookie * get_cookie(struct cookie *first_node, Str domain, Str path, Str name);
+static struct cookie * nth_cookie(int n);
+static struct portlist * make_portlist(Str port);
+static unsigned int total_dot_number(char *p, char *ep, unsigned int max_count);
+static void check_expired_cookies(void);
+static void unlink_cookie(struct cookie **list, struct cookie *cookie);
 
 #define contain_no_dots(p, ep) (total_dot_number((p),(ep),1)==0)
 
-static unsigned int
+char *
+FQDN(char *host)
+{
+    char *p;
+#ifndef INET6
+    struct hostent *entry;
+#else				/* INET6 */
+    int *af;
+#endif				/* INET6 */
+
+    if (host == NULL)
+	return NULL;
+
+    if (strcasecmp(host, "localhost") == 0)
+	return host;
+
+    for (p = host; *p && *p != '.'; p++) ;
+
+    if (*p == '.')
+	return host;
+
+#ifndef INET6
+    if (!(entry = gethostbyname(host)))
+	return NULL;
+
+    return allocStr(entry->h_name, -1);
+#else				/* INET6 */
+    for (af = ai_family_order_table[DNS_order];; af++) {
+	int error;
+	struct addrinfo hints;
+	struct addrinfo *res, *res0;
+	char *namebuf;
+
+	memset(&hints, 0, sizeof(hints));
+	hints.ai_flags = AI_CANONNAME;
+	hints.ai_family = *af;
+	hints.ai_socktype = SOCK_STREAM;
+	error = getaddrinfo(host, NULL, &hints, &res0);
+	if (error) {
+	    if (*af == PF_UNSPEC) {
+		/* all done */
+		break;
+	    }
+	    /* try next address family */
+	    continue;
+	}
+	for (res = res0; res != NULL; res = res->ai_next) {
+	    if (res->ai_canonname) {
+		/* found */
+		namebuf = Strnew_charp(res->ai_canonname)->ptr;
+		freeaddrinfo(res0);
+		return namebuf;
+	    }
+	}
+	freeaddrinfo(res0);
+	if (*af == PF_UNSPEC) {
+	    break;
+	}
+    }
+    /* all failed */
+    return NULL;
+#endif				/* INET6 */
+}
+
+void
+parse_cookie(void)
+{
+    if (non_null(cookie_reject_domains))
+	Cookie_reject_domains = make_domain_list(cookie_reject_domains);
+    if (non_null(cookie_accept_domains))
+	Cookie_accept_domains = make_domain_list(cookie_accept_domains);
+    if (non_null(cookie_avoid_wrong_number_of_dots))
+	Cookie_avoid_wrong_number_of_dots_domains
+	    = make_domain_list(cookie_avoid_wrong_number_of_dots);
+}
+
+
+unsigned int
 total_dot_number(char *p, char *ep, unsigned int max_count)
 {
     unsigned int count = 0;
@@ -42,7 +180,7 @@ total_dot_number(char *p, char *ep, unsigned int max_count)
 }
 
 
-static char *
+char *
 domain_match(char *host, char *domain)
 {
     int m0, m1;
@@ -89,7 +227,7 @@ domain_match(char *host, char *domain)
 }
 
 
-static struct portlist *
+struct portlist *
 make_portlist(Str port)
 {
     struct portlist *first = NULL, *pl;
@@ -114,7 +252,7 @@ make_portlist(Str port)
     return first;
 }
 
-static Str
+Str
 portlist2str(struct portlist *first)
 {
     struct portlist *pl;
@@ -126,7 +264,7 @@ portlist2str(struct portlist *first)
     return tmp;
 }
 
-static int
+int
 port_match(struct portlist *first, int port)
 {
     struct portlist *pl;
@@ -138,7 +276,7 @@ port_match(struct portlist *first, int port)
     return 0;
 }
 
-static void
+void
 check_expired_cookies(void)
 {
     struct cookie *p, *p1;
@@ -164,7 +302,7 @@ check_expired_cookies(void)
     }
 }
 
-static Str
+Str
 make_cookie(struct cookie *cookie)
 {
     Str tmp = Strdup(cookie->name);
@@ -173,7 +311,7 @@ make_cookie(struct cookie *cookie)
     return tmp;
 }
 
-static int
+int
 match_cookie(ParsedURL *pu, struct cookie *cookie, char *domainname)
 {
     if (!domainname)
@@ -196,8 +334,8 @@ match_cookie(ParsedURL *pu, struct cookie *cookie, char *domainname)
     return 1;
 }
 
-static struct cookie *
-get_cookie_info(struct cookie *first_node, Str domain, Str path, Str name)
+struct cookie *
+get_cookie(struct cookie *first_node, Str domain, Str path, Str name)
 {
     struct cookie *p;
 
@@ -259,7 +397,7 @@ find_cookie(ParsedURL *pu)
     return tmp;
 }
 
-static int
+int
 check_avoid_wrong_number_of_dots_domain( Str domain )
 {
    TextListItem *tl;
@@ -372,12 +510,11 @@ add_cookie(ParsedURL *pu, Str name, Str value,
 	    Strshrink(path, 1);
     }
 
-    p = get_cookie_info(First_cookie, domain, path, name);
+    p = get_cookie(First_cookie, domain, path, name);
     if (!p) {
 	p = New(struct cookie);
 	p->flag = 0;
-	if (default_use_cookie)
-	    p->flag |= COO_USE;
+	p->flag |= COO_USE;
 	p->next = First_cookie;
 	First_cookie = p;
     }
@@ -418,7 +555,7 @@ add_cookie(ParsedURL *pu, Str name, Str value,
     return 0;
 }
 
-static struct cookie *
+struct cookie *
 nth_cookie(int n)
 {
     struct cookie *p;
@@ -430,7 +567,7 @@ nth_cookie(int n)
     return NULL;
 }
 
-static void
+void
 unlink_cookie(struct cookie **list, struct cookie *cookie)
 {
     struct cookie *c;
@@ -445,7 +582,7 @@ unlink_cookie(struct cookie **list, struct cookie *cookie)
 	    }
 }
 
-static int
+int
 sync_cookies(void)
 {
     struct cookie *ck, *nc, *ncs, *oc;
@@ -470,18 +607,21 @@ sync_cookies(void)
     is_saved = 0;
 
     for (oc = First_cookie; oc; oc = oc->next){
-	if (!(nc = get_cookie_info(ncs, oc->domain, oc->path, oc->name))) {
+	if (!(nc = get_cookie(ncs, oc->domain, oc->path, oc->name))) {
 	    if (!oc->used)
 		unlink_cookie(&First_cookie, oc);
 	    continue;
 	}
 
+	unlink_cookie(&ncs, nc);
+	nc->next = NULL;
 	if (!(nc->expires > oc->expires))
 	    continue;
 
-	for (ck = First_cookie; ck->next != oc; ck = ck->next) ;
+	unlink_cookie(&First_cookie, oc);
+
+	for (ck = First_cookie; ck->next; ck = ck->next) ;
 	ck->next = nc;
-	nc->next = oc->next;
     }
 
     for (oc = First_cookie; oc->next; oc = oc->next) ;
@@ -534,7 +674,7 @@ save_cookies(void)
 }
 #undef str2charp
 
-static Str
+Str
 readcol(char **p)
 {
     Str tmp = Strnew();
@@ -545,7 +685,7 @@ readcol(char **p)
     return tmp;
 }
 
-static int
+int
 load_cookies(struct cookie **cookie)
 {
     FILE *fp;
@@ -796,4 +936,3 @@ check_cookie_accept_domain(char *domain)
     }
     return 1;
 }
-#endif				/* USE_COOKIE */

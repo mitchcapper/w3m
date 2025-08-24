@@ -6,7 +6,7 @@
  */
 #ifndef W3_ALLOC_H
 #define W3_ALLOC_H
-#include <gc.h>
+#include <gc/gc.h>
 #include <limits.h>
 #include <stdlib.h>
 #include <stdint.h>

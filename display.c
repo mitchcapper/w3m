@@ -357,8 +357,7 @@ make_lastline_message(Buffer *buf)
 	    Strcat(msg, Sprintf("%d/%d (%d%%)", cl, ll, r));
     }
     else
-	/* FIXME: gettextize? */
-	Strcat_charp(msg, "Viewing");
+	Strcat_charp(msg, _("Viewing"));
 #ifdef USE_SSL
     if (buf->ssl_certificate)
 	Strcat_charp(msg, "[SSL]");
@@ -493,8 +492,7 @@ displayBuffer(Buffer *buf, int mode)
 
     msg = make_lastline_message(buf);
     if (buf->firstLine == NULL) {
-	/* FIXME: gettextize? */
-	Strcat_charp(msg, "\tNo Line");
+	Strcat_charp(msg, _("\tNo Line"));
     }
     if (delayed_msg != NULL) {
 	disp_message(delayed_msg, FALSE);

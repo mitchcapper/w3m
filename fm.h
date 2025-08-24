@@ -38,7 +38,7 @@
 
 #include "ctrlcode.h"
 #include "html.h"
-#include <gc.h>
+#include <gc/gc.h>
 #include "Str.h"
 #ifdef USE_M17N
 #include "wc.h"

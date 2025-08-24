@@ -3,8 +3,9 @@
 #include <string.h>
 #include <sys/types.h>
 #include "fm.h"
-#include <gc.h>
+#include <gc/gc.h>
 #include "terms.h"
+#include "cookie.h"
 
 
 /* Prototype declaration of internal functions */
