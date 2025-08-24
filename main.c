@@ -206,6 +206,12 @@ fversion(FILE * f)
 #ifdef USE_MIGEMO
 	    ",migemo"
 #endif
+#ifdef USE_HISTORY
+	    ",history"
+#endif
+#ifdef USE_DICT
+	    ",dict"
+#endif
 	);
 }
 
