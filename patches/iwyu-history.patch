@@ -1,0 +1,68 @@
+From: Rene Kita <mail@rkta.de>
+Date: Wed Aug 13 08:34:58 CEST 2025
+
+---
+ func.c    |    4 ++++
+ history.c |   12 ++++++++++--
+ history.h |    4 ----
+ 3 files changed, 14 insertions(+), 6 deletions(-)
+
+--- a/history.c
++++ b/history.c
+@@ -1,9 +1,18 @@
+ /* vi: set sw=4 ts=8 ai sm noet : */
++#include "Str.h"
++#include "alloc.h"
++#include "config.h"
+ #include "fm.h"
++#include "hash.h"
++#include "history.h"
++#include "indep.h"
++#include "textlist.h"
+ 
+ #include <errno.h>
++#include <stdio.h>
++#include <sys/stat.h>
++#include <unistd.h>
+ 
+-#ifdef USE_HISTORY
+ Buffer *
+ historyBuffer(Hist *hist)
+ {
+@@ -150,7 +159,6 @@ fail:
+     disp_err_message("Can't save history", FALSE);
+     return;
+ }
+-#endif				/* USE_HISTORY */
+ 
+ /*
+  * The following functions are used for internal stuff, we need them
+--- a/history.h
++++ b/history.h
+@@ -29,13 +29,9 @@ extern char *lastHist(Hist *hist);
+ extern char *nextHist(Hist *hist);
+ extern char *prevHist(Hist *hist);
+ 
+-#ifdef USE_HISTORY
+ extern int loadUrlHistory(void);
+ extern void saveUrlHistory(void);
+ extern void ldHist(void);
+ extern void svHist(void);
+-#else				/* not USE_HISTORY */
+-#define ldHist nulcmd
+-#endif				/* not USE_HISTORY */
+ 
+ #endif				/* HISTORY_H */
+--- a/func.c
++++ b/func.c
+@@ -28,6 +28,10 @@
+ #ifndef USE_COOKIE
+ #define cooLst nulcmd
+ #endif				/* not USE_COOKIE */
++#ifndef USE_HISTORY
++#define ldHist nulcmd
++#endif				/* not USE_HISTORY */
++
+ #include "funcname.c"
+ #include "functable.c"
+ 

@@ -18,7 +18,7 @@ Patch: patches/Add-Strgrow_n-function.patch
  Str
  Strnew(void)
  {
-@@ -117,12 +119,8 @@ Strfree(Str x)
+@@ -118,12 +120,8 @@ Strfree(Str x)
  void
  Strcopy(Str x, Str y)
  {
@@ -33,7 +33,7 @@ Patch: patches/Add-Strgrow_n-function.patch
      memmove(x->ptr, y->ptr, y->length + 1);
      x->length = y->length;
  }
-@@ -140,12 +138,8 @@ Strcopy_charp(Str x, const char *y)
+@@ -141,12 +139,8 @@ Strcopy_charp(Str x, const char *y)
      len = strlen(y);
      if (len < 0 || len > STR_LEN_MAX)
  	len = STR_LEN_MAX;
@@ -48,7 +48,7 @@ Patch: patches/Add-Strgrow_n-function.patch
      memmove(x->ptr, y, len);
      x->length = len;
      Strnulterm(x);
-@@ -163,12 +157,8 @@ Strcopy_charp_n(Str x, const char *y, in
+@@ -164,12 +158,8 @@ Strcopy_charp_n(Str x, const char *y, in
      }
      if (len < 0 || len > STR_LEN_MAX)
  	len = STR_LEN_MAX;
@@ -63,7 +63,7 @@ Patch: patches/Add-Strgrow_n-function.patch
      memmove(x->ptr, y, len);
      x->length = len;
      Strnulterm(x);
-@@ -190,14 +180,11 @@ Strcat_charp_n(Str x, const char *y, int
+@@ -191,14 +181,11 @@ Strcat_charp_n(Str x, const char *y, int
  	if (n <= 0)
  	    return;
      }
@@ -80,7 +80,7 @@ Patch: patches/Add-Strgrow_n-function.patch
      }
      memmove(&x->ptr[x->length], y, n);
      x->length += n;
-@@ -231,6 +218,22 @@ Strcat_m_charp(Str x, ...)
+@@ -232,6 +219,22 @@ Strcat_m_charp(Str x, ...)
  }
  
  void
@@ -103,7 +103,7 @@ Patch: patches/Add-Strgrow_n-function.patch
  Strgrow(Str x)
  {
      int newlen, addlen;
-@@ -247,13 +250,7 @@ Strgrow(Str x)
+@@ -248,13 +251,7 @@ Strgrow(Str x)
  	if (x->length + 1 >= newlen)
  	    x->length = newlen - 2;
      }

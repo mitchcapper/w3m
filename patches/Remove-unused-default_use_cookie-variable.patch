@@ -1,0 +1,31 @@
+From: Rene Kita <mail@rkta.de>
+Date: Thu Aug 14 07:51:58 CEST 2025
+
+Only set on initialization and only read once.
+---
+ cookie.c |    3 +--
+ cookie.h |    1 -
+ 2 files changed, 1 insertion(+), 3 deletions(-)
+
+--- a/cookie.c
++++ b/cookie.c
+@@ -376,8 +376,7 @@ add_cookie(ParsedURL *pu, Str name, Str
+     if (!p) {
+ 	p = New(struct cookie);
+ 	p->flag = 0;
+-	if (default_use_cookie)
+-	    p->flag |= COO_USE;
++	p->flag |= COO_USE;
+ 	p->next = First_cookie;
+ 	First_cookie = p;
+     }
+--- a/cookie.h
++++ b/cookie.h
+@@ -54,7 +54,6 @@ global char *CookieFile init(NULL);
+ global char *cookie_reject_domains init(NULL);
+ global char *cookie_accept_domains init(NULL);
+ global char *cookie_avoid_wrong_number_of_dots init(NULL);
+-global int default_use_cookie init(TRUE);
+ global int use_cookie init(TRUE);
+ global int show_cookie init(FALSE);
+ global int accept_cookie init(TRUE);

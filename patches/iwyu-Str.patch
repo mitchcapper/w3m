@@ -1,0 +1,86 @@
+From: Rene Kita <mail@rkta.de>
+Date: Tue Aug 12 16:14:06 CEST 2025
+
+---
+ Str.h           |    3 ++-
+ libwc/charset.c |    1 +
+ libwc/ucs.c     |    1 +
+ libwc/wtf.c     |    2 ++
+ parsetag.c      |    9 ++++++---
+ w3mbookmark.c   |    2 ++
+ 6 files changed, 14 insertions(+), 4 deletions(-)
+
+--- a/Str.h
++++ b/Str.h
+@@ -15,9 +15,10 @@
+  */
+ #ifndef GC_STR_H
+ #define GC_STR_H
++
+ #include <stdio.h>
+-#include <string.h>
+ #include <limits.h>
++
+ #ifdef __EMX__
+ #define strcasecmp	stricmp
+ #define strncasecmp	strnicmp
+--- a/libwc/charset.c
++++ b/libwc/charset.c
+@@ -2,6 +2,7 @@
+ 
+ #include <stdlib.h>
+ #include <ctype.h>
++#include <string.h>
+ #include "../alloc.h"
+ 
+ #include "wc.h"
+--- a/libwc/ucs.c
++++ b/libwc/ucs.c
+@@ -3,6 +3,7 @@
+ #ifdef USE_UNICODE
+ 
+ #include <stdlib.h>
++#include <strings.h>
+ #include "wc.h"
+ #include "ucs.h"
+ #include "search.h"
+--- a/libwc/wtf.c
++++ b/libwc/wtf.c
+@@ -16,6 +16,8 @@
+ #include "utf8.h"
+ #endif
+ 
++#include <string.h>
++
+ wc_uint8 WTF_WIDTH_MAP[ 0x100 ] = {
+     1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1,
+     1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1,
+--- a/parsetag.c
++++ b/parsetag.c
+@@ -1,9 +1,12 @@
+ /* vi: set sw=4 ts=8 ai sm noet : */
+-#include "myctype.h"
+-#include "indep.h"
+-#include "Str.h"
+ #include "parsetag.h"
+ 
++#include "Str.h"
++#include "indep.h"
++#include "myctype.h"
++
++#include <strings.h>
++
+ char *
+ tag_get_value(struct parsed_tagarg *t, const char *arg)
+ {
+--- a/w3mbookmark.c
++++ b/w3mbookmark.c
+@@ -1,6 +1,8 @@
+ /* vi: set sw=4 ts=8 ai sm noet : */
+ #include <stdlib.h>
+ #include <stdio.h>
++#include <string.h>
++
+ #include "config.h"
+ #include "Str.h"
+ #include "indep.h"

@@ -37,7 +37,7 @@ Use a STR_LEN_MAX to avoid dealing with of by errors.
      else if (n + 1 < INITIAL_STR_SIZE)
  	n = INITIAL_STR_SIZE - 1;
      x->ptr = GC_MALLOC_ATOMIC(n + 1);
-@@ -181,8 +182,8 @@ Strcopy_charp(Str x, const char *y)
+@@ -182,8 +183,8 @@ Strcopy_charp(Str x, const char *y)
  	return;
      }
      len = strlen(y);
@@ -48,7 +48,7 @@ Use a STR_LEN_MAX to avoid dealing with of by errors.
      if (x->area_size < len + 1) {
  	x->ptr = GC_REALLOC(x->ptr, len + 1);
  	if (x->ptr == NULL)
-@@ -204,8 +205,8 @@ Strcopy_charp_n(Str x, const char *y, in
+@@ -205,8 +206,8 @@ Strcopy_charp_n(Str x, const char *y, in
  	Strnulterm(x);
  	return;
      }
@@ -59,7 +59,7 @@ Use a STR_LEN_MAX to avoid dealing with of by errors.
      if (x->area_size < len + 1) {
  	x->ptr = GC_REALLOC(x->ptr, len + 1);
  	if (x->ptr == NULL)
-@@ -225,7 +226,7 @@ Strcat_charp_n(Str x, const char *y, int
+@@ -226,7 +227,7 @@ Strcat_charp_n(Str x, const char *y, int
      if (y == NULL || n == 0)
  	return;
      if (n < 0)
@@ -68,7 +68,7 @@ Use a STR_LEN_MAX to avoid dealing with of by errors.
      newlen = x->length + n + 1;
      if (newlen <= 0 || newlen > STR_SIZE_MAX) {
  	newlen = STR_SIZE_MAX;
-@@ -370,7 +371,7 @@ Strdelete(Str s, int pos, int n)
+@@ -371,7 +372,7 @@ Strdelete(Str s, int pos, int n)
      if (pos < 0 || s->length < pos)
  	return;
      if (n < 0)
@@ -103,7 +103,7 @@ Use a STR_LEN_MAX to avoid dealing with of by errors.
  	/* TODO(rkta): Better use Str function, does not exist yet */
 --- a/main.c
 +++ b/main.c
-@@ -498,7 +498,7 @@ main(int argc, char **argv)
+@@ -500,7 +500,7 @@ main(int argc, char **argv)
  	    /* Don't use hostname if it is truncated.  */
  	    hostname[HOST_NAME_MAX + 1] = '\0';
  	    hostname_len = strlen(hostname);

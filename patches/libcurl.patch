@@ -9,16 +9,16 @@ Date: Thu Dec 19 06:59:22 CET 2024
 
 --- a/file.c
 +++ b/file.c
-@@ -23,6 +23,8 @@
- 
+@@ -24,6 +24,8 @@
  #include <assert.h>
+ #include <math.h>
  
 +#include <curl/curl.h>
 +
  #ifndef max
  #define max(a,b)        ((a) > (b) ? (a) : (b))
  #endif				/* not max */
-@@ -1679,6 +1681,538 @@ getLinkNumberStr(int correction)
+@@ -1680,6 +1682,538 @@ getLinkNumberStr(int correction)
      return Sprintf("[%d]", cur_hseq + correction - !!zeroBasedLinkNo);
  }
  
@@ -557,7 +557,7 @@ Date: Thu Dec 19 06:59:22 CET 2024
  /* 
   * loadGeneralFile: load file to buffer
   */
-@@ -1734,6 +2268,8 @@ loadGeneralFile(char *path, ParsedURL *v
+@@ -1735,6 +2269,8 @@ loadGeneralFile(char *path, ParsedURL *v
  	    goto load_doc;
  	}
      }
@@ -579,7 +579,7 @@ Date: Thu Dec 19 06:59:22 CET 2024
  W3M_LIBS = @W3M_LIBS@
 --- a/cookie.c
 +++ b/cookie.c
-@@ -209,6 +209,58 @@ get_cookie_info(struct cookie *first_nod
+@@ -331,6 +331,58 @@ get_cookie_info(struct cookie *first_nod
      return NULL;
  }
  

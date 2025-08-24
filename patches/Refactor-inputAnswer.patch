@@ -130,7 +130,7 @@ Patch: patches/Refactor-inputAnswer.patch
  		    amsg = Sprintf("Permanently accepted unverified SSL"
  				   "session: %s", em);
  		    perm = 1;
-@@ -617,15 +616,15 @@ ssl_get_certificate(SSL * ssl, char *hos
+@@ -618,15 +617,15 @@ ssl_get_certificate(SSL * ssl, char *hos
      emsg = ssl_check_cert_ident(x, hostname);
      if (emsg != NULL) {
  	if (accept_this_site(hostname, x))
@@ -152,7 +152,7 @@ Patch: patches/Refactor-inputAnswer.patch
  	}
 --- a/proto.h
 +++ b/proto.h
-@@ -288,7 +288,8 @@ extern int doFileSave(URLFile uf, const
+@@ -287,7 +287,8 @@ extern int doFileSave(URLFile uf, const
  extern int checkCopyFile(const char *path1, const char *path2);
  extern int checkSaveFile(InputStream stream, const char *path);
  extern int checkOverWrite(const char *path);
@@ -164,7 +164,7 @@ Patch: patches/Refactor-inputAnswer.patch
  extern char *checkHeader(Buffer *buf, const char *field);
 --- a/main.c
 +++ b/main.c
-@@ -4576,16 +4576,15 @@ _strSession(char *sf)
+@@ -4578,16 +4578,15 @@ _strSession(char *sf)
      Buffer *buf;
      FILE *f;
      ParsedURL *url;

@@ -88,7 +88,7 @@ Patch: patches/Get-rid-of-xfree.patch
      return 0;
  }
  
-@@ -674,7 +674,7 @@ basic_close(int *handle)
+@@ -675,7 +675,7 @@ basic_close(int *handle)
  #else
      close(*handle);
  #endif
@@ -97,7 +97,7 @@ Patch: patches/Get-rid-of-xfree.patch
      return 0;
  }
  
-@@ -707,7 +707,7 @@ ssl_close(struct ssl_handle *handle)
+@@ -708,7 +708,7 @@ ssl_close(struct ssl_handle *handle)
      close(handle->sock);
      if (handle->ssl)
  	SSL_free(handle->ssl);
@@ -106,7 +106,7 @@ Patch: patches/Get-rid-of-xfree.patch
      return 0;
  }
  
-@@ -745,7 +745,7 @@ ens_close(struct ens_handle *handle)
+@@ -746,7 +746,7 @@ ens_close(struct ens_handle *handle)
  {
      ISclose(handle->is);
      growbuf_clear(&handle->gb);

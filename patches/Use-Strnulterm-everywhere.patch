@@ -78,7 +78,7 @@ While at it, refactor Strshrink.
  }
  
  void
-@@ -170,7 +177,7 @@ Strcopy_charp(Str x, const char *y)
+@@ -171,7 +178,7 @@ Strcopy_charp(Str x, const char *y)
  
      if (y == NULL) {
  	x->length = 0;
@@ -87,7 +87,7 @@ While at it, refactor Strshrink.
  	return;
      }
      len = strlen(y);
-@@ -183,8 +190,8 @@ Strcopy_charp(Str x, const char *y)
+@@ -184,8 +191,8 @@ Strcopy_charp(Str x, const char *y)
  	x->area_size = len + 1;
      }
      memmove(x->ptr, y, len);
@@ -97,7 +97,7 @@ While at it, refactor Strshrink.
  }
  
  void
-@@ -194,7 +201,7 @@ Strcopy_charp_n(Str x, const char *y, in
+@@ -195,7 +202,7 @@ Strcopy_charp_n(Str x, const char *y, in
  
      if (y == NULL) {
  	x->length = 0;
@@ -106,7 +106,7 @@ While at it, refactor Strshrink.
  	return;
      }
      if (len < 0 || len >= STR_SIZE_MAX)
-@@ -206,8 +213,8 @@ Strcopy_charp_n(Str x, const char *y, in
+@@ -207,8 +214,8 @@ Strcopy_charp_n(Str x, const char *y, in
  	x->area_size = len + 1;
      }
      memmove(x->ptr, y, len);
@@ -116,7 +116,7 @@ While at it, refactor Strshrink.
  }
  
  void
-@@ -237,7 +244,7 @@ Strcat_charp_n(Str x, const char *y, int
+@@ -238,7 +245,7 @@ Strcat_charp_n(Str x, const char *y, int
      }
      memmove(&x->ptr[x->length], y, n);
      x->length += n;
@@ -125,7 +125,7 @@ While at it, refactor Strshrink.
  }
  
  void
-@@ -289,7 +296,7 @@ Strgrow(Str x)
+@@ -290,7 +297,7 @@ Strgrow(Str x)
  	    exit(1);
  	x->area_size = newlen;
      }
@@ -134,7 +134,7 @@ While at it, refactor Strshrink.
  }
  
  Str
-@@ -329,7 +336,7 @@ Strchop(Str s)
+@@ -330,7 +337,7 @@ Strchop(Str s)
  	   (s->ptr[s->length - 1] == '\n' || s->ptr[s->length - 1] == '\r')) {
  	s->length--;
      }
@@ -143,7 +143,7 @@ While at it, refactor Strshrink.
  }
  
  void
-@@ -344,7 +351,8 @@ Strinsert_char(Str s, int pos, char c)
+@@ -345,7 +352,8 @@ Strinsert_char(Str s, int pos, char c)
  	return;
      for (i = s->length; i > pos; i--)
  	s->ptr[i] = s->ptr[i - 1];
@@ -153,7 +153,7 @@ While at it, refactor Strshrink.
      s->ptr[pos] = c;
  }
  
-@@ -364,14 +372,14 @@ Strdelete(Str s, int pos, int n)
+@@ -365,14 +373,14 @@ Strdelete(Str s, int pos, int n)
      if (n < 0)
  	n = STR_SIZE_MAX - pos - 1;
      if (s->length <= pos + n) {
@@ -170,7 +170,7 @@ While at it, refactor Strshrink.
  }
  
  void
-@@ -379,8 +387,8 @@ Strtruncate(Str s, int pos)
+@@ -380,8 +388,8 @@ Strtruncate(Str s, int pos)
  {
      if (pos < 0 || s->length < pos)
  	return;
@@ -180,7 +180,7 @@ While at it, refactor Strshrink.
  }
  
  void
-@@ -388,11 +396,11 @@ Strshrink(Str s, int n)
+@@ -389,11 +397,11 @@ Strshrink(Str s, int n)
  {
      if (n >= s->length) {
  	s->length = 0;
@@ -194,7 +194,7 @@ While at it, refactor Strshrink.
      }
  }
  
-@@ -414,7 +422,7 @@ Strremovetrailingspaces(Str s)
+@@ -415,7 +423,7 @@ Strremovetrailingspaces(Str s)
  
      for (i = s->length - 1; i >= 0 && IS_SPACE(s->ptr[i]); i--) ;
      s->length = i + 1;
@@ -227,7 +227,7 @@ While at it, refactor Strshrink.
  #define Strcasecmp(x,y)              strcasecmp((x)->ptr,(y)->ptr)
 --- a/etc.c
 +++ b/etc.c
-@@ -2159,7 +2159,7 @@ base64_encode(const char *src, size_t le
+@@ -2084,7 +2084,7 @@ base64_encode(const char *src, size_t le
  	}
  	Strcatc(dest, '=');
      }

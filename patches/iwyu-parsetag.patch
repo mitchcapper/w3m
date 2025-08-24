@@ -1,0 +1,23 @@
+From: Rene Kita <mail@rkta.de>
+Date: Thu Aug 14 09:34:38 CEST 2025
+
+---
+ parsetag.c |    4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+--- a/parsetag.c
++++ b/parsetag.c
+@@ -1,10 +1,12 @@
+ /* vi: set sw=4 ts=8 ai sm noet : */
++
+ #include "parsetag.h"
+ 
+ #include "Str.h"
++#include "alloc.h"
+ #include "indep.h"
+-#include "myctype.h"
+ 
++#include <stddef.h>
+ #include <strings.h>
+ 
+ char *

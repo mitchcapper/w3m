@@ -18,7 +18,7 @@ Patch: patches/Improve-protected-buffers.patch
  
  void set_buffer_environ(Buffer *);
  static void save_buffer_position(Buffer *buf);
-@@ -428,6 +429,26 @@ load_known_hosts(void)
+@@ -430,6 +431,26 @@ load_known_hosts(void)
  }
  
  int
@@ -45,7 +45,7 @@ Patch: patches/Improve-protected-buffers.patch
  main(int argc, char **argv)
  {
      Buffer *newbuf = NULL;
-@@ -1104,17 +1125,17 @@ main(int argc, char **argv)
+@@ -1106,17 +1127,17 @@ main(int argc, char **argv)
  	    SearchHeader = search_header;
  	    DefaultType = default_type;
  	    char *url;
@@ -66,7 +66,7 @@ Patch: patches/Improve-protected-buffers.patch
  	    else
  		url = url_encode(conv_from_system(load_argv[i]), NULL, 0);
  	    if (w3m_dump == DUMP_HEAD) {
-@@ -1155,7 +1176,7 @@ main(int argc, char **argv)
+@@ -1157,7 +1178,7 @@ main(int argc, char **argv)
  	    if (newbuf == NULL) {
  		if (ArgvIsURL && !retry) {
  		    retry = 1;
@@ -75,7 +75,7 @@ Patch: patches/Improve-protected-buffers.patch
  		}
  		Strcat(err_msg,
  		       Sprintf(_("w3m: Can't load %s.\n"), load_argv[i]));
-@@ -1163,6 +1184,9 @@ main(int argc, char **argv)
+@@ -1165,6 +1186,9 @@ main(int argc, char **argv)
  	    }
  	    else if (newbuf == NO_BUFFER)
  		continue;
@@ -85,7 +85,7 @@ Patch: patches/Improve-protected-buffers.patch
  	    switch (newbuf->real_scheme) {
  	    case SCM_MAILTO:
  		break;
-@@ -4539,17 +4563,20 @@ static void
+@@ -4541,17 +4565,20 @@ static void
  cmd_loadURL(char *url, ParsedURL *current, char *referer, FormList *request)
  {
      Buffer *buf;
@@ -106,7 +106,7 @@ Patch: patches/Improve-protected-buffers.patch
  	pushBuffer(buf);
  	if (RenderFrame && Currentbuf->frameset != NULL)
  	    rFrame();
-@@ -4621,8 +4648,6 @@ goURL0(const char *prompt, int relative)
+@@ -4623,8 +4650,6 @@ goURL0(const char *prompt, int relative)
  	gotoLabel(url + 1);
  	return;
      }
@@ -115,7 +115,7 @@ Patch: patches/Improve-protected-buffers.patch
      cmd_loadURL(url, current, referer, NULL);
      if (Currentbuf != cur_buf)	/* success */
  	pushHashHist(URLHist, parsedURL2Str(&Currentbuf->currentURL)->ptr);
-@@ -4741,7 +4766,9 @@ _strSession(char *sf)
+@@ -4743,7 +4768,9 @@ _strSession(char *sf)
  	    if (buf->bufferprop & BP_INTERNAL)
  		continue;
  	    if ((url = baseURL(buf)))

@@ -1,0 +1,32 @@
+From: Rene Kita <mail@rkta.de>
+Date: Thu Aug 14 09:37:59 CEST 2025
+
+---
+ parsetagx.c |   15 ++++++++++-----
+ 1 file changed, 10 insertions(+), 5 deletions(-)
+
+--- a/parsetagx.c
++++ b/parsetagx.c
+@@ -1,12 +1,17 @@
+ /* vi: set sw=4 ts=8 ai sm noet : */
+-#include "fm.h"
+-#include "myctype.h"
+-#include "indep.h"
+-#include "Str.h"
+ #include "parsetagx.h"
+-#include "hash.h"
+ 
++#include "Str.h"
++#include "alloc.h"
++#include "fm.h"
++#include "hash.h"
+ #include "html.c"
++#include "indep.h"
++#include "myctype.h"
++
++#include <stdlib.h>
++#include <string.h>
++#include <strings.h>
+ 
+ /* parse HTML tag */
+ 

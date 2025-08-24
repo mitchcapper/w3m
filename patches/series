@@ -1,6 +1,19 @@
-# Cookies
+Remove-islang.c.patch
+Use-gettext-for-user-facing-strings.patch
+Do-not-use-legacy-gc-include.patch
+Make-intTrap-static.patch
+Make-funcname0.awk-a-prerequisite.patch
+Remove-unused-default_use_cookie-variable.patch
+Cleanup-cookie-code.patch
+Add-cd-command.patch
+# readline
+Add-key-binding-to-insert-word-under-cursor.patch
+Add-smartcase-option-for-search.patch
+Show-all-link-numbers.patch
+Let-Strfree-take-a-NULL.patch
 # gemini
 gemini.patch
+Make-CTRL-Y-insert-deleted-text.patch
 # WARNINGS
 Enable-more-warnings.patch
 0143-Add-cppcheck-target.patch
@@ -15,15 +28,8 @@ Suppress-Wstrict-prototypes.patch
 0081-Only-use-malloc-if-the-default-buffer-is-to-small.patch
 # ACTIVE
 shorten-not-assigned-in-help.patch
-Use-gettext-for-user-facing-strings.patch
-Add-cd-command.patch
 do_download.patch
 gophertmp.patch
-# readline
-Add-key-binding-to-insert-word-under-cursor.patch
-Add-smartcase-option-for-search.patch
-Make-CTRL-Y-insert-deleted-text.patch
-Show-all-link-numbers.patch
 scan-build-issues.patch
 Refactor-inputAnswer.patch
 Refactor-checkOverwrite.patch
@@ -40,21 +46,27 @@ Refactor-Strnew-functions.patch
 Add-Strgrow_n-function.patch
 Refactor-Strcopy-functions.patch
 Refactor-Strcat-functions.patch
-Let-Strfree-take-a-NULL.patch
 Refactor-Strcat_char.patch
 Get-rid-of-xfree.patch
 Strinsert_charp_n.patch
 Let-Str-functions-return-a-Str.patch
 Get-rid-of-Strnulterm.patch
-Refactor-handling-of-close-tags.patch
-Remove-islang.c.patch
 Fix-yank.patch
+Refactor-handling-of-close-tags.patch
 Use-prec_num-with-followA.patch
 Use-confirm-in-quitfm.patch
 Add-command-to-protect-buffers.patch
 Improve-protected-buffers.patch
 Fix-link-numbers-in-tables.patch
 Change-filename-when-saving-compressed-source.patch
+iwyu-mktable.patch
+iwyu-func.patch
+iwyu-Str.patch
+iwyu-matrix.patch
+iwyu-history.patch
+iwyu-parsetag.patch
+iwyu-parsetagx.patch
+iwyu-alloc.patch
 libcurl.patch
 lto.patch
 # BORKED
@@ -65,9 +77,3 @@ Add-option-to-auto-accept-self-signed.patch
 0036-Move-chkurl-to-own-translation-unit.patch
 0037-Make-MARK_URL-work-with-display_link_numbers.patch
 0038-Do-not-double-check-urls-in-html-files.patch
-0040-Remove-redundant-code.patch
-0041-Toggle-check_url-with-chkURL.patch
-Fix-Wunused-result.patch
-Enable-Wformat=2.patch
-Remove-all-volatile.patch
-remove-emx-support.patch

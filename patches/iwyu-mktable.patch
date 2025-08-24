@@ -1,0 +1,28 @@
+From: Rene Kita <mail@rkta.de>
+Date: Tue Aug 12 16:53:56 CEST 2025
+
+---
+ mktable.c |   11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
+
+--- a/mktable.c
++++ b/mktable.c
+@@ -1,12 +1,13 @@
+ /* vi: set sw=4 ts=8 ai sm noet : */
+-#include <stdio.h>
+-#include <stdlib.h>
+-#include "myctype.h"
+-#include "config.h"
++#include "Str.h"
+ #include "hash.h"
+ #include "myctype.h"
+-#include "Str.h"
++
+ #include <gc/gc.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++
+ 
+ /* *INDENT-OFF* */
+ defhash(HashItem_ss *, int, hss_i)

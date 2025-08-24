@@ -21,7 +21,7 @@ Patch: patches/Add-smartcase-option-for-search.patch
  global char *BookmarkFile init(NULL);
 --- a/rc.c
 +++ b/rc.c
-@@ -217,6 +217,7 @@ static int OptionEncode = FALSE;
+@@ -215,6 +215,7 @@ static int OptionEncode = FALSE;
  #define CMT_NOSENDREFERER N_("Suppress `Referer:' header")
  #define CMT_CROSSORIGINREFERER N_("Exclude pathname and query string from `Referer:' header when cross domain communication")
  #define CMT_IGNORE_CASE N_("Search case-insensitively")
@@ -29,7 +29,7 @@ Patch: patches/Add-smartcase-option-for-search.patch
  #define CMT_USE_LESSOPEN N_("Use LESSOPEN")
  #ifdef USE_SSL
  #ifdef USE_SSL_VERIFY
-@@ -539,6 +540,8 @@ struct param_ptr params3[] = {
+@@ -536,6 +537,8 @@ struct param_ptr params3[] = {
      {"wrap_search", P_INT, PI_ONOFF, (void *)&WrapDefault, CMT_WRAP, NULL},
      {"ignorecase_search", P_INT, PI_ONOFF, (void *)&IgnoreCase,
       CMT_IGNORE_CASE, NULL},

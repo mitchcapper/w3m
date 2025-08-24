@@ -5,17 +5,17 @@ Patch: patches/Add-test-for-Str.patch
 
 ---
  t/0001-Str.c |  601 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- t/run        |    3 
- 2 files changed, 604 insertions(+)
+ t/run        |    1 
+ 2 files changed, 602 insertions(+)
 
 --- /dev/null
 +++ b/t/0001-Str.c
 @@ -0,0 +1,601 @@
 +#if 0
 +#!/bin/sh
-+#trap 'rm -f ./a.out' EXIT
 +cc -Werror -g -O0 $0 -I.. -I../libwc -L.. -L../libwc -lwc -lgc -lindep
-+./a.out "$@"
++./a.out "$@" || exit 1
++rm -f ./a.out
 +exit
 +#endif
 +
@@ -614,7 +614,7 @@ Patch: patches/Add-test-for-Str.patch
 +}
 --- a/t/run
 +++ b/t/run
-@@ -11,9 +11,12 @@ test -x ../w3m || exit 2
+@@ -11,6 +11,7 @@ test -x ../w3m || exit 2
  
  for t in [0-9][0-9][0-9][0-9]*
  do
@@ -622,8 +622,3 @@ Patch: patches/Add-test-for-Str.patch
  	./$t || exit 1
  done
  
-+sh ./0001-Str.c || exit 1
-+
- total=0
- pass=0
- fail=0

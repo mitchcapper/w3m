@@ -1,0 +1,26 @@
+From: Rene Kita <mail@rkta.de>
+Date: Wed Aug 13 16:42:33 CEST 2025
+
+---
+ Makefile.in |    6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -169,13 +169,13 @@ funcname.tab: $(DEFUNS)
+ 		mv $@.tmp $@; \
+ 	fi
+ 
+-funcname.c: funcname.tab
++funcname.c: funcname.tab funcname0.awk
+ 	sort funcname.tab | $(AWK) -f $(top_srcdir)/funcname0.awk > $@
+ 
+-funcname1.h: funcname.tab
++funcname1.h: funcname.tab funcname1.awk
+ 	sort funcname.tab | $(AWK) -f $(top_srcdir)/funcname1.awk > $@
+ 
+-funcname2.h: funcname.tab
++funcname2.h: funcname.tab funcname2.awk
+ 	sort funcname.tab | $(AWK) -f $(top_srcdir)/funcname2.awk > $@
+ 
+ functable.c: funcname.tab mktable$(EXT)

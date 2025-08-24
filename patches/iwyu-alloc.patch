@@ -1,0 +1,17 @@
+From: Rene Kita <mail@rkta.de>
+Date: Tue Aug 12 17:42:35 CEST 2025
+
+---
+ alloc.h |    1 -
+ 1 file changed, 1 deletion(-)
+
+--- a/alloc.h
++++ b/alloc.h
+@@ -7,7 +7,6 @@
+ #ifndef W3_ALLOC_H
+ #define W3_ALLOC_H
+ #include <gc/gc.h>
+-#include <limits.h>
+ #include <stdlib.h>
+ #include <stdint.h>
+ #include <stdio.h>

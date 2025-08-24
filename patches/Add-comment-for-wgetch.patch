@@ -9,7 +9,7 @@
  #ifdef USE_MOUSE
  #ifdef USE_GPM
 +/*
-+ * While wgetch seems to be unused, it's need.
++ * While wgetch seems to be unused, it's needed.
 + * E.g. SELECT_MENU will segfault if you remove it.
 + * TODO(rkta): wgetch belongs to libcurses, something fishy is going on here.
 + */

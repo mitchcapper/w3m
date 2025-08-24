@@ -1,0 +1,76 @@
+From: Rene Kita <mail@rkta.de>
+Date: Wed Aug 13 11:57:22 CEST 2025
+
+---
+ fm.h   |    1 -
+ func.c |   19 +++++++++++++++----
+ func.h |    5 ++---
+ 3 files changed, 17 insertions(+), 8 deletions(-)
+
+--- a/func.c
++++ b/func.c
+@@ -3,20 +3,31 @@
+  * w3m func.c
+  */
+ 
+-#include <stdio.h>
++#include "func.h"
+ 
++#include "Str.h"
++#include "alloc.h"
+ #include "config.h"
+ #include "cookie.h"
++#include "ctrlcode.h"
+ #include "fm.h"
+-#include "func.h"
++#include "hash.h"
++#include "indep.h"
+ #include "myctype.h"
+-#include "regex.h"
+ #include "rc.h"
++#include "regex.h"
++#include "wc.h"
++#include "wc_types.h"
++
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <strings.h>
++#include <sys/stat.h>
+ 
+ #ifndef USE_COOKIE
+ #define cooLst nulcmd
+ #endif				/* not USE_COOKIE */
+-
+ #include "funcname.c"
+ #include "functable.c"
+ 
+--- a/func.h
++++ b/func.h
+@@ -6,9 +6,6 @@
+ #ifndef FUNC_H
+ #define FUNC_H
+ 
+-#include "textlist.h"
+-#include "hash.h"
+-
+ #define KEY_HASH_SIZE 127
+ 
+ #define K_ESC  0x100
+@@ -22,4 +19,6 @@ typedef struct _FuncList {
+     void (*func) (void);
+ } FuncList;
+ 
++extern FuncList w3mFuncList[];
++
+ #endif				/* not FUNC_H */
+--- a/fm.h
++++ b/fm.h
+@@ -818,7 +818,6 @@ extern unsigned char EscDKeymap[];
+ #ifdef __EMX__
+ extern unsigned char PcKeymap[];
+ #endif
+-extern FuncList w3mFuncList[];
+ 
+ global char *HTTP_proxy init(NULL);
+ #ifdef USE_SSL

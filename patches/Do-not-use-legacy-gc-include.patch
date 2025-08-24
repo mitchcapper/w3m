@@ -1,0 +1,114 @@
+From: Rene Kita <mail@rkta.de>
+Date: Tue Aug 12 17:00:24 CEST 2025
+
+---
+ Str.c      |    2 +-
+ alloc.h    |    2 +-
+ backend.c  |    2 +-
+ fm.h       |    2 +-
+ hash.c     |    2 +-
+ indep.c    |    2 +-
+ mktable.c  |    2 +-
+ regex.c    |    2 +-
+ textlist.c |    2 +-
+ 9 files changed, 9 insertions(+), 9 deletions(-)
+
+--- a/Str.c
++++ b/Str.c
+@@ -15,7 +15,7 @@
+  */
+ #include <stdio.h>
+ #include <stdlib.h>
+-#include <gc.h>
++#include <gc/gc.h>
+ #include <stdarg.h>
+ #include <string.h>
+ #ifdef __EMX__			/* or include "fm.h" for HAVE_BCOPY? */
+--- a/alloc.h
++++ b/alloc.h
+@@ -6,7 +6,7 @@
+  */
+ #ifndef W3_ALLOC_H
+ #define W3_ALLOC_H
+-#include <gc.h>
++#include <gc/gc.h>
+ #include <limits.h>
+ #include <stdlib.h>
+ #include <stdint.h>
+--- a/backend.c
++++ b/backend.c
+@@ -3,7 +3,7 @@
+ #include <string.h>
+ #include <sys/types.h>
+ #include "fm.h"
+-#include <gc.h>
++#include <gc/gc.h>
+ #include "terms.h"
+ 
+ 
+--- a/fm.h
++++ b/fm.h
+@@ -38,7 +38,7 @@
+ 
+ #include "ctrlcode.h"
+ #include "html.h"
+-#include <gc.h>
++#include <gc/gc.h>
+ #include "Str.h"
+ #ifdef USE_M17N
+ #include "wc.h"
+--- a/hash.c
++++ b/hash.c
+@@ -1,7 +1,7 @@
+ /* vi: set sw=4 ts=8 ai sm noet : */
+ #include <string.h>
+ #include "hash.h"
+-#include <gc.h>
++#include <gc/gc.h>
+ 
+ static unsigned int
+ hashfunc(const char *s)
+--- a/indep.c
++++ b/indep.c
+@@ -9,7 +9,7 @@
+ #include <stdlib.h>
+ #include "indep.h"
+ #include "Str.h"
+-#include <gc.h>
++#include <gc/gc.h>
+ #include "myctype.h"
+ #include "entity.h"
+ 
+--- a/mktable.c
++++ b/mktable.c
+@@ -6,7 +6,7 @@
+ #include "hash.h"
+ #include "myctype.h"
+ #include "Str.h"
+-#include <gc.h>
++#include <gc/gc.h>
+ 
+ /* *INDENT-OFF* */
+ defhash(HashItem_ss *, int, hss_i)
+--- a/regex.c
++++ b/regex.c
+@@ -13,7 +13,7 @@
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+-#include <gc.h>
++#include <gc/gc.h>
+ #include "config.h"
+ #ifdef USE_M17N
+ #include "wc.h"
+--- a/textlist.c
++++ b/textlist.c
+@@ -2,7 +2,7 @@
+ #include "textlist.h"
+ #include "indep.h"
+ #include "Str.h"
+-#include <gc.h>
++#include <gc/gc.h>
+ 
+ /* General doubly linked list */
+ 

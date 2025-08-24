@@ -9,7 +9,7 @@ Patch: patches/Refactor-Strshrink.patch
 
 --- a/Str.c
 +++ b/Str.c
-@@ -395,14 +395,8 @@ Strtruncate(Str s, int pos)
+@@ -396,14 +396,8 @@ Strtruncate(Str s, int pos)
  void
  Strshrink(Str s, int n)
  {

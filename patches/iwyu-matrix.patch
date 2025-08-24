@@ -1,0 +1,68 @@
+From: Rene Kita <mail@rkta.de>
+Date: Tue Aug 12 16:36:24 CEST 2025
+
+---
+ display.c |    1 +
+ file.c    |    1 +
+ matrix.c  |    6 +++++-
+ matrix.h  |    8 +++-----
+ 4 files changed, 10 insertions(+), 6 deletions(-)
+
+--- a/matrix.c
++++ b/matrix.c
+@@ -32,9 +32,13 @@
+ **
+ ***************************************************************************/
+ 
+-#include "config.h"
+ #include "matrix.h"
++
+ #include "alloc.h"
++#include "config.h"
++
++#include <math.h>
++#include <stddef.h>
+ 
+ /* 
+  * Macros from "fm.h".
+--- a/matrix.h
++++ b/matrix.h
+@@ -7,9 +7,8 @@
+  * You can use,copy,modify and distribute this program without any permission.
+  */
+ 
+-#ifndef _MATRIX_H
+-#include <math.h>
+-#include <string.h>
++#ifndef W3M_MATRIX_H_
++#define W3M_MATRIX_H_
+ 
+ /* 
+  * Types.
+@@ -65,5 +64,4 @@ extern int Usolve(Matrix, Vector, Vector
+ extern Matrix new_matrix(int);
+ extern Vector new_vector(int);
+ 
+-#define _MATRIX_H
+-#endif				/* _MATRIX_H */
++#endif				/* W3M_MATRIX_H_ */
+--- a/display.c
++++ b/display.c
+@@ -1,6 +1,7 @@
+ /* vi: set sw=4 ts=8 ai sm noet : */
+ #include "display.h"
+ 
++#include <math.h>
+ #include <signal.h>
+ #include "fm.h"
+ 
+--- a/file.c
++++ b/file.c
+@@ -22,6 +22,7 @@
+ #include "regex.h"
+ 
+ #include <assert.h>
++#include <math.h>
+ 
+ #ifndef max
+ #define max(a,b)        ((a) > (b) ? (a) : (b))
