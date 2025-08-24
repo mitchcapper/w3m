@@ -137,13 +137,6 @@ dnl Checks for library functions.
 AC_CHECK_FUNCS(strcasecmp strcasestr strchr memcpy strerror setpgrp chdir mkdtemp faccessat getcwd getwd readlink setenv putenv strtoll stroq atoll atoq symlink readlink lstat srand48 srandom getpassphrase waitpid setlocale)
 AC_FUNC_STRFTIME
 AC_FUNC_SETPGRP
-case "$host_os" in
-  *cygwin*)
-    ;;
-  *)
-    AM_LANGINFO_CODESET
-    ;;
-esac
 AC_W3M_SIGSETJMP
 
 AC_SUBST(HELP_DIR)
