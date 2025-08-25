@@ -85,8 +85,10 @@ tasks:
         --disable-alarm \
         --disable-color\
         --disable-cookie \
+        --disable-dict \
         --disable-external_uri_loader \
         --disable-gopher \
+        --disable-history \
         --disable-image \
         --disable-ipv6 \
         --disable-m17n \
