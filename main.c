@@ -7152,3 +7152,28 @@ DEFUN(userMessage, MESSAGE , "Display a message")
 
     disp_message_nsec(msg, FALSE, MessageDelay, FALSE, TRUE);
 }
+
+DEFUN(lineTop, LINE_TOP, "Redraw screen with current line at top")
+{
+    int offsety;
+    if (Currentbuf->firstLine == NULL)
+	return;
+    offsety = Currentbuf->cursorY;
+    Currentbuf->topLine = lineSkip(Currentbuf, Currentbuf->topLine,
+                                   offsety, FALSE);
+    arrangeLine(Currentbuf);
+    displayBuffer(Currentbuf, B_NORMAL);
+}
+
+DEFUN(lineBottom, LINE_BOTTOM, "Redraw screen with current line at bottom")
+{
+    int offsety;
+    if (Currentbuf->firstLine == NULL)
+	return;
+    /* subtract 1 to exclude current line */
+    offsety = (Currentbuf->LINES - 1) - Currentbuf->cursorY;
+    Currentbuf->topLine = lineSkip(Currentbuf, Currentbuf->topLine,
+                                   -offsety, FALSE);
+    arrangeLine(Currentbuf);
+    displayBuffer(Currentbuf, B_NORMAL);
+}
