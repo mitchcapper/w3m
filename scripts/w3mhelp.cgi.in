@@ -136,7 +136,7 @@ print "<P><A HREF=\"$keymap\">$head</A>\n";
 	     split(" ", "pgFore pgBack movR movL movD movU
 		movR1 movL1 movD1 movU1 ldown1 lup1
 		shiftl shiftr col1L col1R linbeg linend ctrCsrH ctrCsrV
-		goLine goLineF goLineL movRW movLW
+		lineBottom lineTop goLine goLineF goLineL movRW movLW
 		topA lastA nextA prevA movlistMn
 		nextR nextL nextD nextU nextRD nextLU nextI prevI
 		undoPos redoPos cursorTop cursorMiddle cursorBottom"));
