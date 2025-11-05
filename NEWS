@@ -3,6 +3,10 @@ Unreleased
 * new features
   - Add commands to scroll current line to top/bottom (LINE_BOTTOM, LINE_TOP)
 
+* bug fixes
+  - Ignore C-i, C-l, C-s, C-z, C-\, C-], C-^ and C-_ key presses when
+    inserting text
+
 w3m 0.5.5 - 2025-08-20
 
 * new feature
