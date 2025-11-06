@@ -9,7 +9,7 @@ Patch: patches/Use-confirm-in-quitfm.patch
 
 --- a/main.c
 +++ b/main.c
-@@ -2684,21 +2684,16 @@ save_known_hosts(void)
+@@ -2677,21 +2677,16 @@ save_known_hosts(void)
  }
  
  static void
@@ -38,7 +38,7 @@ Patch: patches/Use-confirm-in-quitfm.patch
  
      term_title("");		/* XXX */
  #ifdef USE_IMAGE
-@@ -2721,6 +2716,9 @@ _quitfm(int confirm)
+@@ -2714,6 +2709,9 @@ _quitfm(int confirm)
  		"-H is deprecated and will be removed in the future.",
  		"Use -o highIntensityColors=true instead.");
      w3m_exit(0);

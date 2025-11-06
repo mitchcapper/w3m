@@ -105,9 +105,9 @@ Date: Wed Aug 13 08:34:58 CEST 2025
  
 --- a/proto.h
 +++ b/proto.h
-@@ -381,9 +381,6 @@ extern void escbmap(void);
- extern void escdmap(char c);
- extern void multimap(void);
+@@ -385,9 +385,6 @@ extern char *inputLineHistSearch(const c
+ 				 int (*incfunc) (int ch, Str buf,
+ 							     Lineprop *prop));
  extern Str unescape_spaces(Str s);
 -#ifdef USE_HISTORY
 -extern Buffer *historyBuffer(Hist *hist);
@@ -117,7 +117,7 @@ Date: Wed Aug 13 08:34:58 CEST 2025
  extern int visible_length(const char *str);
 --- a/fm.h
 +++ b/fm.h
-@@ -1021,16 +1021,6 @@ global char *urimethodmap_files init(USE
+@@ -1027,16 +1027,6 @@ global char *urimethodmap_files init(USE
  
  global TextList *fileToDelete;
  
@@ -136,7 +136,7 @@ Date: Wed Aug 13 08:34:58 CEST 2025
  #ifdef USE_M17N
 --- a/main.c
 +++ b/main.c
-@@ -51,13 +51,6 @@ WSADATA WSAData;
+@@ -50,13 +50,6 @@ WSADATA WSAData;
  
  #define DSTR_LEN	256
  

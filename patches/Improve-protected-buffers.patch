@@ -10,7 +10,7 @@ Patch: patches/Improve-protected-buffers.patch
 
 --- a/main.c
 +++ b/main.c
-@@ -114,6 +114,7 @@ static int add_download_list = FALSE;
+@@ -107,6 +107,7 @@ static int add_download_list = FALSE;
  static char *session_file;
  static char *session_bak;
  static int _strSession(char *sf);
@@ -18,7 +18,7 @@ Patch: patches/Improve-protected-buffers.patch
  
  void set_buffer_environ(Buffer *);
  static void save_buffer_position(Buffer *buf);
-@@ -436,6 +437,26 @@ load_known_hosts(void)
+@@ -429,6 +430,26 @@ load_known_hosts(void)
  }
  
  int
@@ -45,7 +45,7 @@ Patch: patches/Improve-protected-buffers.patch
  main(int argc, char **argv)
  {
      Buffer *newbuf = NULL;
-@@ -1112,17 +1133,17 @@ main(int argc, char **argv)
+@@ -1105,17 +1126,17 @@ main(int argc, char **argv)
  	    SearchHeader = search_header;
  	    DefaultType = default_type;
  	    char *url;
@@ -66,7 +66,7 @@ Patch: patches/Improve-protected-buffers.patch
  	    else
  		url = url_encode(conv_from_system(load_argv[i]), NULL, 0);
  	    if (w3m_dump == DUMP_HEAD) {
-@@ -1163,7 +1184,7 @@ main(int argc, char **argv)
+@@ -1156,7 +1177,7 @@ main(int argc, char **argv)
  	    if (newbuf == NULL) {
  		if (ArgvIsURL && !retry) {
  		    retry = 1;
@@ -75,7 +75,7 @@ Patch: patches/Improve-protected-buffers.patch
  		}
  		Strcat(err_msg,
  		       Sprintf(_("w3m: Can't load %s.\n"), load_argv[i]));
-@@ -1171,6 +1192,9 @@ main(int argc, char **argv)
+@@ -1164,6 +1185,9 @@ main(int argc, char **argv)
  	    }
  	    else if (newbuf == NO_BUFFER)
  		continue;
@@ -85,7 +85,7 @@ Patch: patches/Improve-protected-buffers.patch
  	    switch (newbuf->real_scheme) {
  	    case SCM_MAILTO:
  		break;
-@@ -4547,17 +4571,20 @@ static void
+@@ -4540,17 +4564,20 @@ static void
  cmd_loadURL(char *url, ParsedURL *current, char *referer, FormList *request)
  {
      Buffer *buf;
@@ -106,7 +106,7 @@ Patch: patches/Improve-protected-buffers.patch
  	pushBuffer(buf);
  	if (RenderFrame && Currentbuf->frameset != NULL)
  	    rFrame();
-@@ -4629,8 +4656,6 @@ goURL0(const char *prompt, int relative)
+@@ -4622,8 +4649,6 @@ goURL0(const char *prompt, int relative)
  	gotoLabel(url + 1);
  	return;
      }
@@ -115,7 +115,7 @@ Patch: patches/Improve-protected-buffers.patch
      cmd_loadURL(url, current, referer, NULL);
      if (Currentbuf != cur_buf)	/* success */
  	pushHashHist(URLHist, parsedURL2Str(&Currentbuf->currentURL)->ptr);
-@@ -4749,7 +4774,9 @@ _strSession(char *sf)
+@@ -4742,7 +4767,9 @@ _strSession(char *sf)
  	    if (buf->bufferprop & BP_INTERNAL)
  		continue;
  	    if ((url = baseURL(buf)))
@@ -136,7 +136,7 @@ Patch: patches/Improve-protected-buffers.patch
    </ul>
    <hr>
    <h2 id="Introduction">
-@@ -2463,5 +2464,19 @@ Location: http://www.example.org/
+@@ -2489,5 +2490,19 @@ Location: http://www.example.org/
    <p>
    Note that w3m will pass the complete hostname including any subdomains.
    </p>
