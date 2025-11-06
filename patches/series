@@ -40,16 +40,7 @@ Suppress-Wold-style-definition.patch
 Suppress-Wstrict-prototypes.patch
 # ACTIVE
 Fix-some-include-what-you-use-issues.patch
-iwyu-func.patch
-iwyu-Str.patch
-iwyu-matrix.patch
-iwyu-history.patch
-iwyu-parsetag.patch
-iwyu-parsetagx.patch
-iwyu-alloc.patch
-iwyu-buffer.patch
 Fix-some-includes-in-libwc.patch
-iwyu-etc.patch
 shorten-not-assigned-in-help.patch
 do_download.patch
 gophertmp.patch
