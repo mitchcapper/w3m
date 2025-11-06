@@ -15,7 +15,7 @@ w3m-0.5.3+git20230121.
  doc/README.func        |    1 
  file.c                 |  291 ++++++++++++++++++++++++++++++++++++++++++++++++-
  html.h                 |    1 
- istream.c              |  139 ++++++++++++++++++-----
+ istream.c              |  141 ++++++++++++++++++-----
  istream.h              |    5 
  main.c                 |  152 +++++++++++++++++++++++++
  proto.h                |    1 
@@ -23,7 +23,7 @@ w3m-0.5.3+git20230121.
  rc.h                   |    2 
  scripts/w3mhelp.cgi.in |    5 
  url.c                  |   35 +++++
- 14 files changed, 614 insertions(+), 36 deletions(-)
+ 14 files changed, 616 insertions(+), 36 deletions(-)
 
 --- a/file.c
 +++ b/file.c
@@ -45,7 +45,7 @@ w3m-0.5.3+git20230121.
      return buf;
  }
  
-@@ -2007,6 +2009,166 @@ loadGeneralFile(char *path, ParsedURL *v
+@@ -2005,6 +2007,166 @@ loadGeneralFile(char *path, ParsedURL *v
      else if (pu.scheme == SCM_DATA) {
  	t = f.guess_type;
      }
@@ -212,7 +212,7 @@ w3m-0.5.3+git20230121.
      else if (searchHeader) {
  	searchHeader = SearchHeader = FALSE;
  	if (t_buf == NULL)
-@@ -2185,6 +2347,8 @@ loadGeneralFile(char *path, ParsedURL *v
+@@ -2183,6 +2345,8 @@ loadGeneralFile(char *path, ParsedURL *v
  
      if (is_html_type(t))
  	proc = loadHTMLBuffer;
@@ -221,7 +221,7 @@ w3m-0.5.3+git20230121.
      else if (is_plain_text_type(t))
  	proc = loadBuffer;
  #ifdef USE_IMAGE
-@@ -2439,7 +2603,6 @@ is_boundary(const unsigned char *ch1, co
+@@ -2437,7 +2601,6 @@ is_boundary(const unsigned char *ch1, co
      return 1;
  }
  
@@ -229,7 +229,7 @@ w3m-0.5.3+git20230121.
  static void
  set_breakpoint(struct readbuffer *obuf, int tag_length)
  {
-@@ -7487,6 +7650,130 @@ loadGopherSearch0(ParsedURL *pu)
+@@ -7484,6 +7647,130 @@ loadGopherSearch0(ParsedURL *pu)
  }
  #endif				/* USE_GOPHER */
  
@@ -502,7 +502,7 @@ w3m-0.5.3+git20230121.
      UFclose(&f);
 --- a/main.c
 +++ b/main.c
-@@ -403,6 +403,32 @@ die_oom(size_t bytes)
+@@ -409,6 +409,32 @@ die_oom(size_t bytes)
      return NULL;
  }
  
@@ -535,7 +535,7 @@ w3m-0.5.3+git20230121.
  int
  main(int argc, char **argv)
  {
-@@ -918,6 +944,9 @@ main(int argc, char **argv)
+@@ -924,6 +950,9 @@ main(int argc, char **argv)
      if (UseHistory)
  	loadUrlHistory();
  #endif				/* not USE_HISTORY */
@@ -545,7 +545,7 @@ w3m-0.5.3+git20230121.
  
      /* Restore a previously saved session */
      if (opt_restore) {
-@@ -2613,10 +2642,36 @@ DEFUN(movRW, NEXT_WORD, "Move to the nex
+@@ -2626,10 +2655,36 @@ DEFUN(movRW, NEXT_WORD, "Move to the nex
      displayBuffer(Currentbuf, B_NORMAL);
  }
  
@@ -582,7 +582,7 @@ w3m-0.5.3+git20230121.
  
      if (checkDownloadList())
  	/* FIXME: gettextize? */
-@@ -2642,6 +2697,8 @@ _quitfm(int confirm)
+@@ -2655,6 +2710,8 @@ _quitfm(int confirm)
      if (UseHistory && SaveURLHist)
  	saveUrlHistory();
  #endif				/* USE_HISTORY */
@@ -591,7 +591,7 @@ w3m-0.5.3+git20230121.
      if (deprecated)
  	fprintf(stderr, "%s\n%s\n%s\n",
  		"DEPRECATION WARNING",
-@@ -5002,6 +5059,13 @@ DEFUN(vwSrc, SOURCE VIEW, "Toggle betwee
+@@ -5014,6 +5071,13 @@ DEFUN(vwSrc, SOURCE VIEW, "Toggle betwee
  	displayBuffer(Currentbuf, B_NORMAL);
  	return;
      }
@@ -605,7 +605,7 @@ w3m-0.5.3+git20230121.
      if (Currentbuf->sourcefile == NULL) {
  	if (Currentbuf->pagerSource &&
  	    !strcasecmp(Currentbuf->type, "text/plain")) {
-@@ -5087,6 +5151,93 @@ DEFUN(foldPre, FOLD_PRE, "Fold long line
+@@ -5099,6 +5163,93 @@ DEFUN(foldPre, FOLD_PRE, "Fold long line
      fold_pre = FoldPre;
  }
  
@@ -699,7 +699,7 @@ w3m-0.5.3+git20230121.
  /* reload */
  DEFUN(reload, RELOAD, "Load current document anew")
  {
-@@ -5307,6 +5458,7 @@ chkURLBuffer(Buffer *buf)
+@@ -5319,6 +5470,7 @@ chkURLBuffer(Buffer *buf)
  	"https?://[a-zA-Z0-9:%\\-\\./_@]*\\[[a-fA-F0-9:][a-fA-F0-9:\\.]*\\][a-zA-Z0-9:%\\-\\./?=~_\\&+@#,\\$;]*",
  	"ftp://[a-zA-Z0-9:%\\-\\./_@]*\\[[a-fA-F0-9:][a-fA-F0-9:\\.]*\\][a-zA-Z0-9:%\\-\\./=_+@#,\\$]*",
  #endif				/* INET6 */
@@ -847,10 +847,10 @@ w3m-0.5.3+git20230121.
 -	if (accept_this_site
 -	    && strcasecmp(accept_this_site->ptr, hostname) == 0)
 +	if (accept_this_site(hostname, x))
- 	    ans = "y";
- 	else {
- 	    emsg = Strnew_charp(_("No SSL peer certificate: accept? (y/n)"));
-@@ -498,7 +571,7 @@ ssl_get_certificate(SSL * ssl, char *hos
+ 	    ans = 1;
+ 	else
+ 	    ans = confirm(Strnew_charp(_("No SSL peer certificate: accept?")));
+@@ -496,7 +569,7 @@ ssl_get_certificate(SSL * ssl, char *hos
  	}
  	if (amsg)
  	    disp_err_message(amsg->ptr, FALSE);
@@ -859,7 +859,7 @@ w3m-0.5.3+git20230121.
  	s = amsg ? amsg : Strnew_charp(_("valid certificate"));
  	return s;
      }
-@@ -507,38 +580,46 @@ ssl_get_certificate(SSL * ssl, char *hos
+@@ -505,37 +578,47 @@ ssl_get_certificate(SSL * ssl, char *hos
       * The chain length is automatically checked by OpenSSL when we
       * set the verify depth in the ctx.
       */
@@ -871,18 +871,14 @@ w3m-0.5.3+git20230121.
  	    const char *em = X509_verify_cert_error_string(verr);
 -	    if (accept_this_site
 -		&& strcasecmp(accept_this_site->ptr, hostname) == 0)
+-		ans = 1;
 +	    if (accept_this_site(hostname, x))
- 		ans = "y";
++		ans = 'y';
  	    else {
--		/* FIXME: gettextize? */
--		emsg = Sprintf("%s: accept? (y/n)", em);
-+		if (ssl_known_hosts)
-+		    emsg = Sprintf("%s: accept? (y)es/(n)o/(a)lways)", em);
-+		else
-+		    emsg = Sprintf("%s: accept? (y/n)", em);
- 		ans = inputAnswer(emsg->ptr);
+ 		/* FIXME: gettextize? */
+-		ans = confirm(Sprintf("%s: accept?", em));
 -	    }
--	    if (ans && TOLOWER(*ans) == 'y') {
+-	    if (ans) {
 -		/* FIXME: gettextize? */
 -		amsg = Sprintf("Accept unsecure SSL session: "
 -			       "unverified: %s", em);
@@ -893,12 +889,17 @@ w3m-0.5.3+git20230121.
 -		disp_err_message(e, FALSE);
 -		free_ssl_ctx();
 -		return NULL;
-+		if (ans && TOLOWER(*ans) == 'y') {
++		if (ssl_known_hosts)
++		    emsg = Sprintf("%s: accept? (y)es/(n)o/(a)lways)", em);
++		else
++		    emsg = Sprintf("%s: accept? (y/n)", em);
++		ans = confirm_multi(emsg->ptr);
++		if (ans == 'y') {
 +		    /* FIXME: gettextize? */
 +		    amsg = Sprintf("Accept unsecure SSL session: "
 +				   "unverified: %s", em);
 +		}
-+		else if (ssl_known_hosts && ans && TOLOWER(*ans) == 'a') {
++		else if (ssl_known_hosts && ans == 'a') {
 +		    amsg = Sprintf("Permanently accepted unverified SSL"
 +				   "session: %s", em);
 +		    perm = 1;
@@ -921,10 +922,10 @@ w3m-0.5.3+git20230121.
 -	if (accept_this_site
 -	    && strcasecmp(accept_this_site->ptr, hostname) == 0)
 +	if (accept_this_site(hostname, x))
- 	    ans = "y";
+ 	    ans = 1;
  	else {
  	    Str ep = Strdup(emsg);
-@@ -559,10 +640,10 @@ ssl_get_certificate(SSL * ssl, char *hos
+@@ -556,10 +639,10 @@ ssl_get_certificate(SSL * ssl, char *hos
  	    free_ssl_ctx();
  	    return NULL;
  	}
@@ -968,7 +969,7 @@ w3m-0.5.3+git20230121.
  #define P_INT      0
  #define P_SHORT    1
  #define P_CHARINT  2
-@@ -225,6 +227,7 @@ static int OptionEncode = FALSE;
+@@ -226,6 +228,7 @@ static int OptionEncode = FALSE;
  #define CMT_SSL_CA_PATH N_("Path to directory for PEM encoded certificates of CAs")
  #define CMT_SSL_CA_FILE N_("File consisting of PEM encoded certificates of CAs")
  #define CMT_SSL_CA_DEFAULT N_("Use default locations for PEM encoded certificates of CAs")
@@ -976,7 +977,7 @@ w3m-0.5.3+git20230121.
  #endif				/* USE_SSL_VERIFY */
  #define CMT_SSL_FORBID_METHOD N_("List of forbidden SSL methods (2: SSLv2, 3: SSLv3, t: TLSv1.0, 5: TLSv1.1, 6: TLSv1.2, 7: TLSv1.3)")
  #ifdef SSL_CTX_set_min_proto_version
-@@ -664,6 +667,8 @@ struct param_ptr params7[] = {
+@@ -667,6 +670,8 @@ struct param_ptr params7[] = {
       NULL},
      {"ssl_ca_default", P_INT, PI_ONOFF, (void *)&ssl_ca_default,
       CMT_SSL_CA_DEFAULT, NULL},

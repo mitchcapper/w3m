@@ -5,14 +5,14 @@ Patch: patches/Refactor-inputAnswer.patch
 
 ---
  file.c    |   33 +++++++++++++++++++++------------
- istream.c |   23 +++++++++++------------
+ istream.c |   27 ++++++++++++---------------
  main.c    |    7 +++----
  proto.h   |    3 ++-
- 4 files changed, 37 insertions(+), 29 deletions(-)
+ 4 files changed, 38 insertions(+), 32 deletions(-)
 
 --- a/file.c
 +++ b/file.c
-@@ -859,8 +859,7 @@ readHeader(URLFile *uf, Buffer *newBuf,
+@@ -852,8 +852,7 @@ readHeader(URLFile *uf, Buffer *newBuf,
  		    add_cookie(pu, name, value, expires, domain, path, flag,
  			       comment, version, port, commentURL);
  		if (err) {
@@ -22,7 +22,7 @@ Patch: patches/Refactor-inputAnswer.patch
  		    if (fmInitialized && (err & COO_OVERRIDE_OK) &&
  			accept_bad_cookie == ACCEPT_BAD_COOKIE_ASK) {
  			Str msg = Sprintf("Accept bad cookie from %s for %s?",
-@@ -869,10 +868,9 @@ readHeader(URLFile *uf, Buffer *newBuf,
+@@ -862,10 +861,9 @@ readHeader(URLFile *uf, Buffer *newBuf,
  					   ? domain->ptr : "<localdomain>"));
  			if (msg->length > COLS - 10)
  			    Strshrink(msg, msg->length - (COLS - 10));
@@ -35,7 +35,7 @@ Patch: patches/Refactor-inputAnswer.patch
  			(err =
  			 add_cookie(pu, name, value, expires, domain, path,
  				    flag | COO_OVERRIDE, comment, version,
-@@ -8768,24 +8766,22 @@ int
+@@ -8488,24 +8486,22 @@ int
  checkOverWrite(const char *path)
  {
      struct stat st;
@@ -64,7 +64,7 @@ Patch: patches/Refactor-inputAnswer.patch
      if (fmInitialized) {
  	term_raw();
  	ans = inputChar(prompt);
-@@ -8795,7 +8791,20 @@ inputAnswer(const char *prompt)
+@@ -8515,7 +8511,20 @@ inputAnswer(const char *prompt)
  	fflush(stdout);
  	ans = Strfgets(stdin)->ptr;
      }
@@ -88,7 +88,7 @@ Patch: patches/Refactor-inputAnswer.patch
  static void
 --- a/istream.c
 +++ b/istream.c
-@@ -545,7 +545,7 @@ ssl_get_certificate(SSL * ssl, char *hos
+@@ -472,7 +472,7 @@ ssl_get_certificate(SSL * ssl, char *hos
      char buf[2048];
      Str amsg = NULL;
      Str emsg;
@@ -97,43 +97,44 @@ Patch: patches/Refactor-inputAnswer.patch
  
      if (ssl == NULL)
  	return NULL;
-@@ -553,12 +553,11 @@ ssl_get_certificate(SSL * ssl, char *hos
-     x = SSL_get_peer_certificate(ssl);
+@@ -480,12 +480,10 @@ ssl_get_certificate(SSL * ssl, char *hos
      if (x == NULL) {
- 	if (accept_this_site(hostname, x))
+ 	if (accept_this_site
+ 	    && strcasecmp(accept_this_site->ptr, hostname) == 0)
 -	    ans = "y";
-+	    ans = 1;
- 	else {
+-	else {
 -	    emsg = Strnew_charp(_("No SSL peer certificate: accept? (y/n)"));
 -	    ans = inputAnswer(emsg->ptr);
-+	    ans = confirm(Strnew_charp(_("No SSL peer certificate: accept?")));
- 	}
+-	}
 -	if (ans && TOLOWER(*ans) == 'y')
++	    ans = 1;
++	else
++	    ans = confirm(Strnew_charp(_("No SSL peer certificate: accept?")));
 +	if (ans)
  	    amsg = Strnew_charp
  		(_("Accept SSL session without any peer certificate"));
  	else {
-@@ -591,13 +590,13 @@ ssl_get_certificate(SSL * ssl, char *hos
- 		    emsg = Sprintf("%s: accept? (y)es/(n)o/(a)lways)", em);
- 		else
- 		    emsg = Sprintf("%s: accept? (y/n)", em);
+@@ -514,13 +512,12 @@ ssl_get_certificate(SSL * ssl, char *hos
+ 	    const char *em = X509_verify_cert_error_string(verr);
+ 	    if (accept_this_site
+ 		&& strcasecmp(accept_this_site->ptr, hostname) == 0)
+-		ans = "y";
++		ans = 1;
+ 	    else {
+ 		/* FIXME: gettextize? */
+-		emsg = Sprintf("%s: accept? (y/n)", em);
 -		ans = inputAnswer(emsg->ptr);
--		if (ans && TOLOWER(*ans) == 'y') {
-+		ans = confirm_multi(emsg->ptr);
-+		if (ans == 'y') {
- 		    /* FIXME: gettextize? */
- 		    amsg = Sprintf("Accept unsecure SSL session: "
- 				   "unverified: %s", em);
- 		}
--		else if (ssl_known_hosts && ans && TOLOWER(*ans) == 'a') {
-+		else if (ssl_known_hosts && ans == 'a') {
- 		    amsg = Sprintf("Permanently accepted unverified SSL"
- 				   "session: %s", em);
- 		    perm = 1;
-@@ -618,15 +617,15 @@ ssl_get_certificate(SSL * ssl, char *hos
-     emsg = ssl_check_cert_ident(x, hostname);
++		ans = confirm(Sprintf("%s: accept?", em));
+ 	    }
+-	    if (ans && TOLOWER(*ans) == 'y') {
++	    if (ans) {
+ 		/* FIXME: gettextize? */
+ 		amsg = Sprintf("Accept unsecure SSL session: "
+ 			       "unverified: %s", em);
+@@ -539,15 +536,15 @@ ssl_get_certificate(SSL * ssl, char *hos
      if (emsg != NULL) {
- 	if (accept_this_site(hostname, x))
+ 	if (accept_this_site
+ 	    && strcasecmp(accept_this_site->ptr, hostname) == 0)
 -	    ans = "y";
 +	    ans = 1;
  	else {
@@ -152,7 +153,7 @@ Patch: patches/Refactor-inputAnswer.patch
  	}
 --- a/proto.h
 +++ b/proto.h
-@@ -287,7 +287,8 @@ extern int doFileSave(URLFile uf, const
+@@ -286,7 +286,8 @@ extern int doFileSave(URLFile uf, const
  extern int checkCopyFile(const char *path1, const char *path2);
  extern int checkSaveFile(InputStream stream, const char *path);
  extern int checkOverWrite(const char *path);
@@ -164,7 +165,7 @@ Patch: patches/Refactor-inputAnswer.patch
  extern char *checkHeader(Buffer *buf, const char *field);
 --- a/main.c
 +++ b/main.c
-@@ -4578,16 +4578,15 @@ _strSession(char *sf)
+@@ -4523,16 +4523,15 @@ _strSession(char *sf)
      Buffer *buf;
      FILE *f;
      ParsedURL *url;

@@ -14,7 +14,7 @@ need_number include.
 
 --- a/file.c
 +++ b/file.c
-@@ -38,7 +38,7 @@ char * conv_entity(unsigned int c); /* T
+@@ -40,7 +40,7 @@ char * conv_entity(unsigned int c); /* T
  
  extern int fold_pre;
  static int frame_source = 0;
@@ -23,7 +23,7 @@ need_number include.
  
  static char *guess_filename(const char *file);
  static int _MoveFile(const char *path1, const char *path2);
-@@ -3735,13 +3735,17 @@ process_input(struct parsed_tag *tag)
+@@ -3737,13 +3737,17 @@ process_input(struct parsed_tag *tag)
      case FORM_INPUT_TEXT:
      case FORM_INPUT_FILE:
      case FORM_INPUT_CHECKBOX:
@@ -43,7 +43,7 @@ need_number include.
  	Strcat_char(tmp, '(');
      }
      Strcat(tmp, Sprintf("<input_alt hseq=\"%d\" fid=\"%d\" type=\"%s\" "
-@@ -3783,8 +3787,10 @@ process_input(struct parsed_tag *tag)
+@@ -3785,8 +3789,10 @@ process_input(struct parsed_tag *tag)
  	case FORM_INPUT_SUBMIT:
  	case FORM_INPUT_BUTTON:
  	case FORM_INPUT_RESET:
@@ -55,7 +55,7 @@ need_number include.
  	    Strcat_charp(tmp, "[");
  	    break;
  	}
-@@ -6617,6 +6623,12 @@ HTMLlineproc0(char *line, struct html_fe
+@@ -6619,6 +6625,12 @@ HTMLlineproc0(char *line, struct html_fe
  	     * are fed to the table renderer, and then the renderer
  	     * makes HTML output.
  	     */
@@ -70,7 +70,7 @@ need_number include.
  		/* </table> tag */
 --- a/table.c
 +++ b/table.c
-@@ -3002,12 +3002,6 @@ feed_table_tag(struct table *tbl, char *
+@@ -2989,12 +2989,6 @@ feed_table_tag(struct table *tbl, char *
  	    check_rowcol(tbl, mode);
  	    if (i == 0) {
  		Str tmp = process_anchor(tag, line);

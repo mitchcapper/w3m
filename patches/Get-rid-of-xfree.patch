@@ -12,7 +12,7 @@ Patch: patches/Get-rid-of-xfree.patch
 
 --- a/file.c
 +++ b/file.c
-@@ -8370,7 +8370,7 @@ save2tmp(URLFile uf, const char *tmpf)
+@@ -8087,7 +8087,7 @@ save2tmp(URLFile uf, const char *tmpf)
    _end:
      memmove(AbortLoading, env_bak, sizeof(JMP_BUF));
      TRAP_OFF;
@@ -21,7 +21,7 @@ Patch: patches/Get-rid-of-xfree.patch
      fclose(ff);
      current_content_length = 0;
      return retval;
-@@ -8512,7 +8512,7 @@ _MoveFile(const char *path1, const char
+@@ -8229,7 +8229,7 @@ _MoveFile(const char *path1, const char
  	linelen += count;
  	showProgress(&linelen, &trbyte);
      }
@@ -30,7 +30,7 @@ Patch: patches/Get-rid-of-xfree.patch
      ISclose(f1);
      if (is_pipe)
  	pclose(f2);
-@@ -8883,7 +8883,7 @@ uncompress_stream(URLFile *uf, char **sr
+@@ -8600,7 +8600,7 @@ uncompress_stream(URLFile *uf, char **sr
  	    UFclose(uf);
  	    if (f)
  		fclose(f);
@@ -41,7 +41,7 @@ Patch: patches/Get-rid-of-xfree.patch
  	/* child1 */
 --- a/indep.c
 +++ b/indep.c
-@@ -668,14 +668,6 @@ xrealloc(void *ptr, size_t size)
+@@ -663,14 +663,6 @@ xrealloc(void *ptr, size_t size)
      return newptr;
  }
  
@@ -56,7 +56,7 @@ Patch: patches/Get-rid-of-xfree.patch
  void *
  w3m_GC_realloc_atomic(void *ptr, size_t size)
  {
-@@ -705,7 +697,7 @@ growbuf_init_without_GC(struct growbuf *
+@@ -700,7 +692,7 @@ growbuf_init_without_GC(struct growbuf *
      gb->length = 0;
      gb->area_size = 0;
      gb->realloc_proc = &xrealloc;
@@ -67,7 +67,7 @@ Patch: patches/Get-rid-of-xfree.patch
  void
 --- a/indep.h
 +++ b/indep.h
-@@ -73,7 +73,6 @@ extern Str Str_form_quote(Str x);
+@@ -74,7 +74,6 @@ extern Str Str_form_quote(Str x);
  extern const char *shell_quote(const char *str);
  #define xmalloc(s) xrealloc(NULL, s)
  extern void *xrealloc(void *ptr, size_t size);
@@ -77,7 +77,7 @@ Patch: patches/Get-rid-of-xfree.patch
  extern void growbuf_init(struct growbuf *gb);
 --- a/istream.c
 +++ b/istream.c
-@@ -191,8 +191,8 @@ ISclose(InputStream stream)
+@@ -190,8 +190,8 @@ ISclose(InputStream stream)
          stream->base.close(stream->base.handle);
          mySignal(SIGINT, prevtrap);
      }
@@ -88,7 +88,7 @@ Patch: patches/Get-rid-of-xfree.patch
      return 0;
  }
  
-@@ -675,7 +675,7 @@ basic_close(int *handle)
+@@ -594,7 +594,7 @@ basic_close(int *handle)
  #else
      close(*handle);
  #endif
@@ -97,7 +97,7 @@ Patch: patches/Get-rid-of-xfree.patch
      return 0;
  }
  
-@@ -708,7 +708,7 @@ ssl_close(struct ssl_handle *handle)
+@@ -627,7 +627,7 @@ ssl_close(struct ssl_handle *handle)
      close(handle->sock);
      if (handle->ssl)
  	SSL_free(handle->ssl);
@@ -106,7 +106,7 @@ Patch: patches/Get-rid-of-xfree.patch
      return 0;
  }
  
-@@ -746,7 +746,7 @@ ens_close(struct ens_handle *handle)
+@@ -665,7 +665,7 @@ ens_close(struct ens_handle *handle)
  {
      ISclose(handle->is);
      growbuf_clear(&handle->gb);

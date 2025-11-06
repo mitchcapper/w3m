@@ -2,21 +2,25 @@ From: Rene Kita <mail@rkta.de>
 Date: Wed Aug 13 08:34:58 CEST 2025
 
 ---
- func.c    |    4 ++++
- history.c |   12 ++++++++++--
- history.h |    4 ----
- 3 files changed, 14 insertions(+), 6 deletions(-)
+ fm.h      |   10 ----------
+ func.c    |    5 +++++
+ history.c |   24 ++++++++++++++++++++++--
+ history.h |   18 +++++++++++++-----
+ main.c    |    7 -------
+ proto.h   |    3 ---
+ 6 files changed, 40 insertions(+), 27 deletions(-)
 
 --- a/history.c
 +++ b/history.c
-@@ -1,9 +1,18 @@
+@@ -1,9 +1,30 @@
  /* vi: set sw=4 ts=8 ai sm noet : */
++#include "history.h"
++
 +#include "Str.h"
 +#include "alloc.h"
 +#include "config.h"
  #include "fm.h"
 +#include "hash.h"
-+#include "history.h"
 +#include "indep.h"
 +#include "textlist.h"
  
@@ -24,12 +28,23 @@ Date: Wed Aug 13 08:34:58 CEST 2025
 +#include <stdio.h>
 +#include <sys/stat.h>
 +#include <unistd.h>
++
++Hist *LoadHist;
++Hist *SaveHist;
++Hist *URLHist;
++Hist *ShellHist;
++Hist *TextHist;
++Hist *DictHist;
++
++int UseHistory = TRUE;
++int URLHistSize = 100;
++int SaveURLHist = TRUE;
  
 -#ifdef USE_HISTORY
  Buffer *
  historyBuffer(Hist *hist)
  {
-@@ -150,7 +159,6 @@ fail:
+@@ -150,7 +171,6 @@ fail:
      disp_err_message("Can't save history", FALSE);
      return;
  }
@@ -39,7 +54,27 @@ Date: Wed Aug 13 08:34:58 CEST 2025
   * The following functions are used for internal stuff, we need them
 --- a/history.h
 +++ b/history.h
-@@ -29,13 +29,9 @@ extern char *lastHist(Hist *hist);
+@@ -19,6 +19,19 @@ typedef struct {
+     long long mtime;
+ } Hist;
+ 
++extern Hist *LoadHist;
++extern Hist *SaveHist;
++extern Hist *URLHist;
++extern Hist *ShellHist;
++extern Hist *TextHist;
++extern Hist *DictHist;
++
++extern int UseHistory;
++extern int URLHistSize;
++extern int SaveURLHist;
++
++typedef struct _Buffer Buffer; /* TODO(rkta): Why needed? */
++extern Buffer *historyBuffer(Hist *hist);
+ extern Hist *newHist(void);
+ extern Hist *copyHist(Hist *hist);
+ extern HistItem *unshiftHist(Hist *hist, const char *ptr);
+@@ -29,14 +42,9 @@ extern char *lastHist(Hist *hist);
  extern char *nextHist(Hist *hist);
  extern char *prevHist(Hist *hist);
  
@@ -50,19 +85,68 @@ Date: Wed Aug 13 08:34:58 CEST 2025
  extern void svHist(void);
 -#else				/* not USE_HISTORY */
 -#define ldHist nulcmd
+-#define svHist nulcmd
 -#endif				/* not USE_HISTORY */
  
  #endif				/* HISTORY_H */
 --- a/func.c
 +++ b/func.c
-@@ -28,6 +28,10 @@
+@@ -28,6 +28,11 @@
  #ifndef USE_COOKIE
  #define cooLst nulcmd
  #endif				/* not USE_COOKIE */
 +#ifndef USE_HISTORY
 +#define ldHist nulcmd
++#define svHist nulcmd
 +#endif				/* not USE_HISTORY */
 +
  #include "funcname.c"
  #include "functable.c"
  
+--- a/proto.h
++++ b/proto.h
+@@ -381,9 +381,6 @@ extern void escbmap(void);
+ extern void escdmap(char c);
+ extern void multimap(void);
+ extern Str unescape_spaces(Str s);
+-#ifdef USE_HISTORY
+-extern Buffer *historyBuffer(Hist *hist);
+-#endif				/* not USE_HISTORY */
+ extern struct table *newTable(void);
+ extern void pushdata(struct table *t, int row, int col, char *data);
+ extern int visible_length(const char *str);
+--- a/fm.h
++++ b/fm.h
+@@ -1021,16 +1021,6 @@ global char *urimethodmap_files init(USE
+ 
+ global TextList *fileToDelete;
+ 
+-extern Hist *LoadHist;
+-extern Hist *SaveHist;
+-extern Hist *URLHist;
+-extern Hist *ShellHist;
+-extern Hist *TextHist;
+-#ifdef USE_HISTORY
+-global int UseHistory init(TRUE);
+-global int URLHistSize init(100);
+-global int SaveURLHist init(TRUE);
+-#endif				/* USE_HISTORY */
+ global int multicolList init(FALSE);
+ 
+ #ifdef USE_M17N
+--- a/main.c
++++ b/main.c
+@@ -51,13 +51,6 @@ WSADATA WSAData;
+ 
+ #define DSTR_LEN	256
+ 
+-Hist *LoadHist;
+-Hist *SaveHist;
+-Hist *URLHist;
+-Hist *ShellHist;
+-Hist *TextHist;
+-Hist *DictHist;
+-
+ typedef struct _Event {
+     int cmd;
+     void *data;

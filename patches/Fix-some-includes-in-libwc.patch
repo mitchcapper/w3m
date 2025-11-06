@@ -1,0 +1,17 @@
+From: Rene Kita <mail@rkta.de>
+Date: Thu Nov  6 08:48:20 CET 2025
+
+---
+ libwc/iso2022.h |    2 ++
+ 1 file changed, 2 insertions(+)
+
+--- a/libwc/iso2022.h
++++ b/libwc/iso2022.h
+@@ -1,5 +1,7 @@
+ /* vi: set sw=4 ts=8 ai sm noet : */
+ 
++#include "wc_types.h"
++
+ #ifndef _WC_ISO2022_H
+ #define _WC_ISO2022_H
+ 

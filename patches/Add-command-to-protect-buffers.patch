@@ -28,7 +28,7 @@ Protected buffers cannot be deleted with BACK.
  typedef struct _BufferPos {
 --- a/main.c
 +++ b/main.c
-@@ -2680,6 +2680,7 @@ save_known_hosts(void)
+@@ -2686,6 +2686,7 @@ save_known_hosts(void)
  static void
  _quitfm(int ask)
  {
@@ -36,7 +36,7 @@ Protected buffers cannot be deleted with BACK.
      int err = 0;
  
      if (checkDownloadList()
-@@ -2689,6 +2690,10 @@ _quitfm(int ask)
+@@ -2695,6 +2696,10 @@ _quitfm(int ask)
      else if (ask && !confirm(Strnew_charp(_("Do you want to exit w3m?"))))
  	goto nope;
  
@@ -47,7 +47,7 @@ Protected buffers cannot be deleted with BACK.
      term_title("");		/* XXX */
  #ifdef USE_IMAGE
      if (activeImage)
-@@ -4467,15 +4472,20 @@ DEFUN(backBf, BACK, "Close current buffe
+@@ -4473,15 +4478,20 @@ DEFUN(backBf, BACK, "Close current buffe
  {
      Buffer *buf = Currentbuf->linkBuffer[LB_N_FRAME];
  
@@ -71,7 +71,7 @@ Protected buffers cannot be deleted with BACK.
  	return;
      }
  
-@@ -4520,6 +4530,13 @@ DEFUN(deletePrevBuf, DELETE_PREVBUF, "De
+@@ -4526,6 +4536,13 @@ DEFUN(deletePrevBuf, DELETE_PREVBUF, "De
  	delBuffer(buf);
  }
  
@@ -85,7 +85,7 @@ Protected buffers cannot be deleted with BACK.
  static void
  cmd_loadURL(char *url, ParsedURL *current, char *referer, FormList *request)
  {
-@@ -6234,6 +6251,7 @@ DEFUN(tabMs, TAB_MOUSE, "Select tab by m
+@@ -6240,6 +6257,7 @@ DEFUN(tabMs, TAB_MOUSE, "Select tab by m
  
  DEFUN(closeTMs, CLOSE_TAB_MOUSE, "Close tab at mouse pointer")
  {
@@ -93,7 +93,7 @@ Protected buffers cannot be deleted with BACK.
      TabBuffer *tab;
  
      if (!mouse_action.in_action)
-@@ -6241,6 +6259,14 @@ DEFUN(closeTMs, CLOSE_TAB_MOUSE, "Close
+@@ -6247,6 +6265,14 @@ DEFUN(closeTMs, CLOSE_TAB_MOUSE, "Close
      tab = posTab(mouse_action.cursorX, mouse_action.cursorY);
      if (!tab || tab == NO_TABBUFFER)
  	return;
@@ -108,7 +108,7 @@ Protected buffers cannot be deleted with BACK.
      deleteTab(tab);
      displayBuffer(Currentbuf, B_FORCE_REDRAW);
  }
-@@ -6871,16 +6897,25 @@ deleteTab(TabBuffer * tab)
+@@ -6877,16 +6903,25 @@ deleteTab(TabBuffer * tab)
  
  DEFUN(closeT, CLOSE_TAB, "Close tab")
  {
@@ -267,7 +267,7 @@ Protected buffers cannot be deleted with BACK.
      Firstbuf = deleteBuffer(Firstbuf, buf);
 --- a/display.c
 +++ b/display.c
-@@ -367,7 +367,7 @@ make_lastline_message(Buffer *buf)
+@@ -368,7 +368,7 @@ make_lastline_message(Buffer *buf)
      if (buf->ssl_certificate)
  	Strcat_charp(msg, "[SSL]");
  #endif

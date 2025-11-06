@@ -1,0 +1,29 @@
+From: Rene Kita <mail@rkta.de>
+Date: Thu Aug 28 18:05:52 CEST 2025
+
+---
+ buffer.c |   14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+
+--- a/buffer.c
++++ b/buffer.c
+@@ -1,5 +1,19 @@
+ /* vi: set sw=4 ts=8 ai sm noet : */
++#include "Str.h"
++#include "alloc.h"
++#include "config.h"
++#include "ctrlcode.h"
+ #include "fm.h"
++#include "html.h"
++#include "terms.h"
++#include "wc.h"
++#include "wc_types.h"
++
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <strings.h>
++#include <unistd.h>
+ 
+ #ifdef USE_MOUSE
+ #ifdef USE_GPM

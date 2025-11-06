@@ -10,7 +10,7 @@ Patch: patches/Use-Ctrl-L-to-insert-next-char-in-search.patch
 
 --- a/linein.c
 +++ b/linein.c
-@@ -211,6 +211,10 @@ inputLineHistSearch(const char *prompt,
+@@ -230,6 +230,10 @@ inputLineHistSearch(const char *prompt,
  	    if (incrfunc == NULL
  		|| (c = incrfunc((int)c, strBuf, strProp)) < 0x20)
  		(*InputKeymap[(int)c]) ();
@@ -23,7 +23,7 @@ Patch: patches/Use-Ctrl-L-to-insert-next-char-in-search.patch
  	    if (cm_clear)
 --- a/main.c
 +++ b/main.c
-@@ -1921,6 +1921,7 @@ dispincsrch(int ch, Str buf, Lineprop *p
+@@ -1895,6 +1895,7 @@ dispincsrch(int ch, Str buf, Lineprop *p
  {
      static Buffer sbuf;
      char *str;
@@ -31,7 +31,7 @@ Patch: patches/Use-Ctrl-L-to-insert-next-char-in-search.patch
      int do_next_search = FALSE;
  
      if (ch == 0 && buf == NULL) {
-@@ -1930,6 +1931,12 @@ dispincsrch(int ch, Str buf, Lineprop *p
+@@ -1904,6 +1905,12 @@ dispincsrch(int ch, Str buf, Lineprop *p
  
      str = buf->ptr;
      switch (ch) {

@@ -9,16 +9,16 @@ Date: Thu Dec 19 06:59:22 CET 2024
 
 --- a/file.c
 +++ b/file.c
-@@ -24,6 +24,8 @@
+@@ -26,6 +26,8 @@
+ 
  #include <assert.h>
- #include <math.h>
  
 +#include <curl/curl.h>
 +
  #ifndef max
  #define max(a,b)        ((a) > (b) ? (a) : (b))
  #endif				/* not max */
-@@ -1680,6 +1682,538 @@ getLinkNumberStr(int correction)
+@@ -1682,6 +1684,538 @@ getLinkNumberStr(int correction)
      return Sprintf("[%d]", cur_hseq + correction - !!zeroBasedLinkNo);
  }
  
@@ -481,7 +481,7 @@ Date: Thu Dec 19 06:59:22 CET 2024
 +    fn = tmpfname(TMPF_SRC, NULL);
 +    fp = fopen(fn->ptr, "w");
 +
-+#define VERSION "w3m/0.5.3+rkta (libcurl)"
++#define VERSION "w3m/0.5.5+rkta (libcurl)"
 +    curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
 +    curl_easy_setopt(curl, CURLOPT_URL, parsedURL2Str(url)->ptr);
 +    curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp) ;
@@ -557,7 +557,7 @@ Date: Thu Dec 19 06:59:22 CET 2024
  /* 
   * loadGeneralFile: load file to buffer
   */
-@@ -1735,6 +2269,8 @@ loadGeneralFile(char *path, ParsedURL *v
+@@ -1737,6 +2271,8 @@ loadGeneralFile(char *path, ParsedURL *v
  	    goto load_doc;
  	}
      }
@@ -568,7 +568,7 @@ Date: Thu Dec 19 06:59:22 CET 2024
      url_option.flag = flag;
 --- a/Makefile.in
 +++ b/Makefile.in
-@@ -68,7 +68,7 @@ DEFS = @DEFS@ -DAUXBIN_DIR=\"$(AUXBIN_DI
+@@ -69,7 +69,7 @@ DEFS = @DEFS@ -DAUXBIN_DIR=\"$(AUXBIN_DI
  	-DRC_DIR=\"$(RC_DIR)\" \
          -DLOCALEDIR=\"$(localedir)\"
  LDFLAGS = @LDFLAGS@

@@ -82,7 +82,7 @@ Patch: patches/Get-rid-of-Strnulterm.patch
      s->ptr[pos] = c;
      return s;
  }
-@@ -320,12 +318,14 @@ Strdelete(Str s, int pos, int n)
+@@ -312,12 +310,14 @@ Strdelete(Str s, int pos, int n)
  	n = STR_LEN_MAX - pos;
      if (s->length <= pos + n) {
  	s->length = pos;
@@ -99,7 +99,7 @@ Patch: patches/Get-rid-of-Strnulterm.patch
  }
  
  Str
-@@ -334,14 +334,16 @@ Strtruncate(Str s, int pos)
+@@ -326,14 +326,16 @@ Strtruncate(Str s, int pos)
      if (pos < 0 || s->length < pos)
  	return s;
      s->length = pos;
@@ -118,7 +118,7 @@ Patch: patches/Get-rid-of-Strnulterm.patch
  }
  
  Str
-@@ -362,7 +364,8 @@ Strremovetrailingspaces(Str s)
+@@ -354,7 +356,8 @@ Strremovetrailingspaces(Str s)
  
      for (i = s->length - 1; i >= 0 && IS_SPACE(s->ptr[i]); i--) ;
      s->length = i + 1;

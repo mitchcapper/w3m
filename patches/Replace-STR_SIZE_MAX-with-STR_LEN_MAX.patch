@@ -10,11 +10,10 @@ little visible to the user as possible.
 
 Use a STR_LEN_MAX to avoid dealing with of by errors.
 ---
- Str.c    |   17 +++++++++--------
- Str.h    |    4 ++--
- linein.c |    2 +-
- main.c   |    2 +-
- 4 files changed, 13 insertions(+), 12 deletions(-)
+ Str.c  |   17 +++++++++--------
+ Str.h  |    4 ++--
+ main.c |    2 +-
+ 3 files changed, 12 insertions(+), 11 deletions(-)
 
 --- a/Str.c
 +++ b/Str.c
@@ -90,20 +89,9 @@ Use a STR_LEN_MAX to avoid dealing with of by errors.
  #define Strcmp(x,y)                  strcmp((x)->ptr,(y)->ptr)
  #define Strcmp_charp(x,y)            strcmp((x)->ptr,(y))
  #define Strcasecmp(x,y)              strcasecmp((x)->ptr,(y)->ptr)
---- a/linein.c
-+++ b/linein.c
-@@ -507,7 +507,7 @@ delC(void)
- 
-     if (!is_passwd) {
- 	while (ynkBuf->length + delta > ynkBuf->area_size) {
--	    if (ynkBuf->area_size == STR_SIZE_MAX) return;
-+	    if (ynkBuf->area_size == STR_LEN_MAX + 1) return;
- 		Strgrow(ynkBuf);
- 	}
- 	/* TODO(rkta): Better use Str function, does not exist yet */
 --- a/main.c
 +++ b/main.c
-@@ -500,7 +500,7 @@ main(int argc, char **argv)
+@@ -480,7 +480,7 @@ main(int argc, char **argv)
  	    /* Don't use hostname if it is truncated.  */
  	    hostname[HOST_NAME_MAX + 1] = '\0';
  	    hostname_len = strlen(hostname);

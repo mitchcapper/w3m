@@ -1,0 +1,467 @@
+From: Rene Kita <mail@rkta.de>
+Date: Thu Aug 28 17:21:30 CEST 2025
+
+---
+ file.c   |    3 +-
+ fm.h     |    8 -----
+ ftp.c    |    1 
+ linein.c |   93 ++++++++++++++++++++++++++++++++++++---------------------------
+ linein.h |   23 +++++++++++++++
+ main.c   |    1 
+ menu.c   |    1 
+ proto.h  |    4 --
+ 8 files changed, 82 insertions(+), 52 deletions(-)
+
+--- a/linein.c
++++ b/linein.c
+@@ -1,7 +1,21 @@
+ /* vi: set sw=4 ts=8 ai sm noet : */
++#include "linein.h"
++
++#include "alloc.h"
++#include "config.h"
++#include "ctrlcode.h"
+ #include "fm.h"
++#include "indep.h"
+ #include "local.h"
+-#include "myctype.h"
++#include "terms.h"
++#include "wc.h"
++#include "wc_types.h"
++#include "wtf.h"
++
++#include <dirent.h>
++#include <stdlib.h>
++#include <string.h>
++#include <sys/stat.h>
+ 
+ #ifdef USE_MOUSE
+ #ifdef USE_GPM
+@@ -87,6 +101,7 @@ void (*InputKeymap[32]) (void) = {
+ };
+ /* *INDENT-ON* */
+ 
++static Str escape_spaces(Str s);
+ static int setStrType(Str str, Lineprop *prop);
+ static void addPasswd(char *p, Lineprop *pr, int len, int pos, int limit);
+ static void addStr(char *p, Lineprop *pr, int len, int pos, int limit);
+@@ -346,7 +361,7 @@ getcntrl(void)
+ }
+ #endif
+ 
+-static void
++void
+ addPasswd(char *p, Lineprop *pr, int len, int offset, int limit)
+ {
+     int rcol = 0, ncol;
+@@ -362,7 +377,7 @@ addPasswd(char *p, Lineprop *pr, int len
+ 	addChar('*', 0);
+ }
+ 
+-static void
++void
+ addStr(char *p, Lineprop *pr, int len, int offset, int limit)
+ {
+     int i = 0, rcol = 0, ncol, delta = 1;
+@@ -408,7 +423,7 @@ addStr(char *p, Lineprop *pr, int len, i
+ }
+ 
+ #ifdef USE_M17N
+-static void
++void
+ ins_char(Str str)
+ {
+     const char *p = str->ptr, *ep = p + str->length;
+@@ -443,7 +458,7 @@ ins_char(Str str)
+ }
+ #endif
+ 
+-static void
++void
+ _esc(void)
+ {
+     char c;
+@@ -501,7 +516,7 @@ _esc(void)
+     }
+ }
+ 
+-static void
++void
+ insC(void)
+ {
+     int i;
+@@ -513,7 +528,7 @@ insC(void)
+     }
+ }
+ 
+-static void
++void
+ delC(void)
+ {
+     int delta = 1;
+@@ -539,7 +554,7 @@ delC(void)
+     CLen -= delta;
+ }
+ 
+-static void
++void
+ _cy(void)
+ {
+     if (readline_paste)
+@@ -548,7 +563,7 @@ _cy(void)
+ 	_mvRw();
+ }
+ 
+-static void
++void
+ _paste(void)
+ {
+     if (!ynkBuf) return;
+@@ -556,7 +571,7 @@ _paste(void)
+     ynkCon = 0;
+ }
+ 
+-static void
++void
+ _mvL(void)
+ {
+     if (CPos > 0)
+@@ -568,7 +583,7 @@ _mvL(void)
+     ynkCon = 0;
+ }
+ 
+-static void
++void
+ _mvLw(void)
+ {
+     int first = 1;
+@@ -585,7 +600,7 @@ _mvLw(void)
+     ynkCon = 0;
+ }
+ 
+-static void
++void
+ _mvRw(void)
+ {
+     int first = 1;
+@@ -602,7 +617,7 @@ _mvRw(void)
+     ynkCon = 0;
+ }
+ 
+-static void
++void
+ _mvR(void)
+ {
+     if (CPos < CLen)
+@@ -614,7 +629,7 @@ _mvR(void)
+     ynkCon = 0;
+ }
+ 
+-static void
++void
+ _bs(void)
+ {
+     int y;
+@@ -627,7 +642,7 @@ _bs(void)
+     }
+ }
+ 
+-static void
++void
+ _bsw(void)
+ {
+     int t = 0, y;
+@@ -641,86 +656,86 @@ _bsw(void)
+     }
+ }
+ 
+-static void
++void
+ _enter(void)
+ {
+     i_cont = FALSE;
+ }
+ 
+ char * GetWord(Buffer *buf); /* TODO(rkta): Proper declaration from header */
+-static void
++void
+ _iword(void)
+ {
+     ins_char(Strnew_charp(GetWord(Currentbuf)));
+ }
+ 
+-static void
++void
+ _noop(void)
+ {
+     return;
+ }
+ 
+ extern const char *SearchString;
+-static void
++void
+ _isrch(void)
+ {
+     ins_char(Strnew_charp(SearchString));
+ }
+ 
+-static void
++void
+ _quo(void)
+ {
+     i_quote = TRUE;
+ }
+ 
+-static void
++void
+ _mvB(void)
+ {
+     CPos = 0;
+     ynkCon = 0;
+ }
+ 
+-static void
++void
+ _mvE(void)
+ {
+     CPos = CLen;
+     ynkCon = 0;
+ }
+ 
+-static void
++void
+ killn(void)
+ {
+     CLen = CPos;
+     Strtruncate(strBuf, CLen);
+ }
+ 
+-static void
++void
+ killb(void)
+ {
+     while (CPos > 0)
+ 	_bs();
+ }
+ 
+-static void
++void
+ _inbrk(void)
+ {
+     i_cont = FALSE;
+     i_broken = TRUE;
+ }
+ 
+-static void
++void
+ _compl(void)
+ {
+     next_compl(1);
+ }
+ 
+-static void
++void
+ _rcompl(void)
+ {
+     next_compl(-1);
+ }
+ 
+-static void
++void
+ _tcompl(void)
+ {
+     if (cm_mode & CPL_OFF)
+@@ -729,7 +744,7 @@ _tcompl(void)
+ 	cm_mode = CPL_OFF;
+ }
+ 
+-static void
++void
+ next_compl(int next)
+ {
+     int status;
+@@ -776,19 +791,19 @@ next_compl(int next)
+ 	CPos = CLen;
+ }
+ 
+-static void
++void
+ _dcompl(void)
+ {
+     next_dcompl(1);
+ }
+ 
+-static void
++void
+ _rdcompl(void)
+ {
+     next_dcompl(-1);
+ }
+ 
+-static void
++void
+ next_dcompl(int next)
+ {
+     static int col, row;
+@@ -921,7 +936,7 @@ next_dcompl(int next)
+ }
+ 
+ 
+-static Str
++Str
+ escape_spaces(Str s)
+ {
+     Str tmp = NULL;
+@@ -967,7 +982,7 @@ unescape_spaces(Str s)
+     return s;
+ }
+ 
+-static Str
++Str
+ doComplete(Str ifn, int *status, int next)
+ {
+     int fl, i;
+@@ -1082,7 +1097,7 @@ doComplete(Str ifn, int *status, int nex
+     return Str_conv_from_system(CompleteBuf);
+ }
+ 
+-static void
++void
+ _prev(void)
+ {
+     Hist *hist = CurrentHist;
+@@ -1108,7 +1123,7 @@ _prev(void)
+     offset = 0;
+ }
+ 
+-static void
++void
+ _next(void)
+ {
+     Hist *hist = CurrentHist;
+@@ -1132,7 +1147,7 @@ _next(void)
+     offset = 0;
+ }
+ 
+-static int
++int
+ setStrType(Str str, Lineprop *prop)
+ {
+     Lineprop ctype;
+@@ -1169,7 +1184,7 @@ setStrType(Str str, Lineprop *prop)
+     return i;
+ }
+ 
+-static int
++int
+ terminated(const unsigned char c)
+ {
+     int termchar[] = { '/', '&', '?', ' ', -1 };
+@@ -1184,7 +1199,7 @@ terminated(const unsigned char c)
+     return 0;
+ }
+ 
+-static void
++void
+ _editor(void)
+ {
+     FormItemList fi;
+--- /dev/null
++++ b/linein.h
+@@ -0,0 +1,23 @@
++#ifndef W3M_LINEIN_H_
++#define W3M_LINEIN_H_
++
++#include "Str.h"
++#include "fm.h"
++#include "history.h"
++
++#include <stddef.h>
++
++#define inputLineHist(p,d,f,h)	inputLineHistSearch(p,d,f,h,NULL)
++#define inputLine(p,d,f)	inputLineHist(p,d,f,NULL)
++#define inputStr(p,d)		inputLine(p,d,IN_STRING)
++#define inputStrHist(p,d,h)	inputLineHist(p,d,IN_STRING,h)
++#define inputFilename(p,d)	inputLine(p,d,IN_FILENAME)
++#define inputFilenameHist(p,d,h)	inputLineHist(p,d,IN_FILENAME,h)
++#define inputChar(p)		inputLine(p,"",IN_CHAR)
++
++extern char *inputLineHistSearch(const char *prompt, const char *def_str,
++				 int flag, Hist *hist,
++				 int (*incfunc) (int ch, Str buf,
++						 Lineprop *prop));
++
++#endif
+--- a/proto.h
++++ b/proto.h
+@@ -380,10 +380,6 @@ extern void escmap(void);
+ extern void escbmap(void);
+ extern void escdmap(char c);
+ extern void multimap(void);
+-extern char *inputLineHistSearch(const char *prompt, const char *def_str,
+-				 int flag, Hist *hist,
+-				 int (*incfunc) (int ch, Str buf,
+-							     Lineprop *prop));
+ extern Str unescape_spaces(Str s);
+ #ifdef USE_HISTORY
+ extern Buffer *historyBuffer(Hist *hist);
+--- a/file.c
++++ b/file.c
+@@ -17,8 +17,9 @@
+ 
+ #include "cookie.h"
+ #include "html.h"
+-#include "parsetagx.h"
++#include "linein.h"
+ #include "local.h"
++#include "parsetagx.h"
+ #include "regex.h"
+ 
+ #include <math.h>
+--- a/fm.h
++++ b/fm.h
+@@ -281,14 +281,6 @@ extern int REV_LB[];
+  * Macros.
+  */
+ 
+-#define inputLineHist(p,d,f,h)	inputLineHistSearch(p,d,f,h,NULL)
+-#define inputLine(p,d,f)	inputLineHist(p,d,f,NULL)
+-#define inputStr(p,d)		inputLine(p,d,IN_STRING)
+-#define inputStrHist(p,d,h)	inputLineHist(p,d,IN_STRING,h)
+-#define inputFilename(p,d)	inputLine(p,d,IN_FILENAME)
+-#define inputFilenameHist(p,d,h)	inputLineHist(p,d,IN_FILENAME,h)
+-#define inputChar(p)		inputLine(p,"",IN_CHAR)
+-
+ #ifdef __EMX__
+ #define HAVE_STRCASECMP
+ #define strcasecmp	stricmp
+--- a/ftp.c
++++ b/ftp.c
+@@ -10,6 +10,7 @@
+ 
+ #include "fm.h"
+ #include "html.h"
++#include "linein.h"
+ #include "myctype.h"
+ 
+ #ifdef DEBUG
+--- a/main.c
++++ b/main.c
+@@ -40,6 +40,7 @@ extern int do_getch(void);
+ #endif
+ 
+ #include "cookie.h"
++#include "linein.h"
+ #include "util.h"
+ 
+ #ifdef __MINGW32_VERSION
+--- a/menu.c
++++ b/menu.c
+@@ -8,6 +8,7 @@
+ #include "menu.h"
+ #include "func.h"
+ #include "myctype.h"
++#include "linein.h"
+ #include "regex.h"
+ 
+ #ifdef USE_MOUSE

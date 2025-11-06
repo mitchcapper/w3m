@@ -66,7 +66,7 @@ Date: Wed Aug 13 11:57:22 CEST 2025
  #endif				/* not FUNC_H */
 --- a/fm.h
 +++ b/fm.h
-@@ -818,7 +818,6 @@ extern unsigned char EscDKeymap[];
+@@ -817,7 +817,6 @@ extern unsigned char EscDKeymap[];
  #ifdef __EMX__
  extern unsigned char PcKeymap[];
  #endif

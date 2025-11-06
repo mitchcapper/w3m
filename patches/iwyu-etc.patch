@@ -1,0 +1,58 @@
+From: Rene Kita <mail@rkta.de>
+Date: Thu Nov  6 08:39:41 CET 2025
+
+---
+ etc.c |   35 ++++++++++++++++++++++++++++-------
+ 1 file changed, 28 insertions(+), 7 deletions(-)
+
+--- a/etc.c
++++ b/etc.c
+@@ -1,20 +1,41 @@
+ /* vi: set sw=4 ts=8 ai sm noet : */
+ #include "fm.h"
+-#ifndef __MINGW32_VERSION
+-#include <pwd.h>
+-#endif
+-#include "myctype.h"
++
++#include "Str.h"
++#include "alloc.h"
++#include "ces.h"
++#include "config.h"
++#include "ctrlcode.h"
++#include "hash.h"
+ #include "html.h"
++#include "indep.h"
+ #include "local.h"
+-#include "hash.h"
++#include "myctype.h"
++#include "terms.h"
++#include "textlist.h"
++#include "wc.h"
++#include "wc_types.h"
++#include "wtf.h"
+ 
++#include <bits/struct_stat.h>
+ #include <fcntl.h>
+-#include <sys/types.h>
++#include <pwd.h>
++#include <signal.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <strings.h>
++#include <sys/stat.h>
+ #include <time.h>
++#include <unistd.h>
++
+ #if defined(HAVE_WAITPID)
+ #include <sys/wait.h>
+ #endif
+-#include <signal.h>
++
++#ifndef __MINGW32_VERSION
++#include <pwd.h>
++#endif
+ 
+ #ifdef	__WATT32__
+ #define	read(a,b,c)	read_s(a,b,c)

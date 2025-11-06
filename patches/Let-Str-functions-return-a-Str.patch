@@ -4,9 +4,9 @@ Subject: Let Str functions return a Str
 Patch: patches/Let-Str-functions-return-a-Str.patch
 
 ---
- Str.c |  118 +++++++++++++++++++++++++++++++++---------------------------------
- Str.h |   40 +++++++++++-----------
- 2 files changed, 79 insertions(+), 79 deletions(-)
+ Str.c |  115 ++++++++++++++++++++++++++++++++----------------------------------
+ Str.h |   38 ++++++++++-----------
+ 2 files changed, 76 insertions(+), 77 deletions(-)
 
 --- a/Str.c
 +++ b/Str.c
@@ -234,19 +234,10 @@ Patch: patches/Let-Str-functions-return-a-Str.patch
      if (s->length + 1 >= s->area_size)
  	Strgrow(s);
      for (i = s->length; i > pos; i--)
-@@ -293,76 +291,78 @@ Strinsert_char(Str s, int pos, char c)
+@@ -293,69 +291,70 @@ Strinsert_char(Str s, int pos, char c)
      s->length++;
      Strnulterm(s);
      s->ptr[pos] = c;
-+    return s;
- }
- 
--void
-+Str
- Strinsert_charp_n(Str s, int pos, const char *p, int n)
- {
-     while (n--)
- 	Strinsert_char(s, pos++, *(p++));
 +    return s;
  }
  
@@ -332,7 +323,7 @@ Patch: patches/Let-Str-functions-return-a-Str.patch
  Str
 --- a/Str.h
 +++ b/Str.h
-@@ -35,27 +35,27 @@ Str Strnew_charp(const char *);
+@@ -35,26 +35,26 @@ Str Strnew_charp(const char *);
  Str Strnew_charp_n(const char *, int);
  Str Strnew_m_charp(const char *, ...);
  Str Strdup(Str);
@@ -356,7 +347,6 @@ Patch: patches/Let-Str-functions-return-a-Str.patch
  Str Strsubstr(Str, int, int);
 -void Strinsert_char(Str, int, char);
 -void Strinsert_charp(Str, int, const char *);
--void Strinsert_charp_n(Str s, int pos, const char *p, int n);
 -void Strdelete(Str, int, int);
 -void Strtruncate(Str, int);
 -void Strlower(Str);
@@ -367,7 +357,6 @@ Patch: patches/Let-Str-functions-return-a-Str.patch
 -void Strremovetrailingspaces(Str);
 +Str Strinsert_char(Str, int, char);
 +Str Strinsert_charp(Str, int, const char *);
-+Str Strinsert_charp_n(Str s, int pos, const char *p, int n);
 +Str Strdelete(Str, int, int);
 +Str Strtruncate(Str, int);
 +Str Strlower(Str);
@@ -379,7 +368,7 @@ Patch: patches/Let-Str-functions-return-a-Str.patch
  Str Stralign_left(Str, int);
  Str Stralign_right(Str, int);
  Str Stralign_center(Str, int);
-@@ -65,7 +65,7 @@ Str Sprintf(const char *fmt, ...);
+@@ -64,7 +64,7 @@ Str Sprintf(const char *fmt, ...);
  Str Strfgets(FILE *);
  Str Strfgetall(FILE *);
  

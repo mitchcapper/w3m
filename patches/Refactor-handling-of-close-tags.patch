@@ -17,7 +17,7 @@ WIP TagMAP OoB access possible now
 
 --- a/file.c
 +++ b/file.c
-@@ -3233,7 +3233,7 @@ close_anchor(struct html_feed_environ *h
+@@ -3235,7 +3235,7 @@ close_anchor(struct html_feed_environ *h
  	    obuf->pos++;
  	}
  
@@ -26,7 +26,7 @@ WIP TagMAP OoB access possible now
      }
      bzero((void *)&obuf->anchor, sizeof(obuf->anchor));
  }
-@@ -3247,15 +3247,15 @@ save_fonteffect(struct html_feed_environ
+@@ -3249,15 +3249,15 @@ save_fonteffect(struct html_feed_environ
      if (obuf->fontstat_sp < INT_MAX)
  	obuf->fontstat_sp++;
      if (obuf->in_bold)
@@ -47,7 +47,7 @@ WIP TagMAP OoB access possible now
      bzero(obuf->fontstat, FONTSTAT_SIZE);
  }
  
-@@ -4026,7 +4026,7 @@ feed_select(char *str)
+@@ -4028,7 +4028,7 @@ feed_select(char *str)
  		cur_option_selected = parsedtag_exists(tag, ATTR_SELECTED);
  		prev_spaces = -1;
  		break;
@@ -56,7 +56,7 @@ WIP TagMAP OoB access possible now
  		/* do nothing */
  		break;
  	    default:
-@@ -4553,11 +4553,9 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -4555,11 +4555,9 @@ HTMLtagproc1(struct parsed_tag *tag, str
      cmd = tag->tagid;
  
      if (obuf->flag & RB_PRE) {
@@ -69,7 +69,7 @@ WIP TagMAP OoB access possible now
  	    return 1;
  	}
      }
-@@ -4569,7 +4567,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -4571,7 +4569,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	if (obuf->in_bold > 1)
  	    return 1;
  	return 0;
@@ -78,7 +78,7 @@ WIP TagMAP OoB access possible now
  	if (obuf->in_bold == 1 && close_effect0(obuf, HTML_B))
  	    obuf->in_bold = 0;
  	if (obuf->in_bold > 0) {
-@@ -4584,7 +4582,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -4586,7 +4584,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	if (obuf->in_italic > 1)
  	    return 1;
  	return 0;
@@ -87,7 +87,7 @@ WIP TagMAP OoB access possible now
  	if (obuf->in_italic == 1 && close_effect0(obuf, HTML_I))
  	    obuf->in_italic = 0;
  	if (obuf->in_italic > 0) {
-@@ -4599,7 +4597,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -4601,7 +4599,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	if (obuf->in_under > 1)
  	    return 1;
  	return 0;
@@ -96,7 +96,7 @@ WIP TagMAP OoB access possible now
  	if (obuf->in_under == 1 && close_effect0(obuf, HTML_U))
  	    obuf->in_under = 0;
  	if (obuf->in_under > 0) {
-@@ -4611,13 +4609,13 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -4613,13 +4611,13 @@ HTMLtagproc1(struct parsed_tag *tag, str
      case HTML_EM:
  	HTMLlineproc1("<i>", h_env);
  	return 1;
@@ -112,7 +112,7 @@ WIP TagMAP OoB access possible now
  	HTMLlineproc1("</b>", h_env);
  	return 1;
      case HTML_Q:
-@@ -4632,7 +4630,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -4634,7 +4632,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  #endif
  	HTMLlineproc1("`", h_env);
  	return 1;
@@ -121,7 +121,7 @@ WIP TagMAP OoB access possible now
  #ifdef USE_M17N
  #ifdef USE_UNICODE
  	if (DisplayCharset != WC_CES_US_ASCII) {
-@@ -4645,9 +4643,9 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -4647,9 +4645,9 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	HTMLlineproc1("'", h_env);
  	return 1;
      case HTML_FIGURE:
@@ -133,7 +133,7 @@ WIP TagMAP OoB access possible now
  	CLOSE_A;
  	if (!(obuf->flag & RB_IGNORE_P)) {
  	    flushline(h_env, obuf, envs[h_env->envc].indent, 1, h_env->limit);
-@@ -4660,7 +4658,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -4662,7 +4660,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	}
  	return 1;
      case HTML_FIGCAPTION:
@@ -142,7 +142,7 @@ WIP TagMAP OoB access possible now
      case HTML_BR:
  	flushline(h_env, obuf, envs[h_env->envc].indent, 1, h_env->limit);
  	h_env->blank_lines = 0;
-@@ -4673,7 +4671,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -4675,7 +4673,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	HTMLlineproc1("<b>", h_env);
  	set_alignment(obuf, tag);
  	return 1;
@@ -151,7 +151,7 @@ WIP TagMAP OoB access possible now
  	HTMLlineproc1("</b>", h_env);
  	if (!(obuf->flag & RB_PREMODE)) {
  	    flushline(h_env, obuf, envs[h_env->envc].indent, 0, h_env->limit);
-@@ -4709,13 +4707,13 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -4711,13 +4709,13 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	    envs[h_env->envc].type = ul_type(tag, 0);
  	flushline(h_env, obuf, envs[h_env->envc].indent, 0, h_env->limit);
  	return 1;
@@ -171,7 +171,7 @@ WIP TagMAP OoB access possible now
  	    CLOSE_DD;
  	CLOSE_A;
  	if (h_env->envc > 0) {
-@@ -4723,7 +4721,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -4725,7 +4723,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  		      h_env->limit);
  	    POP_ENV;
  	    if (!(obuf->flag & RB_PREMODE) &&
@@ -180,7 +180,7 @@ WIP TagMAP OoB access possible now
  		do_blankline(h_env, obuf,
  			     envs[h_env->envc].indent, h_env->limit);
  		obuf->flag |= RB_IGNORE_P;
-@@ -4831,6 +4829,8 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -4833,6 +4831,8 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	}
  	obuf->flag |= RB_IGNORE_P;
  	return 1;
@@ -189,7 +189,7 @@ WIP TagMAP OoB access possible now
      case HTML_DT:
  	CLOSE_A;
  	CLOSE_DD;
-@@ -4850,7 +4850,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -4852,7 +4852,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	}
  	obuf->flag |= RB_IGNORE_P;
  	return 1;
@@ -198,7 +198,7 @@ WIP TagMAP OoB access possible now
  	if (!(obuf->flag & RB_IN_DT)) {
  	    return 1;
  	}
-@@ -4880,9 +4880,9 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -4882,9 +4882,9 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	close_anchor(h_env, obuf);
  	process_title(tag);
  	obuf->flag |= RB_TITLE;
@@ -210,7 +210,7 @@ WIP TagMAP OoB access possible now
  	if (!(obuf->flag & RB_TITLE))
  	    return 1;
  	obuf->flag &= ~RB_TITLE;
-@@ -4900,7 +4900,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -4902,7 +4902,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	push_charp(obuf, 9, "--FRAME--", PC_ASCII);
  	flushline(h_env, obuf, envs[h_env->envc].indent, 0, h_env->limit);
  	return 0;
@@ -219,7 +219,7 @@ WIP TagMAP OoB access possible now
  	if (h_env->envc > 0) {
  	    POP_ENV;
  	    flushline(h_env, obuf, envs[h_env->envc].indent, 0, h_env->limit);
-@@ -4912,7 +4912,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -4914,7 +4914,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	obuf->flag |= (RB_NOFRAMES | RB_IGNORE_P);
  	/* istr = str; */
  	return 1;
@@ -228,7 +228,7 @@ WIP TagMAP OoB access possible now
  	CLOSE_A;
  	flushline(h_env, obuf, envs[h_env->envc].indent, 0, h_env->limit);
  	obuf->flag &= ~RB_NOFRAMES;
-@@ -4928,7 +4928,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -4930,7 +4930,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	    if (r)
  		q = html_quote(r);
  	    push_charp(obuf, get_strwidth(q), q, PC_ASCII);
@@ -237,7 +237,7 @@ WIP TagMAP OoB access possible now
  	}
  	flushline(h_env, obuf, envs[h_env->envc].indent, 0, h_env->limit);
  	return 0;
-@@ -4952,7 +4952,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -4954,7 +4954,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	obuf->flag |= (RB_PRE | RB_IGNORE_P);
  	/* istr = str; */
  	return 1;
@@ -246,7 +246,7 @@ WIP TagMAP OoB access possible now
  	flushline(h_env, obuf, envs[h_env->envc].indent, 0, h_env->limit);
  	if (!(obuf->flag & RB_IGNORE_P)) {
  	    do_blankline(h_env, obuf, envs[h_env->envc].indent, h_env->limit);
-@@ -4970,8 +4970,8 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -4972,8 +4972,8 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	}
  	obuf->flag |= RB_PRE_INT;
  	return 0;
@@ -257,7 +257,7 @@ WIP TagMAP OoB access possible now
  	obuf->flag &= ~RB_PRE_INT;
  	if (!(obuf->flag & RB_SPECIAL) && obuf->pos > obuf->bp.pos) {
  	    set_prevchar(obuf->prevchar, "", 0);
-@@ -4982,7 +4982,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -4984,7 +4984,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	obuf->flag |= RB_NOBR;
  	obuf->nobr_level++;
  	return 0;
@@ -266,7 +266,7 @@ WIP TagMAP OoB access possible now
  	if (obuf->nobr_level > 0)
  	    obuf->nobr_level--;
  	if (obuf->nobr_level == 0)
-@@ -4996,7 +4996,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -4998,7 +4998,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	}
  	obuf->flag |= (RB_PRE | RB_IGNORE_P);
  	return 1;
@@ -275,7 +275,7 @@ WIP TagMAP OoB access possible now
  	CLOSE_A;
  	if (!(obuf->flag & RB_IGNORE_P)) {
  	    flushline(h_env, obuf, envs[h_env->envc].indent, 0, h_env->limit);
-@@ -5016,18 +5016,18 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -5018,18 +5018,18 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	obuf->flag |= (RB_PLAIN | RB_IGNORE_P);
  	switch (cmd) {
  	case HTML_LISTING:
@@ -298,7 +298,7 @@ WIP TagMAP OoB access possible now
  	CLOSE_A;
  	if (!(obuf->flag & RB_IGNORE_P)) {
  	    flushline(h_env, obuf, envs[h_env->envc].indent, 0, h_env->limit);
-@@ -5039,17 +5039,17 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -5041,17 +5041,17 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	return 1;
      case HTML_SCRIPT:
  	obuf->flag |= RB_SCRIPT;
@@ -320,7 +320,7 @@ WIP TagMAP OoB access possible now
  	obuf->flag &= ~RB_STYLE;
  	obuf->end_tag = 0;
  	return 1;
-@@ -5080,7 +5080,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -5082,7 +5082,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	    return 1;
  	}
  	return 0;
@@ -329,7 +329,7 @@ WIP TagMAP OoB access possible now
  	close_anchor(h_env, obuf);
  	return 1;
      case HTML_IMG:
-@@ -5109,10 +5109,10 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -5111,10 +5111,10 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	}
  #endif
  	return 0;
@@ -342,7 +342,7 @@ WIP TagMAP OoB access possible now
  	    obuf->img_alt = NULL;
  	}
  	return 1;
-@@ -5144,10 +5144,10 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -5146,10 +5146,10 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	}
  	obuf->input_alt.in = 1;
  	return 0;
@@ -355,7 +355,7 @@ WIP TagMAP OoB access possible now
  	    obuf->input_alt.hseq = 0;
  	    obuf->input_alt.fid = -1;
  	    obuf->input_alt.in = 0;
-@@ -5226,7 +5226,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -5228,7 +5228,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	tables[obuf->table_level]->total_width = 0;
  #endif
  	return 1;
@@ -364,7 +364,7 @@ WIP TagMAP OoB access possible now
  	/* should be processed in HTMLlineproc() */
  	return 1;
      case HTML_CENTER:
-@@ -5239,7 +5239,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -5241,7 +5241,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	else
  	    RB_SET_ALIGN(obuf, RB_CENTER);
  	return 1;
@@ -373,7 +373,7 @@ WIP TagMAP OoB access possible now
  	CLOSE_A;
  	if (!(obuf->flag & RB_PREMODE))
  	    flushline(h_env, obuf, envs[h_env->envc].indent, 0, h_env->limit);
-@@ -5251,7 +5251,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -5253,7 +5253,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	    flushline(h_env, obuf, envs[h_env->envc].indent, 0, h_env->limit);
  	set_alignment(obuf, tag);
  	return 1;
@@ -382,7 +382,7 @@ WIP TagMAP OoB access possible now
  	CLOSE_A;
  	flushline(h_env, obuf, envs[h_env->envc].indent, 0, h_env->limit);
  	RB_RESTORE_FLAG(obuf);
-@@ -5262,7 +5262,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -5264,7 +5264,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	    flushline(h_env, obuf, envs[h_env->envc].indent, 0, h_env->limit);
  	set_alignment(obuf, tag);
  	return 1;
@@ -391,7 +391,7 @@ WIP TagMAP OoB access possible now
  	CLOSE_P;
  	flushline(h_env, obuf, envs[h_env->envc].indent, 0, h_env->limit);
  	RB_RESTORE_FLAG(obuf);
-@@ -5275,7 +5275,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -5277,7 +5277,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	if (tmp)
  	    HTMLlineproc1(tmp->ptr, h_env);
  	return 1;
@@ -400,7 +400,7 @@ WIP TagMAP OoB access possible now
  	CLOSE_A;
  	flushline(h_env, obuf, envs[h_env->envc].indent, 0, h_env->limit);
  	obuf->flag |= RB_IGNORE_P;
-@@ -5293,7 +5293,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -5295,7 +5295,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	if (tmp)
  	    HTMLlineproc1(tmp->ptr, h_env);
  	return 1;
@@ -409,7 +409,7 @@ WIP TagMAP OoB access possible now
  	tmp = process_n_button();
  	if (tmp)
  	    HTMLlineproc1(tmp->ptr, h_env);
-@@ -5304,9 +5304,9 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -5306,9 +5306,9 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	if (tmp)
  	    HTMLlineproc1(tmp->ptr, h_env);
  	obuf->flag |= RB_INSELECT;
@@ -421,7 +421,7 @@ WIP TagMAP OoB access possible now
  	obuf->flag &= ~RB_INSELECT;
  	obuf->end_tag = 0;
  	tmp = process_n_select();
-@@ -5322,9 +5322,9 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -5324,9 +5324,9 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	if (tmp)
  	    HTMLlineproc1(tmp->ptr, h_env);
  	obuf->flag |= RB_INTXTA;
@@ -433,7 +433,7 @@ WIP TagMAP OoB access possible now
  	obuf->flag &= ~RB_INTXTA;
  	obuf->end_tag = 0;
  	tmp = process_n_textarea();
-@@ -5405,7 +5405,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -5407,7 +5407,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	}
  #endif
      case HTML_MAP:
@@ -442,7 +442,7 @@ WIP TagMAP OoB access possible now
      case HTML_AREA:
  	return 0;
      case HTML_DEL:
-@@ -5425,7 +5425,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -5427,7 +5427,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	    break;
  	}
  	return 1;
@@ -451,7 +451,7 @@ WIP TagMAP OoB access possible now
  	switch (displayInsDel) {
  	case DISPLAY_INS_DEL_SIMPLE:
  	    obuf->flag &= ~RB_DEL;
-@@ -5440,7 +5440,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -5442,7 +5442,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	    if (obuf->in_strike > 0) {
  		obuf->in_strike--;
  		if (obuf->in_strike == 0) {
@@ -460,7 +460,7 @@ WIP TagMAP OoB access possible now
  		}
  	    }
  	    break;
-@@ -5463,7 +5463,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -5465,7 +5465,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	    break;
  	}
  	return 1;
@@ -469,7 +469,7 @@ WIP TagMAP OoB access possible now
  	switch (displayInsDel) {
  	case DISPLAY_INS_DEL_SIMPLE:
  	    obuf->flag &= ~RB_S;
-@@ -5479,7 +5479,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -5481,7 +5481,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	    if (obuf->in_strike > 0) {
  		obuf->in_strike--;
  		if (obuf->in_strike == 0) {
@@ -478,7 +478,7 @@ WIP TagMAP OoB access possible now
  		}
  	    }
  	}
-@@ -5500,7 +5500,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -5502,7 +5502,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	    break;
  	}
  	return 1;
@@ -487,7 +487,7 @@ WIP TagMAP OoB access possible now
  	switch (displayInsDel) {
  	case DISPLAY_INS_DEL_SIMPLE:
  	    break;
-@@ -5515,7 +5515,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -5517,7 +5517,7 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	    if (obuf->in_ins > 0) {
  		obuf->in_ins--;
  		if (obuf->in_ins == 0) {
@@ -496,7 +496,7 @@ WIP TagMAP OoB access possible now
  		}
  	    }
  	    break;
-@@ -5525,18 +5525,18 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -5527,18 +5527,18 @@ HTMLtagproc1(struct parsed_tag *tag, str
  	if (!(obuf->flag & (RB_DEL | RB_S)))
  	    HTMLlineproc1("^", h_env);
  	return 1;
@@ -518,7 +518,7 @@ WIP TagMAP OoB access possible now
      case HTML_NOP:
  	return 1;
      case HTML_BGSOUND:
-@@ -5579,11 +5579,11 @@ HTMLtagproc1(struct parsed_tag *tag, str
+@@ -5581,11 +5581,11 @@ HTMLtagproc1(struct parsed_tag *tag, str
  		HTMLlineproc1(s->ptr, h_env);
  	    }
  	}
@@ -532,7 +532,7 @@ WIP TagMAP OoB access possible now
  	return 1;
      case HTML_MAIN:
  	Strcopy_charp(obuf->line, "<main>");
-@@ -5824,31 +5824,31 @@ HTMLlineproc2body(Buffer *buf, Str (*fee
+@@ -5826,31 +5826,31 @@ HTMLlineproc2body(Buffer *buf, Str (*fee
  		case HTML_B:
  		    effect |= PE_BOLD;
  		    break;
@@ -569,7 +569,7 @@ WIP TagMAP OoB access possible now
  		    ex_effect &= ~PE_EX_STRIKE;
  		    break;
  		case HTML_A:
-@@ -5909,7 +5909,7 @@ HTMLlineproc2body(Buffer *buf, Str (*fee
+@@ -5911,7 +5911,7 @@ HTMLlineproc2body(Buffer *buf, Str (*fee
  			a_href->slave = (hseq > 0) ? FALSE : TRUE;
  		    }
  		    break;
@@ -578,7 +578,7 @@ WIP TagMAP OoB access possible now
  		    effect &= ~PE_ANCHOR;
  		    if (a_href) {
  			a_href->end.line = currentLn(buf);
-@@ -6000,7 +6000,7 @@ HTMLlineproc2body(Buffer *buf, Str (*fee
+@@ -6002,7 +6002,7 @@ HTMLlineproc2body(Buffer *buf, Str (*fee
  		    }
  		    effect |= PE_IMAGE;
  		    break;
@@ -587,7 +587,7 @@ WIP TagMAP OoB access possible now
  		    effect &= ~PE_IMAGE;
  		    if (a_img) {
  			a_img->end.line = currentLn(buf);
-@@ -6094,7 +6094,7 @@ HTMLlineproc2body(Buffer *buf, Str (*fee
+@@ -6096,7 +6096,7 @@ HTMLlineproc2body(Buffer *buf, Str (*fee
  			    break;
  			}
  		    }
@@ -596,7 +596,7 @@ WIP TagMAP OoB access possible now
  		    effect &= ~PE_FORM;
  		    if (a_form) {
  			a_form->end.line = currentLn(buf);
-@@ -6114,7 +6114,7 @@ HTMLlineproc2body(Buffer *buf, Str (*fee
+@@ -6116,7 +6116,7 @@ HTMLlineproc2body(Buffer *buf, Str (*fee
  			buf->maplist = m;
  		    }
  		    break;
@@ -605,7 +605,7 @@ WIP TagMAP OoB access possible now
  		    /* nothing to do */
  		    break;
  		case HTML_AREA:
-@@ -6158,7 +6158,7 @@ HTMLlineproc2body(Buffer *buf, Str (*fee
+@@ -6160,7 +6160,7 @@ HTMLlineproc2body(Buffer *buf, Str (*fee
  					   *(union frameset_element *)
  					   &frameset_s[frameset_sp]);
  		    break;
@@ -614,7 +614,7 @@ WIP TagMAP OoB access possible now
  		    if (frameset_sp >= 0)
  			frameset_sp--;
  		    break;
-@@ -6218,8 +6218,8 @@ HTMLlineproc2body(Buffer *buf, Str (*fee
+@@ -6220,8 +6220,8 @@ HTMLlineproc2body(Buffer *buf, Str (*fee
  		case HTML_INTERNAL:
  		    internal = HTML_INTERNAL;
  		    break;
@@ -625,7 +625,7 @@ WIP TagMAP OoB access possible now
  		    break;
  		case HTML_FORM_INT:
  		    if (parsedtag_get_value(tag, ATTR_FID, &form_id))
-@@ -6234,7 +6234,7 @@ HTMLlineproc2body(Buffer *buf, Str (*fee
+@@ -6236,7 +6236,7 @@ HTMLlineproc2body(Buffer *buf, Str (*fee
  		    else
  			n_textarea = -1;
  		    break;
@@ -634,7 +634,7 @@ WIP TagMAP OoB access possible now
  		    if (a_textarea && n_textarea >= 0) {
  			FormItemList *item =
  			    (FormItemList *)a_textarea[n_textarea]->url;
-@@ -6252,7 +6252,7 @@ HTMLlineproc2body(Buffer *buf, Str (*fee
+@@ -6254,7 +6254,7 @@ HTMLlineproc2body(Buffer *buf, Str (*fee
  		    else
  			n_select = -1;
  		    break;
@@ -643,7 +643,7 @@ WIP TagMAP OoB access possible now
  		    if (a_select && n_select >= 0) {
  			FormItemList *item =
  			    (FormItemList *)a_select[n_select]->url;
-@@ -6286,7 +6286,7 @@ HTMLlineproc2body(Buffer *buf, Str (*fee
+@@ -6288,7 +6288,7 @@ HTMLlineproc2body(Buffer *buf, Str (*fee
  		    if (parsedtag_get_value(tag, ATTR_TYPE, &p))
  			symbol = (char)atoi(p);
  		    break;
@@ -652,7 +652,7 @@ WIP TagMAP OoB access possible now
  		    effect &= ~PC_SYMBOL;
  		    break;
  		case HTML_MAIN:
-@@ -6319,7 +6319,7 @@ HTMLlineproc2body(Buffer *buf, Str (*fee
+@@ -6321,7 +6321,7 @@ HTMLlineproc2body(Buffer *buf, Str (*fee
  	/* end of processing for one line */
  	if (!internal)
  	    addnewline(buf, outc, outp, NULL, pos, -1, nlines);
@@ -661,7 +661,7 @@ WIP TagMAP OoB access possible now
  	    internal = 0;
  	if (str != endp) {
  	    line = Strsubstr(line, str - line->ptr, endp - str);
-@@ -6568,9 +6568,10 @@ HTMLlineproc0(char *line, struct html_fe
+@@ -6570,9 +6570,10 @@ HTMLlineproc0(char *line, struct html_fe
  		p = str;
  		if ((tag = parse_tag(&p, internal))) {
  		    if (tag->tagid == end_tag ||
@@ -674,7 +674,7 @@ WIP TagMAP OoB access possible now
  				|| tag->tagid == HTML_BODY)))
  			goto proc_normal;
  		}
-@@ -7159,11 +7160,11 @@ completeHTMLstream(struct html_feed_envi
+@@ -7161,11 +7162,11 @@ completeHTMLstream(struct html_feed_envi
  {
      close_anchor(h_env, obuf);
      if (obuf->img_alt) {
@@ -688,7 +688,7 @@ WIP TagMAP OoB access possible now
  	obuf->input_alt.hseq = 0;
  	obuf->input_alt.fid = -1;
  	obuf->input_alt.in = 0;
-@@ -7172,23 +7173,23 @@ completeHTMLstream(struct html_feed_envi
+@@ -7174,23 +7175,23 @@ completeHTMLstream(struct html_feed_envi
  	obuf->input_alt.value = NULL;
      }
      if (obuf->in_bold) {
@@ -1189,7 +1189,7 @@ WIP TagMAP OoB access possible now
  			    case ATTR_HREF:
 --- a/table.c
 +++ b/table.c
-@@ -2460,21 +2460,21 @@ table_close_anchor0(struct table *tbl, s
+@@ -2447,21 +2447,21 @@ table_close_anchor0(struct table *tbl, s
  
  #define CASE_TABLE_TAG \
  	case HTML_TABLE:\
@@ -1219,7 +1219,7 @@ WIP TagMAP OoB access possible now
  	case HTML_COL
  
  #define ATTR_ROWSPAN_MAX 32766
-@@ -2508,9 +2508,9 @@ feed_table_tag(struct table *tbl, char *
+@@ -2495,9 +2495,9 @@ feed_table_tag(struct table *tbl, char *
      if (mode->pre_mode & TBLM_INTXTA) {
  	switch (cmd) {
  	CASE_TABLE_TAG:
@@ -1231,7 +1231,7 @@ WIP TagMAP OoB access possible now
  		return TAG_ACTION_NONE;
  	    break;
  	default:
-@@ -2537,11 +2537,11 @@ feed_table_tag(struct table *tbl, char *
+@@ -2524,11 +2524,11 @@ feed_table_tag(struct table *tbl, char *
       * <select> environment is regarded as the end of <select>. */
      if (mode->pre_mode & TBLM_INSELECT) {
  	switch (cmd) {
@@ -1247,7 +1247,7 @@ WIP TagMAP OoB access possible now
  		return TAG_ACTION_NONE;
  	    break;
  	default:
-@@ -2550,10 +2550,10 @@ feed_table_tag(struct table *tbl, char *
+@@ -2537,10 +2537,10 @@ feed_table_tag(struct table *tbl, char *
      }
      if (mode->caption) {
  	switch (cmd) {
@@ -1261,7 +1261,7 @@ WIP TagMAP OoB access possible now
  		return TAG_ACTION_NONE;
  	    break;
  	default:
-@@ -2564,9 +2564,9 @@ feed_table_tag(struct table *tbl, char *
+@@ -2551,9 +2551,9 @@ feed_table_tag(struct table *tbl, char *
      if (mode->pre_mode & TBLM_PRE) {
  	switch (cmd) {
  	case HTML_NOBR:
@@ -1273,7 +1273,7 @@ WIP TagMAP OoB access possible now
  	    return TAG_ACTION_NONE;
  	}
      }
-@@ -2575,7 +2575,7 @@ feed_table_tag(struct table *tbl, char *
+@@ -2562,7 +2562,7 @@ feed_table_tag(struct table *tbl, char *
      case HTML_TABLE:
  	check_rowcol(tbl, mode);
  	return TAG_ACTION_TABLE;
@@ -1282,7 +1282,7 @@ WIP TagMAP OoB access possible now
  	if (tbl->suspended_data)
  	    check_rowcol(tbl, mode);
  	return TAG_ACTION_N_TABLE;
-@@ -2803,13 +2803,13 @@ feed_table_tag(struct table *tbl, char *
+@@ -2790,13 +2790,13 @@ feed_table_tag(struct table *tbl, char *
  	}
  	begin_cell(tbl, mode);
  	break;
@@ -1299,7 +1299,7 @@ WIP TagMAP OoB access possible now
  	setwidth(tbl, mode);
  	tbl->flag &= ~TBL_IN_COL;
  #ifdef FEED_TABLE_DEBUG
-@@ -2828,41 +2828,41 @@ feed_table_tag(struct table *tbl, char *
+@@ -2815,41 +2815,41 @@ feed_table_tag(struct table *tbl, char *
      case HTML_P:
      case HTML_BR:
      case HTML_CENTER:
@@ -1350,7 +1350,7 @@ WIP TagMAP OoB access possible now
  	    break;
  	case HTML_PLAINTEXT:
  	    mode->pre_mode |= TBLM_PLAIN;
-@@ -2876,10 +2876,10 @@ feed_table_tag(struct table *tbl, char *
+@@ -2863,10 +2863,10 @@ feed_table_tag(struct table *tbl, char *
      case HTML_UL:
  	feed_table_block_tag(tbl, line, mode, 1, cmd);
  	break;
@@ -1365,7 +1365,7 @@ WIP TagMAP OoB access possible now
  	feed_table_block_tag(tbl, line, mode, -1, cmd);
  	break;
      case HTML_NOBR:
-@@ -2908,7 +2908,7 @@ feed_table_tag(struct table *tbl, char *
+@@ -2895,7 +2895,7 @@ feed_table_tag(struct table *tbl, char *
  	    tbl->linfo.length = 0;
  	}
  	break;
@@ -1374,7 +1374,7 @@ WIP TagMAP OoB access possible now
  	if (!(tbl->flag & TBL_IN_ROW))
  	    break;
  	feed_table_inline_tag(tbl, line, mode, -1);
-@@ -2917,7 +2917,7 @@ feed_table_tag(struct table *tbl, char *
+@@ -2904,7 +2904,7 @@ feed_table_tag(struct table *tbl, char *
  	if (mode->nobr_level == 0)
  	    mode->pre_mode &= ~TBLM_NOBR;
  	break;
@@ -1383,7 +1383,7 @@ WIP TagMAP OoB access possible now
  	feed_table_inline_tag(tbl, line, mode, -1);
  	mode->pre_mode &= ~TBLM_PRE_INT;
  	break;
-@@ -2947,7 +2947,7 @@ feed_table_tag(struct table *tbl, char *
+@@ -2934,7 +2934,7 @@ feed_table_tag(struct table *tbl, char *
  	if (tmp)
  	    feed_table1(tbl, tmp, mode, width);
  	break;
@@ -1392,7 +1392,7 @@ WIP TagMAP OoB access possible now
  	feed_table_block_tag(tbl, "", mode, 0, cmd);
  	process_n_form();
  	break;
-@@ -2959,7 +2959,7 @@ feed_table_tag(struct table *tbl, char *
+@@ -2946,7 +2946,7 @@ feed_table_tag(struct table *tbl, char *
         tmp = process_button(tag);
         feed_table1(tbl, tmp, mode, width);
         break;
@@ -1401,7 +1401,7 @@ WIP TagMAP OoB access possible now
         tmp = process_n_button();
         feed_table1(tbl, tmp, mode, width);
         break;
-@@ -2968,9 +2968,9 @@ feed_table_tag(struct table *tbl, char *
+@@ -2955,9 +2955,9 @@ feed_table_tag(struct table *tbl, char *
  	if (tmp)
  	    feed_table1(tbl, tmp, mode, width);
  	mode->pre_mode |= TBLM_INSELECT;
@@ -1413,7 +1413,7 @@ WIP TagMAP OoB access possible now
      case HTML_OPTION:
  	/* nothing */
  	break;
-@@ -2990,7 +2990,7 @@ feed_table_tag(struct table *tbl, char *
+@@ -2977,7 +2977,7 @@ feed_table_tag(struct table *tbl, char *
  	if (tmp)
  	    feed_table1(tbl, tmp, mode, width);
  	mode->pre_mode |= TBLM_INTXTA;
@@ -1422,7 +1422,7 @@ WIP TagMAP OoB access possible now
  	break;
      case HTML_A:
  	table_close_anchor0(tbl, mode);
-@@ -3033,7 +3033,7 @@ feed_table_tag(struct table *tbl, char *
+@@ -3020,7 +3020,7 @@ feed_table_tag(struct table *tbl, char *
  	    break;
  	}
  	break;
@@ -1431,7 +1431,7 @@ WIP TagMAP OoB access possible now
  	switch (displayInsDel) {
  	case DISPLAY_INS_DEL_SIMPLE:
  	    mode->pre_mode &= ~TBLM_DEL;
-@@ -3059,7 +3059,7 @@ feed_table_tag(struct table *tbl, char *
+@@ -3046,7 +3046,7 @@ feed_table_tag(struct table *tbl, char *
  	    break;
  	}
  	break;
@@ -1440,7 +1440,7 @@ WIP TagMAP OoB access possible now
  	switch (displayInsDel) {
  	case DISPLAY_INS_DEL_SIMPLE:
  	    mode->pre_mode &= ~TBLM_S;
-@@ -3073,7 +3073,7 @@ feed_table_tag(struct table *tbl, char *
+@@ -3060,7 +3060,7 @@ feed_table_tag(struct table *tbl, char *
  	}
  	break;
      case HTML_INS:
@@ -1449,7 +1449,7 @@ WIP TagMAP OoB access possible now
  	switch (displayInsDel) {
  	case DISPLAY_INS_DEL_SIMPLE:
  	    break;
-@@ -3087,11 +3087,11 @@ feed_table_tag(struct table *tbl, char *
+@@ -3074,11 +3074,11 @@ feed_table_tag(struct table *tbl, char *
  	break;
      case HTML_SUP:
      case HTML_SUB:
@@ -1463,7 +1463,7 @@ WIP TagMAP OoB access possible now
  	break;
      case HTML_TABLE_ALT:
  	id = -1;
-@@ -3133,46 +3133,46 @@ feed_table_tag(struct table *tbl, char *
+@@ -3120,46 +3120,46 @@ feed_table_tag(struct table *tbl, char *
      case HTML_CAPTION:
  	mode->caption = 1;
  	break;

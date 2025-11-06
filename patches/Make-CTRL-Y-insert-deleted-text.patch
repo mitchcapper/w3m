@@ -7,44 +7,47 @@ WIP Needs Strfree fix and Fix-yank.patch(?)
 
 ---
  fm.h     |    1 +
- linein.c |   47 ++++++++++++++++++++++++++++++++++++++++-------
+ linein.c |   56 ++++++++++++++++++++++++++++++++++++++++++++++++++------
  rc.c     |    3 +++
- 3 files changed, 44 insertions(+), 7 deletions(-)
+ 3 files changed, 54 insertions(+), 6 deletions(-)
 
 --- a/linein.c
 +++ b/linein.c
-@@ -22,6 +22,7 @@ extern int do_getch(void);
+@@ -22,6 +22,8 @@ extern int do_getch(void);
  
  static Str strBuf;
  static Lineprop strProp[STR_LEN];
 +static Str ynkBuf;
++static int ynkCon;
  
  static Str CompleteBuf;
  static Str CFileName;
-@@ -32,7 +33,7 @@ static char **CFileBuf = NULL;
- static int NCFileBuf;
- static int NCFileOffset;
- 
--static void _iword(void),
-+static void _iword(void), _cy(void), _paste(void),
- _mvR(void), _mvL(void), _mvRw(void), _mvLw(void), delC(void), insC(void),
- _mvB(void), _mvE(void), _enter(void), _quo(void), _bs(void), _bsw(void),
- killn(void), killb(void), _inbrk(void), _esc(void), _editor(void),
-@@ -53,11 +54,11 @@ void (*InputKeymap[32]) (void) = {
- /*  C-@     C-a     C-b     C-c     C-d     C-e     C-f     C-g     */
-     _compl, _mvB,   _mvL,   _inbrk, delC,   _mvE,   _mvR,   _inbrk,
- /*  C-h     C-i     C-j     C-k     C-l     C-m     C-n     C-o     */
--    _bs,    _iword,  _enter, killn,  _iword,  _enter, _next,  _editor,
-+    _bs,    _iword, _enter, killn,  _iword, _enter, _next,  _editor,
+@@ -35,6 +37,7 @@ static int NCFileOffset;
+ static void _bs(void);
+ static void _bsw(void);
+ static void _compl(void);
++static void _cy(void);
+ static void _dcompl(void);
+ static void _editor(void);
+ static void _enter(void);
+@@ -49,6 +52,7 @@ static void _mvLw(void);
+ static void _mvR(void);
+ static void _mvRw(void);
+ static void _next(void);
++static void _paste(void);
+ static void _prev(void);
+ static void _quo(void);
+ static void _rcompl(void);
+@@ -79,7 +83,7 @@ void (*InputKeymap[32]) (void) = {
  /*  C-p     C-q     C-r     C-s     C-t     C-u     C-v     C-w     */
-     _prev,  _quo,   _bsw,   _iword,  _mvLw,  killb,  _quo,   _bsw,
+     _prev,  _quo,   _bsw,   _noop,  _mvLw,  killb,  _quo,   _bsw,
  /*  C-x     C-y     C-z     C-[     C-\     C-]     C-^     C-_     */
--    _tcompl,_mvRw,  _iword,  _esc,   _iword,  _iword,  _iword,  _iword,
-+    _tcompl,_cy,    _iword, _esc,   _iword, _iword, _iword, _iword,
+-    _tcompl,_mvRw,  _noop,  _esc,   _isrch, _noop,  _noop,  _noop,
++    _tcompl,_cy,    _noop,  _esc,   _isrch, _noop,  _noop,  _noop,
  };
  /* *INDENT-ON* */
  
-@@ -182,7 +183,8 @@ inputLineHistSearch(const char *prompt,
+@@ -204,7 +208,8 @@ inputLineHistSearch(const char *prompt,
  	cm_clear = TRUE;
  	cm_disp_clear = TRUE;
  	if (!i_quote &&
@@ -54,17 +57,23 @@ WIP Needs Strfree fix and Fix-yank.patch(?)
  	     ((cm_mode & CPL_ON) && (c == CTRL_I)))) {
  	    if (emacs_like_lineedit && cm_next) {
  		_dcompl();
-@@ -407,6 +409,9 @@ ins_char(Str str)
- 	    }
- 	}
-     }
-+    if (ynkBuf)
-+	Strfree(ynkBuf);
-+    ynkBuf = NULL;
- }
- #endif
- 
-@@ -483,23 +488,51 @@ insC(void)
+@@ -254,6 +259,7 @@ inputLineHistSearch(const char *prompt,
+ 	    cm_disp_next = -1;
+ 	    if (CLen + tmp->length > STR_LEN || !tmp->length)
+ 		goto next_char;
++	    ynkCon = 0;
+ 	    ins_char(tmp);
+ 	    if (incrfunc)
+ 		incrfunc(-1, strBuf, strProp);
+@@ -265,6 +271,7 @@ inputLineHistSearch(const char *prompt,
+ 	    cm_disp_next = -1;
+ 	    if (CLen >= STR_LEN)
+ 		goto next_char;
++	    ynkCon = 0;
+ 	    insC();
+ 	    strBuf->ptr[CPos] = c;
+ 	    if (!is_passwd && get_mctype(&c) == PC_CTRL)
+@@ -509,23 +516,47 @@ insC(void)
  static void
  delC(void)
  {
@@ -73,8 +82,6 @@ WIP Needs Strfree fix and Fix-yank.patch(?)
  
      if (CLen == CPos)
  	return;
-+    if (!ynkBuf)
-+	ynkBuf = Strnew();
  #ifdef USE_M17N
 -    while (i + delta < CLen && strProp[i + delta] & PC_WCHAR2)
 +    while (CPos + delta < CLen && strProp[CPos + delta] & PC_WCHAR2)
@@ -85,15 +92,12 @@ WIP Needs Strfree fix and Fix-yank.patch(?)
  	strProp[i] = strProp[i + delta];
 +
 +    if (!is_passwd) {
-+	while (ynkBuf->length + delta > ynkBuf->area_size) {
-+	    if (ynkBuf->area_size == STR_SIZE_MAX) return;
-+		Strgrow(ynkBuf);
-+	}
-+	/* TODO(rkta): Better use Str function, does not exist yet */
-+	memmove(ynkBuf->ptr + delta, ynkBuf->ptr, ynkBuf->length);
-+	memcpy(ynkBuf->ptr, &strBuf->ptr[CPos], delta);
-+	ynkBuf->length += delta;
-+	ynkBuf->ptr[ynkBuf->length] = '\0';
++	if (!ynkBuf)
++	    ynkBuf = Strnew();
++	if (!ynkCon)
++	    Strshrink(ynkBuf, ynkBuf->length); /* TODO(rkta): same as clear? */
++	Strinsert_charp_n(ynkBuf, 0, &strBuf->ptr[CPos], delta);
++	ynkCon = 1;
      }
      Strdelete(strBuf, CPos, delta);
      CLen -= delta;
@@ -113,12 +117,85 @@ WIP Needs Strfree fix and Fix-yank.patch(?)
 +{
 +    if (!ynkBuf) return;
 +    ins_char(ynkBuf);
++    ynkCon = 0;
 +}
 +
 +static void
  _mvL(void)
  {
      if (CPos > 0)
+@@ -534,6 +565,7 @@ _mvL(void)
+     while (CPos > 0 && strProp[CPos] & PC_WCHAR2)
+ 	CPos--;
+ #endif
++    ynkCon = 0;
+ }
+ 
+ static void
+@@ -550,6 +582,7 @@ _mvLw(void)
+ 	if (!move_word)
+ 	    break;
+     }
++    ynkCon = 0;
+ }
+ 
+ static void
+@@ -566,6 +599,7 @@ _mvRw(void)
+ 	if (!move_word)
+ 	    break;
+     }
++    ynkCon = 0;
+ }
+ 
+ static void
+@@ -577,13 +611,18 @@ _mvR(void)
+     while (CPos < CLen && strProp[CPos] & PC_WCHAR2)
+ 	CPos++;
+ #endif
++    ynkCon = 0;
+ }
+ 
+ static void
+ _bs(void)
+ {
++    int y;
++
+     if (CPos > 0) {
++	y = ynkCon;
+ 	_mvL();
++	ynkCon = y;
+ 	delC();
+     }
+ }
+@@ -591,9 +630,12 @@ _bs(void)
+ static void
+ _bsw(void)
+ {
+-    int t = 0;
++    int t = 0, y;
++
+     while (CPos > 0 && !t) {
++	y = ynkCon;
+ 	_mvL();
++	ynkCon = y;
+ 	t = (move_word && terminated(strBuf->ptr[CPos - 1]));
+ 	delC();
+     }
+@@ -635,12 +677,14 @@ static void
+ _mvB(void)
+ {
+     CPos = 0;
++    ynkCon = 0;
+ }
+ 
+ static void
+ _mvE(void)
+ {
+     CPos = CLen;
++    ynkCon = 0;
+ }
+ 
+ static void
 --- a/fm.h
 +++ b/fm.h
 @@ -922,6 +922,7 @@ global int exit_on_last init(FALSE);
@@ -131,7 +208,7 @@ WIP Needs Strfree fix and Fix-yank.patch(?)
  global int label_topline init(FALSE);
 --- a/rc.c
 +++ b/rc.c
-@@ -148,6 +148,7 @@ static int OptionEncode = FALSE;
+@@ -146,6 +146,7 @@ static int OptionEncode = FALSE;
  #define CMT_USE_MARK	N_("Enable mark operations")
  #endif
  #define CMT_EMACS_LIKE_LINEEDIT	N_("Enable Emacs-style line editing")
@@ -139,7 +216,7 @@ WIP Needs Strfree fix and Fix-yank.patch(?)
  #define CMT_SPACE_AUTOCOMPLETE  N_("Space key triggers file completion while editing URLs")
  #define CMT_VI_PREC_NUM	 N_("Enable vi-like numeric prefix")
  #define CMT_LABEL_TOPLINE N_("Move cursor to top line when going to label")
-@@ -531,6 +532,8 @@ struct param_ptr params3[] = {
+@@ -528,6 +529,8 @@ struct param_ptr params3[] = {
  #endif
      {"emacs_like_lineedit", P_INT, PI_ONOFF, (void *)&emacs_like_lineedit,
       CMT_EMACS_LIKE_LINEEDIT, NULL},

@@ -1,36 +1,10 @@
-Remove-islang.c.patch
+Replace-borked-function-with-noop.patch
 Add-cd-command.patch
-# readline
-Add-key-binding-to-insert-word-under-cursor.patch
-Add-smartcase-option-for-search.patch
 Show-all-link-numbers.patch
 Let-Strfree-take-a-NULL.patch
-# gemini
-gemini.patch
-Make-CTRL-Y-insert-deleted-text.patch
-# WARNINGS
-Enable-more-warnings.patch
-0143-Add-cppcheck-target.patch
-# WIP
-WIP-gpm_process_mouse-prototyp.patch
-Workaround-entity-desaster-fix-missing-prototypes.patch
-Add-comment-for-wgetch.patch
-0101-WIP-getch-Fix-warning-strict-prototype.patch
-Suppress-Wlogical-op.patch
-Suppress-Wold-style-definition.patch
-Suppress-Wstrict-prototypes.patch
-0081-Only-use-malloc-if-the-default-buffer-is-to-small.patch
-# ACTIVE
-shorten-not-assigned-in-help.patch
-do_download.patch
-gophertmp.patch
-scan-build-issues.patch
 Refactor-inputAnswer.patch
 Refactor-checkOverwrite.patch
-Add-password-manager-integration.patch
-Use-Ctrl-L-to-insert-next-char-in-search.patch
-Recognize-aria-label-for-buttons.patch
-Add-keybinding-to-insert-current-search-term.patch
+Reformat-function-declaration.patch
 Fix-select-menu-setup.patch
 Add-test-for-Str.patch
 Use-Strnulterm-everywhere.patch
@@ -42,18 +16,30 @@ Refactor-Strcopy-functions.patch
 Refactor-Strcat-functions.patch
 Refactor-Strcat_char.patch
 Get-rid-of-xfree.patch
-Strinsert_charp_n.patch
 Let-Str-functions-return-a-Str.patch
 Get-rid-of-Strnulterm.patch
-Fix-yank.patch
-Refactor-handling-of-close-tags.patch
-Use-prec_num-with-followA.patch
-Use-confirm-in-quitfm.patch
-Add-command-to-protect-buffers.patch
-Improve-protected-buffers.patch
-Fix-link-numbers-in-tables.patch
-Change-filename-when-saving-compressed-source.patch
-iwyu-mktable.patch
+Add-Strinsert_charp_n-functon.patch
+# readline
+Add-key-binding-to-insert-word-under-cursor.patch
+Add-smartcase-option-for-search.patch
+Use-Ctrl-L-to-insert-next-char-in-search.patch
+Add-keybinding-to-insert-current-search-term.patch
+Make-CTRL-Y-insert-deleted-text.patch
+# gemini
+gemini.patch
+# WARNINGS
+Enable-more-warnings.patch
+0143-Add-cppcheck-target.patch
+# WIP
+WIP-gpm_process_mouse-prototyp.patch
+Workaround-entity-desaster-fix-missing-prototypes.patch
+Add-comment-for-wgetch.patch
+0101-WIP-getch-Fix-warning-strict-prototype.patch
+Suppress-Wlogical-op.patch
+Suppress-Wold-style-definition.patch
+Suppress-Wstrict-prototypes.patch
+# ACTIVE
+Fix-some-include-what-you-use-issues.patch
 iwyu-func.patch
 iwyu-Str.patch
 iwyu-matrix.patch
@@ -61,8 +47,26 @@ iwyu-history.patch
 iwyu-parsetag.patch
 iwyu-parsetagx.patch
 iwyu-alloc.patch
-libcurl.patch
+iwyu-buffer.patch
+Fix-some-includes-in-libwc.patch
+iwyu-etc.patch
+iwyu-file.patch
+shorten-not-assigned-in-help.patch
+do_download.patch
+gophertmp.patch
+scan-build-issues.patch
+Add-password-manager-integration.patch
+Recognize-aria-label-for-buttons.patch
+Refactor-handling-of-close-tags.patch
+Use-prec_num-with-followA.patch
+Use-confirm-in-quitfm.patch
+Add-command-to-protect-buffers.patch
+Improve-protected-buffers.patch
+Fix-link-numbers-in-tables.patch
+Change-filename-when-saving-compressed-source.patch
+Refactor-linein.patch
 lto.patch
+libcurl.patch
 # BORKED
 rc.patch
 Refactor-regex-library.patch
