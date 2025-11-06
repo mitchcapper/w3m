@@ -206,6 +206,12 @@ fversion(FILE * f)
 #ifdef USE_MIGEMO
 	    ",migemo"
 #endif
+#ifdef USE_HISTORY
+	    ",history"
+#endif
+#ifdef USE_DICT
+	    ",dict"
+#endif
 	);
 }
 
@@ -440,7 +446,7 @@ main(int argc, char **argv)
 #else
     GC_oom_fn = die_oom;
 #endif
-#if defined(ENABLE_NLS) || (defined(USE_M17N) && defined(HAVE_LANGINFO_CODESET))
+#if defined(ENABLE_NLS) || defined(USE_M17N)
     setlocale(LC_ALL, "");
 #endif
 #ifdef ENABLE_NLS
@@ -7145,4 +7151,29 @@ DEFUN(userMessage, MESSAGE , "Display a message")
     }
 
     disp_message_nsec(msg, FALSE, MessageDelay, FALSE, TRUE);
+}
+
+DEFUN(lineTop, LINE_TOP, "Redraw screen with current line at top")
+{
+    int offsety;
+    if (Currentbuf->firstLine == NULL)
+	return;
+    offsety = Currentbuf->cursorY;
+    Currentbuf->topLine = lineSkip(Currentbuf, Currentbuf->topLine,
+                                   offsety, FALSE);
+    arrangeLine(Currentbuf);
+    displayBuffer(Currentbuf, B_NORMAL);
+}
+
+DEFUN(lineBottom, LINE_BOTTOM, "Redraw screen with current line at bottom")
+{
+    int offsety;
+    if (Currentbuf->firstLine == NULL)
+	return;
+    /* subtract 1 to exclude current line */
+    offsety = (Currentbuf->LINES - 1) - Currentbuf->cursorY;
+    Currentbuf->topLine = lineSkip(Currentbuf, Currentbuf->topLine,
+                                   -offsety, FALSE);
+    arrangeLine(Currentbuf);
+    displayBuffer(Currentbuf, B_NORMAL);
 }

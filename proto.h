@@ -17,6 +17,8 @@ extern void lup1(void);
 extern void ldown1(void);
 extern void ctrCsrV(void);
 extern void ctrCsrH(void);
+extern void lineTop(void);
+extern void lineBottom(void);
 extern void rdrwSc(void);
 extern void srchfor(void);
 extern void isrchfor(void);

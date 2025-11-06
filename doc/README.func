@@ -46,8 +46,10 @@ ISEARCH 	Incremental search forward
 ISEARCH_BACK	Incremental search backward
 LEFT		Shift screen one column left
 LINE_BEGIN	Go to the beginning of the line
+LINE_BOTTOM	Redraw screen with current line at bottom
 LINE_END	Go to the end of the line
 LINE_INFO	Display current position in document
+LINE_TOP	Redraw screen with current line at top
 LINK_BEGIN	Move to the first hyperlink
 LINK_END	Move to the last hyperlink
 LINK_MENU	Pop up link element menu

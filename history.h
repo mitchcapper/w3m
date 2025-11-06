@@ -36,6 +36,7 @@ extern void ldHist(void);
 extern void svHist(void);
 #else				/* not USE_HISTORY */
 #define ldHist nulcmd
+#define svHist nulcmd
 #endif				/* not USE_HISTORY */
 
 #endif				/* HISTORY_H */

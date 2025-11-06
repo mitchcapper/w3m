@@ -10384,48 +10384,6 @@ printf "%s\n" "#define SETPGRP_VOID 1" >>confdefs.h
 
 fi
 
-case "$host_os" in
-  *cygwin*)
-    ;;
-  *)
-
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for nl_langinfo and CODESET" >&5
-printf %s "checking for nl_langinfo and CODESET... " >&6; }
-if test ${am_cv_langinfo_codeset+y}
-then :
-  printf %s "(cached) " >&6
-else $as_nop
-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-#include <langinfo.h>
-int
-main (void)
-{
-char* cs = nl_langinfo(CODESET); return !cs;
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_link "$LINENO"
-then :
-  am_cv_langinfo_codeset=yes
-else $as_nop
-  am_cv_langinfo_codeset=no
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam \
-    conftest$ac_exeext conftest.$ac_ext
-
-fi
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $am_cv_langinfo_codeset" >&5
-printf "%s\n" "$am_cv_langinfo_codeset" >&6; }
-  if test $am_cv_langinfo_codeset = yes; then
-
-printf "%s\n" "#define HAVE_LANGINFO_CODESET 1" >>confdefs.h
-
-  fi
-
-    ;;
-esac
 
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for sigsetjmp" >&5
 printf %s "checking for sigsetjmp... " >&6; }
