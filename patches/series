@@ -50,7 +50,6 @@ iwyu-alloc.patch
 iwyu-buffer.patch
 Fix-some-includes-in-libwc.patch
 iwyu-etc.patch
-iwyu-file.patch
 shorten-not-assigned-in-help.patch
 do_download.patch
 gophertmp.patch
