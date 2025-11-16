@@ -70,11 +70,9 @@ static int CPos, CLen, offset;
 static int i_cont, i_broken, i_quote;
 static int cm_mode, cm_next, cm_clear, cm_disp_next, cm_disp_clear;
 static int need_redraw, is_passwd;
-static int move_word;
 
 static Hist *CurrentHist;
 static Str strCurrentBuf;
-static int use_hist;
 #ifdef USE_M17N
 static void ins_char(Str str);
 #endif
@@ -92,16 +90,10 @@ inputLineHistSearch(const char *prompt, const char *def_str,
 #endif
 
     is_passwd = FALSE;
-    move_word = TRUE;
 
-    CurrentHist = hist;
-    if (hist != NULL) {
-	use_hist = TRUE;
+    if ((CurrentHist = hist))
 	strCurrentBuf = NULL;
-    }
-    else {
-	use_hist = FALSE;
-    }
+
     if (flag & IN_URL) {
 	cm_mode = CPL_ALWAYS | CPL_URL;
     }
@@ -111,7 +103,6 @@ inputLineHistSearch(const char *prompt, const char *def_str,
     else if (flag & IN_PASSWORD) {
 	cm_mode = CPL_NEVER;
 	is_passwd = TRUE;
-	move_word = FALSE;
     }
     else if (flag & IN_COMMAND)
 	cm_mode = CPL_ON;
@@ -273,7 +264,7 @@ inputLineHistSearch(const char *prompt, const char *def_str,
     if (flag & (IN_FILENAME | IN_COMMAND)) {
 	SKIP_BLANKS(p);
     }
-    if (use_hist && !(flag & IN_URL) && *p != '\0') {
+    if (hist && !(flag & IN_URL) && *p != '\0') {
 	char *q = lastHist(hist);
 	if (!q || strcmp(q, p))
 	    pushHist(hist, p);
@@ -522,7 +513,7 @@ _mvLw(void)
 	if (CPos > 0 && strProp[CPos] & PC_WCHAR2)
 	    CPos--;
 #endif
-	if (!move_word)
+	if (is_passwd)
 	    break;
     }
 }
@@ -538,7 +529,7 @@ _mvRw(void)
 	if (CPos < CLen && strProp[CPos] & PC_WCHAR2)
 	    CPos++;
 #endif
-	if (!move_word)
+	if (is_passwd)
 	    break;
     }
 }
@@ -569,7 +560,7 @@ _bsw(void)
     int t = 0;
     while (CPos > 0 && !t) {
 	_mvL();
-	t = (move_word && terminated(strBuf->ptr[CPos - 1]));
+	t = (!is_passwd && terminated(strBuf->ptr[CPos - 1]));
 	delC();
     }
 }
@@ -1010,7 +1001,7 @@ _prev(void)
     Hist *hist = CurrentHist;
     char *p;
 
-    if (!use_hist)
+    if (!hist)
 	return;
     if (strCurrentBuf) {
 	p = prevHist(hist);
@@ -1036,7 +1027,7 @@ _next(void)
     Hist *hist = CurrentHist;
     char *p;
 
-    if (!use_hist)
+    if (!hist)
 	return;
     if (strCurrentBuf == NULL)
 	return;
