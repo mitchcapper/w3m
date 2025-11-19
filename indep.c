@@ -72,7 +72,16 @@ strtoclen(const char *s)
     return atoi(s);
 #endif
 }
-
+#ifdef _WIN32
+void
+bzero(void* ptr, int len)
+{
+	int i;
+	char* p = ptr;
+	for (i = 0; i < len; i++)
+		*(p++) = 0;
+}
+#endif
 char *
 allocStr(const char *s, int len)
 {
