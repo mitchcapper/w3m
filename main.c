@@ -8,6 +8,11 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <fcntl.h>
+#ifdef _WIN32
+#define __MINGW32_VERSION
+#define __CYGWIN__
+#define cygwin_mouse_btn_swapped 0
+#endif
 #if defined(HAVE_WAITPID) || defined(HAVE_WAIT3)
 #include <sys/wait.h>
 #endif
@@ -20,6 +25,9 @@
 #include "myctype.h"
 #include "regex.h"
 #include "rc.h"
+#ifdef EXTCURSES
+#include <ext_curses.h>
+#endif
 #ifdef USE_M17N
 #include "wc.h"
 #include "wtf.h"
@@ -38,7 +46,9 @@ extern int do_getch();
 #endif
 
 #include "util.h"
-
+#ifdef PD_MOUSE_DEBUG
+#include "wlb_debug.h"
+#endif
 #ifdef __MINGW32_VERSION
 #include <winsock.h>
 
@@ -133,10 +143,14 @@ static void
 fversion(FILE * f)
 {
     fprintf(f, "w3m version %s, options %s\n", w3m_version,
+#ifndef _WIN32
 #if LANG == JA
 	    "lang=ja"
 #else
 	    "lang=en"
+#endif
+#else
+		"lang=en"
 #endif
 #ifdef USE_M17N
 	    ",m17n"
@@ -405,6 +419,7 @@ die_oom(size_t bytes)
      */
     return NULL;
 }
+static void PDHandleMouseEvent();
 
 int
 main(int argc, char **argv)
@@ -1262,7 +1277,34 @@ main(int argc, char **argv)
 	    } while (sleep_till_anykey(1, 0) <= 0);
 	}
 #endif
-	c = getch();
+		c = w3m_getch();
+#ifdef EXTCURSES
+		/* Handle mouse events using PDCurses native Mouse_status */
+		if (c == KEY_MOUSE) {
+			PDHandleMouseEvent();
+			continue;
+		}
+
+		if (c > 0x100) {
+			int handled = TRUE;
+			switch (c) {
+			case KEY_DOWN: movD(); break;
+			case KEY_UP: movU(); break;
+			case KEY_LEFT: movL(); break;
+			case KEY_RIGHT: movR(); break;
+			case KEY_HOME: goLineF(); break;
+			case KEY_END: goLineL(); break;
+			case KEY_NPAGE:
+				pgFore();
+				break;
+			case KEY_PPAGE: pgBack(); break;
+			case KEY_IC: mainMn(); break;
+			default: handled = FALSE; break;
+			}
+			if (handled)
+				continue;
+		}
+#endif
 #ifdef USE_ALARM
 	if (CurrentAlarm->sec > 0) {
 	    alarm(0);
@@ -5452,7 +5494,126 @@ do_mouse_action(int btn, int x, int y)
 }
 
 static void
+/* Forward declaration for process_mouse */
+static void process_mouse(int btn, int x, int y);
+
+#ifdef PD_MOUSE_DEBUG
+static void PDMouseDbg() {
+	int button = 0;
+	int i;
+	request_mouse_pos();
+
+	for (i = 0; i < PDC_MAX_MOUSE_BUTTONS; i++)
+		if (BUTTON_CHANGED(i))
+			button = i;
+
+
+	if (button)
+		dlog( "Button %d: ", button);
+
+	if (MOUSE_MOVED)
+		dlog("moved: ");
+	else if (MOUSE_WHEEL_UP)
+		dlog("wheel up: ");
+	else if (MOUSE_WHEEL_DOWN)
+		dlog("wheel dn: ");
+	else if (MOUSE_WHEEL_LEFT)
+		dlog("wheel lt: ");
+	else if (MOUSE_WHEEL_RIGHT)
+		dlog("wheel rt: ");
+	else if ((BUTTON_STATUS(button) &
+		BUTTON_ACTION_MASK) == BUTTON_PRESSED)
+		dlog("pressed: ");
+	else if ((BUTTON_STATUS(button) &
+		BUTTON_ACTION_MASK) == BUTTON_CLICKED)
+		dlog("clicked: ");
+	else if ((BUTTON_STATUS(button) &
+		BUTTON_ACTION_MASK) == BUTTON_DOUBLE_CLICKED)
+		dlog("double: ");
+	else if ((BUTTON_STATUS(button) &
+		BUTTON_ACTION_MASK) == BUTTON_TRIPLE_CLICKED)
+		dlog("triple: ");
+	else
+		dlog("released: ");
+
+	if (!button)
+		button = 1;     /* to allow button modifiers to be read */
+	if (BUTTON_STATUS(button) & BUTTON_MODIFIER_MASK)
+	{
+		if (BUTTON_STATUS(button) & BUTTON_SHIFT)
+			dlog("SHIFT ");
+
+		if (BUTTON_STATUS(button) & BUTTON_CONTROL)
+			dlog("CONTROL ");
+
+		if (BUTTON_STATUS(button) & BUTTON_ALT)
+			dlog("ALT ");
+	}
+
+	dlog("Posn: Y: %d X: %d", MOUSE_Y_POS, MOUSE_X_POS);
+}
+#endif
+static void PDHandleMouseEvent() {
+/*
+*   Depending on the version we link with vt vs wincon determines how this functions.  with VT we only key mouse press events and nothing else,   wincon has better events.  Note you dont generally get mouse down and up and click if you get click there are no down and up events so we need to synthisize them.
+* */
+	request_mouse_pos();
+#ifdef PD_MOUSE_DEBUG
+	PDMouseDbg();
+#endif
+	int x = Mouse_status.x;
+	int y = Mouse_status.y;
+	int i;
 process_mouse(int btn, int x, int y)
+	/* Handle Wheel Events
+	   Based on your logs:
+	   0x40 (PDC_MOUSE_WHEEL_DOWN) -> MOUSE_BTN4_DOWN_RXVT
+	   0x20 (PDC_MOUSE_WHEEL_UP)   -> MOUSE_BTN5_DOWN_RXVT
+	*/
+	if (Mouse_status.changes & PDC_MOUSE_WHEEL_UP) {
+		process_mouse(MOUSE_BTN4_DOWN_RXVT, x, y);
+		process_mouse(MOUSE_BTN_UP, x, y);
+	}
+	else if (Mouse_status.changes & PDC_MOUSE_WHEEL_DOWN) {
+		process_mouse(MOUSE_BTN5_DOWN_RXVT, x, y);
+		process_mouse(MOUSE_BTN_UP, x, y);
+	}
+
+	/* Handle Buttons 1, 2, 3 (Indices 0, 1, 2) */
+	/* We ignore index 3 (Button 4) as w3m primarily uses the first three */
+	for (i = 0; i < 3; i++) {
+		/* Check if the specific button changed state */
+		if (Mouse_status.changes & (1 << i)) {
+			int btn_code = MOUSE_BTN1_DOWN + i;
+			int clicks = 1;
+
+			switch (Mouse_status.button[i]) {
+			case BUTTON_PRESSED:
+#ifndef VT_MODE // vt moe we only get prssed and it means clicked.
+				process_mouse(btn_code, x, y);
+				break;
+
+			case BUTTON_RELEASED:
+				process_mouse(MOUSE_BTN_UP, x, y);
+				break;
+			case BUTTON_TRIPLE_CLICKED:
+				clicks = 3;
+			case BUTTON_DOUBLE_CLICKED:
+				if (clicks == 1)
+					clicks = 2;
+			case BUTTON_CLICKED:
+#endif
+				/* w3m expects a Down event followed by an Up event.
+				   PDCurses "Clicked" implies both happened, so we send both. */
+				for (auto m = 0; m < clicks; m++) {
+					process_mouse(btn_code, x, y);
+					process_mouse(MOUSE_BTN_UP, x, y);
+				}
+				break;
+			}
+		}
+	}
+}
 {
     int delta_x, delta_y, i;
     static int press_btn = MOUSE_BTN_RESET, press_x, press_y;

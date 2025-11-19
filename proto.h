@@ -472,16 +472,22 @@ extern void getTCstr(void);
 extern void setlinescols(void);
 extern void setupscreen(void);
 extern pid_t open_pipe_rw(FILE ** fr, FILE ** fw);
+#ifndef EXTCURSES
 extern int initscr(void);
 extern void move(int line, int column);
+#endif
 #ifdef USE_M17N
 extern void addmch(char *p, size_t len);
 #endif
+#ifndef EXTCURSES
 extern void addch(char c);
+#endif
 extern void wrap(void);
 extern void touch_line(void);
+#ifndef EXTCURSES
 extern void standout(void);
 extern void standend(void);
+#endif
 extern void bold(void);
 extern void boldend(void);
 extern void underline(void);
@@ -495,8 +501,10 @@ extern void setfcolor(int color);
 extern void setbcolor(int color);
 #endif				/* USE_BG_COLOR */
 #endif				/* USE_COLOR */
+#ifndef EXTCURSES
 extern void refresh(void);
 extern void clear(void);
+#endif
 #ifdef USE_RAW_SCROLL
 extern void scroll(int);
 extern void rscroll(int);
@@ -504,16 +512,24 @@ extern void rscroll(int);
 #if 0
 extern void need_clrtoeol(void);
 #endif
+#ifndef EXTCURSES
 extern void clrtoeol(void);
+#endif
 extern void clrtoeolx(void);
+#ifndef EXTCURSES
 extern void clrtobot(void);
+#endif
 extern void clrtobotx(void);
 extern void no_clrtoeol(void);
+#ifndef EXTCURSES
 extern void addstr(char *s);
 extern void addnstr(char *s, int n);
+#endif
 extern void addnstr_sup(char *s, int n);
+#ifndef EXTCURSES
 extern void crmode(void);
 extern void nocrmode(void);
+#endif
 extern void term_echo(void);
 extern void term_noecho(void);
 extern void term_raw(void);
