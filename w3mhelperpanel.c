@@ -11,7 +11,7 @@
 #include "parsetag.h"
 #include "myctype.h"
 
-#if LANG == JA
+#ifdef IS_LANG_JA
 /* FIXME: gettextize here */
 #define MSG_TITLE		"外部ビューアの編集"
 #define MSG_NEW_ENTRY		"新規登録"
@@ -83,7 +83,7 @@ printMailcapPanel(char *mailcap)
 	    }
 	}
     }
-#if LANG == JA
+#ifdef IS_LANG_JA
     /* FIXME: gettextize here */
     printf("Content-Type: text/html; charset=EUC-JP\n\n");
 #else

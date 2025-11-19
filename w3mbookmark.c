@@ -8,7 +8,7 @@
 #include "textlist.h"
 #include "parsetag.h"
 
-#if LANG == JA
+#ifdef IS_LANG_JA
 /* FIXME: gettextize here */
 #define BKMARK_TITLE "¥Ö¥Ã¥¯¥Þ¡¼¥¯¤ÎÅÐÏ¿"
 #define BKMARK_ADD "ÅÐÏ¿"
