@@ -11,7 +11,9 @@ set_mark(Line *l, int pos, int epos)
     for (; pos < epos && pos < l->size; pos++)
 	l->propBuf[pos] |= PE_MARK;
 }
-
+#ifdef _WIN32
+#undef USE_MIGEMO
+#endif
 #ifdef USE_MIGEMO
 /* Migemo: romaji --> kana+kanji in regexp */
 static FILE *migemor = NULL, *migemow = NULL;

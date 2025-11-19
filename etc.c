@@ -1,5 +1,8 @@
 /* $Id: etc.c,v 1.81 2007/05/23 15:06:05 inu Exp $ */
 #include "fm.h"
+#ifdef _WIN32
+#define __MINGW32_VERSION
+#endif
 #ifndef __MINGW32_VERSION
 #include <pwd.h>
 #endif
@@ -2066,7 +2069,7 @@ FQDN(char *host)
 #endif				/* USE_COOKIE */
 
 void (*mySignal(int signal_number, void (*action) (int))) (int) {
-#ifdef	SA_RESTART
+#if	defined(SA_RESTART) && !defined(_WIN32)
     struct sigaction new_action, old_action;
 
     sigemptyset(&new_action.sa_mask);

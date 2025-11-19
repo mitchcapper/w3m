@@ -34,7 +34,17 @@ static pid_t Imgdisplay_pid = 0;
 static int openImgdisplay(void);
 static void closeImgdisplay(void);
 static int getCharSize(void);
-
+#ifdef _WIN32
+static void killProc(pid_t pid)
+{
+	HANDLE handle = OpenProcess(PROCESS_TERMINATE, FALSE, pid);
+	if (NULL != handle) {
+		TerminateProcess(handle, 0);
+		CloseHandle(handle);
+	}
+}
+#define kill(pid, sig)	killProc(pid)
+#endif
 void
 initImage()
 {
@@ -116,7 +126,11 @@ openImgdisplay()
 	cmd = Strnew_m_charp(w3m_auxbin_dir(), "/", Imgdisplay, NULL)->ptr;
     else
 	cmd = Imgdisplay;
+#ifndef _WIN32
     Imgdisplay_pid = open_pipe_rw(&Imgdisplay_rf, &Imgdisplay_wf);
+#else
+	Imgdisplay_pid = -1;
+#endif
     if (Imgdisplay_pid < 0)
 	goto err0;
     if (Imgdisplay_pid == 0) {
@@ -528,6 +542,7 @@ loadImage(Buffer *buf, int flag)
 	}
 
 	flush_tty();
+#ifndef _WIN32
 #ifdef DONT_CALL_GC_AFTER_FORK
 	loadargs[0] = MyProgramName;
 	loadargs[1] = "-$$getimage";
@@ -573,6 +588,7 @@ loadImage(Buffer *buf, int flag)
 	    return;
 	}
 #endif /* !DONT_CALL_GC_AFTER_FORK */
+#endif /* _WIN32 */
     }
 }
 

@@ -10,6 +10,7 @@
 #include <sys/types.h>
 #include <malloc.h>
 #endif				/* REGEX_DEBUG */
+#include <config.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

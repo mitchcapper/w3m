@@ -7,6 +7,9 @@
 #define LOCAL_H
 
 #include <sys/types.h>
+#ifdef _WIN32
+#define HAVE_DIRENT_H
+#endif
 #ifdef HAVE_DIRENT_H
 #include <dirent.h>
 typedef struct dirent Directory;

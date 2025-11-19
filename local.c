@@ -15,7 +15,9 @@
 #endif				/* __EMX__ */
 #include "local.h"
 #include "hash.h"
-
+#ifdef _WIN32
+#define __MINGW32_VERSION
+#endif
 #ifdef __MINGW32_VERSION
 #include <winsock.h>
 #endif
