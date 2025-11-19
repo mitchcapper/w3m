@@ -9,7 +9,7 @@ CC=@CC@
 WARNINGS  = -Wall
 WARNINGS += -Werror=vla
 CFLAGS = $(WARNINGS) $(OPTS) -I.. -I$(top_srcdir) -I$(srcdir) @CFLAGS@ @CPPFLAGS@ @WCCFLAGS@ @DEFS@
-AR=ar
+AR = @AR@
 RANLIB=@RANLIB@
 RM=rm
 

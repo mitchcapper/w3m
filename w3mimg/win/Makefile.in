@@ -15,16 +15,15 @@ CC=@CC@
 CXX=@CXX@
 
 IMGCFLAGS=@IMGWINCFLAGS@
-OBJS=win_w3mimg.o
+OBJS=win_w3mimg.@OBJEXT@
 
-all: win_w3mimg.o
+all: win_w3mimg.@OBJEXT@
 
-win_w3mimg.o: win_w3mimg.cpp
+win_w3mimg.@OBJEXT@: win_w3mimg.cpp
 	$(CXX) $(CFLAGS) -c $<
 
 clean:
-	@-$(RM) -f *.o
-
+	@-$(RM) -f *.@OBJEXT@
 distclean: clean
 	-$(RM) -f Makefile
 

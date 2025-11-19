@@ -9,7 +9,7 @@ VPATH = $(srcdir):.
 WARNINGS  = -Wall
 WARNINGS += -Werror=vla
 CFLAGS=$(WARNINGS) $(OPTS) -I.. -I$(top_srcdir) -I$(srcdir) @CFLAGS@ @CPPFLAGS@ @DEFS@ $(IMGCFLAGS)
-AR=ar
+AR = @AR@
 RANLIB=@RANLIB@
 RM=rm
 
@@ -20,18 +20,18 @@ IMGOBJS=@IMGOBJS@
 .PHONY: $(SUBDIRS)
 all: w3mimg.a
 
-w3mimg.a: w3mimg.o @IMGTARGETS@
+w3mimg.a: w3mimg.$(OBJEXT) @IMGTARGETS@
 	$(AR) rv $@ $(IMGOBJS)
 	$(RANLIB) $@
 
-w3mimg.o: w3mimg.c
+w3mimg.$(OBJEXT): w3mimg.c
 	$(CC) $(CFLAGS) -c $<
 
 $(SUBDIRS):
 	cd $@ && $(MAKE) CC="$(CC)" OPTS="$(OPTS)"
 
 clean:
-	@-$(RM) -f *.o
+	@-$(RM) -f *.$(OBJEXT)
 	@for dir in $(SUBDIRS); do \
 		(cd $$dir && $(MAKE) clean RM=$(RM)); \
 	 done
