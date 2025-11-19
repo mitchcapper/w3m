@@ -16,7 +16,7 @@ AC_MSG_CHECKING(if color escape sequence for kterm/pxvt is enabled)
 AC_ARG_ENABLE(color,
  [  --disable-color         disable color for VT100 terminal],,
  [enable_color="yes"])
-test x"$enable_color" = xyes && AC_DEFINE(USE_COLOR)
+test x"$enable_color" = xyes && AC_DEFINE([USE_COLOR], [1], [Use color])
 AC_MSG_RESULT($enable_color)])
 #
 # ----------------------------------------------------------------
@@ -28,7 +28,7 @@ AC_MSG_CHECKING(if ANSI color escape sequence support is enabled)
 AC_ARG_ENABLE(ansi_color,
  [   --disable-ansi-color   disable ANSI color escape sequence],,
  [enable_ansi_color="$enable_color"])
- test x"$enable_ansi_color" = xyes && AC_DEFINE(USE_ANSI_COLOR)
+ test x"$enable_ansi_color" = xyes && AC_DEFINE([USE_ANSI_COLOR], [1], [Use ANSI color])
  AC_MSG_RESULT($enable_ansi_color)])
 #
 # ----------------------------------------------------------------
@@ -40,7 +40,7 @@ AC_MSG_CHECKING(if background color support is enabled)
 AC_ARG_ENABLE(bgcolor,
  [   --disable-bgcolor      disable to set background color],,
  [enable_bgcolor="$enable_color"])
- test x"$enable_bgcolor" = xyes && AC_DEFINE(USE_BG_COLOR)
+ test x"$enable_bgcolor" = xyes && AC_DEFINE([USE_BG_COLOR], [1], [Use background color])
 AC_MSG_RESULT($enable_bgcolor)])
 #
 # ----------------------------------------------------------------
@@ -52,7 +52,7 @@ AC_MSG_CHECKING(if popup menu is enabled)
 AC_ARG_ENABLE(menu,
  [  --disable-menu          disable popup menu],,
  [enable_menu="yes"])
- test x"$enable_menu" = xyes && AC_DEFINE(USE_MENU)
+ test x"$enable_menu" = xyes && AC_DEFINE([USE_MENU], [1], [Use menu])
  AC_MSG_RESULT($enable_menu)])
 #
 # ----------------------------------------------------------------
@@ -64,7 +64,7 @@ AC_MSG_CHECKING(if mouse operation enabled)
 AC_ARG_ENABLE(mouse,
  [  --disable-mouse         disable mouse operation],,
  [enable_mouse="yes"])
-test x"$enable_mouse" = xyes && AC_DEFINE(USE_MOUSE)
+test x"$enable_mouse" = xyes && AC_DEFINE([USE_MOUSE], [1], [Use mouse])
 AC_MSG_RESULT($enable_mouse)])
 #
 # ----------------------------------------------------------------
@@ -76,7 +76,7 @@ AC_MSG_CHECKING(if cookie is enabled)
 AC_ARG_ENABLE(cookie,
  [  --disable-cookie        disable cookie],,
  [enable_cookie="yes"])
-test x"$enable_cookie" = xyes && AC_DEFINE(USE_COOKIE)
+test x"$enable_cookie" = xyes && AC_DEFINE([USE_COOKIE], [1], [Use cookie])
 AC_MSG_RESULT($enable_cookie)])
 #
 # ----------------------------------------------------------------
@@ -88,7 +88,7 @@ AC_MSG_CHECKING(if dictionary lookup is enabled)
 AC_ARG_ENABLE(dict,
  [  --disable-dict          disable dictionary lookup],,
  [enable_dict="yes"])
- test x"$enable_dict" = xyes && AC_DEFINE(USE_DICT)
+ test x"$enable_dict" = xyes && AC_DEFINE([USE_DICT], [1], [Use dictionary])
  AC_MSG_RESULT($enable_dict)])
 #
 # ----------------------------------------------------------------
@@ -100,7 +100,7 @@ AC_MSG_CHECKING(if URL history is enabled)
 AC_ARG_ENABLE(history,
  [  --disable-history       disable URL history],,
  [enable_history="yes"])
- test x"$enable_history" = xyes && AC_DEFINE(USE_HISTORY)
+ test x"$enable_history" = xyes && AC_DEFINE([USE_HISTORY], [1], [Use history])
  AC_MSG_RESULT($enable_history)])
 #
 # ----------------------------------------------------------------
@@ -112,7 +112,7 @@ AC_DEFUN([AC_W3M_NNTP],
  AC_ARG_ENABLE(nntp,
   [  --disable-nntp          disable NNTP],,
   [enable_nntp="yes"])
- test x"$enable_nntp" = xyes && AC_DEFINE(USE_NNTP)
+ test x"$enable_nntp" = xyes && AC_DEFINE([USE_NNTP], [1], [Use NNTP])
  AC_MSG_RESULT($enable_nntp)])
 # 
 # ----------------------------------------------------------------
@@ -124,7 +124,7 @@ AC_DEFUN([AC_W3M_GOPHER],
  AC_ARG_ENABLE(gopher,
   [  --disable-gopher        disable Gopher],,
   [enable_gopher="yes"])
- test x"$enable_gopher" = xyes &&  AC_DEFINE(USE_GOPHER)
+ test x"$enable_gopher" = xyes &&  AC_DEFINE([USE_GOPHER], [1], [Use Gopher])
  AC_MSG_RESULT($enable_gopher)])
 #
 # ----------------------------------------------------------------
@@ -157,7 +157,7 @@ if test x"$enable_m17n" = xno; then
   system_charset='WC_CES_US_ASCII'
   document_charset='WC_CES_US_ASCII'
 else
- AC_DEFINE(USE_M17N)
+ AC_DEFINE([USE_M17N], [1], [Use M17N])
  WCTARGET="libwc/libwc.a"
  WCCFLAGS='-I$(srcdir) -I$(srcdir)/..'
  wcinclude='-I$(srcdir)/libwc'
@@ -177,7 +177,7 @@ else
     if test x"$charset" = xUS-ASCII; then
      charset=UTF-8
     fi
-    AC_DEFINE(USE_UNICODE)
+    AC_DEFINE([USE_UNICODE], [1], [Use Unicode])
  fi
  AC_MSG_CHECKING(if message l10n)
  AC_ARG_ENABLE(messagel10n,
@@ -247,14 +247,14 @@ else
 fi
 W3M_LANGDEF=`echo $w3m_lang | tr 'a-z' 'A-Z'`
 W3M_LANG=$W3M_LANGDEF
-AC_DEFINE_UNQUOTED(W3M_LANG, $W3M_LANG)
-AC_DEFINE_UNQUOTED(WCTARGET, "$WCTARGET")
-AC_DEFINE_UNQUOTED(WCCFLAGS, "$WCCFLAGS")
+AC_DEFINE_UNQUOTED([W3M_LANG], $W3M_LANG, [w3m language])
+AC_DEFINE_UNQUOTED([WCTARGET], $WCTARGET, [libwc target])
+AC_DEFINE_UNQUOTED([WCCFLAGS], $WCCFLAGS, [libwc CFLAGS])
 CFLAGS="$CFLAGS $wcinclude"
 W3M_LIBS="$W3M_LIBS $wclib"
-AC_DEFINE_UNQUOTED(DISPLAY_CHARSET, $display_charset)
-AC_DEFINE_UNQUOTED(SYSTEM_CHARSET, $system_charset)
-AC_DEFINE_UNQUOTED(DOCUMENT_CHARSET, $document_charset)])
+AC_DEFINE_UNQUOTED([DISPLAY_CHARSET], $display_charset, [Display charset])
+AC_DEFINE_UNQUOTED([SYSTEM_CHARSET], $system_charset, [System charset])
+AC_DEFINE_UNQUOTED([DOCUMENT_CHARSET], $document_charset, [Document charset])])
 #
 # ----------------------------------------------------------------
 # AC_W3M_KEYMAP
@@ -276,9 +276,9 @@ AC_DEFUN([AC_W3M_KEYMAP],
  esac
  AC_SUBST(HELP_FILE)
  HELP_FILE=w3mhelp-${enable_keymap}_$w3m_lang.html
- AC_DEFINE_UNQUOTED(HELP_FILE, "$HELP_FILE")
+ AC_DEFINE_UNQUOTED([HELP_FILE], $HELP_FILE, [help file])
  AC_SUBST(KEYBIND)
- AC_DEFINE_UNQUOTED(KEYBIND, $enable_keymap)])
+ AC_DEFINE_UNQUOTED([KEYBIND], $enable_keymap, [keybind])])
 #
 # ----------------------------------------------------------------
 # AC_W3M_MIGEMO
@@ -312,11 +312,11 @@ AC_DEFUN([AC_W3M_MIGEMO],
   migemo_command="$migemo_command $f"
  fi
  if test "${with_migemo+set}" = set -a "$with_migemo" != "no"; then
-   AC_DEFINE(USE_MIGEMO)
+   AC_DEFINE([USE_MIGEMO], [1], [Use migemo])
  fi
  AC_MSG_RESULT($migemo_command)
  if test x"$migemo_command" = xno; then migemo_command=""; fi
- AC_DEFINE_UNQUOTED(DEF_MIGEMO_COMMAND, "$migemo_command")])
+ AC_DEFINE_UNQUOTED([DEF_MIGEMO_COMMAND], "$migemo_command", [Default migemo command])])
 #
 # ----------------------------------------------------------------
 # AC_W3M_EDITOR
@@ -329,7 +329,7 @@ AC_ARG_WITH(editor,
  [  --with-editor=EDITOR    default editor [[/usr/bin/vi]]],
  [w3m_editor="$with_editor"])
 AC_MSG_RESULT($w3m_editor)
-AC_DEFINE_UNQUOTED(DEF_EDITOR, "$w3m_editor")])
+AC_DEFINE_UNQUOTED([DEF_EDITOR], "$w3m_editor", [Default editor])])
 #
 # ----------------------------------------------------------------
 # AC_W3M_MAILER
@@ -342,7 +342,7 @@ AC_ARG_WITH(mailer,
  [  --with-mailer=MAILER    default mailer [[/usr/bin/mail]]],
  [w3m_mailer="$with_mailer"])
 AC_MSG_RESULT($w3m_mailer)
-AC_DEFINE_UNQUOTED(DEF_MAILER, "$w3m_mailer")])
+AC_DEFINE_UNQUOTED([DEF_MAILER], "$w3m_mailer", [Default mailer])])
 #
 # ----------------------------------------------------------------
 # AC_W3M_EXT_BROWSER
@@ -355,7 +355,7 @@ AC_ARG_WITH(browser,
  [  --with-browser=BROWSER  default browser [[/usr/bin/firefox]]],
  [w3m_browser="$with_browser"])
 AC_MSG_RESULT($w3m_browser)
-AC_DEFINE_UNQUOTED(DEF_EXT_BROWSER, "$w3m_browser")])
+AC_DEFINE_UNQUOTED([DEF_EXT_BROWSER], "$w3m_browser", [Default external browser])])
 #
 # ----------------------------------------------------------------
 # AC_W3M_HELP_CGI
@@ -366,7 +366,7 @@ AC_DEFUN([AC_W3M_HELP_CGI],
  AC_ARG_ENABLE(help_cgi,
   [  --disable-help-cgi      disable help cgi],,
   [enable_help_cgi="yes"])
- test x"$enable_help_cgi" = xyes && AC_DEFINE(USE_HELP_CGI)
+ test x"$enable_help_cgi" = xyes && AC_DEFINE([USE_HELP_CGI], [1], [Use help CGI])
  AC_MSG_RESULT($enable_help_cgi)])
 # 
 # ----------------------------------------------------------------
@@ -378,7 +378,7 @@ AC_DEFUN([AC_W3M_EXTERNAL_URI_LOADER],
  AC_ARG_ENABLE(external_uri_loader,
  [  --disable-external-uri-loader  disable external URI loader],,
  [enable_external_uri_loader="yes"])
- test x"$enable_external_uri_loader" = xyes && AC_DEFINE(USE_EXTERNAL_URI_LOADER)
+ test x"$enable_external_uri_loader" = xyes && AC_DEFINE([USE_EXTERNAL_URI_LOADER], [1], [Use external URI loader])
  AC_MSG_RESULT($enable_external_uri_loader)])
 # 
 # ----------------------------------------------------------------
@@ -391,7 +391,7 @@ AC_DEFUN([AC_W3M_W3MMAILER],
  [  --disable-w3mmailer     disable w3mmailer],,
  [enable_w3mmailer="$enable_external_uri_loader"])
  test x"$enable_external_uri_loader" = xno && enable_w3mmailer=no
- test x"$enable_w3mmailer" = xyes && AC_DEFINE(USE_W3MMAILER)
+ test x"$enable_w3mmailer" = xyes && AC_DEFINE([USE_W3MMAILER], [1], [Use w3mmailer])
  AC_MSG_RESULT($enable_w3mmailer)])
 #
 # ----------------------------------------------------------------
@@ -422,7 +422,7 @@ AC_ARG_WITH(termlib,
                             terminfo mytinfo termcap tinfo ncurses curses],,
  [with_termlib="yes"])
  AC_MSG_RESULT($with_termlib)
- test x"$with_termlib" = xyes && with_termlib="terminfo mytinfo termlib termcap tinfo ncurses curses"
+ test x"$with_termlib" = xyes && with_termlib="terminfo mytinfo termlib termcap tinfo ncurses curses pdcurses pdcursesstatic pdcursesstaticd"
  for lib in $with_termlib; do
    AC_CHECK_LIB($lib, tgetent, [W3M_LIBS="$W3M_LIBS -l$lib"; break])
  done
@@ -464,7 +464,7 @@ AC_ARG_WITH(gc,
    fi
  fi
  unset ac_cv_lib_gc_GC_init
- AC_CHECK_LIB(gc, GC_init, [LIBGC="-lgc"])
+ AC_CHECK_LIB(gc, GC_init, [LIBGC="-lgc libw3m.a"])
  if test x"$ac_cv_lib_gc_GC_init" = xno; then
     AC_MSG_CHECKING(GC library location)
     AC_MSG_RESULT($with_gc)
@@ -474,7 +474,7 @@ AC_ARG_WITH(gc,
       LDFLAGS="$LDFLAGS -L$dir/lib"
       AC_MSG_CHECKING($dir)
       unset ac_cv_lib_gc_GC_init
-      AC_CHECK_LIB(gc, GC_init, [gclibdir="$dir/lib"; LIBGC="-L$dir/lib -lgc"; break])
+      AC_CHECK_LIB(gc, GC_init, [gclibdir="$dir/lib"; LIBGC="-L$dir/lib -lgc libw3m.a"; break])
       LDFLAGS="$ldflags"
     done
     if test x"$gclibdir" = xno; then
@@ -519,12 +519,12 @@ if test x"$with_ssl" != xno; then
 	[$SSL_LIBS -lcrypto])
 
   if test x"$w3m_ssl" = xfound; then
-    AC_DEFINE(USE_SSL)
+    AC_DEFINE([USE_SSL], [1], [Use SSL])
     AC_MSG_CHECKING(if SSL certificate verification is enabled)
     AC_ARG_ENABLE(sslverify,
       [  --disable-sslverify     disable SSL certificate verification],,
       [enable_sslverify="yes"])
-    test x"$enable_sslverify" = xyes && AC_DEFINE(USE_SSL_VERIFY)
+    test x"$enable_sslverify" = xyes && AC_DEFINE([USE_SSL_VERIFY], [1], [Use SSL verify])
     AC_MSG_RESULT($enable_sslverify)
   fi
 fi
@@ -550,14 +550,14 @@ if test x"$enable_sslverify" = xyes; then
   fi
   AC_MSG_RESULT($w3m_cafile)
 fi
-AC_DEFINE_UNQUOTED(DEF_CAFILE, "$w3m_cafile")
+AC_DEFINE_UNQUOTED([DEF_CAFILE], "$w3m_cafile", [Default CA file])
 AC_SUBST(USE_DIGEST_AUTH)
 AC_MSG_CHECKING(if digest auth is enabled)
 AC_ARG_ENABLE(digest_auth,
  [  --disable-digest-auth   disable digest auth],,
  [enable_digest_auth="yes"])
 if test x"$enable_digest_auth" = xyes -a x"$w3m_ssl" = xfound; then
-  AC_DEFINE(USE_DIGEST_AUTH)
+  AC_DEFINE([USE_DIGEST_AUTH], [1], [Use Digest authentication])
 else
   enable_digest_auth="no"
 fi
@@ -577,7 +577,7 @@ AC_DEFUN([AC_W3M_ALARM],
  if test x"$enable_alarm" = xyes; then
    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <unistd.h>
 #include <signal.h>]], [[int sa = SIGALRM;
-     void (*a) = alarm;]])],[AC_DEFINE(USE_ALARM)],[])
+     void (*a) = alarm;]])],[AC_DEFINE([USE_ALARM], [1], [Use alarm])],[])
  fi])
 #
 # ----------------------------------------------------------------
@@ -605,7 +605,9 @@ AC_DEFUN([AC_W3M_CHECK_VER],
 # AC_W3M_IMAGE
 # ----------------------------------------------------------------
 AC_DEFUN([AC_W3M_IMAGE],
-[AC_SUBST(USE_IMAGE)
+[
+ AC_SUBST(IMGLDFLAGS)
+ AC_SUBST(USE_IMAGE)
  AC_SUBST(USE_W3MIMG_X11)
  AC_SUBST(USE_W3MIMG_FB)
  AC_SUBST(USE_W3MIMG_WIN)
@@ -613,7 +615,7 @@ AC_DEFUN([AC_W3M_IMAGE],
  AC_SUBST(W3MIMGDISPLAY_SETUID)
  AC_SUBST(INSTALL_W3MIMGDISPLAY)
  INSTALL_W3MIMGDISPLAY='${INSTALL_PROGRAM}'
- AC_DEFINE(INSTALL_W3MIMGDISPLAY, $INSTALL_W3MIMGDISPLAY)
+ AC_DEFINE_UNQUOTED([INSTALL_W3MIMGDISPLAY], $INSTALL_W3MIMGDISPLAY, [Install w3mimgdisplay])
  AC_SUBST(USE_GDKPIXBUF)
  AC_SUBST(USE_GTK2)
  AC_SUBST(USE_IMLIB)
@@ -633,7 +635,7 @@ AC_DEFUN([AC_W3M_IMAGE],
  [enable_image="yes"])
  AC_MSG_RESULT($enable_image)
  if test x"$enable_image" != xno; then
-  IMGOBJS=w3mimg.o
+  IMGOBJS=w3mimg.$ac_objext
   if test x"$enable_image" = xyes; then
     enable_image=x11
     case "`uname -s`" in
@@ -653,14 +655,14 @@ AC_DEFUN([AC_W3M_IMAGE],
       x11) x11=yes;;
       fb)  fb=yes;;
       fb+s) fb=yes
-           AC_DEFINE(W3MIMGDISPLAY_SETUID)
+           AC_DEFINE([W3MIMGDISPLAY_SETUID], [1], [Set UID for w3mimgdisplay])
            INSTALL_W3MIMGDISPLAY='${INSTALL} -o root -m 4755 -s'
-           AC_DEFINE(INSTALL_W3MIMGDISPLAY, $INSTALL_W3MIMGDISPLAY);;
+           AC_DEFINE_UNQUOTED([INSTALL_W3MIMGDISPLAY], $INSTALL_W3MIMGDISPLAY, [Install w3mimgdisplay]);;
       win) win=yes;;
     esac
   done
   enable_image=yes
-  AC_DEFINE(USE_IMAGE)
+  AC_DEFINE([USE_IMAGE], [1], [Use image])
   AC_MSG_CHECKING(image library)
   AC_ARG_WITH(imagelib,
    [  --with-imagelib[[=LIBS]]  image library [[guessed]]
@@ -734,32 +736,32 @@ AC_DEFUN([AC_W3M_IMAGE],
   fi
   if test x"$x11" = xyes; then
    if test x"$have_imlib2" = xyes; then
-     AC_DEFINE(USE_W3MIMG_X11)
-     IMGOBJS="$IMGOBJS x11/x11_w3mimg.o"
+     AC_DEFINE([USE_W3MIMG_X11], [1], [Use w3mimg with X11])
+     IMGOBJS="$IMGOBJS x11/x11_w3mimg.$ac_objext"
      IMGTARGETS="x11"    
-     AC_DEFINE(USE_IMLIB2)
+     AC_DEFINE([USE_IMLIB2], [1], [Use imlib2])
      IMGX11CFLAGS="`${PKG_CONFIG} --cflags imlib2`"
      IMGX11LDFLAGS="-lX11 `${PKG_CONFIG} --libs imlib2`"
    elif test x"$have_gtk2" = xyes; then
-     AC_DEFINE(USE_W3MIMG_X11)
-     IMGOBJS="$IMGOBJS x11/x11_w3mimg.o"
+     AC_DEFINE([USE_W3MIMG_X11], [1], [Use w3mimg with X11])
+     IMGOBJS="$IMGOBJS x11/x11_w3mimg.$ac_objext"
      IMGTARGETS="x11"    
-     AC_DEFINE(USE_GDKPIXBUF)
-     AC_DEFINE(USE_GTK2)
+     AC_DEFINE([USE_GDKPIXBUF], [1], [Use gdk-pixbuf])
+     AC_DEFINE([USE_GTK2], [1], [Use GTK2])
      IMGX11CFLAGS="`${PKG_CONFIG} --cflags gdk-pixbuf-2.0 gdk-pixbuf-xlib-2.0`"
      IMGX11LDFLAGS="-lX11 `${PKG_CONFIG} --libs gdk-pixbuf-2.0 gdk-pixbuf-xlib-2.0`"
    elif test x"$have_gdkpixbuf" = xyes; then
-     AC_DEFINE(USE_W3MIMG_X11)
-     IMGOBJS="$IMGOBJS x11/x11_w3mimg.o"
+     AC_DEFINE([USE_W3MIMG_X11], [1], [Use w3mimg with X11])
+     IMGOBJS="$IMGOBJS x11/x11_w3mimg.$ac_objext"
      IMGTARGETS="x11"    
-     AC_DEFINE(USE_GDKPIXBUF)
+     AC_DEFINE([USE_GDKPIXBUF], [1], [Use gdk-pixbuf])
      IMGX11CFLAGS="`${GDKPIXBUF_CONFIG} --cflags`"
      IMGX11LDFLAGS="`${GDKPIXBUF_CONFIG} --libs` -lgdk_pixbuf_xlib"
    elif test x"$have_imlib" = xyes; then
-     AC_DEFINE(USE_W3MIMG_X11)
-     IMGOBJS="$IMGOBJS x11/x11_w3mimg.o"
+     AC_DEFINE([USE_W3MIMG_X11], [1], [Use w3mimg with X11])
+     IMGOBJS="$IMGOBJS x11/x11_w3mimg.$ac_objext"
      IMGTARGETS="x11"    
-     AC_DEFINE(USE_IMLIB)
+     AC_DEFINE([USE_IMLIB], [1], [Use imlib])
      IMGX11CFLAGS="`${IMLIB_CONFIG} --cflags`"
      IMGX11LDFLAGS="`${IMLIB_CONFIG} --libs`"
      IMGTARGETS="x11"    
@@ -769,26 +771,26 @@ AC_DEFUN([AC_W3M_IMAGE],
   fi
   if test x"$fb" = xyes; then
    if test x"$have_imlib2" = xyes; then
-     AC_DEFINE(USE_W3MIMG_FB)
-     IMGOBJS="$IMGOBJS fb/fb_w3mimg.o fb/fb.o fb/fb_img.o"
+     AC_DEFINE([USE_W3MIMG_FB], [1], [Use w3mimg with framebuffer])
+     IMGOBJS="$IMGOBJS fb/fb_w3mimg.$ac_objext fb/fb.$ac_objext fb/fb_img.$ac_objext"
      IMGTARGETS="${IMGTARGETS} fb"
-     AC_DEFINE(USE_IMLIB2)
-     IMGOBJS="$IMGOBJS fb/fb_w3mimg.o fb/fb.o fb/fb_img.o"
+     AC_DEFINE([USE_IMLIB2], [1], [Use imlib2])
+     IMGOBJS="$IMGOBJS fb/fb_w3mimg.$ac_objext fb/fb.$ac_objext fb/fb_img.$ac_objext"
      IMGFBCFLAGS="`${PKG_CONFIG} --cflags imlib2`"
      IMGFBLDFLAGS="`${PKG_CONFIG} --libs imlib2`"
    elif test x"$have_gtk2" = xyes; then
-     AC_DEFINE(USE_W3MIMG_FB)
-     IMGOBJS="$IMGOBJS fb/fb_w3mimg.o fb/fb.o fb/fb_img.o"
+     AC_DEFINE([USE_W3MIMG_FB], [1], [Use w3mimg with framebuffer])
+     IMGOBJS="$IMGOBJS fb/fb_w3mimg.$ac_objext fb/fb.$ac_objext fb/fb_img.$ac_objext"
      IMGTARGETS="${IMGTARGETS} fb"
-     AC_DEFINE(USE_GDKPIXBUF)
-     AC_DEFINE(USE_GTK2)
+     AC_DEFINE([USE_GDKPIXBUF], [1], [Use gdk-pixbuf])
+     AC_DEFINE([USE_GTK2], [1], [Use GTK2])
      IMGFBCFLAGS="`${PKG_CONFIG} --cflags gdk-pixbuf-2.0`"
      IMGFBLDFLAGS="`${PKG_CONFIG} --libs gdk-pixbuf-2.0`"
    elif test x"$have_gdkpixbuf" = xyes; then
-     AC_DEFINE(USE_W3MIMG_FB)
-     IMGOBJS="$IMGOBJS fb/fb_w3mimg.o fb/fb.o fb/fb_img.o"
+     AC_DEFINE([USE_W3MIMG_FB], [1], [Use w3mimg with framebuffer])
+     IMGOBJS="$IMGOBJS fb/fb_w3mimg.$ac_objext fb/fb.$ac_objext fb/fb_img.$ac_objext"
      IMGTARGETS="${IMGTARGETS} fb"
-     AC_DEFINE(USE_GDKPIXBUF)
+     AC_DEFINE([USE_GDKPIXBUF], [1], [Use gdk-pixbuf])
      IMGFBCFLAGS="`${GDKPIXBUF_CONFIG} --cflags`"
      IMGFBLDFLAGS="`${GDKPIXBUF_CONFIG} --libs`"
    else
@@ -796,22 +798,25 @@ AC_DEFUN([AC_W3M_IMAGE],
    fi
   fi
   if test x"$win" = xyes; then
-    AC_DEFINE(USE_W3MIMG_WIN)
-    IMGOBJS="$IMGOBJS win/win_w3mimg.o"
+    AC_DEFINE([USE_W3MIMG_WIN], [1], [Use w3mimg with Windows])
+    IMGOBJS="$IMGOBJS win/win_w3mimg.$ac_objext"
     IMGTARGETS="${IMGTARGETS} win"
     IMGWINCFLAGS="-I/usr/include/w32api"
     IMGWINLDFLAGS="-lgdiplus -lgdi32 -luser32"
     IMGLINK='$(CXX)'
   fi
-  AC_DEFINE(IMGTARGETS, "$IMGTARGETS")
-  AC_DEFINE(IMGOBJS, "$IMGOBJS")
-  AC_DEFINE(IMGX11CFLAGS, "$IMGX11CFLAGS")
-  AC_DEFINE(IMGX11LDFLAGS, "$IMGX11LDFLAGS")
-  AC_DEFINE(IMGFBCFLAGS, "$IMGFBCFLAGS")
-  AC_DEFINE(IMGFBLDFLAGS, "$IMGFBLDFLAGS")
-  AC_DEFINE(IMGLINK, "$IMGLINK")
-  AC_DEFINE(IMGWINCFLAGS, "$IMGWINCFLAGS")
-  AC_DEFINE(IMGWINLDFLAGS, "$IMGWINLDFLAGS")
+  IMGLDFLAGS="$IMGX11LDFLAGS $IMGFBLDFLAGS $IMGWINLDFLAGS"
+  AC_DEFINE_UNQUOTED([IMGTARGETS], "$IMGTARGETS", [Image targets])
+  AC_DEFINE_UNQUOTED([IMGX11CFLAGS], "$IMGX11CFLAGS", [Image X11 CFLAGS])
+  AC_DEFINE_UNQUOTED([IMGX11LDFLAGS], "$IMGX11LDFLAGS", [Image X11 LDFLAGS])
+  AC_DEFINE_UNQUOTED([IMGOBJS], "$IMGOBJS", [Image objects])
+  AC_DEFINE_UNQUOTED([IMGFBCFLAGS], "$IMGFBCFLAGS", [Image framebuffer CFLAGS])
+  AC_DEFINE_UNQUOTED([IMGFBLDFLAGS], "$IMGFBLDFLAGS", [Image framebuffer LDFLAGS])
+  AC_DEFINE_UNQUOTED([IMGLINK], "$IMGLINK", [Image link])
+  AC_DEFINE_UNQUOTED([IMGWINCFLAGS], "$IMGWINCFLAGS", [Image Windows CFLAGS])
+  AC_DEFINE_UNQUOTED([IMGWINLDFLAGS], "$IMGWINLDFLAGS", [Image Windows LDFLAGS])
+  AC_DEFINE_UNQUOTED([IMGLDFLAGS], "$IMGLDFLAGS", [Image LDFLAGS])
+
  fi])
 # ----------------------------------------------------------------
 # AC_W3M_XFACE
@@ -822,7 +827,7 @@ AC_DEFUN([AC_W3M_XFACE],
  AC_ARG_ENABLE(xface,
   [   --disable-xface        disable X-Face support],,
   [enable_xface="$enable_image"])
- test x"$enable_xface" = xyes && AC_DEFINE(USE_XFACE)
+ test x"$enable_xface" = xyes && AC_DEFINE([USE_XFACE], [1], [Use X-Face])
  AC_MSG_RESULT($enable_xface)
  AC_CHECK_PROG(uncompface, uncompface, "yes", "no")
  test "$uncompface" = "no" && AC_MSG_WARN([uncompface is not installed.])
@@ -874,7 +879,7 @@ if test x"$enable_ipv6" = xyes; then
       enable_ipv6="no"])
  fi
  if test x"$enable_ipv6" = xyes; then
-    AC_DEFINE(INET6)
+    AC_DEFINE([INET6], [1], [Enable IPv6])
  fi
 fi])
 #
@@ -886,5 +891,5 @@ AC_DEFUN([AC_W3M_SIGSETJMP],
 AC_MSG_CHECKING(for sigsetjmp)
 AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <setjmp.h>
  #include <stdlib.h>]], [[ jmp_buf env;
-   if (sigsetjmp(env, 1) != 0) { exit(0); } siglongjmp(env, 1);]])],[have_sigsetjmp="yes"; AC_DEFINE(HAVE_SIGSETJMP)],[have_sigsetjmp="no"])
+   if (sigsetjmp(env, 1) != 0) { exit(0); } siglongjmp(env, 1);]])],[have_sigsetjmp="yes"; AC_DEFINE([HAVE_SIGSETJMP], [1], [Have sigsetjmp])],[have_sigsetjmp="no"])
 AC_MSG_RESULT($have_sigsetjmp)])
