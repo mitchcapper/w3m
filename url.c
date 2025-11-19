@@ -1,5 +1,9 @@
 /* $Id: url.c,v 1.100 2010/12/15 10:50:24 htrb Exp $ */
 #include "fm.h"
+#ifdef _WIN32
+#define __MINGW32_VERSION
+#include <sys/socket.h>
+#endif
 #ifndef __MINGW32_VERSION
 #include <unistd.h>
 #include <sys/types.h>
@@ -360,9 +364,10 @@ openSSLHandle(int sock, char *hostname, char **p_cert)
 	SSLeay_add_ssl_algorithms();
 	SSL_load_error_strings();
 #else
-	OPENSSL_init_ssl(0, NULL);
+	if (!OPENSSL_init_ssl(0, NULL))
+		goto eend;
 #endif
-	if (!(ssl_ctx = SSL_CTX_new(SSLv23_client_method())))
+	if (!(ssl_ctx = SSL_CTX_new(TLS_client_method())))
 	    goto eend;
 #ifdef SSL_CTX_set_min_proto_version
 	if (ssl_min_version && *ssl_min_version != '\0') {
@@ -456,14 +461,49 @@ openSSLHandle(int sock, char *hostname, char **p_cert)
 #endif				/* SSLEAY_VERSION_NUMBER >= 0x0800 */
     }
     handle = SSL_new(ssl_ctx);
-    SSL_set_fd(handle, sock);
+#ifdef SOCK_DEBUG
+	SSL_set_msg_callback(handle, SSL_trace);
+	SSL_set_msg_callback_arg(handle, BIO_new_fp(stderr, 0)); // Direct output to stdout
+#endif
+
+#if defined(_WIN32)
+	 /*
+		If 'sock' is a CRT file descriptor (from gnulib/mingw), we must
+		extract the underlying Win32 SOCKET handle (e.g. 484) from the
+		fd (e.g. 3) before passing it to OpenSSL.
+	 */
+	 {
+		 int os_handle = -1;
+		 /* _get_osfhandle returns a HANDLE (pointer sized), cast to safe int for SSL_set_fd */
+		 intptr_t raw_handle = _get_osfhandle((int)sock);
+
+		 if (raw_handle == -1 || raw_handle == (intptr_t)INVALID_HANDLE_VALUE) {
+			 /* Fallback: Maybe it was already a raw socket? */
+			 os_handle = (int)sock;
+		 }
+		 else {
+			 os_handle = (int)raw_handle;
+		 }
+
+		 if (!SSL_set_fd(handle, os_handle))
+			 goto eend;
+	 }
+#else
+	 if (!SSL_set_fd(handle, sock))
+		 goto eend;
+#endif
+
+
 #if SSLEAY_VERSION_NUMBER >= 0x00905100
     init_PRNG();
 #endif				/* SSLEAY_VERSION_NUMBER >= 0x00905100 */
 #if (SSLEAY_VERSION_NUMBER >= 0x00908070) && !defined(OPENSSL_NO_TLSEXT)
     SSL_set_tlsext_host_name(handle,hostname);
 #endif				/* (SSLEAY_VERSION_NUMBER >= 0x00908070) && !defined(OPENSSL_NO_TLSEXT) */
-    if (SSL_connect(handle) > 0) {
+	errno = 0;
+
+	int result = SSL_connect(handle);
+	if (result > 0) {
 	Str serv_cert = ssl_get_certificate(handle, hostname);
 	if (serv_cert) {
 	    *p_cert = serv_cert->ptr;
@@ -473,6 +513,45 @@ openSSLHandle(int sock, char *hostname, char **p_cert)
 	SSL_free(handle);
 	return NULL;
     }
+	else {
+		int errNo = SSL_get_error(handle, result);
+		if (errNo == SSL_ERROR_SYSCALL) {
+			// THe official documentation for openssl says for SSL_ERROR_SYSCALL says  look at error stack/return value/errno
+			unsigned long ssl_err = ERR_get_error();
+
+			if (ssl_err != 0) {
+				// Error is in OpenSSL's error queue
+				char err_buf[256];
+				ERR_error_string_n(ssl_err, err_buf, sizeof(err_buf));
+				disp_err_message(Sprintf("SSL connect error (SSL stack): %s (code: %lu)",
+					err_buf, ssl_err)->ptr, FALSE);
+			} else if (result == 0) {
+				// EOF - connection closed by peer
+				disp_err_message("SSL connect error: Connection closed by peer (EOF)", FALSE);
+			} else if (result == -1) {
+				// Check errno for system error
+				if (errno != 0) {
+					disp_err_message(Sprintf("SSL connect error (syscall): errno=%d: %s",
+						errno, strerror(errno))->ptr, FALSE);
+				} else {
+#ifdef _WIN32
+					int sock_err = WSAGetLastError();
+					if (sock_err != 0) {
+						disp_err_message(Sprintf("SSL connect error (winsock): error=%d",
+							sock_err)->ptr, FALSE);
+					}else
+
+#endif
+					disp_err_message("SSL connect error: Unexpected EOF", FALSE);
+				}
+			}
+		}
+		else {
+			disp_err_message(Sprintf
+			("SSL connect error: %s (%d)",
+				ERR_error_string(errNo, NULL), errNo)->ptr, FALSE);
+		}
+	}
   eend:
     close(sock);
     if (handle)
@@ -777,7 +856,7 @@ parseURL(char *url, ParsedURL *p_url, ParsedURL *current)
 	    copyParsedURL(p_url, current);
 	goto do_label;
     }
-#if defined( __EMX__ ) || defined( __CYGWIN__ )
+#if defined( __EMX__ ) || defined( __CYGWIN__ ) || defined (_WIN32)
     if (!strncasecmp(url, "file://localhost/", 17)) {
 	p_url->scheme = SCM_LOCAL;
 	p += 17 - 1;
