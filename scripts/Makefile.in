@@ -65,6 +65,7 @@ w3mhelp-funcdesc-stamp: $(top_srcdir)/doc/README.func $(top_srcdir)/doc-jp/READM
 	@for dirlang in $(DOCDIRS); do \
 	  dir=`expr "$$dirlang" : "\(.*\):.*"`; \
 	  lang=`expr "$$dirlang" : ".*:\(.*\)_.*"`; \
+	  if test -z "$$lang"; then lang=en; fi; \
 	  echo '%funcdesc = (' > w3mhelp-funcdesc.$$lang.pl; \
 	  sed -ne "/^[a-zA-Z@]/s/\([a-zA-Z@][a-zA-Z0-9@_]*\)[ 	][ 	]*\(.*\)/'\1', '\2',/p" < $(top_srcdir)/$$dir/README.func >> w3mhelp-funcdesc.$$lang.pl; \
 	  echo ');' >> w3mhelp-funcdesc.$$lang.pl; \
