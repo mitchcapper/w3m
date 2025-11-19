@@ -1,7 +1,8 @@
 /* $Id: w3mbookmark.c,v 1.12 2007/05/31 01:19:50 inu Exp $ */
+#include "config.h"
 #include <stdlib.h>
 #include <stdio.h>
-#include "config.h"
+#include "orig_config.h"
 #include "Str.h"
 #include "indep.h"
 #include "textlist.h"

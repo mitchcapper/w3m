@@ -43,7 +43,11 @@
 #undef USE_UNICODE
 #define W3M_LANG @W3M_LANG@
 #define LANG W3M_LANG
-
+#ifndef _WIN32
+#if LANG == JA
+#define IS_LANG_JA
+#endif
+#endif
 /* Define to 1 if translation of program messages to the user's
    native language is requested. */
 #undef ENABLE_NLS
@@ -172,7 +176,7 @@ typedef RETSIGTYPE MySignalHandler;
 #define SIGNAL_RETURN @SIGNAL_RETURN@
 
 #ifdef HAVE_SIGSETJMP
-#ifdef __MINGW32_VERSION
+#if defined(__MINGW32_VERSION) || defined(_WIN32)
 # define SETJMP(env) setjmp(env)
 # define LONGJMP(env,val) longjmp(env, val)
 # define JMP_BUF jmp_buf
@@ -204,11 +208,11 @@ typedef RETSIGTYPE MySignalHandler;
 #define __CYGWIN__
 #endif
 
-#if defined( __CYGWIN__ ) || defined( __EMX__ )
+#if defined( __CYGWIN__ ) || defined( __EMX__ ) || defined (_WIN32)
 #define SUPPORT_DOS_DRIVE_PREFIX 1
 #endif
 
-#if defined( __CYGWIN__ )
+#if defined( __CYGWIN__ ) || defined (_WIN32)
 #define SUPPORT_NETBIOS_SHARE 1
 #define SUPPORT_WIN9X_CONSOLE_MBCS 1
 #endif
@@ -223,7 +227,7 @@ typedef RETSIGTYPE MySignalHandler;
 #define DEFAULT_TERM	0	/* XXX */
 #endif
 
-#if defined(__EMX__) /* use $extension? */
+#if defined(__EMX__)  || defined (_WIN32) /* use $extension? */
 #define GUNZIP_CMDNAME  "gzip"
 #define BUNZIP2_CMDNAME "bzip2"
 #define INFLATE_CMDNAME  "inflate.exe"

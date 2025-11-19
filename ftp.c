@@ -1,4 +1,5 @@
 /* $Id: ftp.c,v 1.42 2010/12/15 10:50:24 htrb Exp $ */
+#include "fm.h"
 #include <stdio.h>
 #ifndef __MINGW32_VERSION
 #include <pwd.h>
@@ -8,7 +9,7 @@
 #include <setjmp.h>
 #include <time.h>
 
-#include "fm.h"
+
 #include "html.h"
 #include "myctype.h"
 

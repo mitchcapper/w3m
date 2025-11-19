@@ -1,4 +1,6 @@
 /* $Id: parsetag.c,v 1.4 2001/11/20 17:49:23 ukai Exp $ */
+#include "config.h"
+#include "orig_config.h"
 #include "myctype.h"
 #include "indep.h"
 #include "Str.h"

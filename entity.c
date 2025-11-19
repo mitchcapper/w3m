@@ -1,5 +1,6 @@
 /* $Id: entity.c,v 1.7 2003/09/24 18:48:59 ukai Exp $ */
 #ifdef DUMMY
+#include "config.h"
 #include "Str.h"
 #define NBSP " "
 #define UseAltEntity 1

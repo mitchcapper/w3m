@@ -3,6 +3,7 @@
  * An original curses library for EUC-kanji by Akinori ITO,     December 1989
  * revised by Akinori ITO, January 1995
  */
+#include "config.h"
 #include <stdio.h>
 #include <signal.h>
 #include <sys/types.h>
@@ -11,7 +12,7 @@
 #include <errno.h>
 #include <sys/time.h>
 #include <unistd.h>
-#include "config.h"
+#include "orig_config.h"
 #include <string.h>
 #include <sys/wait.h>
 #ifdef HAVE_SYS_SELECT_H

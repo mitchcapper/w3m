@@ -1,8 +1,8 @@
 /* $Id: display.c,v 1.71 2010/07/18 14:10:09 htrb Exp $ */
 #include "display.h"
+#include "fm.h"
 
 #include <signal.h>
-#include "fm.h"
 
 /* *INDENT-OFF* */
 #ifdef USE_COLOR

@@ -1,4 +1,4 @@
-
+#include "config.h"
 #ifndef _WC_WC_H
 #define _WC_WC_H
 

@@ -2,10 +2,10 @@
 /*
  * w3m func.c
  */
-
+#include "fm.h"
 #include <stdio.h>
 
-#include "fm.h"
+
 #include "func.h"
 #include "myctype.h"
 #include "regex.h"

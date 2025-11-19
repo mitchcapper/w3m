@@ -1,5 +1,5 @@
 /* $Id: w3mimg.c,v 1.6 2010/12/21 10:13:55 htrb Exp $ */
-
+#include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>

@@ -2,9 +2,9 @@
 /* 
  * MIME header support by Akinori ITO
  */
-
-#include <sys/types.h>
 #include "fm.h"
+#include <sys/types.h>
+
 #include "myctype.h"
 #include "Str.h"
 

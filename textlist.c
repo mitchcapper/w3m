@@ -1,4 +1,6 @@
 /* $Id: textlist.c,v 1.6 2003/04/07 16:27:11 ukai Exp $ */
+#include <config.h>
+#include "orig_config.h"
 #include "textlist.h"
 #include "indep.h"
 #include "Str.h"
