@@ -1,7 +1,8 @@
 /* vi: set sw=4 ts=8 ai sm noet : */
+#include "config.h"
 #include <stdlib.h>
 #include <stdio.h>
-#include "config.h"
+#include "orig_config.h"
 #include "Str.h"
 #include "indep.h"
 #include "textlist.h"

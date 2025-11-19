@@ -1,4 +1,5 @@
 /* vi: set sw=4 ts=8 ai sm noet : */
+#include "fm.h"
 #include <stdio.h>
 #ifndef __MINGW32_VERSION
 #include <pwd.h>
@@ -8,7 +9,7 @@
 #include <setjmp.h>
 #include <time.h>
 
-#include "fm.h"
+
 #include "html.h"
 #include "myctype.h"
 

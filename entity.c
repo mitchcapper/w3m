@@ -1,5 +1,6 @@
 /* vi: set sw=4 ts=8 ai sm noet : */
 #ifdef DUMMY
+#include "config.h"
 #include "Str.h"
 #define NBSP " "
 #define UseAltEntity 1

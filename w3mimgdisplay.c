@@ -1,11 +1,12 @@
 /* vi: set sw=4 ts=8 ai sm noet : */
+#include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include "config.h"
+#include "orig_config.h"
 #include "w3mimg/w3mimg.h"
 
 w3mimg_op *w_op;

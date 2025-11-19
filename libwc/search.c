@@ -1,3 +1,4 @@
+#include "config.h"
 #include "search.h"
 
 #include <stdlib.h>

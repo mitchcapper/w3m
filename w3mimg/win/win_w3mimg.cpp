@@ -1,8 +1,9 @@
+#include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include "config.h"
+#include "orig_config.h"
 #include <assert.h>
 #include <locale.h>
 

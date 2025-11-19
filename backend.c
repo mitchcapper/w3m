@@ -1,8 +1,9 @@
 /* vi: set sw=4 ts=8 ai sm noet : */
+#include "fm.h"
 #include <stdio.h>
 #include <string.h>
 #include <sys/types.h>
-#include "fm.h"
+
 #include <gc/gc.h>
 #include "terms.h"
 #include "cookie.h"

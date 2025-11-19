@@ -10,7 +10,7 @@
 #ifndef FM_H
 #define FM_H
 
-
+#include <config.h>
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE		/* strcasestr() */
 #endif
@@ -23,7 +23,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
-#include "config.h"
+#include "orig_config.h"
 #include "history.h"
 
 #ifdef USE_MENU

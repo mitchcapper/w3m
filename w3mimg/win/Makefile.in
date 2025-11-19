@@ -9,7 +9,7 @@ top_srcdir = @top_srcdir@
 VPATH = $(srcdir):.
 WARNINGS  = -Wall
 WARNINGS += -Werror=vla
-CFLAGS=$(WARNINGS) $(OPTS) -I../.. -I$(top_srcdir) -I$(srcdir) @CFLAGS@ @CPPFLAGS@ @DEFS@ $(IMGCFLAGS)
+CFLAGS=$(WARNINGS) $(OPTS) -I../.. -I$(top_srcdir) -I$(top_srcdir)/lib -I$(top_srcdir) -I$(srcdir) @CFLAGS@ @CPPFLAGS@ @DEFS@ $(IMGCFLAGS)
 RM=rm
 CC=@CC@
 CXX=@CXX@

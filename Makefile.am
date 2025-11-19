@@ -5,8 +5,8 @@
 # AM_CPPFLAGS is for the C Preprocessor (e.g., -I, -D defines)
 # AM_CFLAGS is for the C Compiler
 AUTOMAKE_OPTIONS = foreign
-SUBDIRS = m4 lib scripts w3mimg libwc .
-LDADD = lib/libw3m.a
+SUBDIRS = lib scripts w3mimg libwc .
+LDADD = lib/libgnu.a
 
 # most recursive makefiles dont have an install target
 install-recursive:
@@ -18,18 +18,19 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir) \
 	-DAUXBIN_DIR=\"$(libexecdir)/$(PACKAGE)\" \
 	-DCGIBIN_DIR=\"$(libexecdir)/$(PACKAGE)/cgi-bin\" \
-	-DHELP_DIR=\"@HELP_DIR@\" \
 	-DETC_DIR=\"$(sysconfdir)\" \
 	-DCONF_DIR=\"$(sysconfdir)/$(PACKAGE)\" \
+	-DRC_DIR=\"@RC_DIR@\" \
+        -DLOCALEDIR=\"$(localedir)\"
+
 WARNINGS  = -Wall
 WARNINGS += -Werror=vla
-WARNINGS= -Wall -Wnull-dereference
+WARNINGS += -Wnull-dereference
 WARNINGS += -Wimplicit-function-declaration
 WARNINGS += -Wimplicit-int
 WARNINGS += -Wstrict-prototypes
 
-	-DRC_DIR=\"@RC_DIR@\" \
-        -DLOCALEDIR=\"$(localedir)\"
+
 
 ACLOCAL_AMFLAGS = -I m4
 # 2. Subdirectories to process
@@ -80,7 +81,7 @@ w3m_SOURCES = \
 	image.c symbol.c entity.c terms.c url.c ftp.c mimehead.c \
 	regex.c news.c func.c cookie.c history.c backend.c util.c \
 	keybind.c \
-	anchor.c parsetagx.c tagtable.c istream.c version.c
+	anchor.c parsetagx.c tagtable.c istream.c
 w3m_LDADD = libindep.a libwc/libwc.a $(W3M_LIBS) @LIBINTL@ @LIBGC@
 ALLOBJS=$(OBJS) $(LOBJS) $(LLOBJS)
 

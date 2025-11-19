@@ -1,8 +1,8 @@
 /* vi: set sw=4 ts=8 ai sm noet : */
 #include "display.h"
+#include "fm.h"
 
 #include <signal.h>
-#include "fm.h"
 
 /* *INDENT-OFF* */
 #ifdef USE_COLOR

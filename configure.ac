@@ -169,9 +169,10 @@ AC_DEFINE_UNQUOTED([DOCDIRS], "$DOCDIRS", [Documentation directories])
 
 
 
+AC_CONFIG_MACRO_DIRS([m4])
 
 AC_CONFIG_FILES([Makefile posubst po/Makefile.in \
-m4/Makefile lib/Makefile \
+lib/Makefile \
 scripts/Makefile scripts/dirlist.cgi \
 scripts/w3mhelp.cgi \
 scripts/w3mmail.cgi scripts/xface2xpm \

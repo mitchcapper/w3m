@@ -1,9 +1,10 @@
 /* vi: set sw=4 ts=8 ai sm noet : */
+#include "config.h"
 #include <errno.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "config.h"
+#include "orig_config.h"
 #include "Str.h"
 #include "indep.h"
 #include "textlist.h"

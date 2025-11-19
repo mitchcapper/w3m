@@ -1,8 +1,9 @@
 /* vi: set sw=4 ts=8 ai sm noet : */
+#include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include "myctype.h"
-#include "config.h"
+#include "orig_config.h"
 #include "hash.h"
 #include "myctype.h"
 #include "Str.h"

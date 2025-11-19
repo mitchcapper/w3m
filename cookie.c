@@ -7,11 +7,11 @@
  *   [RFC 2109] http://www.ics.uci.edu/pub/ietf/http/rfc2109.txt
  *   [DRAFT 12] http://www.ics.uci.edu/pub/ietf/http/draft-ietf-http-state-man-mec-12.txt
  */
-
+#include "config.h"
 #include "cookie.h"
 
 #include "alloc.h"
-#include "config.h"
+#include "orig_config.h"
 #include "fm.h"
 #include "html.h"
 #include "indep.h"
@@ -33,7 +33,7 @@
 #ifdef INET6
 #include <sys/socket.h>
 #endif				/* INET6 */
-#ifndef __MINGW32_VERSION
+#if !defined(__MINGW32_VERSION) && !defined(_WIN32)
 #include <netdb.h>
 #else
 #include <winsock.h>

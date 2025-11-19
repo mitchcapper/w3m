@@ -5,7 +5,7 @@
  * by A.ITO, December 1989
  * Revised by A.ITO, January 2002
  */
-
+#include "config.h"
 #ifdef REGEX_DEBUG
 #include <sys/types.h>
 #include <malloc.h>
@@ -14,7 +14,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <gc/gc.h>
-#include "config.h"
+#include "orig_config.h"
 #ifdef USE_M17N
 #include "wc.h"
 #include "wtf.h"
@@ -23,7 +23,6 @@
 #endif
 #endif
 #include "regex.h"
-#include "config.h"
 #include "myctype.h"
 
 #ifndef NULL

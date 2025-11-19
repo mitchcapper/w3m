@@ -13,6 +13,7 @@
  * limited to warranty of fitness of purpose, or merchantability, or
  * results obtained from use of this software.
  */
+#include <config.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <gc/gc.h>

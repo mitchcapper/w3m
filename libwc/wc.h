@@ -1,5 +1,5 @@
 /* vi: set sw=4 ts=8 ai sm noet : */
-
+#include "config.h"
 #ifndef _WC_WC_H
 #define _WC_WC_H
 

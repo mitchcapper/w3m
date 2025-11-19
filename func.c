@@ -2,12 +2,11 @@
 /*
  * w3m func.c
  */
-
+#include "fm.h"
 #include <stdio.h>
 
 #include "config.h"
 #include "cookie.h"
-#include "fm.h"
 #include "func.h"
 #include "myctype.h"
 #include "regex.h"

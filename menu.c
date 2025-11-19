@@ -2,9 +2,10 @@
 /* 
  * w3m menu.c
  */
+#include "fm.h"
 #include <stdio.h>
 
-#include "fm.h"
+
 #include "menu.h"
 #include "func.h"
 #include "myctype.h"
