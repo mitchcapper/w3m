@@ -2,6 +2,9 @@
 #include "display.h"
 #include "fm.h"
 #include <sys/types.h>
+#ifdef _WIN32
+#define __MINGW32_VERSION
+#endif
 #include "myctype.h"
 #include <signal.h>
 #include <setjmp.h>

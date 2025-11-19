@@ -1,10 +1,15 @@
 /* vi: set sw=4 ts=8 ai sm noet : */
+#ifdef _WIN32
+#define __MINGW32_VERSION
+#endif
 #include "fm.h"
 #include <stdio.h>
 #ifndef __MINGW32_VERSION
 #include <pwd.h>
 #endif /* __MINGW32_VERSION */
+#ifndef _WIN32
 #include <sys/param.h>
+#endif
 #include <sys/types.h>
 #include <stdlib.h>
 #include "indep.h"

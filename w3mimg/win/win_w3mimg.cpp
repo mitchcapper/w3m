@@ -11,10 +11,16 @@
 #include <algorithm>
 
 #include "w3mimg/w3mimg.h"
+#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#include <objidl.h>
 #include <gdiplus.h>
 #include <unistd.h>
+#ifdef __CYGWIN__
 #include <sys/cygwin.h>
+#else
+#undef close
+#endif
 /* GDI+ can handle BMP, GIF, JPEG, PNG and TIFF by itself. */
 
 #define OFFSET_X	2
@@ -87,7 +93,7 @@ static const char *gdip_strerror(Gdiplus::Status status) THROW_NONE;
 static void gdip_perror(w3mimg_op *wop, Gdiplus::Status status, const char *func) THROW_NONE;
 static char *win32_strerror_alloc(DWORD status) THROW_NONE;
 static void win32_perror(w3mimg_op *wop, DWORD status, const char *func) THROW_NONE;
-#if 0 /* unused */
+#ifndef __CYGWIN__
 static WCHAR *mb2wstr_alloc(const char *) THROW_NONE;
 static char *wstr2mb_alloc(const WCHAR *) THROW_NONE;
 #endif
@@ -546,7 +552,11 @@ read_image_file(w3mimg_op *wop, const char *fname) THROW_NONE
     if (xi->logfile)
 	fprintf(xi->logfile, "read_image_file(%p, \"%s\") start\n", wop, fname);
     {
+#ifndef __CYGWIN__
+	wfname = mb2wstr_alloc(fname);
+#else
 	wfname = (WCHAR *)cygwin_create_path(CCP_POSIX_TO_WIN_W, fname);
+#endif
 	if (wfname == NULL)
 	    goto last;
 	gpbitmap = new Gdiplus::Bitmap(wfname);
@@ -866,8 +876,7 @@ gdip_strerror(Gdiplus::Status status) THROW_NONE
 	ERRITEM(UnsupportedGdiplusVersion),
 	ERRITEM(GdiplusNotInitialized),
 	ERRITEM(PropertyNotFound),
-	ERRITEM(PropertyNotSupported),
-	ERRITEM(ProfileNotFound),
+	ERRITEM(PropertyNotSupported)
 #undef ERRITEM
     };
     for (i = 0; i != sizeof table / sizeof table[0]; ++i)
@@ -925,7 +934,7 @@ win32_perror(w3mimg_op *wop, DWORD status, const char *func) THROW_NONE
     LocalFree(errbuf);
 }
 
-#if 0 /* unused */
+#ifndef __CYGWIN__
 static WCHAR *
 mb2wstr_alloc(const char *s) THROW_NONE
 {

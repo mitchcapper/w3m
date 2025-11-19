@@ -1,5 +1,8 @@
 /* vi: set sw=4 ts=8 ai sm noet : */
 #include "fm.h"
+#ifdef _WIN32
+#define __MINGW32_VERSION
+#endif
 #ifndef __MINGW32_VERSION
 #include <pwd.h>
 #endif
@@ -2001,7 +2004,7 @@ mymktime(char *timestr)
 }
 
 void (*mySignal(int signal_number, void (*action) (int))) (int) {
-#ifdef	SA_RESTART
+#if	defined(SA_RESTART) && !defined(_WIN32)
     struct sigaction new_action, old_action;
 
     sigemptyset(&new_action.sa_mask);

@@ -10,14 +10,17 @@ w3mimg_op *
 w3mimg_open(void)
 {
     w3mimg_op *w_op = NULL;
+#ifndef _WIN32
 #ifdef W3MIMGDISPLAY_SETUID
     uid_t runner_uid = getuid();
     uid_t owner_uid = geteuid();
+#endif
 #endif
 #ifdef USE_W3MIMG_WIN
     if (w_op == NULL)
 	w_op = w3mimg_winopen();
 #endif
+#ifndef _WIN32
 #ifdef USE_W3MIMG_X11
 #ifdef W3MIMGDISPLAY_SETUID
     /* run in user privileges */
@@ -33,6 +36,7 @@ w3mimg_open(void)
     /* run in setuid privileges */
     if (w_op == NULL)
 	w_op = w3mimg_fbopen();
+#endif
 #endif
     return w_op;
 }
