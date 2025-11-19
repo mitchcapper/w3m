@@ -18,6 +18,11 @@
 #ifdef HAVE_SYS_SELECT_H
 #include <sys/select.h>
 #endif
+#ifdef _WIN32
+#define __MINGW32_VERSION
+#define CYGWIN_VERSION_DLL_MAJOR 99999999
+#include <sys/select.h>
+#endif
 #ifndef __MINGW32_VERSION
 #include <sys/ioctl.h>
 #else
@@ -58,9 +63,12 @@ static int tty;
 #include <os2.h>
 #endif				/* __EMX__ */
 
-#if defined(__CYGWIN__)
+#if defined(__CYGWIN__) || defined(_WIN32)
 #include <windows.h>
+#ifdef __CYGWIN__
 #include <sys/cygwin.h>
+#endif
+
 static int isWinConsole = 0;
 #define TERM_CYGWIN 1
 #define TERM_CYGWIN_RESERVE_IME 2
@@ -224,6 +232,7 @@ check_cygwin_console(void)
 	}
 #ifdef SUPPORT_WIN9X_CONSOLE_MBCS
 	check_win9x();
+#ifndef _WIN32
 	if (isWin95 && ttyslot() != -1) {
 	    isLocalConsole = 0;
 	}
@@ -376,6 +385,7 @@ char *ttyname(int);
 
 typedef unsigned short l_prop;
 
+#ifndef EXTCURSES
 typedef struct scline {
 #ifdef USE_M17N
     char **lineimage;
@@ -386,6 +396,7 @@ typedef struct scline {
     short isdirty;
     short eol;
 } Screen;
+#endif
 
 static TerminalMode d_ioval;
 static int tty = -1;
@@ -397,8 +408,13 @@ char bp[1024], funcstr[256];
 char *T_cd, *T_ce, *T_kr, *T_kl, *T_cr, *T_bt, *T_ta, *T_sc, *T_rc,
     *T_so, *T_se, *T_us, *T_ue, *T_cl, *T_cm, *T_al, *T_sr, *T_md, *T_me,
     *T_ti, *T_te, *T_nd, *T_as, *T_ae, *T_eA, *T_ac, *T_op;
-
+#ifdef _WIN32
+#undef LASTLINE
+int LASTLINE;
+#endif
+#ifndef EXTCURSES
 int LINES, COLS;
+#endif
 int opt_cols;
 #if defined(__CYGWIN__)
 int LASTLINE;
@@ -406,13 +422,16 @@ int LASTLINE;
 
 static int max_LINES = 0, max_COLS = 0;
 static int tab_step = 8;
+#ifndef EXTCURSES
 static int CurLine, CurColumn;
 static Screen *ScreenElem = NULL, **ScreenImage = NULL;
+#endif
 static l_prop CurrentMode = 0;
 static int graph_enabled = 0;
 
 static char gcmap[96];
 
+#ifndef EXTCURSES
 extern int tgetent(char *, char *);
 extern int tgetnum(char *);
 extern int tgetflag(char *);
@@ -421,13 +440,25 @@ extern char *tgoto(char *, int, int);
 extern int tputs(char *, int, int (*)(char));
 void wrap(void), touch_line(void), touch_column(int);
 void clrtoeol(void);		/* conflicts with curs_clear(3)? */
+#else
+#include <ext_curses.h>
+#endif
 
+#ifdef EXTCURSES
+static int write1(int);
+#else
 static int write1(char);
+#endif
+
 
 static void
 writestr(char *s)
 {
+#ifndef EXTCURSES
     tputs(s, 1, write1);
+#else
+	addstr(s);
+#endif
 }
 
 #define MOVE(line,column)       writestr(tgoto(T_cm,column,line));
@@ -519,8 +550,9 @@ put_image_kitty(char *url, int x, int y, int w, int h, int sx, int sy, int sw,
     pid_t pid;
     void (*volatile previntr) (SIGNAL_ARG);
     void (*volatile prevquit) (SIGNAL_ARG);
+#ifndef _WIN32
     void (*volatile prevstop) (SIGNAL_ARG);
-
+#endif
     type = guessContentType(url);
 
     /* convert to PNG, so that we transfer as little data as possible. */
@@ -535,6 +567,7 @@ put_image_kitty(char *url, int x, int y, int w, int h, int sx, int sy, int sw,
 
 	    flush_tty();
 
+#ifndef _WIN32
 	    previntr = mySignal(SIGINT, SIG_IGN);
 	    prevquit = mySignal(SIGQUIT, SIG_IGN);
 	    prevstop = mySignal(SIGTSTP, SIG_IGN);
@@ -567,6 +600,8 @@ put_image_kitty(char *url, int x, int y, int w, int h, int sx, int sy, int sw,
 	    }
 
 	    pushText(fileToDelete, tmpf);
+
+#endif
 	}
 	url = tmpf;
     }
@@ -692,6 +727,7 @@ put_image_sixel(char *url, int x, int y, int w, int h, int sx, int sy, int sw, i
     pid_t pid;
     int do_anim;
     void (*volatile previntr) (SIGNAL_ARG);
+#ifndef _WIN32
     void (*volatile prevquit) (SIGNAL_ARG);
     void (*volatile prevstop) (SIGNAL_ARG);
 
@@ -772,6 +808,7 @@ put_image_sixel(char *url, int x, int y, int w, int h, int sx, int sy, int sw, i
     }
 
     MOVE(Currentbuf->cursorY,Currentbuf->cursorX);
+#endif
 }
 
 int
@@ -848,7 +885,7 @@ set_tty(void)
 	tty = 2;
     }
     ttyf = fdopen(tty, "w");
-#ifdef __CYGWIN__
+#if defined(__CYGWIN__) || defined(_WIN32)
     check_cygwin_console();
 #endif
     TerminalGet(tty, &d_ioval);
@@ -866,7 +903,7 @@ set_tty(void)
 #endif
     return 0;
 }
-
+#endif
 void
 ttymode_set(int mode, int imode)
 {
@@ -942,7 +979,8 @@ ttyname_tty(void)
 void
 reset_tty(void)
 {
-    writestr(T_op);		/* turn off */
+#ifndef EXTCURSES
+	writestr(T_op);		/* turn off */
     writestr(T_me);
     if (!Do_not_use_ti_te) {
 	if (T_te && *T_te)
@@ -955,6 +993,10 @@ reset_tty(void)
     TerminalSet(tty, &d_ioval);
     if (tty != 2)
         close_tty();
+
+#else
+	endwin();
+#endif
 }
 
 static void
@@ -1083,13 +1125,20 @@ getTCstr(void)
     GETSTR(T_ae, "ae");		/* alternative (graphic) charset end */
     GETSTR(T_ac, "ac");		/* graphics charset pairs */
     GETSTR(T_op, "op");		/* set default color pair to its original value */
-#if defined( CYGWIN ) && CYGWIN < 1
+#if defined (_WIN32) || (defined( CYGWIN ) && CYGWIN < 1)
     /* for TERM=pcansi on MS-DOS prompt. */
+#ifdef _WIN32
+    T_eA = "";
+    T_as = "\033[12m";
+    T_ae = "\033[10m";
+    T_ac = "l\001k\002m\003j\004x\005q\006n\020a\024v\025w\026u\027t\031";
+#else
     T_eA = "";
     T_as = "";
     T_ae = "";
     T_ac = "";
 #endif				/* CYGWIN */
+#endif
 
     LINES = COLS = 0;
     setlinescols();
@@ -1102,6 +1151,10 @@ setlinescols(void)
     char *p;
     int i;
 #ifdef __EMX__
+#ifdef EXTCURSES
+	/* PDCurses maintains LINES and COLS */
+	return;
+#endif
     {
 	int s[2];
 	_scrsize(s);
@@ -1137,7 +1190,7 @@ setlinescols(void)
 	COLS = MaxCols;
     if (opt_cols && COLS > opt_cols)
 	COLS = opt_cols;
-#if defined(__CYGWIN__)
+#if defined(__CYGWIN__) || defined(_WIN32)
     LASTLINE = LINES - (isWinConsole == TERM_CYGWIN_RESERVE_IME ? 2 : 1);
 #endif				/* defined(__CYGWIN__) */
 }
@@ -1146,6 +1199,7 @@ void
 setupscreen(void)
 {
     int i;
+#ifndef EXTCURSES
 
     if (LINES + 1 > max_LINES) {
 	max_LINES = LINES + 1;
@@ -1173,13 +1227,65 @@ setupscreen(void)
     for (; i < max_LINES; i++) {
 	ScreenElem[i].isdirty = L_UNUSED;
     }
-
+#endif
     clear();
 }
 
-/* 
+
+#ifdef EXTCURSES
+static int current_fg = 7; // White
+static int current_bg = 0; // Black
+static int pairs_initialized = 0;
+static void update_color();
+static void init_colors_pdcurses() {
+	if (has_colors()) {
+		start_color();
+		use_default_colors();
+		// Simple 8x8 grid for basic 8 colors
+		for (int bg = 0; bg < 8; bg++) {
+			for (int fg = 0; fg < 8; fg++) {
+				init_pair(bg * 8 + fg + 1, fg, bg);
+			}
+		}
+		pairs_initialized = 1;
+		current_fg = 8;
+		current_bg = 8;
+		int default_pair = (0 * 8) + 7 + 1;
+
+		/* Set the background for the entire window so clear() uses Gray */
+		/*bkgd(COLOR_PAIR(default_pair));
+
+		update_color();*/
+
+	}
+}
+
+static void update_color() {
+	if (pairs_initialized) {
+		/*
+		   Map '8' (w3m's "Terminal Default") to standard Console colors:
+		   FG 8 -> 7 (White)
+		   BG 8 -> 0 (Black)
+		   Values 0-7 pass through unchanged.
+		*/
+		int eff_fg = (current_fg >= 8) ? 7 : (current_fg & 7);
+		int eff_bg = (current_bg >= 8) ? 0 : (current_bg & 7);
+
+		/* Calculate pair index based on our 8x8 grid */
+		/* Formula: (Background * 8) + Foreground + 1 */
+		int pair = (eff_bg * 8) + eff_fg + 1;
+
+		/* Mask off color bits and set new pair */
+		chtype attrs = getattrs(stdscr);
+		attrs &= ~A_COLOR;
+		attrset(attrs | COLOR_PAIR(pair));
+	}
+}
+#endif
+/*
  * Screen initialize
  */
+#ifndef EXTCURSES
 int
 initscr(void)
 {
@@ -1193,16 +1299,40 @@ initscr(void)
     return 0;
 }
 
-static int
-write1(const char c)
+#else
+int
+w3m_initscr(void)
 {
+	/* Call pdcurses initscr */
+	if (initscr() == NULL) return -1;
+	noecho();
+	cbreak();
+	keypad(stdscr, TRUE);
+	init_colors_pdcurses();
+	/* Enable all mouse events */
+	mouse_on(ALL_MOUSE_EVENTS);
+	setupscreen();
+	return 0;
+}
+#endif
+static int
+#ifdef EXTCURSES
+write1(int c)
+#else
+write1(const char c)
+#endif
+{
+#ifndef EXTCURSES
     putc(c, ttyf);
 #ifdef SCREEN_DEBUG
     flush_tty();
 #endif				/* SCREEN_DEBUG */
+#else
+	addch((chtype)c);
+#endif
     return 0;
 }
-
+#ifndef EXTCURSES
 void
 move(int line, int column)
 {
@@ -1211,7 +1341,7 @@ move(int line, int column)
     if (column >= 0 && column < COLS)
 	CurColumn = column;
 }
-
+#endif
 #ifdef USE_BG_COLOR
 #define M_SPACE (S_SCREENPROP|S_COLORED|S_BCOLORED|S_GRAPHICS)
 #else				/* not USE_BG_COLOR */
@@ -1249,20 +1379,26 @@ need_redraw(const char c1, l_prop pr1, const char c2, l_prop pr2)
 #endif
 
 #ifdef USE_M17N
+#ifndef EXTCURSES
 void
 addch(const char c)
 {
     addmch(&c, 1);
 }
-
+#endif
 void
 addmch(const char *pc, size_t len)
 #else
+#ifndef EXTCURSES
 void
 addch(const char pc)
 #endif
+
+#endif
 {
+#ifndef EXTCURSES
     l_prop *pr;
+
     int dest, i;
 #ifdef USE_M17N
     static Str tmp = NULL;
@@ -1425,17 +1561,33 @@ addch(const char pc)
 	    CurColumn--;
 #endif
     }
+#else /* EXTCURSES */
+#ifdef USE_M17N
+	/* w3m passes char* pc and length len */
+	waddnstr(stdscr, pc, len);
+#else
+	/* !USE_M17N, just add the character directly.
+	   Explicitly cast to unsigned char first to prevent sign extension corruption
+	   when cast to chtype by the macro/function. */
+	waddch(stdscr, (unsigned char)pc);
+#endif
+#endif
 }
 
 void
 wrap(void)
 {
+
+#ifndef EXTCURSES
     if (CurLine == LASTLINE)
 	return;
+
     CurLine++;
     CurColumn = 0;
+#endif
 }
 
+#ifndef EXTCURSES
 void
 touch_column(int col)
 {
@@ -1455,6 +1607,8 @@ touch_line(void)
 
 }
 
+#endif
+#ifndef EXTCURSES
 void
 standout(void)
 {
@@ -1467,9 +1621,12 @@ standend(void)
     CurrentMode &= ~S_STANDOUT;
 }
 
+#endif
+
 void
 toggle_stand(void)
 {
+#ifndef EXTCURSES
 #ifdef USE_M17N
     int i;
 #endif
@@ -1481,8 +1638,10 @@ toggle_stand(void)
 	    pr[i] ^= S_STANDOUT;
     }
 #endif
+#endif
 }
 
+#ifndef EXTCURSES
 void
 bold(void)
 {
@@ -1519,20 +1678,66 @@ graphend(void)
     CurrentMode &= ~S_GRAPHICS;
 }
 
+#else
+void
+bold(void)
+{
+	attron(A_BOLD);
+}
+
+void
+boldend(void)
+{
+	attroff(A_BOLD);
+}
+
+void
+underline(void)
+{
+	attron(A_UNDERLINE);
+}
+
+void
+underlineend(void)
+{
+	attroff(A_UNDERLINE);
+}
+
+void
+graphstart(void)
+{
+	attron(A_ALTCHARSET);
+}
+
+void
+graphend(void)
+{
+	attroff(A_ALTCHARSET);
+}
+#endif
 int
 graph_ok(void)
 {
     if (UseGraphicChar != GRAPHIC_CHAR_DEC)
 	return 0;
-    return T_as[0] != 0 && T_ae[0] != 0 && T_ac[0] != 0;
+#ifdef EXTCURSES
+	return 1;
+#else
+	return T_as && T_as[0] != 0 && T_ae && T_ae[0] != 0 && T_ac && T_ac[0] != 0;
+#endif
 }
 
 void
 setfcolor(int color)
 {
     CurrentMode &= ~COL_FCOLOR;
+#ifndef EXTCURSES
     if ((color & 0xf) <= 7)
 	CurrentMode |= (((color & 7) | 8) << 8);
+#else
+	current_fg = color;
+	update_color();
+#endif
 }
 
 static char *
@@ -1552,8 +1757,13 @@ void
 setbcolor(int color)
 {
     CurrentMode &= ~COL_BCOLOR;
+#ifndef EXTCURSES
     if ((color & 0xf) <= 7)
 	CurrentMode |= (((color & 7) | 8) << 12);
+#else
+	current_bg = color;
+	update_color();
+#endif
 }
 
 static char *
@@ -1573,6 +1783,7 @@ bcolor_seq(int colmode)
 #else				/* not USE_BG_COLOR */
 #define M_MEND (S_STANDOUT|S_UNDERLINE|S_BOLD|S_COLORED|S_GRAPHICS)
 #endif				/* not USE_BG_COLOR */
+#ifndef EXTCURSES
 void
 refresh(void)
 {
@@ -1660,8 +1871,8 @@ refresh(void)
 		 * avoid the scroll, I prohibit to draw character on
 		 * (COLS-1,LINES-1).
 		 */
-#if !defined(USE_BG_COLOR) || defined(__CYGWIN__)
-#ifdef __CYGWIN__
+#if !defined(USE_BG_COLOR) || defined(__CYGWIN__) || defined(_WIN32)
+#if defined(__CYGWIN__) || defined(_WIN32)
 		if (isWinConsole)
 #endif
 		    if (line == LINES - 1 && col == COLS - 1)
@@ -1789,6 +2000,7 @@ clear(void)
     CurrentMode = C_ASCII;
 }
 
+#endif
 #ifdef USE_RAW_SCROLL
 static void
 scroll_raw(void)
@@ -1800,6 +2012,7 @@ scroll_raw(void)
 void
 scroll(int n)
 {				/* scroll up */
+#ifndef EXTCURSES
     int cli = CurLine, cco = CurColumn;
     Screen *t;
     int i, j, k;
@@ -1832,11 +2045,13 @@ scroll(int n)
 	scroll_raw();
     }
     move(cli, cco);
+#endif
 }
 
 void
 rscroll(int n)
 {				/* scroll down */
+#ifndef EXTCURSES
     int cli = CurLine, cco = CurColumn;
     Screen *t;
     int i, j, k;
@@ -1880,9 +2095,11 @@ rscroll(int n)
 	    }
 	}
     }
+#endif
 }
 #endif
 
+#ifndef EXTCURSES
 /* XXX: conflicts with curses's clrtoeol(3) ? */
 void
 clrtoeol(void)
@@ -1904,11 +2121,17 @@ clrtoeol(void)
     }
 }
 
+#endif
 #ifdef USE_BG_COLOR
+
+static void bob() {}
+
+
 static void
 clrtoeol_with_bcolor(void)
 {
-    int i, cli, cco;
+#ifndef EXTCURSES
+	int i, cli, cco;
     l_prop pr;
 
     if (!(CurrentMode & S_BCOLORED)) {
@@ -1923,6 +2146,9 @@ clrtoeol_with_bcolor(void)
 	addch(' ');
     move(cli, cco);
     CurrentMode = pr;
+#else
+	clrtoeol();
+#endif
 }
 
 void
@@ -1939,11 +2165,12 @@ clrtoeolx(void)
 }
 #endif				/* not USE_BG_COLOR */
 
+
 static void
 clrtobot_eol(void (*clrtoeol) (void))
 {
     int l, c;
-
+#ifndef EXTCURSES
     l = CurLine;
     c = CurColumn;
     (*clrtoeol) ();
@@ -1953,6 +2180,9 @@ clrtobot_eol(void (*clrtoeol) (void))
 	(*clrtoeol) ();
     CurLine = l;
     CurColumn = c;
+#else
+	clrtobot();
+#endif	
 }
 
 void
@@ -1961,6 +2191,7 @@ clrtobotx(void)
     clrtobot_eol(clrtoeolx);
 }
 
+#ifndef EXTCURSES
 void
 addstr(const char *s)
 {
@@ -1999,11 +2230,12 @@ addnstr(const char *s, int n)
 	addch(*(s++));
 #endif
 }
-
+#endif
 void
 addnstr_sup(const char *s, int n)
 {
     int i;
+#ifndef EXTCURSES
 #ifdef USE_M17N
     int len, width;
 
@@ -2022,8 +2254,12 @@ addnstr_sup(const char *s, int n)
 #endif
     for (; i < n; i++)
 	addch(' ');
+#else
+	addnstr(s, n);
+#endif
 }
 
+#ifndef EXTCURSES
 void
 crmode(void)
 #ifndef HAVE_SGTTY_H
@@ -2041,11 +2277,16 @@ crmode(void)
     ttymode_set(CBREAK, 0);
 }
 #endif				/* HAVE_SGTTY_H */
-
+#endif
 void
 term_noecho(void)
 {
+#ifndef EXTCURSES
+
     ttymode_reset(ECHO, 0);
+#else
+	noecho();
+#endif
 }
 
 void
@@ -2057,12 +2298,16 @@ term_raw(void)
 #define TTY_MODE ISIG|ICANON|ECHO
 #endif				/* not IEXTEN */
 {
-    ttymode_reset(TTY_MODE, IXON | IXOFF);
+#ifndef EXTCURSES
+	ttymode_reset(TTY_MODE, IXON | IXOFF);
 #ifdef HAVE_TERMIOS_H
     set_cc(VMIN, 1);
 #else				/* not HAVE_TERMIOS_H */
     set_cc(VEOF, 1);
 #endif				/* not HAVE_TERMIOS_H */
+#else
+	raw();
+#endif    
 }
 #else				/* HAVE_SGTTY_H */
 {
@@ -2074,6 +2319,7 @@ void
 term_cooked(void)
 #ifndef HAVE_SGTTY_H
 {
+#ifndef EXTCURSES
 #ifdef __EMX__
     /* On XFree86/OS2, some scrambled characters
      * will appear when asserting IEXTEN flag.
@@ -2087,6 +2333,10 @@ term_cooked(void)
 #else				/* not HAVE_TERMIOS_H */
     set_cc(VEOF, 4);
 #endif				/* not HAVE_TERMIOS_H */
+#else
+	noraw();
+	cbreak();
+#endif
 }
 #else				/* HAVE_SGTTY_H */
 {
@@ -2105,6 +2355,7 @@ void
 term_title(const char *s)
 {
     if (!fmInitialized)
+#ifndef EXTCURSES
         return;
     if (title_str != NULL) {
 /*
@@ -2113,7 +2364,7 @@ term_title(const char *s)
  * TERM=cygwin special handle announced deprecation and
  * no one complains
  */
-#ifdef __CYGWIN__
+#if defined(__CYGWIN__) || defined(_WIN32)
 	if (isLocalConsole && title_str == CYGWIN_TITLE) {
 	    Str buff;
 	    buff = Sprintf(title_str, s);
@@ -2126,8 +2377,11 @@ term_title(const char *s)
 #endif
         fprintf(ttyf, title_str, s);
     }
+#else
+	PDC_set_title(s);
+#endif
 }
-
+#ifndef EXTCURSES
 char
 getch(void)
 {
@@ -2148,7 +2402,14 @@ getch(void)
     }
     return c;
 }
-
+#else
+int
+w3m_getch(void)
+{
+	int c = wgetch(stdscr);
+	return c;
+}
+#endif
 #ifdef USE_MOUSE
 #ifdef USE_GPM
 char
@@ -2228,7 +2489,11 @@ sysmouse(SIGNAL_ARG)
 void
 bell(void)
 {
+#ifndef EXTCURSES
     write1(7);
+#else
+	beep();
+#endif
 }
 
 static void
@@ -2404,7 +2669,11 @@ mouse_init(void)
 {
     if (mouseActive)
 	return;
+#ifndef EXTCURSES
     MOUSE_ON;
+#else
+	mouse_set(ALL_MOUSE_EVENTS);
+#endif
     mouseActive = 1;
 }
 
@@ -2413,7 +2682,11 @@ mouse_end(void)
 {
     if (mouseActive == 0)
 	return;
+#ifndef EXTCURSES
     MOUSE_OFF;
+#else
+	mouse_set(0);
+#endif
     mouseActive = 0;
 }
 
@@ -2444,31 +2717,43 @@ flush_tty(void)
 }
 
 #ifdef USE_IMAGE
+
 void
 touch_cursor(void)
 {
-#ifdef USE_M17N
-    int i;
-#endif
-    touch_line();
-#ifdef USE_M17N
-    for (i = CurColumn; i >= 0; i--) {
-	touch_column(i);
-	if (CHMODE(ScreenImage[CurLine]->lineprop[i]) != C_WCHAR2) 
-	    break;
-    }
-    for (i = CurColumn + 1; i < COLS; i++) {
-	if (CHMODE(ScreenImage[CurLine]->lineprop[i]) != C_WCHAR2) 
-	    break;
-	touch_column(i);
-    }
+#ifdef EXTCURSES
+	int y, x;
+	getyx(stdscr, y, x);
+	touchline(stdscr, y, 1);
 #else
-    touch_column(CurColumn);
+#ifdef USE_M17N
+	int i;
+#endif
+	touch_line();
+#ifdef USE_M17N
+	for (i = CurColumn; i >= 0; i--) {
+		touch_column(i);
+		if (CHMODE(ScreenImage[CurLine]->lineprop[i]) != C_WCHAR2)
+			break;
+	}
+	for (i = CurColumn + 1; i < COLS; i++) {
+		if (CHMODE(ScreenImage[CurLine]->lineprop[i]) != C_WCHAR2)
+			break;
+		touch_column(i);
+	}
+#else
+	touch_column(CurColumn);
+#endif
 #endif
 }
 #endif
 
-#ifdef __MINGW32_VERSION
+#if defined(_WIN32)
+char* ttyname(int tty)
+{
+	return "CON";
+}
+#elif defined (__MINGW32_VERSION)
 
 int tgetent(char *bp, char *name)
 {

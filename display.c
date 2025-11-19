@@ -203,7 +203,7 @@ void
 fmInit(void)
 {
     if (!fmInitialized) {
-	initscr();
+	w3m_initscr();
 	term_raw();
 	term_noecho();
 #ifdef USE_IMAGE

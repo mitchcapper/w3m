@@ -462,14 +462,20 @@ extern void set_int(void);
 extern void getTCstr(void);
 extern void setupscreen(void);
 extern pid_t open_pipe_rw(FILE ** fr, FILE ** fw);
+#ifndef EXTCURSES
 extern int initscr(void);
 extern void move(int line, int column);
+#endif
 #ifdef USE_M17N
 extern void addmch(const char *p, size_t len);
 #endif
+#ifndef EXTCURSES
 extern void addch(char c);
+#endif
+#ifndef EXTCURSES
 extern void standout(void);
 extern void standend(void);
+#endif
 extern void bold(void);
 extern void boldend(void);
 extern void underline(void);
@@ -483,17 +489,24 @@ extern void setfcolor(int color);
 extern void setbcolor(int color);
 #endif				/* USE_BG_COLOR */
 #endif				/* USE_COLOR */
+#ifndef EXTCURSES
 extern void refresh(void);
+#endif
 #ifdef USE_RAW_SCROLL
 extern void scroll(int);
 extern void rscroll(int);
 #endif
 extern void clrtoeolx(void);
 extern void clrtobotx(void);
+#ifndef EXTCURSES
 extern void addstr(const char *s);
 extern void addnstr(const char *s, int n);
+#endif
 extern void addnstr_sup(const char *s, int n);
+#ifndef EXTCURSES
 extern void crmode(void);
+extern void nocrmode(void);
+#endif
 extern void term_noecho(void);
 extern void term_raw(void);
 extern void term_cooked(void);

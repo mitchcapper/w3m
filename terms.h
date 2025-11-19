@@ -6,8 +6,9 @@ extern int LINES, COLS;
 #if defined(__CYGWIN__)
 extern int LASTLINE;
 #endif
-
+#ifndef EXTCURSES
 void clear(void);
+#endif
 void flush_tty(void);
 void setlinescols(void);
 
