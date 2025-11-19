@@ -1585,7 +1585,18 @@ myEditor(char *cmd, char *file, int line)
 char *
 expandName(char *name)
 {
-    return getenv("HOME");
+	// if we wanted to expand ~ on windows we should do what which does: https://cgit.git.savannah.gnu.org/cgit/which.git/tree/tilde.c, https://cgit.git.savannah.gnu.org/cgit/which.git/tree/bash.c
+	/*
+		//Prefix $HOME to the rest of the string.
+	expansion = sh_get_env_value("HOME"); // not normally set in windows, but set by cygin/msys
+	if (expansion == 0)
+		expansion = sh_get_env_value("USERPROFILE"); // what windows sets for the users homedir
+	if (expansion == 0){
+		char *home_dir = xmalloc(sizeof(char) * (MAX_PATH));
+		if (!SUCCEEDED(SHGetFolderPath(NULL, CSIDL_PROFILE, NULL, 0, home_dir)))
+	}
+	* */
+    return name;
 }
 #else
 char *
